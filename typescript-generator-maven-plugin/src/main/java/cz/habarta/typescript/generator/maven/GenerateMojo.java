@@ -13,7 +13,7 @@ import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Goal which touches a timestamp file.
+ * Generates TypeScript declaration file from specified java classes.
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateMojo extends AbstractMojo {
