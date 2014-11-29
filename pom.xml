@@ -85,6 +85,16 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh-vojtech@habarta.cz</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                </configuration>
+            </plugin>
         </plugins>
 
     </build>
