@@ -19,11 +19,9 @@ public class Emitter {
     }
 
     public static void emit(Logger logger, Settings settings, File outputFile, Model model) {
-        try {
-            final PrintWriter printWriter = new PrintWriter(outputFile);
+        try (PrintWriter printWriter = new PrintWriter(outputFile)) {
             final Emitter emitter = new Emitter(logger, settings, printWriter);
             emitter.emitModule(model);
-            printWriter.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -46,7 +44,8 @@ public class Emitter {
     private void emitInterfaces(Model model) {
         for (BeanModel bean : model.getBeans()) {
             writeNewLine();
-            writeIndentedLine("export interface " + bean.getName() + " {");
+            final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
+            writeIndentedLine("export interface " + bean.getName() + parent + " {");
             indent++;
             for (PropertyModel property : bean.getProperties()) {
                 emitProperty(property);

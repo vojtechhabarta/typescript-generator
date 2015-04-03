@@ -11,7 +11,7 @@ public abstract class ModelParser {
 
     protected final Logger logger;
     protected final Settings settings;
-    private Queue<Class<?>> classQueue;
+    private final Queue<ClassWithUsage> classQueue = new LinkedList<>();
 
     public ModelParser(Logger logger, Settings settings) {
         this.logger = logger;
@@ -23,27 +23,35 @@ public abstract class ModelParser {
     }
 
     public Model parseModel(List<? extends Class<?>> classes) {
-        classQueue = new LinkedList<>(classes);
+        for (Class<?> cls : classes) {
+            classQueue.add(new ClassWithUsage(cls, null, null));
+        }
         return parseQueue();
     }
 
     private Model parseQueue() {
         final LinkedHashMap<Class<?>, BeanModel> parsedClasses = new LinkedHashMap<>();
-        Class<?> cls;
-        while ((cls = classQueue.poll()) != null) {
+        ClassWithUsage classWithUsage;
+        while ((classWithUsage = classQueue.poll()) != null) {
+            final Class<?> cls = classWithUsage.beanClass;
             if (!parsedClasses.containsKey(cls)) {
-                logger.info(String.format("Parsing '%s'", cls.getName()));
-                final BeanModel bean = parseBean(cls);
+                logger.info("Parsing '" + cls.getName() + "'" +
+                        (classWithUsage.usedInClass != null ? " used in '" + classWithUsage.usedInClass.getSimpleName() + "." + classWithUsage.usedInProperty + "'" : ""));
+                final BeanModel bean = parseBean(classWithUsage);
                 parsedClasses.put(cls, bean);
             }
         }
         return new Model(new ArrayList<>(parsedClasses.values()));
     }
 
-    protected abstract BeanModel parseBean(Class<?> beanClass);
+    protected abstract BeanModel parseBean(ClassWithUsage classWithUsage);
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type) {
-        final TsType originalType = typeFromJava(type);
+    protected void addBeanToQueue(ClassWithUsage classWithUsage) {
+        classQueue.add(classWithUsage);
+    }
+
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Class<?> usedInClass) {
+        final TsType originalType = typeFromJava(type, name, usedInClass);
         final LinkedHashSet<TsType.EnumType> replacedEnums = new LinkedHashSet<>();
         final TsType tsType = TsType.replaceEnumsWithStrings(originalType, replacedEnums);
         List<String> comments = null;
@@ -58,6 +66,9 @@ public abstract class ModelParser {
     }
 
     protected String getMappedName(Class<?> cls) {
+        if (cls == null) {
+            return null;
+        }
         final String name = cls.getSimpleName();
         if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
             return name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
@@ -66,12 +77,12 @@ public abstract class ModelParser {
         }
     }
 
-    private TsType typeFromJava(Type javaType) {
+    private TsType typeFromJava(Type javaType, String usedInProperty, Class<?> usedInClass) {
         if (KnownTypes.containsKey(javaType)) return KnownTypes.get(javaType);
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
             if (javaClass.isArray()) {
-                return new TsType.BasicArrayType(typeFromJava(javaClass.getComponentType()));
+                return new TsType.BasicArrayType(typeFromJava(javaClass.getComponentType(), usedInProperty, usedInClass));
             }
             if (javaClass.isEnum()) {
                 @SuppressWarnings("unchecked")
@@ -89,7 +100,7 @@ public abstract class ModelParser {
                 return new TsType.IndexedArrayType(TsType.String, TsType.Any);
             }
             // consider it structural
-            classQueue.add(javaClass);
+            classQueue.add(new ClassWithUsage(javaClass, usedInProperty, usedInClass));
             return new TsType.StructuralType(getMappedName(javaClass));
         }
         if (javaType instanceof ParameterizedType) {
@@ -97,19 +108,20 @@ public abstract class ModelParser {
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
                 if (List.class.isAssignableFrom(javaClass)) {
-                    return new TsType.BasicArrayType(typeFromJava(parameterizedType.getActualTypeArguments()[0]));
+                    return new TsType.BasicArrayType(typeFromJava(parameterizedType.getActualTypeArguments()[0], usedInProperty, usedInClass));
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
-                    return new TsType.IndexedArrayType(TsType.String, typeFromJava(parameterizedType.getActualTypeArguments()[1]));
+                    return new TsType.IndexedArrayType(TsType.String, typeFromJava(parameterizedType.getActualTypeArguments()[1], usedInProperty, usedInClass));
                 }
             }
         }
-        logger.warning(String.format("Unsupported type '%s'", javaType));
+        logger.warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
         return TsType.Any;
     }
 
     private static Map<Type, TsType> getKnownTypes() {
         final Map<Type, TsType> knownTypes = new LinkedHashMap<>();
+        knownTypes.put(Object.class, TsType.Any);
         knownTypes.put(Byte.class, TsType.Number);
         knownTypes.put(Byte.TYPE, TsType.Number);
         knownTypes.put(Short.class, TsType.Number);

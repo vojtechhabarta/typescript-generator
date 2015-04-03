@@ -33,7 +33,7 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
-     * Name of generated module.
+     * Name of generated TypeScript module.
      */
     @Parameter
     private String moduleName;
@@ -66,7 +66,7 @@ public class GenerateMojo extends AbstractMojo {
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
-            URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
             // classes
             final List<Class<?>> classList = new ArrayList<>();
