@@ -1,15 +1,8 @@
 
-if (! $env:HUDSON_URL) {
-    Write-Error "Please set environment variable 'HUDSON_URL'"
-    exit
-}
+$ErrorActionPreference = "Stop"
 
 # download
-$artifactsUri = "$env:HUDSON_URL/job/typescript-generator/lastSuccessfulBuild/artifact/*zip*/archive.zip"
-$zipFilePath = "target\archive.zip"
-Write-Host -ForegroundColor DarkCyan "Downloading '$artifactsUri'..."
-Invoke-WebRequest $artifactsUri -OutFile $zipFilePath
-$zipFile = Get-Item $zipFilePath
+$zipFile = .\build\download-appveyor-artifacts.ps1
 
 # unzip
 Write-Host -ForegroundColor DarkCyan "Unzipping..."
@@ -19,7 +12,7 @@ rm -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
 $unzipDirectory = mkdir $unzipDirectoryPath
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFile.FullName, $unzipDirectory.FullName)
-$basePath = (Resolve-Path $unzipDirectory\*).Path
+$basePath = (Resolve-Path $unzipDirectory).Path
 
 # passphrase
 $securePassphrase = Read-Host -Prompt "Enter signing key passphrase" -AsSecureString
@@ -31,7 +24,7 @@ if (! $?) {
 }
 
 # sign
-foreach ($file in dir -Recurse -File $basePath) {
+foreach ($file in dir -Recurse -File $basePath -Exclude *.md5,*.sha1) {
     $path = $file.FullName.Substring($basePath.Length + 1)
     Write-Host -ForegroundColor DarkCyan "Signing $path..."
     gpg --detach-sign --armor --passphrase $passphrase $file.FullName
@@ -49,7 +42,9 @@ $headers = @{"Authorization" = "Basic " + [System.Convert]::ToBase64String([Syst
 foreach ($file in dir -Recurse -File $basePath) {
     $path = $file.FullName.Substring($basePath.Length + 1)
     Write-Host -ForegroundColor DarkCyan "Uploading $path..."
-    $groupId = $path | Split-Path | Split-Path | Split-Path
+    $pom = (dir $file.Directory -Filter *.pom).FullName
+    [xml]$pomXml = Get-Content $pom
+    $groupId = if ($pomXml.project.groupId) { $pomXml.project.groupId } else { $pomXml.project.parent.groupId }
     $uri = $groupId.Replace(".", "/") + $path.Substring($groupId.Length).Replace("\", "/")
     $response = Invoke-WebRequest -InFile $file.FullName -Method Put "$repoUri/$uri" -Headers $headers
 }
