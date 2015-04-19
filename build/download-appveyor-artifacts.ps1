@@ -1,3 +1,4 @@
+# this script uses credentials from system browser, so first sign in to appveyor then run this script
 # documentation: http://www.appveyor.com/docs/api/samples/download-artifacts-ps
 $apiUrl = 'https://ci.appveyor.com/api'
 
