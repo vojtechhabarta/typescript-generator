@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project
+    xmlns="http://maven.apache.org/DECORATION/1.4.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.4.0 http://maven.apache.org/xsd/decoration-1.4.0.xsd"
+    name="TypeScript Generator Maven Plugin">
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.3.1</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>false</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+            <gitHub>
+                <projectId>vojtechhabarta/typescript-generator</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>green</ribbonColor>
+            </gitHub>
+        </fluidoSkin>
+    </custom>
+
+    <bannerLeft>
+        <name>TypeScript Generator Maven Plugin</name>
+    </bannerLeft>
+
+    <body>
+        <menu name="TypeScript Generator Maven Plugin">
+            <item name="About" href="index.html"/>
+            <item name="Configuration" href="generate-mojo.html"/>
+        </menu>
+
+        <menu ref="reports"/>
+    </body>
+
+    <poweredBy>
+        <logo width="0"/>
+    </poweredBy>
+
+</project>

@@ -57,4 +57,8 @@ Primarily typescript-generator is used as Maven plugin:
 </plugin>
 ```
 
-It can also be invoked directly using `TypeScriptGenerator.generateTypeScript()` method.
+Detailed description how to configure typescript-generator-maven-plugin is on generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
+
+If you do not use Maven you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
+
+Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
