@@ -52,7 +52,7 @@ public class GenerateMojo extends AbstractMojo {
     private String removeTypeNameSuffix;
 
 
-    @Component
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
     @Override
