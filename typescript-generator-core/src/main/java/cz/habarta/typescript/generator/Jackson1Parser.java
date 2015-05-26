@@ -21,15 +21,17 @@ public class Jackson1Parser extends ModelParser {
 
     @Override
     protected BeanModel parseBean(ClassWithUsage classWithUsage) {
-        final BeanHelper beanHelper = getBeanHelper(classWithUsage.beanClass);
         final List<PropertyModel> properties = new ArrayList<>();
-        for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-            if (!isParentProperty(beanPropertyWriter.getName(), classWithUsage.beanClass)) {
-                Type propertyType = beanPropertyWriter.getGenericPropertyType();
-                if (propertyType.equals(JsonNode.class)) {
-                    propertyType = Object.class;
+        final BeanHelper beanHelper = getBeanHelper(classWithUsage.beanClass);
+        if (beanHelper != null) {
+            for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
+                if (!isParentProperty(beanPropertyWriter.getName(), classWithUsage.beanClass)) {
+                    Type propertyType = beanPropertyWriter.getGenericPropertyType();
+                    if (propertyType.equals(JsonNode.class)) {
+                        propertyType = Object.class;
+                    }
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, classWithUsage.beanClass));
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, classWithUsage.beanClass));
             }
         }
 
@@ -51,9 +53,11 @@ public class Jackson1Parser extends ModelParser {
             return false;
         } else {
             final BeanHelper beanHelper = getBeanHelper(cls.getSuperclass());
-            for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                if (beanPropertyWriter.getName().equals(property)) {
-                    return true;
+            if (beanHelper != null) {
+                for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
+                    if (beanPropertyWriter.getName().equals(property)) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -65,6 +69,9 @@ public class Jackson1Parser extends ModelParser {
             final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
             final JavaType simpleType = objectMapper.constructType(beanClass);
             final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializationConfig, simpleType, null);
+            if (jsonSerializer == null) {
+                return null;
+            }
             if (jsonSerializer instanceof BeanSerializer) {
                 return new BeanHelper((BeanSerializer) jsonSerializer);
             } else {
