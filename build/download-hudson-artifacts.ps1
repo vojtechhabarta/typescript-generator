@@ -9,4 +9,4 @@ Write-Host -ForegroundColor DarkCyan "Downloading '$artifactsUri'..."
 $zipFilePath = "target\archive.zip"
 Invoke-WebRequest $artifactsUri -OutFile $zipFilePath
 $zipFile = Get-Item $zipFilePath
-$zipFile
+$zipFile.FullName

@@ -9,9 +9,9 @@ Write-Host -ForegroundColor DarkCyan "Unzipping..."
 $unzipDirectoryPath = "target\gpg-sign"
 rm -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
 rm -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
-$unzipDirectory = mkdir $unzipDirectoryPath
+$unzipDirectory = mkdir $unzipDirectoryPath -Force
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
-[System.IO.Compression.ZipFile]::ExtractToDirectory($zipFile.FullName, $unzipDirectory.FullName)
+[System.IO.Compression.ZipFile]::ExtractToDirectory($zipFile, $unzipDirectory.FullName)
 $basePath = (Resolve-Path $unzipDirectory).Path
 
 # passphrase

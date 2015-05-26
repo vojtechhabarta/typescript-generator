@@ -9,6 +9,7 @@ $jobId = $project.build.jobs[0].jobId
 $artifactsUri = "$apiUrl/buildjobs/$jobId/artifacts/target/artifacts.zip"
 Write-Host -ForegroundColor DarkCyan "Downloading '$artifactsUri'..."
 $zipFilePath = "target\artifacts.zip"
+$zipFileDirectory = mkdir (Split-Path $zipFilePath) -Force
 Invoke-RestMethod -Method Get -Uri $artifactsUri -OutFile $zipFilePath
 $zipFile = Get-Item $zipFilePath
-$zipFile
+$zipFile.FullName
