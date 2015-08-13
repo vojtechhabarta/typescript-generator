@@ -31,7 +31,15 @@ public class Emitter {
 	private void emitModule(Model model) {
 		if (settings.moduleName != null) {
 			writeNewLine();
-			writeIndentedLine("declare module " + settings.moduleName + " {");
+			String moduleName = null;
+
+			if (settings.ambientModuleName) {
+				moduleName = "\"" + settings.moduleName + "\"";
+			} else {
+				moduleName = settings.moduleName;
+			}
+
+			writeIndentedLine("declare module " + moduleName + " {");
 			indent++;
 			emitDefinitions(model);
 			indent--;

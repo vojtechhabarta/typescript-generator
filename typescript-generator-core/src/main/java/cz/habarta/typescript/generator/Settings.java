@@ -6,6 +6,7 @@ public class Settings {
 	public String newline = String.format("%n");
 	public String indentString = "    ";
 	public String moduleName = null;
+	public boolean ambientModuleName = false;
 	public boolean declarePropertiesAsOptional = false;
 	public boolean declareEnums = false;
 	public String removeTypeNameSuffix = null;

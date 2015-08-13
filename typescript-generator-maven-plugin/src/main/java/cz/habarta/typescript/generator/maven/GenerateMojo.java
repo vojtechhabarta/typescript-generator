@@ -45,6 +45,12 @@ public class GenerateMojo extends AbstractMojo {
 	private String moduleName;
 
 	/**
+	 * If true the module name will be generated in ambient style.
+	 */
+	@Parameter
+	private boolean ambientModuleName;
+
+	/**
 	 * If true the enums will be generated.
 	 */
 	@Parameter
@@ -89,6 +95,7 @@ public class GenerateMojo extends AbstractMojo {
 
 			final Settings settings = new Settings();
 			settings.moduleName = moduleName;
+			settings.ambientModuleName = ambientModuleName;
 			settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
 			settings.removeTypeNameSuffix = removeTypeNameSuffix;
 			settings.declareEnums = declareEnums;
