@@ -1,19 +1,18 @@
 
 package cz.habarta.typescript.generator;
 
-import java.util.*;
-
+import java.util.List;
 
 public class Model {
 
-    private final List<BeanModel> beans;
+	private final List<BaseModel> beans;
 
-    public Model(List<BeanModel> beans) {
-        this.beans = beans;
-    }
+	public Model(List<BaseModel> beans) {
+		this.beans = beans;
+	}
 
-    public List<BeanModel> getBeans() {
-        return beans;
-    }
+	public List<BaseModel> getBeans() {
+		return beans;
+	}
 
 }
