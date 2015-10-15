@@ -11,8 +11,13 @@ public class TypeScriptGenerator {
     public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
         final Logger logger = Logger.getGlobal();
 
-        final Jackson1Parser jacksonParser = new Jackson1Parser(logger, settings);
-        final Model model = jacksonParser.parseModel(classes);
+        final ModelParser modelParser;
+        if (settings.jsonLibrary == Settings.JsonLibrary.jackson2) {
+            modelParser = new Jackson2Parser(logger, settings);
+        } else {
+            modelParser = new Jackson1Parser(logger, settings);
+        }
+        final Model model = modelParser.parseModel(classes);
 
         Emitter.emit(logger, settings, outputDeclarationFile, model);
     }

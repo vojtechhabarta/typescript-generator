@@ -1,21 +1,20 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ser.*;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Logger;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.map.*;
-import org.codehaus.jackson.map.ser.*;
-import org.codehaus.jackson.type.JavaType;
 
 
-public class Jackson1Parser extends ModelParser {
+public class Jackson2Parser extends ModelParser {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
 
-    public Jackson1Parser(Logger logger, Settings settings) {
+    public Jackson2Parser(Logger logger, Settings settings) {
         super(logger, settings);
     }
 
@@ -66,9 +65,10 @@ public class Jackson1Parser extends ModelParser {
 
     private BeanHelper getBeanHelper(Class<?> beanClass) {
         try {
-            final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
+            final DefaultSerializerProvider.Impl serializerProvider1 = (DefaultSerializerProvider.Impl) objectMapper.getSerializerProvider();
+            final DefaultSerializerProvider.Impl serializerProvider2 = serializerProvider1.createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
             final JavaType simpleType = objectMapper.constructType(beanClass);
-            final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializationConfig, simpleType, null);
+            final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider2, simpleType);
             if (jsonSerializer == null) {
                 return null;
             }
@@ -84,6 +84,7 @@ public class Jackson1Parser extends ModelParser {
     }
 
     private static class BeanHelper extends BeanSerializer {
+        private static final long serialVersionUID = 1;
 
         public BeanHelper(BeanSerializer src) {
             super(src);

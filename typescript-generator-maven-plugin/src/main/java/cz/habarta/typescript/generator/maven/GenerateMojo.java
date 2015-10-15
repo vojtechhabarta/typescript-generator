@@ -33,6 +33,12 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
+     * Library used in JSON classes. Default value is 'jackson1'.
+     */
+    @Parameter
+    private Settings.JsonLibrary jsonLibrary;
+
+    /**
      * Name of generated TypeScript module.
      */
     @Parameter
@@ -75,6 +81,7 @@ public class GenerateMojo extends AbstractMojo {
             }
 
             final Settings settings = new Settings();
+            settings.jsonLibrary = jsonLibrary;
             settings.moduleName = moduleName;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
