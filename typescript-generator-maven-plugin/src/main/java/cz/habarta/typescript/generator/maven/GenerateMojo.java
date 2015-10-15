@@ -33,7 +33,9 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
-     * Library used in JSON classes. Default value is 'jackson1'.
+     * Library used in JSON classes.
+     * Supported values are 'jackson1', 'jackson2'.
+     * Default value is 'jackson1'.
      */
     @Parameter
     private Settings.JsonLibrary jsonLibrary;
