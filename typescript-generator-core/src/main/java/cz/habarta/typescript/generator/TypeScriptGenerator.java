@@ -12,7 +12,7 @@ public class TypeScriptGenerator {
         final Logger logger = Logger.getGlobal();
 
         final ModelParser modelParser;
-        if (settings.jsonLibrary == Settings.JsonLibrary.jackson2) {
+        if (settings.jsonLibrary == JsonLibrary.jackson2) {
             modelParser = new Jackson2Parser(logger, settings);
         } else {
             modelParser = new Jackson1Parser(logger, settings);

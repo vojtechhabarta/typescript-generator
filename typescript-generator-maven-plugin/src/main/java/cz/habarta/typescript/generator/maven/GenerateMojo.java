@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.maven;
 
+import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.io.File;
@@ -38,7 +39,7 @@ public class GenerateMojo extends AbstractMojo {
      * Default value is 'jackson1'.
      */
     @Parameter
-    private Settings.JsonLibrary jsonLibrary;
+    private JsonLibrary jsonLibrary;
 
     /**
      * Name of generated TypeScript module.

@@ -4,9 +4,6 @@ package cz.habarta.typescript.generator;
 
 public class Settings {
 
-    public enum JsonLibrary {
-        jackson1, jackson2
-    }
 
     public String newline = String.format("%n");
     public String indentString = "    ";
