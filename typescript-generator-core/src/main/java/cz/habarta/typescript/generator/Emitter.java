@@ -28,9 +28,24 @@ public class Emitter {
     }
 
     private void emitModule(Model model) {
-        if (settings.moduleName != null) {
+        if (settings.module != null) {
             writeNewLine();
-            writeIndentedLine("declare module " + settings.moduleName + " {");
+            writeIndentedLine("declare module '" + settings.module + "' {");
+            indent++;
+            emitNamespace(model, true);
+            indent--;
+            writeNewLine();
+            writeIndentedLine("}");
+        } else {
+            emitNamespace(model, false);
+        }
+    }
+
+    private void emitNamespace(Model model, boolean ambientContext) {
+        if (settings.namespace != null) {
+            writeNewLine();
+            final String declarePrefix = ambientContext ? "" : "declare ";
+            writeIndentedLine(declarePrefix +  "namespace " + settings.namespace + " {");
             indent++;
             emitInterfaces(model);
             indent--;
@@ -45,7 +60,7 @@ public class Emitter {
         for (BeanModel bean : model.getBeans()) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-            writeIndentedLine("export interface " + bean.getName() + parent + " {");
+            writeIndentedLine("interface " + bean.getName() + parent + " {");
             indent++;
             for (PropertyModel property : bean.getProperties()) {
                 emitProperty(property);

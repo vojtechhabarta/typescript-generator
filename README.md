@@ -17,7 +17,7 @@ public class Person {
 
 typescript-generator outputs this TypeScript interface:
 ``` typescript
-export interface Person {
+interface Person {
     name: string;
     age: number;
     hasChildren: boolean;
@@ -39,7 +39,7 @@ Primarily typescript-generator is used as Maven plugin:
 <plugin>
     <groupId>cz.habarta.typescript-generator</groupId>
     <artifactId>typescript-generator-maven-plugin</artifactId>
-    <version>1.1.71</version>
+    <version>1.2.x</version>
     <executions>
         <execution>
             <id>generate</id>
@@ -50,6 +50,7 @@ Primarily typescript-generator is used as Maven plugin:
                 <classes>
                     <class>cz.habarta.typescript.generator.Person</class>
                 </classes>
+                <namespace>Rest</namespace>
                 <outputFile>target/rest.d.ts</outputFile>
             </configuration>
         </execution>

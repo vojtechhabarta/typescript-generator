@@ -42,10 +42,23 @@ public class GenerateMojo extends AbstractMojo {
     private JsonLibrary jsonLibrary;
 
     /**
-     * Name of generated TypeScript module.
+     * @deprecated Use {@link #namespace} instead.
      */
     @Parameter
+    @Deprecated
     private String moduleName;
+
+    /**
+     * TypeScript namespace (previously called "internal module") of generated declarations.
+     */
+    @Parameter
+    private String namespace;
+
+    /**
+     * TypeScript module name (previously called "external module") of generated declarations.
+     */
+    @Parameter
+    private String module;
 
     /**
      * If true declared properties will be optional.
@@ -85,7 +98,8 @@ public class GenerateMojo extends AbstractMojo {
 
             final Settings settings = new Settings();
             settings.jsonLibrary = jsonLibrary;
-            settings.moduleName = moduleName;
+            settings.namespace = namespace != null ? namespace : moduleName;
+            settings.module = module;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             TypeScriptGenerator.generateTypeScript(classList, settings, outputFile);
