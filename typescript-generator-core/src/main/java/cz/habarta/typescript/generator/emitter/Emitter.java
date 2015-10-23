@@ -1,6 +1,8 @@
 
-package cz.habarta.typescript.generator;
+package cz.habarta.typescript.generator.emitter;
 
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TsType;
 import java.io.*;
 import java.util.logging.Logger;
 
@@ -18,7 +20,7 @@ public class Emitter {
         this.writer = writer;
     }
 
-    public static void emit(Logger logger, Settings settings, File outputFile, Model model) {
+    public static void emit(Logger logger, Settings settings, File outputFile, TsModel model) {
         try (PrintWriter printWriter = new PrintWriter(outputFile)) {
             final Emitter emitter = new Emitter(logger, settings, printWriter);
             emitter.emitModule(model);
@@ -27,7 +29,7 @@ public class Emitter {
         }
     }
 
-    private void emitModule(Model model) {
+    private void emitModule(TsModel model) {
         if (settings.module != null) {
             writeNewLine();
             writeIndentedLine("declare module '" + settings.module + "' {");
@@ -41,7 +43,7 @@ public class Emitter {
         }
     }
 
-    private void emitNamespace(Model model, boolean ambientContext) {
+    private void emitNamespace(TsModel model, boolean ambientContext) {
         if (settings.namespace != null) {
             writeNewLine();
             final String declarePrefix = ambientContext ? "" : "declare ";
@@ -56,13 +58,13 @@ public class Emitter {
         }
     }
 
-    private void emitInterfaces(Model model) {
-        for (BeanModel bean : model.getBeans()) {
+    private void emitInterfaces(TsModel model) {
+        for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
             writeIndentedLine("interface " + bean.getName() + parent + " {");
             indent++;
-            for (PropertyModel property : bean.getProperties()) {
+            for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
             }
             indent--;
@@ -70,7 +72,7 @@ public class Emitter {
         }
     }
 
-    private void emitProperty(PropertyModel property) {
+    private void emitProperty(TsPropertyModel property) {
         if (property.getComments() != null) {
             writeIndentedLine("/**");
             for (String comment : property.getComments()) {

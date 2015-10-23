@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.emitter.*;
+import cz.habarta.typescript.generator.parser.*;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
@@ -19,7 +21,10 @@ public class TypeScriptGenerator {
         }
         final Model model = modelParser.parseModel(classes);
 
-        Emitter.emit(logger, settings, outputDeclarationFile, model);
+        final ModelCompiler compiler = new ModelCompiler(settings);
+        final TsModel tsModel = compiler.javaToTypescript(model);
+        
+        Emitter.emit(logger, settings, outputDeclarationFile, tsModel);
     }
 
 }

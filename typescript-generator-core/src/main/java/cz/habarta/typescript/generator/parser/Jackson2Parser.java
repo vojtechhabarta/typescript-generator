@@ -1,9 +1,10 @@
 
-package cz.habarta.typescript.generator;
+package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
+import cz.habarta.typescript.generator.Settings;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Logger;

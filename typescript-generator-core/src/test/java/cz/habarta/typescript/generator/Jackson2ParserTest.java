@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.parser.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.logging.Logger;
 import org.junit.Assert;

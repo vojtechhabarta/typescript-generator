@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.parser.*;
 import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;

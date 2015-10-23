@@ -1,5 +1,5 @@
 
-package cz.habarta.typescript.generator;
+package cz.habarta.typescript.generator.parser;
 
 import java.util.*;
 

@@ -1,6 +1,7 @@
 
-package cz.habarta.typescript.generator;
+package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.TsType;
 import java.lang.reflect.Type;
 import java.util.List;
 
