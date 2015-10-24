@@ -49,13 +49,18 @@ public class Emitter {
             final String declarePrefix = ambientContext ? "" : "declare ";
             writeIndentedLine(declarePrefix +  "namespace " + settings.namespace + " {");
             indent++;
-            emitInterfaces(model);
+            emitObjects(model);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
         } else {
-            emitInterfaces(model);
+            emitObjects(model);
         }
+    }
+
+    private void emitObjects(TsModel model) {
+        emitInterfaces(model);
+        emitTypeAliases(model);
     }
 
     private void emitInterfaces(TsModel model) {
@@ -83,6 +88,13 @@ public class Emitter {
         final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
         final String opt = settings.declarePropertiesAsOptional ? "?" : "";
         writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
+    }
+
+    private void emitTypeAliases(TsModel model) {
+        for (TsType.AliasType alias : model.getTypeAliases()) {
+            writeNewLine();
+            writeIndentedLine(alias.definition);
+        }
     }
 
     private void writeIndentedLine(String line) {

@@ -1,9 +1,7 @@
 
 package cz.habarta.typescript.generator.maven;
 
-import cz.habarta.typescript.generator.JsonLibrary;
-import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.*;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -73,6 +71,14 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private String removeTypeNameSuffix;
 
+    /**
+     * Specifies how {@link java.util.Date} will be mapped.
+     * Supported values are 'asDate', 'asNumber, 'asString'.
+     * Default value is 'asDate'.
+     */
+    @Parameter
+    private DateMapping mapDate;
+
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -102,6 +108,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.module = module;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
+            settings.mapDate = mapDate;
             TypeScriptGenerator.generateTypeScript(classList, settings, outputFile);
 
         } catch (Exception e) {

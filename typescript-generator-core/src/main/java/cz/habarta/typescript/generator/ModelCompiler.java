@@ -44,17 +44,19 @@ public class ModelCompiler {
     private void processProperty(CompilationContext context, PropertyModel property) {
         final TsType originalType = typeFromJava(property.getType(), property.getName(), context.bean.getBeanClass(), true, null);
         final LinkedHashSet<TsType.EnumType> replacedEnums = new LinkedHashSet<>();
-        final TsType tsType = TsType.replaceEnumsWithStrings(originalType, replacedEnums);
+        final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
+        final TsType tsType = replaceTypes(originalType, replacedEnums, typeAliases);
         List<String> comments = null;
         if (!replacedEnums.isEmpty()) {
             comments = new ArrayList<>();
             comments.add("Original type: " + originalType);
             for (TsType.EnumType replacedEnum : replacedEnums) {
-                comments.add(replacedEnum.toString() + ": " + join(replacedEnum.getValues(), ", "));
+                comments.add(replacedEnum.toString() + ": " + join(replacedEnum.values, ", "));
             }
         }
         final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, concat(property.getComments(), comments));
         context.tsBean.getProperties().add(tsPropertyModel);
+        context.tsModel.getTypeAliases().addAll(typeAliases);
     }
 
     private static class CompilationContext {
@@ -137,6 +139,35 @@ public class ModelCompiler {
         } else {
             return name;
         }
+    }
+
+    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> replacedEnums, LinkedHashSet<TsType.AliasType> typeAliases) {
+        if (type == TsType.Date) {
+            if (settings.mapDate == DateMapping.asNumber) {
+                typeAliases.add(TsType.DateAsNumber);
+                return TsType.DateAsNumber;
+            }
+            if (settings.mapDate == DateMapping.asString) {
+                typeAliases.add(TsType.DateAsString);
+                return TsType.DateAsString;
+            }
+        }
+        if (type instanceof TsType.EnumType) {
+            final TsType.EnumType enumType = (TsType.EnumType) type;
+            replacedEnums.add(enumType);
+            return TsType.String;
+        }
+        if (type instanceof TsType.BasicArrayType) {
+            final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
+            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
+        }
+        if (type instanceof TsType.IndexedArrayType) {
+            final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
+            return new TsType.IndexedArrayType(
+                    replaceTypes(indexedArrayType.indexType, replacedEnums, typeAliases),
+                    replaceTypes(indexedArrayType.elementType, replacedEnums, typeAliases));
+        }
+        return type;
     }
 
     private static Map<Type, TsType> getKnownTypes() {

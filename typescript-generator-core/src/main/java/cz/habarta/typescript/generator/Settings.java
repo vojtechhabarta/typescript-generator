@@ -12,5 +12,6 @@ public class Settings {
     public String module = null;
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNameSuffix = null;
+    public DateMapping mapDate = DateMapping.asDate;
 
 }
