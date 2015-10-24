@@ -4,7 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
-import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Logger;
@@ -15,8 +15,8 @@ public class Jackson2Parser extends ModelParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
     
 
-    public Jackson2Parser(Logger logger, Settings settings) {
-        super(logger, settings);
+    public Jackson2Parser(Logger logger, Settings settings, ModelCompiler compiler) {
+        super(logger, settings, compiler);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class Jackson2Parser extends ModelParser {
         if (superclass != null) {
             addBeanToQueue(new ClassWithUsage(superclass, "<superClass>", classWithUsage.beanClass));
         }
-        return new BeanModel(getMappedName(classWithUsage.beanClass), getMappedName(superclass), properties);
+        return new BeanModel(classWithUsage.beanClass, superclass, properties);
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {
@@ -77,7 +77,10 @@ public class Jackson2Parser extends ModelParser {
                 return new BeanHelper((BeanSerializer) jsonSerializer);
             } else {
                 final String jsonSerializerName = jsonSerializer.getClass().getName();
-                throw new RuntimeException(String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
+                final String message = String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass);
+//                throw new RuntimeException(message);
+                logger.warning(message);
+                return null;
             }
         } catch (JsonMappingException e) {
             throw new RuntimeException(e);

@@ -6,21 +6,21 @@ import java.util.List;
 
 public class BeanModel {
 
-    private final String name;
-    private final String parent;
+    private final Class<?> beanClass;
+    private final Class<?> parent;
     private final List<PropertyModel> properties;
 
-    public BeanModel(String name, String parent, List<PropertyModel> properties) {
-        this.name = name;
+    public BeanModel(Class<?> beanClass, Class<?> parent, List<PropertyModel> properties) {
+        this.beanClass = beanClass;
         this.parent = parent;
         this.properties = properties;
     }
 
-    public String getName() {
-        return name;
+    public Class<?> getBeanClass() {
+        return beanClass;
     }
 
-    public String getParent() {
+    public Class<?> getParent() {
         return parent;
     }
 
@@ -30,7 +30,7 @@ public class BeanModel {
 
     @Override
     public String toString() {
-        return "BeanModel{" + "name=" + name + ", properties=" + properties + '}';
+        return "BeanModel{" + "name=" + beanClass + ", properties=" + properties + '}';
     }
 
 }

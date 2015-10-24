@@ -12,16 +12,16 @@ public class TypeScriptGenerator {
 
     public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
         final Logger logger = Logger.getGlobal();
+        final ModelCompiler compiler = new ModelCompiler(logger, settings);
 
         final ModelParser modelParser;
         if (settings.jsonLibrary == JsonLibrary.jackson2) {
-            modelParser = new Jackson2Parser(logger, settings);
+            modelParser = new Jackson2Parser(logger, settings, compiler);
         } else {
-            modelParser = new Jackson1Parser(logger, settings);
+            modelParser = new Jackson1Parser(logger, settings, compiler);
         }
         final Model model = modelParser.parseModel(classes);
 
-        final ModelCompiler compiler = new ModelCompiler(settings);
         final TsModel tsModel = compiler.javaToTypescript(model);
         
         Emitter.emit(logger, settings, outputDeclarationFile, tsModel);
