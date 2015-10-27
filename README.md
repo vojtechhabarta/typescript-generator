@@ -34,7 +34,11 @@ Supported types include:
 - array
 - `List` and `Map` (including derived interfaces and implementation classes)
 
-Primarily typescript-generator is used as Maven plugin:
+
+Maven
+-----
+
+In Maven build you can use `typescript-generator-maven-plugin` like this:
 ``` xml
 <plugin>
     <groupId>cz.habarta.typescript-generator</groupId>
@@ -58,8 +62,44 @@ Primarily typescript-generator is used as Maven plugin:
 </plugin>
 ```
 
+More complete sample can be found [here](sample-maven).
 Detailed description how to configure typescript-generator-maven-plugin is on generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
 
-If you do not use Maven you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
+
+Gradle
+------
+
+In Gradle build you can use `cz.habarta.typescript-generator` plugin like this:
+```groovy
+apply plugin: 'cz.habarta.typescript-generator'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.2.x'
+    }
+}
+generateTypeScript {
+    outputFile = 'build/sample.d.ts'
+    classes = [
+        'cz.habarta.typescript.generator.sample.Person'
+    ]
+    jsonLibrary = 'jackson2'
+    namespace = 'Rest';
+//    module = 'my-module'
+//    declarePropertiesAsOptional = false
+//    removeTypeNameSuffix = 'Json'
+//    mapDate = 'asNumber'
+}
+```
+
+More complete sample can be found [here](sample-gradle).
+Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html). 
+
+
+Direct invocation
+-----------------
+If you do not use Maven or Gradle you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
 
 Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
