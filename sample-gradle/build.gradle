@@ -1,0 +1,38 @@
+
+apply plugin: 'java'
+apply plugin: 'cz.habarta.typescript-generator'
+
+
+version = '1.0'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.6.3'
+}
+
+buildscript {
+    repositories {
+//        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.2-SNAPSHOT'
+    }
+}
+
+generateTypeScript {
+    outputFile = 'build/sample.d.ts'
+    classes = [
+        'cz.habarta.typescript.generator.sample.Person'
+    ]
+    jsonLibrary = 'jackson2'
+    namespace = 'Rest';
+//    module = 'my-module'
+//    declarePropertiesAsOptional = false
+//    removeTypeNameSuffix = 'Json'
+//    mapDate = 'asNumber'
+}

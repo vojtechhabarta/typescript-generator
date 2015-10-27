@@ -13,6 +13,7 @@
     <modules>
         <module>typescript-generator-core</module>
         <module>typescript-generator-maven-plugin</module>
+        <module>typescript-generator-gradle-plugin</module>
     </modules>
 
     <licenses>
