@@ -28,7 +28,7 @@ public class Jackson1Parser extends ModelParser {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 if (!isParentProperty(beanPropertyWriter.getName(), classWithUsage.beanClass)) {
                     Type propertyType = beanPropertyWriter.getGenericPropertyType();
-                    if (propertyType.equals(JsonNode.class)) {
+                    if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
                     properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, classWithUsage.beanClass));
@@ -42,7 +42,7 @@ public class Jackson1Parser extends ModelParser {
                 addBeanToQueue(new ClassWithUsage(type.value(), "<subClass>", classWithUsage.beanClass));
             }
         }
-        final Class<?> superclass = classWithUsage.beanClass.getSuperclass().equals(Object.class) ? null : classWithUsage.beanClass.getSuperclass();
+        final Class<?> superclass = classWithUsage.beanClass.getSuperclass() == Object.class ? null : classWithUsage.beanClass.getSuperclass();
         if (superclass != null) {
             addBeanToQueue(new ClassWithUsage(superclass, "<superClass>", classWithUsage.beanClass));
         }
@@ -50,7 +50,7 @@ public class Jackson1Parser extends ModelParser {
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {
-        if (cls.getSuperclass().equals(Object.class)) {
+        if (cls.getSuperclass() == Object.class) {
             return false;
         } else {
             final BeanHelper beanHelper = getBeanHelper(cls.getSuperclass());
@@ -66,6 +66,9 @@ public class Jackson1Parser extends ModelParser {
     }
 
     private BeanHelper getBeanHelper(Class<?> beanClass) {
+        if (beanClass == null) {
+            return null;
+        }
         try {
             final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
             final JavaType simpleType = objectMapper.constructType(beanClass);

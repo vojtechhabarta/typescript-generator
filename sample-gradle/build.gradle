@@ -30,7 +30,7 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.Person'
     ]
     jsonLibrary = 'jackson2'
-    namespace = 'Rest';
+    namespace = 'GradleSample';
 //    module = 'my-module'
 //    declarePropertiesAsOptional = false
 //    removeTypeNameSuffix = 'Json'

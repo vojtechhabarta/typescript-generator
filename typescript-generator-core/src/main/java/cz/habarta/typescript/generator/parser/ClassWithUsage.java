@@ -15,7 +15,7 @@ public class ClassWithUsage {
     }
 
     public String usage() {
-        return usedInClass.getSimpleName() + "." + usedInProperty;
+        return (usedInClass != null ? (usedInClass.getSimpleName() + ".") : "") + usedInProperty;
     }
 
 }

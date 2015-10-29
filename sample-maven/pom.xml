@@ -32,7 +32,9 @@
                             <classes>
                                 <class>cz.habarta.typescript.generator.sample.Person</class>
                             </classes>
+                            <jsonLibrary>jackson2</jsonLibrary>
                             <outputFile>target/sample.d.ts</outputFile>
+                            <namespace>MavenSample</namespace>
                         </configuration>
                     </execution>
                 </executions>
