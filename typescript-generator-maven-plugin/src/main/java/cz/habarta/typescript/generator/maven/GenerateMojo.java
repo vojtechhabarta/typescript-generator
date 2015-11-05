@@ -1,15 +1,25 @@
 
 package cz.habarta.typescript.generator.maven;
 
-import cz.habarta.typescript.generator.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+
+import cz.habarta.typescript.generator.DateMapping;
+import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 
 /**
  * Generates TypeScript declaration file from specified java classes.
@@ -109,7 +119,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             settings.mapDate = mapDate;
-            TypeScriptGenerator.generateTypeScript(classList, settings, outputFile);
+            TypeScriptGenerator.generateTypeScript(classList, settings, new FileOutputStream(outputFile));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

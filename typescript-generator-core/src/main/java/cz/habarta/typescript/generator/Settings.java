@@ -19,4 +19,6 @@ public class Settings {
         }
     };
     public String defaultCustomTypePrefix = "";
+    public String declarationPrefix = "";
+    public int initialIndentationLevel = 0;
 }

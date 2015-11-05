@@ -2,6 +2,9 @@
 package cz.habarta.typescript.generator;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +20,14 @@ import cz.habarta.typescript.generator.parser.ModelParser;
 
 public class TypeScriptGenerator {
 
-    public static Map<Type, TsType> generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
+    public static Map<Type, TsType> generateTypeScript(List<? extends Class<?>> classes, Settings settings, File file) {
+        try {
+            return generateTypeScript(classes, settings, new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static Map<Type, TsType> generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output) {
         final Logger logger = Logger.getGlobal();
         final ModelCompiler compiler = new ModelCompiler(logger, settings);
 
@@ -31,7 +41,7 @@ public class TypeScriptGenerator {
 
         final TsModel tsModel = compiler.javaToTypescript(model);
 
-        Emitter.emit(logger, settings, outputDeclarationFile, tsModel);
+        Emitter.emit(logger, settings, output, tsModel);
         return compiler.getJavaToTypescriptTypeMap();
     }
 

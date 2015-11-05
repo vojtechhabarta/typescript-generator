@@ -1,8 +1,7 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.Logger;
@@ -18,20 +17,19 @@ public class Emitter {
     private final Logger logger;
     private final Settings settings;
     private final PrintWriter writer;
-    private int indent = 0;
+    private int indent;
 
     private Emitter(Logger logger, Settings settings, PrintWriter writer) {
         this.logger = logger;
         this.settings = settings;
         this.writer = writer;
+        this.indent = settings.initialIndentationLevel;
     }
 
-    public static void emit(Logger logger, Settings settings, File outputFile, TsModel model) {
-        try (PrintWriter printWriter = new PrintWriter(outputFile)) {
+    public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model) {
+        try (PrintWriter printWriter = new PrintWriter(output)) {
             final Emitter emitter = new Emitter(logger, settings, printWriter);
             emitter.emitModule(model);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -75,7 +73,7 @@ public class Emitter {
             if (bean instanceof TsEnumBeanModel) {
                 TsEnumBeanModel enumBean = (TsEnumBeanModel) bean;
                 List<String> values = enumBean.getType().values;
-                writeIndentedLine("var " + bean.getName() + " {");
+                writeIndentedLine(settings.declarationPrefix + "var " + bean.getName() + " {");
                 indent++;
                 int i = 0;
                 for (String value : values) {
@@ -94,7 +92,7 @@ public class Emitter {
                     genericString = "<" + Joiner.on(", ").join(bean.getGenericDeclarations().iterator()) + ">";
                 }
 
-                writeIndentedLine("interface " + bean.getName() + parent + genericString + " {");
+                writeIndentedLine(settings.declarationPrefix + "interface " + bean.getName() + parent + genericString + " {");
                 indent++;
                 for (TsPropertyModel property : bean.getProperties()) {
                     emitProperty(property);

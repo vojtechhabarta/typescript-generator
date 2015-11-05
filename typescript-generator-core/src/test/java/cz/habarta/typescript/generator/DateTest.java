@@ -1,9 +1,13 @@
 
 package cz.habarta.typescript.generator;
 
-import java.io.*;
-import java.util.*;
-import org.junit.*;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
 
 
 public class DateTest {
