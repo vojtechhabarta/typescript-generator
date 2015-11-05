@@ -12,4 +12,7 @@ public class Settings {
     public String removeTypeNameSuffix = null;
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
+    public String addTypeNamePrefix = "";
+    public String addDeclarationPrefix = "";
+    public int initialIndentationLevel = 0;
 }
