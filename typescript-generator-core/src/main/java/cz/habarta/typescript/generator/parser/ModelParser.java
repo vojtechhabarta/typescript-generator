@@ -46,8 +46,12 @@ public abstract class ModelParser {
             if (!parsedClasses.containsKey(cls)) {
                 logger.info("Parsing '" + cls.getName() + "'" +
                         (classWithUsage.usedInClass != null ? " used in '" + classWithUsage.usedInClass.getSimpleName() + "." + classWithUsage.usedInProperty + "'" : ""));
-                final BeanModel bean = parseBean(classWithUsage);
-                parsedClasses.put(cls, bean);
+                if (classWithUsage.beanClass.isEnum()) {
+                    parsedClasses.put(cls, new EnumBeanModel(classWithUsage.beanClass));
+                } else {
+                    final BeanModel bean = parseBean(classWithUsage);
+                    parsedClasses.put(cls, bean);
+                }
             }
         }
         return new Model(new ArrayList<>(parsedClasses.values()));

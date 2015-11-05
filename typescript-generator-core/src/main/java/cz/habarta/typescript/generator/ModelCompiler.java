@@ -12,7 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.google.api.client.util.Lists;
+
+import cz.habarta.typescript.generator.TsType.EnumType;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
+import cz.habarta.typescript.generator.emitter.TsEnumBeanModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.emitter.TsPropertyModel;
 import cz.habarta.typescript.generator.parser.BeanModel;
@@ -47,11 +51,17 @@ public class ModelCompiler {
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()));
-        context.tsModel.getBeans().add(tsBean);
-        context = context.bean(bean, tsBean);
-        for (PropertyModel jBean : bean.getProperties()) {
-            processProperty(context, jBean);
+        if (bean.getBeanClass().isEnum()) {
+            EnumType enumType = (EnumType) this.typeFromJava(bean.getBeanClass(), null, null, true, Lists.<Class<?>>newArrayList());
+            TsEnumBeanModel tsEnumBeanModel = new TsEnumBeanModel(getMappedName(bean.getBeanClass()), enumType);
+            context.tsModel.getBeans().add(tsEnumBeanModel);
+        } else {
+            final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()));
+            context.tsModel.getBeans().add(tsBean);
+            context = context.bean(bean, tsBean);
+            for (PropertyModel jBean : bean.getProperties()) {
+                processProperty(context, jBean);
+            }
         }
     }
 
@@ -127,6 +137,9 @@ public class ModelCompiler {
                 final List<java.lang.String> values = new ArrayList<>();
                 for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
                     values.add(enumConstant.name());
+                }
+                if (discoveredClasses != null) {
+                    discoveredClasses.add(javaClass);
                 }
                 return new TsType.EnumType(getMappedName(javaClass), values);
             }

@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.emitter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.logging.Logger;
 
 import cz.habarta.typescript.generator.Settings;
@@ -69,13 +70,30 @@ public class Emitter {
     private void emitInterfaces(TsModel model) {
         for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
-            final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-            writeIndentedLine("interface " + bean.getName() + parent + " {");
-            indent++;
-            for (TsPropertyModel property : bean.getProperties()) {
-                emitProperty(property);
+            if (bean instanceof TsEnumBeanModel) {
+                TsEnumBeanModel enumBean = (TsEnumBeanModel) bean;
+                List<String> values = enumBean.getType().values;
+                writeIndentedLine("var " + bean.getName() + " {");
+                indent++;
+                int i = 0;
+                for (String value : values) {
+                    String lineToWrite = value + ": \"" + value + "\"";
+                    if (i != values.size() - 1) {
+                        lineToWrite += ",";
+                    }
+                    i++;
+                    writeIndentedLine(lineToWrite);
+                }
+                indent--;
+            } else {
+                final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
+                writeIndentedLine("interface " + bean.getName() + parent + " {");
+                indent++;
+                for (TsPropertyModel property : bean.getProperties()) {
+                    emitProperty(property);
+                }
+                indent--;
             }
-            indent--;
             writeIndentedLine("}");
         }
     }
