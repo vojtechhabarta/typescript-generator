@@ -10,3 +10,4 @@ release.properties
 **.classpath
 **.project
 **.settings
+*.d.ts

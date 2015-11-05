@@ -89,7 +89,7 @@ public class Emitter {
             writeIndentedLine("  */");
         }
         final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
-        final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() || tsType.getOptional() ? "?" : "";
+        final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() ? "?" : "";
         writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
     }
 

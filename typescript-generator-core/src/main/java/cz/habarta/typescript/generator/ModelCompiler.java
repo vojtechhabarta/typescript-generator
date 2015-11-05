@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,10 +24,12 @@ public class ModelCompiler {
 
     private final Logger logger;
     private final Settings settings;
+    private Map<Type, TsType> javaToTypescriptTypeMap;
 
     public ModelCompiler(Logger logger, Settings settings) {
         this.logger = logger;
         this.settings = settings;
+        this.javaToTypescriptTypeMap = new HashMap<Type, TsType>();
     }
 
     public List<Class<?>> discoverClasses(Type type) {
@@ -95,6 +98,12 @@ public class ModelCompiler {
     }
 
     private TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        TsType ret = typeFromJavaInner(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
+        this.javaToTypescriptTypeMap.put(javaType, ret);
+        return ret;
+    }
+
+    private TsType typeFromJavaInner(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
         if (settings.customTypeParser != null) {
             TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeParser() {
                 @Override
@@ -244,5 +253,9 @@ public class ModelCompiler {
             result.addAll(second);
         }
         return result;
+    }
+
+    public Map<Type, TsType> getJavaToTypescriptTypeMap() {
+        return this.javaToTypescriptTypeMap;
     }
 }
