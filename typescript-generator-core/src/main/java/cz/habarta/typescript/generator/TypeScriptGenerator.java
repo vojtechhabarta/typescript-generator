@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class TypeScriptGenerator {
 
-    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
+    public static JavaToTypescriptTypeConverter generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
         final Logger logger = Logger.getGlobal();
         final ModelCompiler compiler = new ModelCompiler(logger, settings);
 
@@ -23,8 +23,9 @@ public class TypeScriptGenerator {
         final Model model = modelParser.parseModel(classes);
 
         final TsModel tsModel = compiler.javaToTypescript(model);
-        
+
         Emitter.emit(logger, settings, outputDeclarationFile, tsModel);
+        return compiler.getJavaToTypescriptTypeParser();
     }
 
 }

@@ -83,7 +83,22 @@ public class ModelCompiler {
 
     }
 
-    private TsType typeFromJava(Type javaType, String usedInProperty, Class<?> usedInClass, boolean logWarnings, List<Class<?>> discoveredClasses) {
+    private TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        TsType parentTsType = null;
+        if (usedInClass != null) {
+            parentTsType = typeFromJava(usedInClass, null, null, logWarnings, discoveredClasses);
+        }
+        if (settings.customTypeParser != null) {
+            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeConverter() {
+                @Override
+                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                    return ModelCompiler.this.typeFromJava(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
+                };
+            });
+            if (customType != null) {
+                return customType;
+            }
+        }
         if (KnownTypes.containsKey(javaType)) return KnownTypes.get(javaType);
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
@@ -191,6 +206,7 @@ public class ModelCompiler {
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(void.class, TsType.Void);
         return knownTypes;
     }
 
@@ -222,5 +238,14 @@ public class ModelCompiler {
             result.addAll(second);
         }
         return result;
+    }
+
+    public JavaToTypescriptTypeConverter getJavaToTypescriptTypeParser() {
+        return new JavaToTypescriptTypeConverter() {
+            @Override
+            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                return ModelCompiler.this.typeFromJava(javaType, null, null, true, new ArrayList<Class<?>>());
+            }
+        };
     }
 }
