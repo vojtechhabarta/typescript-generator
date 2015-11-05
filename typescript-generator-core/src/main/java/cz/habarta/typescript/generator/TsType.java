@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import java.util.List;
 
+import com.google.common.base.Joiner;
 
 public abstract class TsType {
 
@@ -153,5 +154,50 @@ public abstract class TsType {
             ret.optional = true;
             return ret;
         }
+    }
+
+    public static class GenericParamType extends TsType {
+
+        public final String name;
+
+        public GenericParamType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        @Override
+        public TsType getOptionalReference() {
+            GenericParamType ret = new GenericParamType(name);
+            ret.optional = false;
+            return ret;
+        }
+    }
+    public static class GenericInstanceType extends TsType {
+
+        public final TsType base;
+        public final List<TsType> childGenericInstances;
+
+        public GenericInstanceType(TsType base, List<TsType> childGenericInstances) {
+            this.base = base;
+            this.childGenericInstances = childGenericInstances;
+        }
+
+        @Override
+        public String toString() {
+            String genericString = "<" + Joiner.on(", ").join(childGenericInstances) + ">";
+            return base + genericString;
+        }
+
+        @Override
+        public TsType getOptionalReference() {
+            TsType ret = new GenericInstanceType(base, childGenericInstances);
+            ret.optional = true;
+            return ret;
+        }
+
     }
 }

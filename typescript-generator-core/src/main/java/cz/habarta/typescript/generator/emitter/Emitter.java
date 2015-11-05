@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.api.client.repackaged.com.google.common.base.Joiner;
+
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
 
@@ -87,7 +89,12 @@ public class Emitter {
                 indent--;
             } else {
                 final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-                writeIndentedLine("interface " + bean.getName() + parent + " {");
+                String genericString = "";
+                if (bean.getGenericDeclarations().size() > 0) {
+                    genericString = "<" + Joiner.on(", ").join(bean.getGenericDeclarations().iterator()) + ">";
+                }
+
+                writeIndentedLine("interface " + bean.getName() + parent + genericString + " {");
                 indent++;
                 for (TsPropertyModel property : bean.getProperties()) {
                     emitProperty(property);
