@@ -1,7 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
-import java.util.*;
+import java.util.List;
 
 
 public class TsType {
@@ -15,6 +15,14 @@ public class TsType {
     public static final AliasType DateAsNumber = new AliasType("DateAsNumber", "type DateAsNumber = number;");
     public static final AliasType DateAsString = new AliasType("DateAsString", "type DateAsString = string;");
 
+    private boolean optional = false;
+
+    public boolean getOptional() {
+        return optional;
+    }
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
 
     public static class BasicType extends TsType {
 
@@ -111,5 +119,4 @@ public class TsType {
         }
 
     }
-
 }

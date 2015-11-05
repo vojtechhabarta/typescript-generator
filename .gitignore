@@ -7,3 +7,6 @@ release.properties
 /sample-gradle/.gradle/
 /sample-gradle/.nb-gradle/
 /sample-gradle/build/
+**.classpath
+**.project
+**.settings

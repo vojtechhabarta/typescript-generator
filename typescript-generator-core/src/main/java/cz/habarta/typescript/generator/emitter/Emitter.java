@@ -1,10 +1,13 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.logging.Logger;
+
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
-import java.io.*;
-import java.util.logging.Logger;
 
 
 public class Emitter {
@@ -86,7 +89,7 @@ public class Emitter {
             writeIndentedLine("  */");
         }
         final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
-        final String opt = settings.declarePropertiesAsOptional ? "?" : "";
+        final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() || tsType.getOptional() ? "?" : "";
         writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
     }
 

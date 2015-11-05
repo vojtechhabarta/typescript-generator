@@ -1,11 +1,22 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.emitter.*;
-import cz.habarta.typescript.generator.parser.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.*;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import cz.habarta.typescript.generator.emitter.TsBeanModel;
+import cz.habarta.typescript.generator.emitter.TsModel;
+import cz.habarta.typescript.generator.emitter.TsPropertyModel;
+import cz.habarta.typescript.generator.parser.BeanModel;
+import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.PropertyModel;
 
 
 public class ModelCompiler {
@@ -83,7 +94,18 @@ public class ModelCompiler {
 
     }
 
-    private TsType typeFromJava(Type javaType, String usedInProperty, Class<?> usedInClass, boolean logWarnings, List<Class<?>> discoveredClasses) {
+    private TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        if (settings.customTypeParser != null) {
+            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeParser() {
+                @Override
+                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeParser fallback) {
+                    return ModelCompiler.this.typeFromJava(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
+                };
+            });
+            if (customType != null) {
+                return customType;
+            }
+        }
         if (KnownTypes.containsKey(javaType)) return KnownTypes.get(javaType);
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;

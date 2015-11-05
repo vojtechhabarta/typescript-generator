@@ -1,10 +1,17 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.logging.Logger;
+
+import cz.habarta.typescript.generator.ModelCompiler;
+import cz.habarta.typescript.generator.Settings;
 
 
 public abstract class ModelParser {

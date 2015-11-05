@@ -1,8 +1,9 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.TsType;
 import java.util.List;
+
+import cz.habarta.typescript.generator.TsType;
 
 
 public class TsPropertyModel {
