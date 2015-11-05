@@ -155,12 +155,12 @@ public class ModelCompiler {
         if (cls == null) {
             return null;
         }
-        final String name = cls.getSimpleName();
+        String name = cls.getSimpleName();
         if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
-            return name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
-        } else {
-            return name;
+            name = name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
         }
+        name = settings.defaultCustomTypePrefix + name;
+        return name;
     }
 
     private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> replacedEnums, LinkedHashSet<TsType.AliasType> typeAliases) {

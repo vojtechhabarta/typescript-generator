@@ -18,4 +18,5 @@ public class Settings {
             return null;
         }
     };
+    public String defaultCustomTypePrefix = "";
 }
