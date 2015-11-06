@@ -1,8 +1,12 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+
+import cz.habarta.typescript.generator.TsType;
 
 
 public class TsModel {
@@ -18,4 +22,10 @@ public class TsModel {
         return typeAliases;
     }
 
+    public void sort() {
+        for (TsBeanModel beanModel : beans) {
+            beanModel.sort();
+        }
+        Collections.sort(beans);
+    }
 }

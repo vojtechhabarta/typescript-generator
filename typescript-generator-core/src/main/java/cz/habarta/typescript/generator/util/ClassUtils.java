@@ -14,6 +14,9 @@ public class ClassUtils {
         // nope
     }
 
+    // Class A<T, V>
+    // =>
+    // ["A", "V"]
     public static List<String> getGenericDeclarationNames(Class<?> clazz) {
         try {
             Field genericInfoField = clazz.getClass().getDeclaredField("genericInfo");
