@@ -29,6 +29,9 @@ public class Emitter {
     }
 
     private void emitModule(TsModel model) {
+        if (settings.sortDeclarations) {
+            model.sort();
+        }
         if (settings.module != null) {
             writeNewLine();
             writeIndentedLine("declare module '" + settings.module + "' {");

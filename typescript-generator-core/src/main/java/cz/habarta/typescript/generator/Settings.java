@@ -15,4 +15,5 @@ public class Settings {
     public String addTypeNamePrefix = "";
     public String addDeclarationPrefix = "";
     public int initialIndentationLevel = 0;
+    public boolean sortDeclarations = false;
 }
