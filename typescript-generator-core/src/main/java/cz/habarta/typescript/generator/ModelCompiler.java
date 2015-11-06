@@ -119,6 +119,10 @@ public class ModelCompiler {
     }
 
     private TsType typeFromJavaInner(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        TsType parentTsType = null;
+        if (usedInClass != null) {
+            parentTsType = typeFromJava(usedInClass, null, null, logWarnings, discoveredClasses);
+        }
         if (settings.customTypeParser != null) {
             TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeParser() {
                 @Override
