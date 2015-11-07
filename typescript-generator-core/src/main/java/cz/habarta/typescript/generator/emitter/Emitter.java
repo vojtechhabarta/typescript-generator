@@ -74,7 +74,7 @@ public class Emitter {
             if (bean instanceof TsEnumBeanModel) {
                 TsEnumBeanModel enumBean = (TsEnumBeanModel) bean;
                 List<String> values = enumBean.getType().values;
-                writeIndentedLine(settings.declarationPrefix + "var " + bean.getName() + " {");
+                writeIndentedLine(settings.declarationPrefix + "var " + bean.getName() + " = {");
                 indent++;
                 int i = 0;
                 for (String value : values) {
@@ -86,6 +86,7 @@ public class Emitter {
                     writeIndentedLine(lineToWrite);
                 }
                 indent--;
+                writeIndentedLine("};");
             } else {
                 final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
                 String genericString = "";
@@ -99,8 +100,8 @@ public class Emitter {
                     emitProperty(property);
                 }
                 indent--;
+                writeIndentedLine("}");
             }
-            writeIndentedLine("}");
         }
     }
 

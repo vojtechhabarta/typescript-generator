@@ -17,7 +17,7 @@ import com.google.api.client.util.Lists;
 import com.google.api.client.util.Maps;
 import com.google.common.base.Optional;
 
-import cz.habarta.typescript.generator.JavaToTypescriptTypeParser;
+import cz.habarta.typescript.generator.JavaToTypescriptTypeConverter;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
@@ -79,9 +79,9 @@ public class EteTests {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Settings s = new Settings();
 
-        s.customTypeParser = new JavaToTypescriptTypeParser() {
+        s.customTypeParser = new JavaToTypescriptTypeConverter() {
             @Override
-            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeParser fallback) {
+            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
                 if (javaType instanceof ParameterizedType) {
                     ParameterizedType param = (ParameterizedType) javaType;
                     if (param.getRawType() == Optional.class) {

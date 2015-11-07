@@ -124,9 +124,9 @@ public class ModelCompiler {
             parentTsType = typeFromJava(usedInClass, null, null, logWarnings, discoveredClasses);
         }
         if (settings.customTypeParser != null) {
-            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeParser() {
+            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeConverter() {
                 @Override
-                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeParser fallback) {
+                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
                     return ModelCompiler.this.typeFromJava(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
                 };
             });
@@ -257,6 +257,7 @@ public class ModelCompiler {
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(void.class, TsType.Void);
         return knownTypes;
     }
 
@@ -290,7 +291,12 @@ public class ModelCompiler {
         return result;
     }
 
-    public Map<Type, TsType> getJavaToTypescriptTypeMap() {
-        return this.javaToTypescriptTypeMap;
+    public JavaToTypescriptTypeConverter getJavaToTypescriptTypeParser() {
+        return new JavaToTypescriptTypeConverter() {
+            @Override
+            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                return ModelCompiler.this.typeFromJavaInner(javaType, null, null, true, Lists.<Class<?>> newArrayList());
+            }
+        };
     }
 }

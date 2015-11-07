@@ -12,9 +12,9 @@ public class Settings {
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNameSuffix = null;
     public DateMapping mapDate = DateMapping.asDate;
-    public JavaToTypescriptTypeParser customTypeParser = new JavaToTypescriptTypeParser() {
+    public JavaToTypescriptTypeConverter customTypeParser = new JavaToTypescriptTypeConverter() {
         @Override
-        public TsType typeFromJava(Type javaType, JavaToTypescriptTypeParser fallback) {
+        public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
             return null;
         }
     };
