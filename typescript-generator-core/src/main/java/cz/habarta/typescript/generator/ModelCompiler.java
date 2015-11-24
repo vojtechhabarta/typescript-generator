@@ -78,7 +78,11 @@ public class ModelCompiler {
         List<String> comments = null;
         if (!replacedEnums.isEmpty()) {
             comments = new ArrayList<>();
-            comments.add("Original type: " + originalType);
+            String originalTypeString = originalType.toString();
+            if (originalType instanceof TsType.EnumType) {
+                originalTypeString = ((TsType.EnumType) originalType).getName();
+            }
+            comments.add("Original type: " + originalTypeString);
             for (TsType.EnumType replacedEnum : replacedEnums) {
                 comments.add(replacedEnum.toString() + ": " + join(replacedEnum.values, ", "));
             }

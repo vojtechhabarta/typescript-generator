@@ -155,6 +155,10 @@ public abstract class TsType {
             ret.optional = true;
             return ret;
         }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class GenericParamType extends TsType {
