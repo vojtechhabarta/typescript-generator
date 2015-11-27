@@ -103,3 +103,17 @@ Direct invocation
 If you do not use Maven or Gradle you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
 
 Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
+
+
+Contributing
+------------
+
+- this project targets Java 7
+- keep pull requests small and focused ([10 tips for better Pull Requests](http://blog.ploeh.dk/2015/01/15/10-tips-for-better-pull-requests/))
+- do not add dependencies unless previously discussed in issue
+
+### Code formatting
+
+- use 4 spaces for indentation in Java files
+- sort java imports alphabetically, you can use wildcards
+- please do not reformat whole files in IDE
