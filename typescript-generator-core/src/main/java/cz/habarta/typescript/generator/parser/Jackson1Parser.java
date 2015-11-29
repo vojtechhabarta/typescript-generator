@@ -1,15 +1,24 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.map.*;
-import org.codehaus.jackson.map.ser.*;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.ser.BeanPropertyWriter;
+import org.codehaus.jackson.map.ser.BeanSerializer;
+import org.codehaus.jackson.map.ser.BeanSerializerFactory;
 import org.codehaus.jackson.type.JavaType;
+
+import cz.habarta.typescript.generator.ModelCompiler;
+import cz.habarta.typescript.generator.Settings;
 
 
 public class Jackson1Parser extends ModelParser {

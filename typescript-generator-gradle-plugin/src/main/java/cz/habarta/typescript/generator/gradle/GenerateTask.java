@@ -1,12 +1,20 @@
 
 package cz.habarta.typescript.generator.gradle;
 
-import cz.habarta.typescript.generator.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.gradle.api.*;
-import org.gradle.api.tasks.*;
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskAction;
+
+import cz.habarta.typescript.generator.DateMapping;
+import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 
 
 public class GenerateTask extends DefaultTask {

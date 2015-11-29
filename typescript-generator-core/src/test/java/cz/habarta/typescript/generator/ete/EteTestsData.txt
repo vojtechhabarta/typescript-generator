@@ -1,0 +1,138 @@
+=== Begin expected declarations
+Class00
+interface Class00 {
+    x: string;
+}
+Class01
+interface Class01 {
+    x?: string;
+}
+Class02
+var Class02 {
+    A: "A",
+    B: "B",
+    C: "C"
+}
+Class03
+interface Class03<T> {
+    x: T[];
+}
+Class04
+interface Class04<T, V> {
+    x?: { [index: string]: V };
+    y: T[];
+}
+Class05
+interface Class05 {
+    x: Class03<Class00>;
+}
+Class06
+interface Class06 {
+    x: Class06;
+}
+Class07
+interface Class07 {
+    x: Class08;
+}
+Class08
+interface Class08 {
+    x: Class07;
+}
+Class09
+interface Class09<T> {
+    x: Class04<T, Class00>;
+}
+=== End expected declarations
+=== Begin test
+=== Begin input classes
+Class00
+=== End input classes
+=== Begin output classes
+Class00
+=== End output classes
+=== End Test
+=== Begin test
+=== Begin input classes
+Class01
+=== End input classes
+=== Begin output classes
+Class01
+=== End output classes
+=== End Test
+=== Begin test
+=== Begin input classes
+Class02
+=== End input classes
+=== Begin output classes
+Class02
+=== End output classes
+=== End Test
+=== Begin test
+=== Begin input classes
+Class03
+=== End input classes
+=== Begin output classes
+Class03
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class04
+=== End input classes
+=== Begin output classes
+Class04
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class05
+=== End input classes
+=== Begin output classes
+Class00
+Class03
+Class05
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class06
+=== End input classes
+=== Begin output classes
+Class06
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class07
+=== End input classes
+=== Begin output classes
+Class07
+Class08
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class08
+=== End input classes
+=== Begin output classes
+Class07
+Class08
+=== End output classes
+=== End test
+=== Begin test
+=== Begin input classes
+Class09
+=== End input classes
+=== Begin output classes
+Class00
+Class04
+Class09
+=== End output classes
+=== End test
+
+
+
+
+
+
+

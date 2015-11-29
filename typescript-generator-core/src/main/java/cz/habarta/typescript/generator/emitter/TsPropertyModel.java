@@ -1,11 +1,12 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.TsType;
 import java.util.List;
 
+import cz.habarta.typescript.generator.TsType;
 
-public class TsPropertyModel {
+
+public class TsPropertyModel implements Comparable<TsPropertyModel> {
 
     private final String name;
     private final TsType tsType;
@@ -32,6 +33,11 @@ public class TsPropertyModel {
     @Override
     public String toString() {
         return "TsPropertyModel{" + "name=" + name + ", tsType=" + tsType + '}';
+    }
+
+    @Override
+    public int compareTo(TsPropertyModel o) {
+        return name.compareTo(o.getName());
     }
 
 }

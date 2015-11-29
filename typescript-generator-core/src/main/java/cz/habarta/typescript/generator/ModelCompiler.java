@@ -1,21 +1,44 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.emitter.*;
-import cz.habarta.typescript.generator.parser.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.*;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import com.google.api.client.util.Lists;
+
+import cz.habarta.typescript.generator.TsType.EnumType;
+import cz.habarta.typescript.generator.TsType.GenericInstanceType;
+import cz.habarta.typescript.generator.TsType.GenericParamType;
+import cz.habarta.typescript.generator.emitter.TsBeanModel;
+import cz.habarta.typescript.generator.emitter.TsEnumBeanModel;
+import cz.habarta.typescript.generator.emitter.TsModel;
+import cz.habarta.typescript.generator.emitter.TsPropertyModel;
+import cz.habarta.typescript.generator.parser.BeanModel;
+import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.PropertyModel;
+import cz.habarta.typescript.generator.util.ClassUtils;
 
 
 public class ModelCompiler {
 
     private final Logger logger;
     private final Settings settings;
+    private Map<Type, TsType> javaToTypescriptTypeMap;
 
     public ModelCompiler(Logger logger, Settings settings) {
         this.logger = logger;
         this.settings = settings;
+        this.javaToTypescriptTypeMap = new HashMap<Type, TsType>();
     }
 
     public List<Class<?>> discoverClasses(Type type) {
@@ -33,11 +56,17 @@ public class ModelCompiler {
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()));
-        context.tsModel.getBeans().add(tsBean);
-        context = context.bean(bean, tsBean);
-        for (PropertyModel jBean : bean.getProperties()) {
-            processProperty(context, jBean);
+        if (bean.getBeanClass().isEnum()) {
+            EnumType enumType = (EnumType) this.typeFromJava(bean.getBeanClass(), null, null, true, Lists.<Class<?>>newArrayList());
+            TsEnumBeanModel tsEnumBeanModel = new TsEnumBeanModel(getMappedName(bean.getBeanClass()), enumType);
+            context.tsModel.getBeans().add(tsEnumBeanModel);
+        } else {
+            final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()), ClassUtils.getGenericDeclarationNames(bean.getBeanClass()));
+            context.tsModel.getBeans().add(tsBean);
+            context = context.bean(bean, tsBean);
+            for (PropertyModel jBean : bean.getProperties()) {
+                processProperty(context, jBean);
+            }
         }
     }
 
@@ -49,7 +78,11 @@ public class ModelCompiler {
         List<String> comments = null;
         if (!replacedEnums.isEmpty()) {
             comments = new ArrayList<>();
-            comments.add("Original type: " + originalType);
+            String originalTypeString = originalType.toString();
+            if (originalType instanceof TsType.EnumType) {
+                originalTypeString = ((TsType.EnumType) originalType).getName();
+            }
+            comments.add("Original type: " + originalTypeString);
             for (TsType.EnumType replacedEnum : replacedEnums) {
                 comments.add(replacedEnum.toString() + ": " + join(replacedEnum.values, ", "));
             }
@@ -83,7 +116,28 @@ public class ModelCompiler {
 
     }
 
-    private TsType typeFromJava(Type javaType, String usedInProperty, Class<?> usedInClass, boolean logWarnings, List<Class<?>> discoveredClasses) {
+    private TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        TsType ret = typeFromJavaInner(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
+        this.javaToTypescriptTypeMap.put(javaType, ret);
+        return ret;
+    }
+
+    private TsType typeFromJavaInner(Type javaType, final String usedInProperty, final Class<?> usedInClass, final boolean logWarnings, final List<Class<?>> discoveredClasses) {
+        TsType parentTsType = null;
+        if (usedInClass != null) {
+            parentTsType = typeFromJava(usedInClass, null, null, logWarnings, discoveredClasses);
+        }
+        if (settings.customTypeParser != null) {
+            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeConverter() {
+                @Override
+                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                    return ModelCompiler.this.typeFromJava(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
+                };
+            });
+            if (customType != null) {
+                return customType;
+            }
+        }
         if (KnownTypes.containsKey(javaType)) return KnownTypes.get(javaType);
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
@@ -96,6 +150,9 @@ public class ModelCompiler {
                 final List<java.lang.String> values = new ArrayList<>();
                 for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
                     values.add(enumConstant.name());
+                }
+                if (discoveredClasses != null) {
+                    discoveredClasses.add(javaClass);
                 }
                 return new TsType.EnumType(getMappedName(javaClass), values);
             }
@@ -115,13 +172,24 @@ public class ModelCompiler {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (List.class.isAssignableFrom(javaClass)) {
+                if (List.class.isAssignableFrom(javaClass) || Set.class.isAssignableFrom(javaClass)) {
                     return new TsType.BasicArrayType(typeFromJava(parameterizedType.getActualTypeArguments()[0], usedInProperty, usedInClass, logWarnings, discoveredClasses));
-                }
-                if (Map.class.isAssignableFrom(javaClass)) {
+                } else if (Map.class.isAssignableFrom(javaClass)) {
                     return new TsType.IndexedArrayType(TsType.String, typeFromJava(parameterizedType.getActualTypeArguments()[1], usedInProperty, usedInClass, logWarnings, discoveredClasses));
+                } else {
+                    // for example A<String, Integer>
+                    List<TsType> genericInstances = Lists.newArrayList();
+                    for (Type type: parameterizedType.getActualTypeArguments()) {
+                        genericInstances.add(typeFromJava(type, usedInProperty, usedInClass, logWarnings, discoveredClasses));
+                    }
+                    TsType base = typeFromJava(parameterizedType.getRawType(), usedInProperty, usedInClass, logWarnings, discoveredClasses);
+                    return new GenericInstanceType(base, genericInstances);
                 }
             }
+        }
+        if (javaType instanceof TypeVariable) {
+            // for example the generic "T" in List<T>
+            return new GenericParamType(((TypeVariable<?>) javaType).getName());
         }
         if (logWarnings) {
             logger.warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
@@ -133,40 +201,42 @@ public class ModelCompiler {
         if (cls == null) {
             return null;
         }
-        final String name = cls.getSimpleName();
+        String name = cls.getSimpleName();
         if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
-            return name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
-        } else {
-            return name;
+            name = name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
         }
+        name = settings.defaultCustomTypePrefix + name;
+        return name;
     }
 
     private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> replacedEnums, LinkedHashSet<TsType.AliasType> typeAliases) {
+        boolean optional = type.getOptional();
         if (type == TsType.Date) {
             if (settings.mapDate == DateMapping.asNumber) {
                 typeAliases.add(TsType.DateAsNumber);
-                return TsType.DateAsNumber;
-            }
-            if (settings.mapDate == DateMapping.asString) {
+                type = TsType.DateAsNumber;
+            } else if (settings.mapDate == DateMapping.asString) {
                 typeAliases.add(TsType.DateAsString);
-                return TsType.DateAsString;
+                type = TsType.DateAsString;
             }
-        }
-        if (type instanceof TsType.EnumType) {
+        } else if (type instanceof TsType.EnumType) {
             final TsType.EnumType enumType = (TsType.EnumType) type;
             replacedEnums.add(enumType);
-            return TsType.String;
-        }
-        if (type instanceof TsType.BasicArrayType) {
+            type = TsType.String;
+        } else if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
-            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
-        }
-        if (type instanceof TsType.IndexedArrayType) {
+            type = new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
+        } else if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
-            return new TsType.IndexedArrayType(
+            type = new TsType.IndexedArrayType(
                     replaceTypes(indexedArrayType.indexType, replacedEnums, typeAliases),
                     replaceTypes(indexedArrayType.elementType, replacedEnums, typeAliases));
         }
+
+        if (optional) {
+            type = type.getOptionalReference();
+        }
+
         return type;
     }
 
@@ -191,6 +261,7 @@ public class ModelCompiler {
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(void.class, TsType.Void);
         return knownTypes;
     }
 
@@ -222,5 +293,14 @@ public class ModelCompiler {
             result.addAll(second);
         }
         return result;
+    }
+
+    public JavaToTypescriptTypeConverter getJavaToTypescriptTypeParser() {
+        return new JavaToTypescriptTypeConverter() {
+            @Override
+            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                return ModelCompiler.this.typeFromJavaInner(javaType, null, null, true, Lists.<Class<?>> newArrayList());
+            }
+        };
     }
 }
