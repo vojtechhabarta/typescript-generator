@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.maven;
 
 import cz.habarta.typescript.generator.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -109,7 +110,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             settings.mapDate = mapDate;
-            TypeScriptGenerator.generateTypeScript(classList, settings, outputFile);
+            TypeScriptGenerator.generateTypeScript(classList, settings, new FileOutputStream(outputFile));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

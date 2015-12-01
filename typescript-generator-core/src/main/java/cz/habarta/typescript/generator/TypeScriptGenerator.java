@@ -3,14 +3,22 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
-import java.io.File;
+
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
 
 public class TypeScriptGenerator {
 
-    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File outputDeclarationFile) {
+    public static JavaToTypescriptTypeConverter generateTypeScript(List<? extends Class<?>> classes, Settings settings, File file) {
+        try {
+            return generateTypeScript(classes, settings, new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static JavaToTypescriptTypeConverter generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output) {
         final Logger logger = Logger.getGlobal();
         final ModelCompiler compiler = new ModelCompiler(logger, settings);
 
@@ -23,8 +31,9 @@ public class TypeScriptGenerator {
         final Model model = modelParser.parseModel(classes);
 
         final TsModel tsModel = compiler.javaToTypescript(model);
-        
-        Emitter.emit(logger, settings, outputDeclarationFile, tsModel);
+
+        Emitter.emit(logger, settings, output, tsModel);
+        return compiler.getJavaToTypescriptTypeParser();
     }
 
 }

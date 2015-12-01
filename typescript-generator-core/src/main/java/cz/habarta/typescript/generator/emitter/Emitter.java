@@ -20,12 +20,10 @@ public class Emitter {
         this.writer = writer;
     }
 
-    public static void emit(Logger logger, Settings settings, File outputFile, TsModel model) {
-        try (PrintWriter printWriter = new PrintWriter(outputFile)) {
+    public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model) {
+        try (PrintWriter printWriter = new PrintWriter(output)) {
             final Emitter emitter = new Emitter(logger, settings, printWriter);
             emitter.emitModule(model);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -86,7 +84,7 @@ public class Emitter {
             writeIndentedLine("  */");
         }
         final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
-        final String opt = settings.declarePropertiesAsOptional ? "?" : "";
+        final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() ? "?" : "";
         writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
     }
 
