@@ -11,7 +11,7 @@ public class ReturnedTypeConverterTest {
 
     @Test
     public void testTypeConversion() {
-        JavaToTypescriptTypeConverter converter = TypeScriptGenerator.generateTypeScript(Arrays.asList(A.class), new Settings(),
+        JavaToTypeScriptTypeConverter converter = TypeScriptGenerator.generateTypeScript(Arrays.asList(A.class), new Settings(),
                 new ByteArrayOutputStream());
         assertEquals("A", converter.typeFromJava(A.class).toString());
         assertEquals("B", converter.typeFromJava(B.class).toString());

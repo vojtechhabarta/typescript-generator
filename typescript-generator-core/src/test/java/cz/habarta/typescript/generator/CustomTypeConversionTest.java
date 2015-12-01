@@ -15,10 +15,10 @@ public class CustomTypeConversionTest {
     public void testCustomTypeConversion() {
         Settings settings = new Settings();
         // suppose we want to override how A is parsed
-        settings.customTypeParser = new JavaToTypescriptTypeConverter() {
+        settings.customTypeParser = new JavaToTypeScriptTypeConverter() {
 
             @Override
-            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+            public TsType typeFromJava(Type javaType, JavaToTypeScriptTypeConverter fallback) {
                 if (javaType.equals(B.class)) {
                     return TsType.Number.getOptionalReference();
                 }
@@ -27,7 +27,7 @@ public class CustomTypeConversionTest {
         };
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        JavaToTypescriptTypeConverter converter = TypeScriptGenerator.generateTypeScript(Arrays.asList(A.class), settings, out);
+        JavaToTypeScriptTypeConverter converter = TypeScriptGenerator.generateTypeScript(Arrays.asList(A.class), settings, out);
         assertEquals("A", converter.typeFromJava(A.class).toString());
         assertTrue(new String(out.toByteArray()).trim().contains("x?: number;"));
     }

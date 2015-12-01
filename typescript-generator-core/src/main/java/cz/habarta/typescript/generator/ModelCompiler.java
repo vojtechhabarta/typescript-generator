@@ -24,7 +24,7 @@ public class ModelCompiler {
         return discoveredClasses;
     }
 
-    public TsModel javaToTypescript(Model model) {
+    public TsModel javaToTypeScript(Model model) {
         final CompilationContext context = new CompilationContext(model, new TsModel());
         for (BeanModel bean : model.getBeans()) {
             processBean(context, bean);
@@ -89,9 +89,9 @@ public class ModelCompiler {
             parentTsType = typeFromJava(usedInClass, null, null, logWarnings, discoveredClasses);
         }
         if (settings.customTypeParser != null) {
-            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypescriptTypeConverter() {
+            TsType customType = settings.customTypeParser.typeFromJava(javaType, new JavaToTypeScriptTypeConverter() {
                 @Override
-                public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+                public TsType typeFromJava(Type javaType, JavaToTypeScriptTypeConverter fallback) {
                     return ModelCompiler.this.typeFromJava(javaType, usedInProperty, usedInClass, logWarnings, discoveredClasses);
                 };
             });
@@ -240,10 +240,10 @@ public class ModelCompiler {
         return result;
     }
 
-    public JavaToTypescriptTypeConverter getJavaToTypescriptTypeParser() {
-        return new JavaToTypescriptTypeConverter() {
+    public JavaToTypeScriptTypeConverter getJavaToTypeScriptTypeParser() {
+        return new JavaToTypeScriptTypeConverter() {
             @Override
-            public TsType typeFromJava(Type javaType, JavaToTypescriptTypeConverter fallback) {
+            public TsType typeFromJava(Type javaType, JavaToTypeScriptTypeConverter fallback) {
                 return ModelCompiler.this.typeFromJava(javaType, null, null, true, new ArrayList<Class<?>>());
             }
         };
