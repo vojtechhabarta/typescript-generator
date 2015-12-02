@@ -16,6 +16,7 @@ public class StyleConfigurationTest {
         settings.addTypeNamePrefix = "I";
         settings.addDeclarationPrefix = "export ";
         settings.initialIndentationLevel = 1;
+        settings.sortDeclarations = true;
 
         List<Class<?>> classList = new ArrayList<>();
         classList.add(A.class);

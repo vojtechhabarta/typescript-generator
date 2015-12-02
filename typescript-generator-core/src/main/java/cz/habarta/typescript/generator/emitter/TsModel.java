@@ -19,6 +19,9 @@ public class TsModel {
     }
 
     public void sort() {
+        for (TsBeanModel bean : beans) {
+            bean.sort();
+        }
         Collections.sort(beans);
     }
 }

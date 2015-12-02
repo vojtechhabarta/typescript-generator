@@ -38,4 +38,8 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
     public int compareTo(TsBeanModel o) {
         return name.compareTo(o.name);
     }
+
+    public void sort() {
+        Collections.sort(properties);
+    }
 }
