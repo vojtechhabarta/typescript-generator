@@ -98,7 +98,7 @@ public class Emitter {
     }
 
     private void writeIndentedLine(String line) {
-        for (int i = 0; i < indent; i++) {
+        for (int i = 0; !line.isEmpty() && i < indent; i++) {
             writer.write(settings.indentString);
         }
         writer.write(line);
