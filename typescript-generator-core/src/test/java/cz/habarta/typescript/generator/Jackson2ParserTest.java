@@ -39,7 +39,7 @@ public class Jackson2ParserTest {
     static Jackson2Parser getJackson2Parser() {
         final Logger logger = Logger.getGlobal();
         final Settings settings = new Settings();
-        return new Jackson2Parser(logger, settings, new ModelCompiler(logger, settings));
+        return new Jackson2Parser(logger, settings, new DefaultTypeProcessor());
     }
 
     public static class DummyBeanJackson2 {

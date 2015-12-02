@@ -25,7 +25,7 @@ public class Jackson1ParserTest {
     private static Jackson1Parser getJackson1Parser() {
         final Logger logger = Logger.getGlobal();
         final Settings settings = new Settings();
-        return new Jackson1Parser(logger, settings, new ModelCompiler(logger, settings));
+        return new Jackson1Parser(logger, settings, new DefaultTypeProcessor());
     }
 
 }

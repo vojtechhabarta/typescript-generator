@@ -11,13 +11,13 @@ public abstract class ModelParser {
 
     protected final Logger logger;
     protected final Settings settings;
-    protected final ModelCompiler compiler;
+    protected final TypeProcessor typeProcessor;
     private final Queue<ClassWithUsage> classQueue = new LinkedList<>();
 
-    public ModelParser(Logger logger, Settings settings, ModelCompiler compiler) {
+    public ModelParser(Logger logger, Settings settings, TypeProcessor typeProcessor) {
         this.logger = logger;
         this.settings = settings;
-        this.compiler = compiler;
+        this.typeProcessor = typeProcessor;
     }
 
     public Model parseModel(Class<?> cls) {
@@ -53,11 +53,25 @@ public abstract class ModelParser {
     }
 
     protected PropertyModel processTypeAndCreateProperty(String name, Type type, Class<?> usedInClass) {
-        final List<Class<?>> classes = compiler.discoverClasses(type);
+        List<Class<?>> classes = discoverClassesUsedInType(type);
         for (Class<?> cls : classes) {
             classQueue.add(new ClassWithUsage(cls, name, usedInClass));
         }
         return new PropertyModel(name, type, null);
+    }
+
+    private List<Class<?>> discoverClassesUsedInType(Type type) {
+        final TypeProcessor.Result result = typeProcessor.processType(type, new TypeProcessor.Context() {
+            @Override
+            public String getMappedName(Class<?> cls) {
+                return "NA";
+            }
+            @Override
+            public TypeProcessor.Result processType(Type javaType) {
+                return typeProcessor.processType(javaType, this);
+            }
+        });
+        return result.getDiscoveredClasses();
     }
 
 }

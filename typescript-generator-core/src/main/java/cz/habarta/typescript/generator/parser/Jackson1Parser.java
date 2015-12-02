@@ -16,8 +16,8 @@ public class Jackson1Parser extends ModelParser {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Jackson1Parser(Logger logger, Settings settings, ModelCompiler compiler) {
-        super(logger, settings, compiler);
+    public Jackson1Parser(Logger logger, Settings settings, TypeProcessor typeProcessor) {
+        super(logger, settings, typeProcessor);
     }
 
     @Override

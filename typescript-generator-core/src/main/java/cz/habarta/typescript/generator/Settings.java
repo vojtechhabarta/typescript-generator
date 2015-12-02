@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-import java.lang.reflect.Type;
 
 public class Settings {
     public String newline = String.format("%n");
@@ -12,10 +11,5 @@ public class Settings {
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNameSuffix = null;
     public DateMapping mapDate = DateMapping.asDate;
-    public JavaToTypeScriptTypeConverter customTypeParser = new JavaToTypeScriptTypeConverter() {
-        @Override
-        public TsType typeFromJava(Type javaType, JavaToTypeScriptTypeConverter fallback) {
-            return null;
-        }
-    };
+    public TypeProcessor customTypeProcessor = null;
 }
