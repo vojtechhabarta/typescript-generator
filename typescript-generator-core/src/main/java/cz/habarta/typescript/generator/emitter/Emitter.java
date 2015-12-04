@@ -12,12 +12,13 @@ public class Emitter {
     private final Logger logger;
     private final Settings settings;
     private final PrintWriter writer;
-    private int indent = 0;
+    private int indent;
 
     private Emitter(Logger logger, Settings settings, PrintWriter writer) {
         this.logger = logger;
         this.settings = settings;
         this.writer = writer;
+        this.indent = settings.initialIndentationLevel;
     }
 
     public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model) {
@@ -28,6 +29,9 @@ public class Emitter {
     }
 
     private void emitModule(TsModel model) {
+        if (settings.sortDeclarations) {
+            model.sort();
+        }
         if (settings.module != null) {
             writeNewLine();
             writeIndentedLine("declare module '" + settings.module + "' {");
@@ -65,7 +69,8 @@ public class Emitter {
         for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-            writeIndentedLine("interface " + bean.getName() + parent + " {");
+
+            writeIndentedLine(settings.addDeclarationPrefix + "interface " + bean.getName() + parent + " {");
             indent++;
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
@@ -96,7 +101,7 @@ public class Emitter {
     }
 
     private void writeIndentedLine(String line) {
-        for (int i = 0; i < indent; i++) {
+        for (int i = 0; !line.isEmpty() && i < indent; i++) {
             writer.write(settings.indentString);
         }
         writer.write(line);
