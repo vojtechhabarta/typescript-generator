@@ -1,13 +1,14 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.TypeProcessor.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.*;
 import java.util.*;
 import java.util.logging.Logger;
-
 
 public class TypeScriptGenerator {
 
@@ -64,6 +65,25 @@ public class TypeScriptGenerator {
         }
     }
 
+    public static TypeProcessor.Context createTypeProcessorContext(Settings settings) {
+        Logger logger = Logger.getGlobal();
+        final TypeProcessor typeProcessor = createTypeProcessor(settings);
+        final ModelCompiler compiler = new ModelCompiler(logger, settings, typeProcessor);
+
+        return new Context() {
+
+            @Override
+            public Result processType(Type javaType) {
+                return typeProcessor.processType(javaType, this);
+            }
+
+            @Override
+            public String getMappedName(Class<?> cls) {
+                return compiler.getMappedName(cls);
+            }
+        };
+    }
+
     private static String getVersion() {
         try {
             final InputStream inputStream = TypeScriptGenerator.class.getResourceAsStream(
@@ -78,5 +98,4 @@ public class TypeScriptGenerator {
             return null;
         }
     }
-
 }
