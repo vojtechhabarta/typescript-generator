@@ -1,9 +1,10 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.*;
 import java.io.*;
+import java.text.*;
+import java.util.*;
 import java.util.logging.Logger;
 
 
@@ -26,7 +27,15 @@ public class Emitter {
     public static void emit(Logger logger, Settings settings, Writer output, TsModel model, boolean forceExportKeyword, int initialIndentationLevel) {
         try (PrintWriter printWriter = new PrintWriter(output)) {
             final Emitter emitter = new Emitter(logger, settings, forceExportKeyword, initialIndentationLevel, printWriter);
+            emitter.emitFileComment();
             emitter.emitModule(model);
+        }
+    }
+
+    private void emitFileComment() {
+        if (!settings.noFileComment) {
+            final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            writeIndentedLine("// Generated using typescript-generator version " + TypeScriptGenerator.Version + " on " + timestamp + ".");
         }
     }
 

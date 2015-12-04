@@ -3,7 +3,6 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
-
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
@@ -11,6 +10,8 @@ import java.util.logging.Logger;
 
 
 public class TypeScriptGenerator {
+
+    public static final String Version = getVersion();
 
     public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File file) {
         try {
@@ -38,6 +39,7 @@ public class TypeScriptGenerator {
 
     private static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
         final Logger logger = Logger.getGlobal();
+        logger.info("Running TypeScriptGenerator version " + Version);
         final TypeProcessor typeProcessor = createTypeProcessor(settings);
 
         final ModelParser modelParser;
@@ -59,6 +61,21 @@ public class TypeScriptGenerator {
             return new TypeProcessor.Chain(settings.customTypeProcessor, new DefaultTypeProcessor());
         } else {
             return new DefaultTypeProcessor();
+        }
+    }
+
+    private static String getVersion() {
+        try {
+            final InputStream inputStream = TypeScriptGenerator.class.getResourceAsStream(
+                    "/META-INF/maven/cz.habarta.typescript-generator/typescript-generator-core/pom.properties");
+            if (inputStream != null) {
+                final Properties properties = new Properties();
+                properties.load(inputStream);
+                return (String) properties.get("version");
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
         }
     }
 

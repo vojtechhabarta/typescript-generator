@@ -15,6 +15,7 @@ public class StyleConfigurationTest {
         Settings settings = new Settings();
         settings.addTypeNamePrefix = "I";
         settings.sortDeclarations = true;
+        settings.noFileComment = true;
 
         List<Class<?>> classList = new ArrayList<>();
         classList.add(A.class);

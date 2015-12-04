@@ -14,4 +14,5 @@ public class Settings {
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
+    public boolean noFileComment = false;
 }

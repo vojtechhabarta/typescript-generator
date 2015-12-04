@@ -28,6 +28,7 @@ public class SortedTypesTest {
     public void assertCorrectOrder(List<Class<?>> list) {
         Settings settings = new Settings();
         settings.sortDeclarations = true;
+        settings.noFileComment = true;
         String expected = "" +
 ""                           + settings.newline +
 "interface A {"              + settings.newline +
