@@ -23,7 +23,7 @@ public class Emitter {
         this.indent = initialIndentationLevel;
     }
 
-    public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model, boolean forceExportKeyword, int initialIndentationLevel) {
+    public static void emit(Logger logger, Settings settings, Writer output, TsModel model, boolean forceExportKeyword, int initialIndentationLevel) {
         try (PrintWriter printWriter = new PrintWriter(output)) {
             final Emitter emitter = new Emitter(logger, settings, forceExportKeyword, initialIndentationLevel, printWriter);
             emitter.emitModule(model);

@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -20,14 +21,22 @@ public class TypeScriptGenerator {
     }
 
     public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output) {
+        generateTypeScript(classes, settings, new OutputStreamWriter(output, Charset.forName("UTF-8")));
+    }
+
+    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output) {
         generateTypeScript(classes, settings, output, false, 0);
     }
 
     public static void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateEmbeddableTypeScript(classes, settings, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
+    }
+
+    public static void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
         generateTypeScript(classes, settings, output, addExportKeyword, initialIndentationLevel);
     }
 
-    private static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output, boolean forceExportKeyword, int initialIndentationLevel) {
+    private static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
         final Logger logger = Logger.getGlobal();
         final TypeProcessor typeProcessor = createTypeProcessor(settings);
 

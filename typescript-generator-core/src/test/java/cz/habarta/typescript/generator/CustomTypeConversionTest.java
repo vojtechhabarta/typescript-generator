@@ -1,12 +1,10 @@
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.Arrays;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class CustomTypeConversionTest {
@@ -67,9 +65,9 @@ public class CustomTypeConversionTest {
             assertEquals(Arrays.asList(SomeObject.class), result.getDiscoveredClasses());
         }
         {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final StringWriter out = new StringWriter();
             TypeScriptGenerator.generateTypeScript(Arrays.asList(CustomOptionalUsage.class), settings, out);
-            final String dts = new String(out.toByteArray());
+            final String dts = out.toString();
             assertTrue(dts.contains("maybeObject?: SomeObject"));
         }
     }
