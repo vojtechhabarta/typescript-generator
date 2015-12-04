@@ -41,6 +41,7 @@ public class GenerateMojo extends AbstractMojo {
     private JsonLibrary jsonLibrary;
 
     /**
+     * Deprecated. Use "namespace" parameter.
      * @deprecated Use {@link #namespace} instead.
      */
     @Parameter

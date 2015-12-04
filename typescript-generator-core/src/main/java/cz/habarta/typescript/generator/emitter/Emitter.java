@@ -12,18 +12,20 @@ public class Emitter {
     private final Logger logger;
     private final Settings settings;
     private final PrintWriter writer;
+    private final boolean forceExportKeyword;
     private int indent;
 
-    private Emitter(Logger logger, Settings settings, PrintWriter writer) {
+    private Emitter(Logger logger, Settings settings, boolean forceExportKeyword, int initialIndentationLevel, PrintWriter writer) {
         this.logger = logger;
         this.settings = settings;
+        this.forceExportKeyword = forceExportKeyword;
         this.writer = writer;
-        this.indent = settings.initialIndentationLevel;
+        this.indent = initialIndentationLevel;
     }
 
-    public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model) {
+    public static void emit(Logger logger, Settings settings, OutputStream output, TsModel model, boolean forceExportKeyword, int initialIndentationLevel) {
         try (PrintWriter printWriter = new PrintWriter(output)) {
-            final Emitter emitter = new Emitter(logger, settings, printWriter);
+            final Emitter emitter = new Emitter(logger, settings, forceExportKeyword, initialIndentationLevel, printWriter);
             emitter.emitModule(model);
         }
     }
@@ -66,11 +68,11 @@ public class Emitter {
     }
 
     private void emitInterfaces(TsModel model) {
+        String exportPrefix = forceExportKeyword ? "export " : "";
         for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-
-            writeIndentedLine(settings.addDeclarationPrefix + "interface " + bean.getName() + parent + " {");
+            writeIndentedLine(exportPrefix + "interface " + bean.getName() + parent + " {");
             indent++;
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
@@ -101,8 +103,10 @@ public class Emitter {
     }
 
     private void writeIndentedLine(String line) {
-        for (int i = 0; !line.isEmpty() && i < indent; i++) {
-            writer.write(settings.indentString);
+        if (!line.isEmpty()) {
+            for (int i = 0; i < indent; i++) {
+                writer.write(settings.indentString);
+            }
         }
         writer.write(line);
         writeNewLine();

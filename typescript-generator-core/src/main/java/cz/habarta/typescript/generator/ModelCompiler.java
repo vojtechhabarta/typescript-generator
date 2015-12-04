@@ -107,7 +107,9 @@ public class ModelCompiler {
         if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
             name = name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
         }
-        name = settings.addTypeNamePrefix + name;
+        if (settings.addTypeNamePrefix != null) {
+            name = settings.addTypeNamePrefix + name;
+        }
         return name;
     }
 

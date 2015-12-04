@@ -10,10 +10,8 @@ public class Settings {
     public String module = null;
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNameSuffix = null;
+    public String addTypeNamePrefix = null;
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
-    public String addTypeNamePrefix = "";
-    public String addDeclarationPrefix = "";
-    public int initialIndentationLevel = 0;
     public boolean sortDeclarations = false;
 }

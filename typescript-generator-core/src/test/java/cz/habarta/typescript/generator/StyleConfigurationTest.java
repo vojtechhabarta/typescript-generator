@@ -14,8 +14,6 @@ public class StyleConfigurationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Settings settings = new Settings();
         settings.addTypeNamePrefix = "I";
-        settings.addDeclarationPrefix = "export ";
-        settings.initialIndentationLevel = 1;
         settings.sortDeclarations = true;
 
         List<Class<?>> classList = new ArrayList<>();
@@ -32,7 +30,7 @@ public class StyleConfigurationTest {
 "        s: string;"            + settings.newline +
 "    }"                         + settings.newline +
 "";
-        TypeScriptGenerator.generateTypeScript(classList, settings, output);
+        TypeScriptGenerator.generateEmbeddableTypeScript(classList, settings, output, true, 1);
 
         assertEquals(expected, new String(output.toByteArray()));
     }

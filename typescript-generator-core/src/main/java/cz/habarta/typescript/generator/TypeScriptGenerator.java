@@ -20,6 +20,14 @@ public class TypeScriptGenerator {
     }
 
     public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output) {
+        generateTypeScript(classes, settings, output, false, 0);
+    }
+
+    public static void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateTypeScript(classes, settings, output, addExportKeyword, initialIndentationLevel);
+    }
+
+    private static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output, boolean forceExportKeyword, int initialIndentationLevel) {
         final Logger logger = Logger.getGlobal();
         final TypeProcessor typeProcessor = createTypeProcessor(settings);
 
@@ -34,7 +42,7 @@ public class TypeScriptGenerator {
         final ModelCompiler compiler = new ModelCompiler(logger, settings, typeProcessor);
         final TsModel tsModel = compiler.javaToTypeScript(model);
 
-        Emitter.emit(logger, settings, output, tsModel);
+        Emitter.emit(logger, settings, output, tsModel, forceExportKeyword, initialIndentationLevel);
     }
 
     static TypeProcessor createTypeProcessor(Settings settings) {
