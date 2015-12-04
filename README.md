@@ -105,6 +105,28 @@ If you do not use Maven or Gradle you can invoke typescript-generator directly u
 Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
 
 
+Architecture
+------------
+
+`TypeScriptGenerator` has 3 main parts (`ModelParser`, `ModelCompiler` and `Emitter`) which work together to produce TypeScript declarations for specified Java classes.
+
+```
+           (Model)            (TsModel)
+ModelParser  ==>  ModelCompiler  ==>  Emitter
+         |         | 
+         V         V
+        TypeProcessor
+```
+
+- `ModelParser` reads Java JSON classes and their properties using Java reflections and creates `Model`.
+  It uses `TypeProcessor`s for finding used classes.
+  For example if property type is `List<Person>` it discovers that `Person` class should be also parsed.
+  `ModelParser`s are specific for each JSON library (for example `Jackson2Parser`).
+- `ModelCompiler` transforms Java model to TypeScript model (`Model` class to `TsModel` class).
+  It uses `TypeProcessor`s for mapping Java types to TypeScript types (for example for `int` returns `number`).
+- `Emitter` takes `TsModel` and produces TypeScript declaration file.
+
+
 Contributing
 ------------
 
