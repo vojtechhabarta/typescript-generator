@@ -4,9 +4,11 @@ package cz.habarta.typescript.generator;
 import java.lang.reflect.*;
 import java.util.*;
 
+import cz.habarta.typescript.generator.TsType.*;
+
 
 public class DefaultTypeProcessor implements TypeProcessor {
-    
+
     @Override
     public Result processType(Type javaType, Context context) {
         if (KnownTypes.containsKey(javaType)) return new Result(KnownTypes.get(javaType));
@@ -38,15 +40,30 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (List.class.isAssignableFrom(javaClass)) {
+                if (List.class.isAssignableFrom(javaClass) || Set.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
-                }
-                if (Map.class.isAssignableFrom(javaClass)) {
+                } else if (Map.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[1]);
                     return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
+                } else {
+                    // for example A<String, Integer>
+                    List<TsType> genericInstances = new ArrayList<>();
+                    List<Class<?>> discovered = new ArrayList<>();
+                    for (Type type: parameterizedType.getActualTypeArguments()) {
+                        Result result = context.processType(type);
+                        discovered.addAll(result.getDiscoveredClasses());
+                        genericInstances.add(result.getTsType());
+                    }
+                    Result baseResult = context.processType(parameterizedType.getRawType());
+                    discovered.addAll(baseResult.getDiscoveredClasses());
+                    return new Result(new GenericInstanceType(baseResult.getTsType(), genericInstances), discovered);
                 }
             }
+        }
+        if (javaType instanceof TypeVariable) {
+            // for example the generic "T" in List<T>
+            return new Result(new GenericParamType(((TypeVariable<?>) javaType).getName()), new ArrayList<Class<?>>());
         }
         return null;
     }

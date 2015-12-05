@@ -7,10 +7,12 @@ import java.util.*;
 
 import org.junit.*;
 
+import cz.habarta.typescript.generator.TypeProcessor.*;
+
 public class StyleConfigurationTest {
 
     @Test
-    public void testOutputWithCustomStyle() {
+    public void testOutputWithCustomStyle() throws NoSuchMethodException, SecurityException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Settings settings = new Settings();
         settings.addTypeNamePrefix = "I";
@@ -34,6 +36,8 @@ public class StyleConfigurationTest {
         TypeScriptGenerator.generateEmbeddableTypeScript(classList, settings, output, true, 1);
 
         assertEquals(expected, new String(output.toByteArray()));
+        Context context = TypeScriptGenerator.createTypeProcessorContext(settings);
+        assertEquals("IA", context.processType(A.class).getTsType().toString());
     }
 
     public static class A {

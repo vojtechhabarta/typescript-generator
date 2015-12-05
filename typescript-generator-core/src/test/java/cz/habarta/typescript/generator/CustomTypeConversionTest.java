@@ -1,11 +1,12 @@
 package cz.habarta.typescript.generator;
 
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import java.util.*;
+
+import org.junit.*;
 
 public class CustomTypeConversionTest {
 
