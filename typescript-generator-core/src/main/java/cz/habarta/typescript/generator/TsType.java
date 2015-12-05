@@ -145,12 +145,62 @@ public abstract class TsType {
 
         @Override
         public String toString() {
+            return TsType.String.toString();
+        }
+
+        public String getName() {
             return name;
         }
 
         @Override
         public TsType getOptionalReference() {
             EnumType ret = new EnumType(name, values);
+            ret.optional = true;
+            return ret;
+        }
+    }
+    public static class GenericParamType extends TsType {
+        public final String name;
+
+        public GenericParamType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        @Override
+        public TsType getOptionalReference() {
+            GenericParamType ret = new GenericParamType(name);
+            ret.optional = false;
+            return ret;
+        }
+    }
+
+    public static class GenericInstanceType extends TsType {
+
+        public final TsType base;
+        public final List<TsType> childGenericInstances;
+
+        public GenericInstanceType(TsType base, List<TsType> childGenericInstances) {
+            this.base = base;
+            this.childGenericInstances = childGenericInstances;
+        }
+
+        @Override
+        public String toString() {
+            String childGenericsString = Arrays.deepToString(childGenericInstances.toArray());
+            // rm the square brackets
+            childGenericsString = childGenericsString.substring(1, childGenericsString.length() - 1);
+            String genericString = "<" + childGenericsString + ">";
+            return base + genericString;
+        }
+
+        @Override
+        public TsType getOptionalReference() {
+            TsType ret = new GenericInstanceType(base, childGenericInstances);
             ret.optional = true;
             return ret;
         }

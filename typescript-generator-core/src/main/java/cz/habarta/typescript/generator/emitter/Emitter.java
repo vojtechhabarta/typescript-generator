@@ -80,8 +80,14 @@ public class Emitter {
         String exportPrefix = forceExportKeyword ? "export " : "";
         for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
-            final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-            writeIndentedLine(exportPrefix + "interface " + bean.getName() + parent + " {");
+            String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
+            String genericString =  "";
+            if (bean.getGenericDeclarations().size() > 0) {
+                List<String> generics = bean.getGenericDeclarations();
+                genericString = Arrays.toString(generics.toArray());
+                genericString = "<" + genericString.substring(1, genericString.length() - 1) + ">";
+            }
+            writeIndentedLine(exportPrefix + "interface " + bean.getName() + parent + genericString + " {");
             indent++;
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
@@ -99,7 +105,7 @@ public class Emitter {
             }
             writeIndentedLine("  */");
         }
-        final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
+        final TsType tsType = property.getTsType();
         final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() ? "?" : "";
         writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
     }

@@ -1,11 +1,14 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.emitter.*;
-import cz.habarta.typescript.generator.parser.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.logging.*;
+
+import cz.habarta.typescript.generator.TsType.*;
+import cz.habarta.typescript.generator.emitter.*;
+import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.*;
 
 
 public class ModelCompiler {
@@ -29,7 +32,7 @@ public class ModelCompiler {
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()));
+        final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()), ClassUtils.getGenericDeclarationNames(bean.getBeanClass()));
         context.tsModel.getBeans().add(tsBean);
         context = context.bean(bean, tsBean);
         for (PropertyModel jBean : bean.getProperties()) {
@@ -44,10 +47,14 @@ public class ModelCompiler {
         final TsType tsType = replaceTypes(originalType, replacedEnums, typeAliases);
         List<String> comments = null;
         if (!replacedEnums.isEmpty()) {
+            String originalTypeString = originalType.toString();
+            if (originalType instanceof EnumType) {
+                originalTypeString = ((EnumType) originalType).getName();
+            }
             comments = new ArrayList<>();
-            comments.add("Original type: " + originalType);
+            comments.add("Original type: " + originalTypeString);
             for (TsType.EnumType replacedEnum : replacedEnums) {
-                comments.add(replacedEnum.toString() + ": " + join(replacedEnum.values, ", "));
+                comments.add(replacedEnum.getName() + ": " + join(replacedEnum.values, ", "));
             }
         }
         final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, concat(property.getComments(), comments));
@@ -114,30 +121,30 @@ public class ModelCompiler {
     }
 
     private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> replacedEnums, LinkedHashSet<TsType.AliasType> typeAliases) {
+        boolean optional = type.getOptional();
         if (type == TsType.Date) {
             if (settings.mapDate == DateMapping.asNumber) {
                 typeAliases.add(TsType.DateAsNumber);
-                return TsType.DateAsNumber;
-            }
-            if (settings.mapDate == DateMapping.asString) {
+                type = TsType.DateAsNumber;
+            } else if (settings.mapDate == DateMapping.asString) {
                 typeAliases.add(TsType.DateAsString);
-                return TsType.DateAsString;
+                type = TsType.DateAsString;
             }
-        }
-        if (type instanceof TsType.EnumType) {
+        } else if (type instanceof TsType.EnumType) {
             final TsType.EnumType enumType = (TsType.EnumType) type;
             replacedEnums.add(enumType);
-            return TsType.String;
-        }
-        if (type instanceof TsType.BasicArrayType) {
+            type = TsType.String;
+        } else if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
-            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
-        }
-        if (type instanceof TsType.IndexedArrayType) {
+            type = new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
+        } else if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
-            return new TsType.IndexedArrayType(
+            type = new TsType.IndexedArrayType(
                     replaceTypes(indexedArrayType.indexType, replacedEnums, typeAliases),
                     replaceTypes(indexedArrayType.elementType, replacedEnums, typeAliases));
+        }
+        if (optional) {
+            type = type.getOptionalReference();
         }
         return type;
     }

@@ -11,10 +11,12 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
     private final String name;
     private final String parent;
     private final List<TsPropertyModel> properties = new ArrayList<>();
+    private final List<String> genericDeclarations;
 
-    public TsBeanModel(String name, String parent) {
+    public TsBeanModel(String name, String parent, List<String> genericDeclarations) {
         this.name = name;
         this.parent = parent;
+        this.genericDeclarations = genericDeclarations;
     }
 
     public String getName() {
@@ -41,5 +43,9 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
 
     public void sort() {
         Collections.sort(properties);
+    }
+
+    public List<String> getGenericDeclarations() {
+        return genericDeclarations;
     }
 }
