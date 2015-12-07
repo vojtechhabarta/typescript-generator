@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import cz.habarta.typescript.generator.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,20 +9,20 @@ import java.util.List;
 
 public class TsBeanModel implements Comparable<TsBeanModel> {
 
-    private final String name;
-    private final String parent;
+    private final TsType name;
+    private final TsType parent;
     private final List<TsPropertyModel> properties = new ArrayList<>();
 
-    public TsBeanModel(String name, String parent) {
+    public TsBeanModel(TsType name, TsType parent) {
         this.name = name;
         this.parent = parent;
     }
 
-    public String getName() {
+    public TsType getName() {
         return name;
     }
 
-    public String getParent() {
+    public TsType getParent() {
         return parent;
     }
 
@@ -36,7 +37,7 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
 
     @Override
     public int compareTo(TsBeanModel o) {
-        return name.compareTo(o.name);
+        return name.toString().compareTo(o.name.toString());
     }
 
     public void sort() {

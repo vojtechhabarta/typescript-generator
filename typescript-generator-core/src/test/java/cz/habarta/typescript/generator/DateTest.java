@@ -10,17 +10,17 @@ public class DateTest {
 
     @Test
     public void testDate() {
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(Dates.class), settings(DateMapping.asDate, "AsDate"), new File("target/test-date.d.ts"));
+        new TypeScriptGenerator(settings(DateMapping.asDate, "AsDate")).generateTypeScript(Arrays.asList(Dates.class), new File("target/test-date.d.ts"));
     }
 
     @Test
     public void testDateAsNumber() {
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(Dates.class), settings(DateMapping.asNumber, "AsNumber"), new File("target/test-dateAsNumber.d.ts"));
+        new TypeScriptGenerator(settings(DateMapping.asNumber, "AsNumber")).generateTypeScript(Arrays.asList(Dates.class), new File("target/test-dateAsNumber.d.ts"));
     }
 
     @Test
     public void testDateAsString() {
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(Dates.class), settings(DateMapping.asString, "AsString"), new File("target/test-dateAsString.d.ts"));
+        new TypeScriptGenerator(settings(DateMapping.asString, "AsString")).generateTypeScript(Arrays.asList(Dates.class), new File("target/test-dateAsString.d.ts"));
     }
 
     private static Settings settings(DateMapping mapDate, String namespace) {

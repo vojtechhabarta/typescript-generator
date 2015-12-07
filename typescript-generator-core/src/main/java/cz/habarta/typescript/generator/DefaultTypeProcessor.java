@@ -25,7 +25,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 }
                 return new Result(new TsType.EnumType(context.getMappedName(javaClass), values));
             }
-            if (List.class.isAssignableFrom(javaClass)) {
+            if (Collection.class.isAssignableFrom(javaClass)) {
                 return new Result(new TsType.BasicArrayType(TsType.Any));
             }
             if (Map.class.isAssignableFrom(javaClass)) {
@@ -38,7 +38,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (List.class.isAssignableFrom(javaClass)) {
+                if (Collection.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
@@ -46,6 +46,8 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[1]);
                     return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
                 }
+                // consider it structural
+                return new Result(new TsType.StructuralType(context.getMappedName(javaClass)), javaClass);
             }
         }
         return null;
@@ -72,7 +74,6 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(Date.class, TsType.Date);
-        knownTypes.put(void.class, TsType.Void);
         return knownTypes;
     }
 

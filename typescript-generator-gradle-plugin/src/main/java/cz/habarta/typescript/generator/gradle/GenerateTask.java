@@ -57,7 +57,7 @@ public class GenerateTask extends DefaultTask {
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
         settings.mapDate = mapDate;
-        TypeScriptGenerator.generateTypeScript(classList, settings, getProject().file(outputFile));
+        new TypeScriptGenerator(settings).generateTypeScript(classList, getProject().file(outputFile));
     }
 
 }

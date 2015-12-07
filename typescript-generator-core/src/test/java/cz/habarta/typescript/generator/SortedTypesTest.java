@@ -41,7 +41,7 @@ public class SortedTypesTest {
 "}"                          + settings.newline +
 "";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        TypeScriptGenerator.generateTypeScript(list, settings, out);
+        new TypeScriptGenerator(settings).generateTypeScript(list, out);
 
         assertEquals(expected, new String(out.toByteArray()));
     }

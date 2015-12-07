@@ -13,55 +13,86 @@ public class TypeScriptGenerator {
 
     public static final String Version = getVersion();
 
-    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, File file) {
+    private final Logger logger = Logger.getGlobal();
+    private final Settings settings;
+    private TypeProcessor typeProcessor = null;
+    private ModelParser modelParser = null;
+    private ModelCompiler modelCompiler = null;
+    private Emitter emitter = null;
+
+    public TypeScriptGenerator() {
+        this (new Settings());
+    }
+
+    public TypeScriptGenerator(Settings settings) {
+        this.settings = settings;
+    }
+
+    public void generateTypeScript(List<? extends Class<?>> classes, File file) {
         try {
-            generateTypeScript(classes, settings, new FileOutputStream(file));
+            generateTypeScript(classes, new FileOutputStream(file));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output) {
-        generateTypeScript(classes, settings, new OutputStreamWriter(output, Charset.forName("UTF-8")));
+    public void generateTypeScript(List<? extends Class<?>> classes, OutputStream output) {
+        generateTypeScript(classes, new OutputStreamWriter(output, Charset.forName("UTF-8")));
     }
 
-    public static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output) {
-        generateTypeScript(classes, settings, output, false, 0);
+    public void generateTypeScript(List<? extends Class<?>> classes, Writer output) {
+        generateTypeScript(classes, output, false, 0);
     }
 
-    public static void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Settings settings, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateEmbeddableTypeScript(classes, settings, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
+    public void generateEmbeddableTypeScript(List<? extends Class<?>> classes, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateEmbeddableTypeScript(classes, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
     }
 
-    public static void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateTypeScript(classes, settings, output, addExportKeyword, initialIndentationLevel);
+    public void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateTypeScript(classes, output, addExportKeyword, initialIndentationLevel);
     }
 
-    private static void generateTypeScript(List<? extends Class<?>> classes, Settings settings, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
-        final Logger logger = Logger.getGlobal();
+    private void generateTypeScript(List<? extends Class<?>> classes, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
         logger.info("Running TypeScriptGenerator version " + Version);
-        final TypeProcessor typeProcessor = createTypeProcessor(settings);
-
-        final ModelParser modelParser;
-        if (settings.jsonLibrary == JsonLibrary.jackson2) {
-            modelParser = new Jackson2Parser(logger, settings, typeProcessor);
-        } else {
-            modelParser = new Jackson1Parser(logger, settings, typeProcessor);
-        }
-        final Model model = modelParser.parseModel(classes);
-
-        final ModelCompiler compiler = new ModelCompiler(logger, settings, typeProcessor);
-        final TsModel tsModel = compiler.javaToTypeScript(model);
-
-        Emitter.emit(logger, settings, output, tsModel, forceExportKeyword, initialIndentationLevel);
+        final Model model = getModelParser().parseModel(classes);
+        final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
+        getEmitter().emit(tsModel, output, forceExportKeyword, initialIndentationLevel);
     }
 
-    static TypeProcessor createTypeProcessor(Settings settings) {
-        if (settings.customTypeProcessor != null) {
-            return new TypeProcessor.Chain(settings.customTypeProcessor, new DefaultTypeProcessor());
-        } else {
-            return new DefaultTypeProcessor();
+    public TypeProcessor getTypeProcessor() {
+        if (typeProcessor == null) {
+            if (settings.customTypeProcessor != null) {
+                typeProcessor = new TypeProcessor.Chain(settings.customTypeProcessor, new DefaultTypeProcessor());
+            } else {
+                typeProcessor = new DefaultTypeProcessor();
+            }
         }
+        return typeProcessor;
+    }
+
+    public ModelParser getModelParser() {
+        if (modelParser == null) {
+            if (settings.jsonLibrary == JsonLibrary.jackson2) {
+                modelParser = new Jackson2Parser(logger, settings, getTypeProcessor());
+            } else {
+                modelParser = new Jackson1Parser(logger, settings, getTypeProcessor());
+            }
+        }
+        return modelParser;
+    }
+
+    public ModelCompiler getModelCompiler() {
+        if (modelCompiler == null) {
+            modelCompiler = new ModelCompiler(logger, settings, getTypeProcessor());
+        }
+        return modelCompiler;
+    }
+
+    public Emitter getEmitter() {
+        if (emitter == null) {
+            emitter = new Emitter(logger, settings);
+        }
+        return emitter;
     }
 
     private static String getVersion() {

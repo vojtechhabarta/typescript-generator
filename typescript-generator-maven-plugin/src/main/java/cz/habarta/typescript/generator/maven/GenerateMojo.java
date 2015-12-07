@@ -111,7 +111,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             settings.mapDate = mapDate;
-            TypeScriptGenerator.generateTypeScript(classList, settings, new FileOutputStream(outputFile));
+            new TypeScriptGenerator(settings).generateTypeScript(classList, new FileOutputStream(outputFile));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

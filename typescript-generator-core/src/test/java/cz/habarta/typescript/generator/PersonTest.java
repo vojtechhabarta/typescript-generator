@@ -10,7 +10,7 @@ public class PersonTest {
     
     @Test
     public void test() {
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(Person.class), new Settings(), new File("target/person.d.ts"));
+        new TypeScriptGenerator().generateTypeScript(Arrays.asList(Person.class), new File("target/person.d.ts"));
     }
 
 }

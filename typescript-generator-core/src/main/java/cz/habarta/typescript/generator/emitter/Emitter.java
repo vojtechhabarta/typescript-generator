@@ -12,23 +12,22 @@ public class Emitter {
 
     private final Logger logger;
     private final Settings settings;
-    private final PrintWriter writer;
-    private final boolean forceExportKeyword;
+    private PrintWriter writer;
+    private boolean forceExportKeyword;
     private int indent;
 
-    private Emitter(Logger logger, Settings settings, boolean forceExportKeyword, int initialIndentationLevel, PrintWriter writer) {
+    public Emitter(Logger logger, Settings settings) {
         this.logger = logger;
         this.settings = settings;
-        this.forceExportKeyword = forceExportKeyword;
-        this.writer = writer;
-        this.indent = initialIndentationLevel;
     }
 
-    public static void emit(Logger logger, Settings settings, Writer output, TsModel model, boolean forceExportKeyword, int initialIndentationLevel) {
+    public void emit(TsModel model, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
         try (PrintWriter printWriter = new PrintWriter(output)) {
-            final Emitter emitter = new Emitter(logger, settings, forceExportKeyword, initialIndentationLevel, printWriter);
-            emitter.emitFileComment();
-            emitter.emitModule(model);
+            this.writer = printWriter;
+            this.forceExportKeyword = forceExportKeyword;
+            this.indent = initialIndentationLevel;
+            emitFileComment();
+            emitModule(model);
         }
     }
 
@@ -100,8 +99,8 @@ public class Emitter {
             writeIndentedLine("  */");
         }
         final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
-        final String opt = settings.declarePropertiesAsOptional || tsType.getOptional() ? "?" : "";
-        writeIndentedLine(property.getName() + opt + ": " + tsType + ";");
+        final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
+        writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
     }
 
     private void emitTypeAliases(TsModel model) {

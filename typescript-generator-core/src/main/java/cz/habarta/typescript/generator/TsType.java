@@ -11,17 +11,12 @@ public abstract class TsType {
     public static final TsType Number = new BasicType("number");
     public static final TsType String = new BasicType("string");
     public static final TsType Date = new BasicType("Date");
-    public static final TsType Void = new BasicType("void");
 
     public static final AliasType DateAsNumber = new AliasType("DateAsNumber", "type DateAsNumber = number;");
     public static final AliasType DateAsString = new AliasType("DateAsString", "type DateAsString = string;");
 
-    protected boolean optional = false;
-
-    public abstract TsType getOptionalReference();
-
-    public boolean getOptional() {
-        return optional;
+    public TsType.OptionalType optional() {
+        return new TsType.OptionalType(this);
     }
 
     public static class BasicType extends TsType {
@@ -37,12 +32,6 @@ public abstract class TsType {
             return name;
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            BasicType ret = new BasicType(name);
-            ret.optional = true;
-            return ret;
-        }
     }
 
     public static class AliasType extends TsType {
@@ -60,12 +49,6 @@ public abstract class TsType {
             return name;
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            AliasType ret = new AliasType(name, definition);
-            ret.optional = true;
-            return ret;
-        }
     }
 
     public static class BasicArrayType extends TsType {
@@ -81,12 +64,6 @@ public abstract class TsType {
             return elementType + "[]";
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            BasicArrayType ret = new BasicArrayType(elementType);
-            ret.optional = true;
-            return ret;
-        }
     }
 
     public static class IndexedArrayType extends TsType {
@@ -104,12 +81,6 @@ public abstract class TsType {
             return "{ [index: " + indexType + "]: " + elementType + " }";
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            IndexedArrayType ret = new IndexedArrayType(indexType, elementType);
-            ret.optional = true;
-            return ret;
-        }
     }
 
     public static class StructuralType extends TsType {
@@ -125,12 +96,6 @@ public abstract class TsType {
             return name;
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            StructuralType ret = new StructuralType(name);
-            ret.optional = true;
-            return ret;
-        }
     }
 
     public static class EnumType extends TsType {
@@ -148,11 +113,21 @@ public abstract class TsType {
             return name;
         }
 
-        @Override
-        public TsType getOptionalReference() {
-            EnumType ret = new EnumType(name, values);
-            ret.optional = true;
-            return ret;
-        }
     }
+
+    public static class OptionalType extends TsType {
+
+        public final TsType type;
+
+        public OptionalType(TsType type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type.toString();
+        }
+
+    }
+
 }

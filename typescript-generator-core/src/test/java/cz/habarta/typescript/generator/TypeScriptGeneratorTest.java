@@ -10,10 +10,10 @@ public class TypeScriptGeneratorTest {
 
     @Test
     public void testNamespacesAndModules() {
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(DummyBean.class), settings("NS1", "mod1"), new File("target/test-nm1.d.ts"));
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(DummyBean.class), settings("NS2", null), new File("target/test-nm2.d.ts"));
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(DummyBean.class), settings(null, "mod3"), new File("target/test-nm3.d.ts"));
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(DummyBean.class), settings(null, null), new File("target/test-nm4.d.ts"));
+        new TypeScriptGenerator(settings("NS1", "mod1")).generateTypeScript(Arrays.asList(DummyBean.class), new File("target/test-nm1.d.ts"));
+        new TypeScriptGenerator(settings("NS2", null)).generateTypeScript(Arrays.asList(DummyBean.class), new File("target/test-nm2.d.ts"));
+        new TypeScriptGenerator(settings(null, "mod3")).generateTypeScript(Arrays.asList(DummyBean.class), new File("target/test-nm3.d.ts"));
+        new TypeScriptGenerator(settings(null, null)).generateTypeScript(Arrays.asList(DummyBean.class), new File("target/test-nm4.d.ts"));
     }
 
     private static Settings settings(String namespace, String module) {

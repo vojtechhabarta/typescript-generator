@@ -71,7 +71,7 @@ public abstract class ModelParser {
                 return typeProcessor.processType(javaType, this);
             }
         });
-        return result.getDiscoveredClasses();
+        return result != null ? result.getDiscoveredClasses() : Collections.<Class<?>>emptyList();
     }
 
 }

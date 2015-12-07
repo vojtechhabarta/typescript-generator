@@ -17,17 +17,16 @@ public class CustomTypeConversionTest {
             @Override
             public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
                 if (javaType.equals(B.class)) {
-                    return new Result(TsType.Number.getOptionalReference());
+                    return new Result(TsType.Number.optional());
                 }
                 return null;
             }
         };
 
-        TypeProcessor typeProcessor = TypeScriptGenerator.createTypeProcessor(settings);
-        final TypeProcessor.Context context = DefaultTypeProcessorTest.getTestContext(typeProcessor);
-        assertEquals("A", typeProcessor.processType(A.class, context).getTsType().toString());
+        final ModelCompiler compiler = new TypeScriptGenerator().getModelCompiler();
+        assertEquals("A", compiler.typeFromJava(A.class).toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        TypeScriptGenerator.generateTypeScript(Arrays.asList(A.class), settings, out);
+        new TypeScriptGenerator(settings).generateTypeScript(Arrays.asList(A.class), out);
         assertTrue(new String(out.toByteArray()).trim().contains("x?: number;"));
     }
 
@@ -52,12 +51,12 @@ public class CustomTypeConversionTest {
                 final Type[] typeArguments = tryGetParameterizedTypeArguments(javaType, CustomOptional.class);
                 if (typeArguments != null) {
                     final TypeProcessor.Result result = context.processType(typeArguments[0]);
-                    return new Result(result.getTsType().getOptionalReference(), result.getDiscoveredClasses());
+                    return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
                 }
                 return null;
             }
         };
-        final TypeProcessor typeProcessor = TypeScriptGenerator.createTypeProcessor(settings);
+        final TypeProcessor typeProcessor = new TypeScriptGenerator(settings).getTypeProcessor();
         final TypeProcessor.Context context = DefaultTypeProcessorTest.getTestContext(typeProcessor);
         {
             final Type maybeObjectFieldType = CustomOptionalUsage.class.getField("maybeObject").getGenericType();
@@ -66,7 +65,7 @@ public class CustomTypeConversionTest {
         }
         {
             final StringWriter out = new StringWriter();
-            TypeScriptGenerator.generateTypeScript(Arrays.asList(CustomOptionalUsage.class), settings, out);
+            new TypeScriptGenerator(settings).generateTypeScript(Arrays.asList(CustomOptionalUsage.class), out);
             final String dts = out.toString();
             assertTrue(dts.contains("maybeObject?: SomeObject"));
         }

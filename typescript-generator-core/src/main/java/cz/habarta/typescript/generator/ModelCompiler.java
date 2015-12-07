@@ -29,7 +29,7 @@ public class ModelCompiler {
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(getMappedName(bean.getBeanClass()), getMappedName(bean.getParent()));
+        final TsBeanModel tsBean = new TsBeanModel(typeFromJava(bean.getBeanClass()), typeFromJava(bean.getParent()));
         context.tsModel.getBeans().add(tsBean);
         context = context.bean(bean, tsBean);
         for (PropertyModel jBean : bean.getProperties()) {
@@ -79,7 +79,14 @@ public class ModelCompiler {
 
     }
 
-    private TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass) {
+    public TsType typeFromJava(Type javaType) {
+        return typeFromJava(javaType, null, null);
+    }
+
+    public TsType typeFromJava(Type javaType, final String usedInProperty, final Class<?> usedInClass) {
+        if (javaType == null) {
+            return null;
+        }
         final TypeProcessor.Result result = typeProcessor.processType(javaType, new TypeProcessor.Context() {
             @Override
             public String getMappedName(Class<?> cls) {
@@ -87,16 +94,19 @@ public class ModelCompiler {
             }
             @Override
             public TypeProcessor.Result processType(Type javaType) {
-                final TypeProcessor.Result nestedResult = typeProcessor.processType(javaType, this);
-                if (nestedResult != null) {
-                    return nestedResult;
-                } else {
-                    logger.warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
-                    return new TypeProcessor.Result(TsType.Any);
-                }
+                return typeProcessor.processType(javaType, this);
             }
         });
-        return result.getTsType();
+        if (result != null) {
+            return result.getTsType();
+        } else {
+            if (usedInClass != null && usedInProperty != null) {
+                logger.warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
+            } else {
+                logger.warning(String.format("Unsupported type '%s'", javaType));
+            }
+            return TsType.Any;
+        }
     }
 
     private String getMappedName(Class<?> cls) {
@@ -142,7 +152,7 @@ public class ModelCompiler {
         return type;
     }
 
-    private static String join(Iterable<? extends Object> values, String delimiter) {
+    static String join(Iterable<? extends Object> values, String delimiter) {
         final StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Object value : values) {
