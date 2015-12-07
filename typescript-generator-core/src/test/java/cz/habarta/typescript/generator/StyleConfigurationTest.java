@@ -34,6 +34,7 @@ public class StyleConfigurationTest {
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(classList, output, true, 1);
 
         assertEquals(expected, new String(output.toByteArray()));
+        assertEquals("IA", TypeScriptGenerator.createTypeProcessorContext(settings).processType(A.class).getTsType().toString());
     }
 
     public static class A {

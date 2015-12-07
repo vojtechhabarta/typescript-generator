@@ -109,7 +109,7 @@ public class ModelCompiler {
         }
     }
 
-    private String getMappedName(Class<?> cls) {
+    public String getMappedName(Class<?> cls) {
         if (cls == null) {
             return null;
         }
