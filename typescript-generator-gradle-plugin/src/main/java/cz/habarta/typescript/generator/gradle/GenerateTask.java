@@ -66,7 +66,9 @@ public class GenerateTask extends DefaultTask {
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.mapDate = mapDate;
-        settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+        if (customTypeProcessor != null) {
+            settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+        }
         settings.sortDeclarations = sortDeclarations;
         settings.noFileComment = noFileComment;
         new TypeScriptGenerator(settings).generateTypeScript(classList, getProject().file(outputFile));

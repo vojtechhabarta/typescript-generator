@@ -158,7 +158,9 @@ public class GenerateMojo extends AbstractMojo {
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.mapDate = mapDate;
-            settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+            if (customTypeProcessor != null) {
+                settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+            }
             settings.sortDeclarations = sortDeclarations;
             settings.noFileComment = noFileComment;
             new TypeScriptGenerator(settings).generateTypeScript(classList, new FileOutputStream(outputFile));
