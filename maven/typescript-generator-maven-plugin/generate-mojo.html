@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2015-12-08
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.3.129
+                  <li id="projectVersion">Version: 1.3.130
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.3.129:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.3.130:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -225,6 +225,20 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
           
 <tr class="b">
             
+<td><b><a href="#customTypeProcessor">customTypeProcessor</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>Specifies custom class implementing <tt>TypeProcessor</tt>.
+This allows to customize how Java types are mapped to TypeScript.
+For example it is possible to implement TypeProcessor for
+<tt>Optional</tt> from guava or for Java 8 date/time classes.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td><b><a href="#declarePropertiesAsOptional">declarePropertiesAsOptional</a></b></td>
             
 <td><tt>boolean</tt></td>
@@ -234,7 +248,7 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
 <td>If true declared properties will be optional.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#jsonLibrary">jsonLibrary</a></b></td>
             
@@ -246,7 +260,7 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
 'jackson2'. Default value is 'jackson1'.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#mapDate">mapDate</a></b></td>
             
@@ -258,7 +272,7 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
 are 'asDate', 'asNumber, 'asString'. Default value is 'asDate'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#module">module</a></b></td>
             
@@ -270,7 +284,7 @@ are 'asDate', 'asNumber, 'asString'. Default value is 'asDate'.<br /></td>
 generated declarations.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#moduleName">moduleName</a></b></td>
             
@@ -281,7 +295,7 @@ generated declarations.<br /></td>
 <td><b>Deprecated.</b> Use <tt>namespace</tt> instead.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#namespace">namespace</a></b></td>
             
@@ -291,6 +305,20 @@ generated declarations.<br /></td>
             
 <td>TypeScript namespace (previously called &quot;internal module&quot;) of
 generated declarations.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#noFileComment">noFileComment</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>If true generated file will not contain comment at the top. By
+default there is a comment with timestamp and typescript-generator
+version. So it might be useful to suppress this comment if the file
+is in source control and is regenerated in build.<br /></td>
           </tr>
           
 <tr class="b">
@@ -317,6 +345,18 @@ will be &quot;Data&quot;.<br /></td>
 <td>Suffix which will be removed from names of classes, interfaces,
 enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&quot;
 will be &quot;Data&quot;.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>If true TypeScript declarations (interfaces, properties) will be
+sorted alphabetically.<br /></td>
           </tr>
         </table>
       </div>
@@ -356,6 +396,19 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
 <li><b>Type</b>: <tt>java.util.List</tt></li>
           
 <li><b>Required</b>: <tt>Yes</tt></li>
+        </ul><hr />
+<p><b><a name="customTypeProcessor">customTypeProcessor</a>:</b></p>
+        
+<div>Specifies custom class implementing <tt>TypeProcessor</tt>.
+This allows to customize how Java types are mapped to TypeScript.
+For example it is possible to implement TypeProcessor for
+<tt>Optional</tt> from guava or for Java 8 date/time classes.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
 <p><b><a name="declarePropertiesAsOptional">declarePropertiesAsOptional</a>:</b></p>
         
@@ -423,6 +476,19 @@ generated declarations.</div>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
+<p><b><a name="noFileComment">noFileComment</a>:</b></p>
+        
+<div>If true generated file will not contain comment at the top. By
+default there is a comment with timestamp and typescript-generator
+version. So it might be useful to suppress this comment if the file
+is in source control and is regenerated in build.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
 <p><b><a name="outputFile">outputFile</a>:</b></p>
         
 <div>Output TypeScript declaration file.</div>
@@ -454,6 +520,17 @@ will be &quot;Data&quot;.</div>
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="sortDeclarations">sortDeclarations</a>:</b></p>
+        
+<div>If true TypeScript declarations (interfaces, properties) will be
+sorted alphabetically.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul>
