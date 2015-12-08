@@ -98,7 +98,7 @@ public class Emitter {
             }
             writeIndentedLine("  */");
         }
-        final TsType tsType = property.getTsType() instanceof TsType.EnumType ? TsType.String : property.getTsType();
+        final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
         writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
     }
