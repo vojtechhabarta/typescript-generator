@@ -114,11 +114,17 @@ public class ModelCompiler {
             return null;
         }
         String name = cls.getSimpleName();
+        if (settings.removeTypeNamePrefix != null && name.startsWith(settings.removeTypeNamePrefix)) {
+            name = name.substring(settings.removeTypeNamePrefix.length(), name.length());
+        }
         if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
             name = name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
         }
         if (settings.addTypeNamePrefix != null) {
             name = settings.addTypeNamePrefix + name;
+        }
+        if (settings.addTypeNameSuffix != null) {
+            name = name + settings.addTypeNameSuffix;
         }
         return name;
     }

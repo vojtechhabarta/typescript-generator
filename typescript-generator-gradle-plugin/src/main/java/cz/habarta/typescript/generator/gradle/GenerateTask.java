@@ -17,7 +17,10 @@ public class GenerateTask extends DefaultTask {
     public String namespace;
     public String module;
     public boolean declarePropertiesAsOptional;
+    public String removeTypeNamePrefix;
     public String removeTypeNameSuffix;
+    public String addTypeNamePrefix;
+    public String addTypeNameSuffix;
     public DateMapping mapDate;
 
 
@@ -55,7 +58,10 @@ public class GenerateTask extends DefaultTask {
         settings.namespace = namespace;
         settings.module = module;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+        settings.removeTypeNamePrefix = removeTypeNamePrefix;
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
+        settings.addTypeNamePrefix = addTypeNamePrefix;
+        settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.mapDate = mapDate;
         new TypeScriptGenerator(settings).generateTypeScript(classList, getProject().file(outputFile));
     }

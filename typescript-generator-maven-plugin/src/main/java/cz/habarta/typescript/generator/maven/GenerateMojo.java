@@ -67,11 +67,32 @@ public class GenerateMojo extends AbstractMojo {
     private boolean declarePropertiesAsOptional;
 
     /**
+     * Prefix which will be removed from names of classes, interfaces, enums.
+     * For example if set to "Json" then mapping for "JsonData" will be "Data".
+     */
+    @Parameter
+    private String removeTypeNamePrefix;
+
+    /**
      * Suffix which will be removed from names of classes, interfaces, enums.
-     * Type names which don't end with this suffix will not change.
+     * For example if set to "JSON" then mapping for "DataJSON" will be "Data".
      */
     @Parameter
     private String removeTypeNameSuffix;
+
+    /**
+     * Prefix which will be added to names of classes, interfaces, enums.
+     * For example if set to "I" then mapping for "Data" will be "IData".
+     */
+    @Parameter
+    private String addTypeNamePrefix;
+
+    /**
+     * Suffix which will be added to names of classes, interfaces, enums.
+     * For example if set to "Data" then mapping for "Person" will be "PersonData".
+     */
+    @Parameter
+    private String addTypeNameSuffix;
 
     /**
      * Specifies how {@link java.util.Date} will be mapped.
@@ -109,7 +130,10 @@ public class GenerateMojo extends AbstractMojo {
             settings.namespace = namespace != null ? namespace : moduleName;
             settings.module = module;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+            settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
+            settings.addTypeNamePrefix = addTypeNamePrefix;
+            settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.mapDate = mapDate;
             new TypeScriptGenerator(settings).generateTypeScript(classList, new FileOutputStream(outputFile));
 

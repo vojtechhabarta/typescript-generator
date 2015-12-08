@@ -9,8 +9,10 @@ public class Settings {
     public String namespace = null;
     public String module = null;
     public boolean declarePropertiesAsOptional = false;
+    public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;
     public String addTypeNamePrefix = null;
+    public String addTypeNameSuffix = null;
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;

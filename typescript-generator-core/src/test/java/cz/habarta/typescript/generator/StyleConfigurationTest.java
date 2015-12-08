@@ -50,4 +50,20 @@ public class StyleConfigurationTest {
             return null;
         }
     }
+
+    @Test
+    public void testTypeNameCustomizations() {
+        final Settings settings = new Settings();
+        settings.removeTypeNamePrefix = "Json";
+        settings.removeTypeNameSuffix = "Class";
+        settings.addTypeNamePrefix = "I";
+        settings.addTypeNameSuffix = "JSON";
+
+        final TsType tsType = new TypeScriptGenerator(settings).getModelCompiler().typeFromJava(JsonTestClass.class);
+        assertEquals("ITestJSON", tsType.toString());
+    }
+
+    private static class JsonTestClass {
+    }
+
 }
