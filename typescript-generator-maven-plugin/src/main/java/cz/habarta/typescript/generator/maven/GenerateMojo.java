@@ -102,6 +102,29 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private DateMapping mapDate;
 
+    /**
+     * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
+     * This allows to customize how Java types are mapped to TypeScript.
+     * For example it is possible to implement TypeProcessor
+     * for {@link com.google.common.base.Optional} from guava or for Java 8 date/time classes.
+     */
+    @Parameter
+    private String customTypeProcessor;
+
+    /**
+     * If true TypeScript declarations (interfaces, properties) will be sorted alphabetically.
+     */
+    @Parameter
+    private boolean sortDeclarations;
+
+    /**
+     * If true generated file will not contain comment at the top.
+     * By default there is a comment with timestamp and typescript-generator version.
+     * So it might be useful to suppress this comment if the file is in source control and is regenerated in build.
+     */
+    @Parameter
+    private boolean noFileComment;
+
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -135,6 +158,9 @@ public class GenerateMojo extends AbstractMojo {
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.mapDate = mapDate;
+            settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+            settings.sortDeclarations = sortDeclarations;
+            settings.noFileComment = noFileComment;
             new TypeScriptGenerator(settings).generateTypeScript(classList, new FileOutputStream(outputFile));
 
         } catch (Exception e) {

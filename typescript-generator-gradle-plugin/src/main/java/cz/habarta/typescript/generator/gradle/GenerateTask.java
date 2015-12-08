@@ -22,6 +22,9 @@ public class GenerateTask extends DefaultTask {
     public String addTypeNamePrefix;
     public String addTypeNameSuffix;
     public DateMapping mapDate;
+    public String customTypeProcessor;
+    public boolean sortDeclarations;
+    public boolean noFileComment;
 
 
     @TaskAction
@@ -63,6 +66,9 @@ public class GenerateTask extends DefaultTask {
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.mapDate = mapDate;
+        settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
+        settings.sortDeclarations = sortDeclarations;
+        settings.noFileComment = noFileComment;
         new TypeScriptGenerator(settings).generateTypeScript(classList, getProject().file(outputFile));
     }
 
