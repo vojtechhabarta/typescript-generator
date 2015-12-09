@@ -79,6 +79,11 @@ public class ModelCompiler {
 
     }
 
+    public TsType typeFromJavaWithReplacement(Type javaType) {
+        final TsType type = typeFromJava(javaType);
+        return replaceTypes(type, new LinkedHashSet<TsType.EnumType>(), new LinkedHashSet<TsType.AliasType>());
+    }
+
     public TsType typeFromJava(Type javaType) {
         return typeFromJava(javaType, null, null);
     }
