@@ -11,6 +11,7 @@ public abstract class TsType {
     public static final TsType Number = new BasicType("number");
     public static final TsType String = new BasicType("string");
     public static final TsType Date = new BasicType("Date");
+    public static final TsType Void = new BasicType("void");
 
     public static final AliasType DateAsNumber = new AliasType("DateAsNumber", "type DateAsNumber = number;");
     public static final AliasType DateAsString = new AliasType("DateAsString", "type DateAsString = string;");

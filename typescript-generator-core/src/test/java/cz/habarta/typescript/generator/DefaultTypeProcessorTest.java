@@ -12,6 +12,7 @@ public class DefaultTypeProcessorTest {
         final TypeProcessor.Context context = getTestContext(converter);
         assertEquals("A", converter.processType(A.class, context).getTsType().toString());
         assertEquals("B", converter.processType(B.class, context).getTsType().toString());
+        assertEquals(TsType.Void, converter.processType(void.class, context).getTsType());
     }
 
     private static class A {

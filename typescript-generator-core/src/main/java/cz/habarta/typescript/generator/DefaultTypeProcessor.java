@@ -74,6 +74,8 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(void.class, TsType.Void);
+        knownTypes.put(Void.class, TsType.Void);
         return knownTypes;
     }
 
