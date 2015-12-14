@@ -62,6 +62,13 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
 </plugin>
 ```
 
+Instead of listing all the classes, you can also define a list of glob patterns patterns matching the classes to export, like that for instance:
+``` xml
+<classPatterns>
+    <classPattern>*TsDto</classPattern>
+</classPatterns>
+```
+
 More complete sample can be found [here](sample-maven).
 Detailed description how to configure typescript-generator-maven-plugin is on generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
 
@@ -95,7 +102,7 @@ generateTypeScript {
 ```
 
 More complete sample can be found [here](sample-gradle).
-Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html). 
+Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
 
 
 Direct invocation
@@ -113,7 +120,7 @@ Architecture
 ```
            (Model)            (TsModel)
 ModelParser  ==>  ModelCompiler  ==>  Emitter
-         |         | 
+         |         |
          V         V
         TypeProcessor
 ```
