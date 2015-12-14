@@ -4,11 +4,16 @@ package cz.habarta.typescript.generator.maven;
 import cz.habarta.typescript.generator.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 
@@ -29,8 +34,15 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * JSON classes to process.
      */
-    @Parameter(required = true)
+    @Parameter
     private List<String> classes;
+
+    /**
+     * Glob patterns to find JSON classes
+     * to process.
+     */
+    @Parameter
+    private List<String> classPatterns;
 
     /**
      * Library used in JSON classes.
@@ -129,11 +141,69 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
+    /**
+     * Find files matching a glob pattern
+     */
+    private static class Finder extends SimpleFileVisitor<Path> {
+
+        private Path srcPath;
+        private PathMatcher matcher;
+        private List<String> matchedFiles = new ArrayList<>();
+
+        public Finder(Path srcPath, PathMatcher matcher) {
+            this.srcPath = srcPath;
+            this.matcher = matcher;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            Path name = file.getFileName();
+            if (name != null && matcher.matches(name)) {
+                matchedFiles.add(getClassName(file));
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        private String getClassName(Path file) {
+            String relativePath = srcPath.relativize(file).toString();
+            return relativePath.replaceAll(Pattern.quote(File.separator), ".").replaceAll("(?i)\\.java$", "");
+        }
+
+        public List<String> getMatchedFiles() {
+            return matchedFiles;
+        }
+    }
+
+    private List<String> findClassesForGlobPattern(String globPattern) throws IOException {
+        List<String> result = new ArrayList<>();
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + globPattern);
+        for (String srcRoot : project.getCompileSourceRoots()) {
+            Path srcPath = Paths.get(srcRoot);
+            Finder finder = new Finder(srcPath, matcher);
+            Files.walkFileTree(srcPath, finder);
+            result.addAll(finder.getMatchedFiles());
+        }
+        return result;
+    }
+
     @Override
     public void execute() {
         try {
             logger.info("outputFile: " + outputFile);
-            logger.info("classes: " + classes);
+
+            if (classes == null && classPatterns == null) {
+                throw new MojoFailureException("Must provide the <class> or <classPatterns> tag!");
+            }
+
+            List<String> classesToProcess = classes;
+            if (classesToProcess == null) {
+                classesToProcess = new ArrayList<>();
+                for (String classPattern: classPatterns) {
+                    classesToProcess.addAll(findClassesForGlobPattern(classPattern + ".java"));
+                }
+            }
+
+            logger.info("classes: " + classesToProcess);
 
             // class loader
             final List<URL> urls = new ArrayList<>();
@@ -144,7 +214,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // classes
             final List<Class<?>> classList = new ArrayList<>();
-            for (String className : classes) {
+            for (String className : classesToProcess) {
                 classList.add(classLoader.loadClass(className));
             }
 
