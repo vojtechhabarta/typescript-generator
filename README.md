@@ -105,6 +105,11 @@ If you do not use Maven or Gradle you can invoke typescript-generator directly u
 Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
 
 
+Wiki
+----
+For more detailed description of some topics see [Wiki pages](wiki).
+
+
 Architecture
 ------------
 

@@ -12,6 +12,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Generates TypeScript declaration file from specified java classes.
+ * For more information see README and Wiki on GitHub.
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateMojo extends AbstractMojo {

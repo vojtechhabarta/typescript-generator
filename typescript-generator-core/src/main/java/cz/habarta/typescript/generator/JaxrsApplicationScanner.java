@@ -36,7 +36,7 @@ public class JaxrsApplicationScanner {
             final Application application = (Application) constructor.newInstance();
             return scanJaxrsApplication(application);
         } catch (ReflectiveOperationException e) {
-            final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JaxrsApplication";
+            final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
             final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
             System.out.println(message);
             throw new RuntimeException(message, e);
