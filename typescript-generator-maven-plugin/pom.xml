@@ -38,7 +38,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <goalPrefix>typescript-generator-maven-plugin</goalPrefix>
+                    <goalPrefix>typescript-generator</goalPrefix>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
                 <executions>

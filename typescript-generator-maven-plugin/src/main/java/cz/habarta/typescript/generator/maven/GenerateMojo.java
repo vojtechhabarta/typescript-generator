@@ -2,12 +2,11 @@
 package cz.habarta.typescript.generator.maven;
 
 import cz.habarta.typescript.generator.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.logging.Logger;
+import org.apache.maven.artifact.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
@@ -29,8 +28,15 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * JSON classes to process.
      */
-    @Parameter(required = true)
+    @Parameter
     private List<String> classes;
+
+    /**
+     * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for JSON classes to process.
+     * Parameter contains fully-qualified class name.
+     */
+    @Parameter
+    private String classesFromJaxrsApplication;
 
     /**
      * Library used in JSON classes.
@@ -133,7 +139,6 @@ public class GenerateMojo extends AbstractMojo {
     public void execute() {
         try {
             logger.info("outputFile: " + outputFile);
-            logger.info("classes: " + classes);
 
             // class loader
             final List<URL> urls = new ArrayList<>();
@@ -142,11 +147,8 @@ public class GenerateMojo extends AbstractMojo {
             }
             URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
-            // classes
-            final List<Class<?>> classList = new ArrayList<>();
-            for (String className : classes) {
-                classList.add(classLoader.loadClass(className));
-            }
+            // input
+            final Input input = Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, classLoader);
 
             final Settings settings = new Settings();
             settings.jsonLibrary = jsonLibrary;
@@ -163,9 +165,9 @@ public class GenerateMojo extends AbstractMojo {
             }
             settings.sortDeclarations = sortDeclarations;
             settings.noFileComment = noFileComment;
-            new TypeScriptGenerator(settings).generateTypeScript(classList, new FileOutputStream(outputFile));
+            new TypeScriptGenerator(settings).generateTypeScript(input, new FileOutputStream(outputFile));
 
-        } catch (Exception e) {
+        } catch (DependencyResolutionRequiredException | ReflectiveOperationException | IOException e) {
             throw new RuntimeException(e);
         }
     }

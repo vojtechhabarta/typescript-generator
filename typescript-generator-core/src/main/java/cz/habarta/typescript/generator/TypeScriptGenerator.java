@@ -28,33 +28,39 @@ public class TypeScriptGenerator {
         this.settings = settings;
     }
 
-    public void generateTypeScript(List<? extends Class<?>> classes, File file) {
+    public String generateTypeScript(Input input) {
+        final StringWriter stringWriter = new StringWriter();
+        generateTypeScript(input, stringWriter);
+        return stringWriter.toString();
+    }
+
+    public void generateTypeScript(Input input, File file) {
         try {
-            generateTypeScript(classes, new FileOutputStream(file));
+            generateTypeScript(input, new FileOutputStream(file));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void generateTypeScript(List<? extends Class<?>> classes, OutputStream output) {
-        generateTypeScript(classes, new OutputStreamWriter(output, Charset.forName("UTF-8")));
+    public void generateTypeScript(Input input, OutputStream output) {
+        generateTypeScript(input, new OutputStreamWriter(output, Charset.forName("UTF-8")));
     }
 
-    public void generateTypeScript(List<? extends Class<?>> classes, Writer output) {
-        generateTypeScript(classes, output, false, 0);
+    public void generateTypeScript(Input input, Writer output) {
+        generateTypeScript(input, output, false, 0);
     }
 
-    public void generateEmbeddableTypeScript(List<? extends Class<?>> classes, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateEmbeddableTypeScript(classes, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
+    public void generateEmbeddableTypeScript(Input input, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateEmbeddableTypeScript(input, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
     }
 
-    public void generateEmbeddableTypeScript(List<? extends Class<?>> classes, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateTypeScript(classes, output, addExportKeyword, initialIndentationLevel);
+    public void generateEmbeddableTypeScript(Input input, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
+        generateTypeScript(input, output, addExportKeyword, initialIndentationLevel);
     }
 
-    private void generateTypeScript(List<? extends Class<?>> classes, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
+    private void generateTypeScript(Input input, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
         logger.info("Running TypeScriptGenerator version " + Version);
-        final Model model = getModelParser().parseModel(classes);
+        final Model model = getModelParser().parseModel(input.getSourceTypes());
         final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
         getEmitter().emit(tsModel, output, forceExportKeyword, initialIndentationLevel);
     }

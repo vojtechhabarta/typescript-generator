@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.gradle;
 
 import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.Input;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -13,6 +14,7 @@ public class GenerateTask extends DefaultTask {
 
     public String outputFile;
     public List<String> classes;
+    public String classesFromJaxrsApplication;
     public JsonLibrary jsonLibrary;
     public String namespace;
     public String module;
@@ -33,10 +35,6 @@ public class GenerateTask extends DefaultTask {
             throw new RuntimeException("Please specify 'outputFile' property.");
         }
         System.out.println("outputFile: " + outputFile);
-        if (classes == null) {
-            throw new RuntimeException("Please specify 'classes' property.");
-        }
-        System.out.println("classes: " + classes);
 
         // class loader
         final List<URL> urls = new ArrayList<>();
@@ -50,11 +48,8 @@ public class GenerateTask extends DefaultTask {
         }
         URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
-        // classes
-        final List<Class<?>> classList = new ArrayList<>();
-        for (String className : classes) {
-            classList.add(classLoader.loadClass(className));
-        }
+        // input
+        final Input input = Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, classLoader);
 
         final Settings settings = new Settings();
         settings.jsonLibrary = jsonLibrary;
@@ -71,7 +66,7 @@ public class GenerateTask extends DefaultTask {
         }
         settings.sortDeclarations = sortDeclarations;
         settings.noFileComment = noFileComment;
-        new TypeScriptGenerator(settings).generateTypeScript(classList, getProject().file(outputFile));
+        new TypeScriptGenerator(settings).generateTypeScript(input, getProject().file(outputFile));
     }
 
 }

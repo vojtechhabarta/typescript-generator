@@ -1,31 +1,21 @@
 package cz.habarta.typescript.generator;
 
 import static org.junit.Assert.*;
-
-import java.io.*;
-import java.util.*;
-
 import org.junit.*;
 
 public class SortedTypesTest {
 
     @Test
     public void testOrder1() {
-        List<Class<?>> list = new ArrayList<>();
-        list.add(A.class);
-        list.add(B.class);
-        assertCorrectOrder(list);
+        assertCorrectOrder(A.class, B.class);
     }
 
     @Test
     public void testOrder2() {
-        List<Class<?>> list = new ArrayList<>();
-        list.add(B.class);
-        list.add(A.class);
-        assertCorrectOrder(list);
+        assertCorrectOrder(B.class, A.class);
     }
 
-    public void assertCorrectOrder(List<Class<?>> list) {
+    public void assertCorrectOrder(Class<?>... classes) {
         Settings settings = new Settings();
         settings.sortDeclarations = true;
         settings.noFileComment = true;
@@ -40,10 +30,9 @@ public class SortedTypesTest {
 "    x: number;"             + settings.newline +
 "}"                          + settings.newline +
 "";
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new TypeScriptGenerator(settings).generateTypeScript(list, out);
+        final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(classes));
 
-        assertEquals(expected, new String(out.toByteArray()));
+        assertEquals(expected, actual);
     }
 
     public static class A {

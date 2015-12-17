@@ -1,11 +1,8 @@
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.*;
-
 import java.io.*;
-import java.util.*;
-
 import org.junit.*;
+import static org.junit.Assert.*;
 
 public class StyleConfigurationTest {
 
@@ -16,9 +13,6 @@ public class StyleConfigurationTest {
         settings.addTypeNamePrefix = "I";
         settings.sortDeclarations = true;
         settings.noFileComment = true;
-
-        List<Class<?>> classList = new ArrayList<>();
-        classList.add(A.class);
 
         String expected = ""    +
 ""                              + settings.newline +
@@ -31,7 +25,7 @@ public class StyleConfigurationTest {
 "        s: string;"            + settings.newline +
 "    }"                         + settings.newline +
 "";
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(classList, output, true, 1);
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), output, true, 1);
 
         assertEquals(expected, new String(output.toByteArray()));
     }

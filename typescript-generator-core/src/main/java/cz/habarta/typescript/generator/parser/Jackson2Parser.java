@@ -20,32 +20,32 @@ public class Jackson2Parser extends ModelParser {
     }
 
     @Override
-    protected BeanModel parseBean(ClassWithUsage classWithUsage) {
+    protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
-        final BeanHelper beanHelper = getBeanHelper(classWithUsage.beanClass);
+        final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                if (!isParentProperty(beanPropertyWriter.getName(), classWithUsage.beanClass)) {
+                if (!isParentProperty(beanPropertyWriter.getName(), sourceClass.type)) {
                     Type propertyType = beanPropertyWriter.getGenericPropertyType();
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, classWithUsage.beanClass));
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, sourceClass.type));
                 }
             }
         }
 
-        final JsonSubTypes jsonSubTypes = classWithUsage.beanClass.getAnnotation(JsonSubTypes.class);
+        final JsonSubTypes jsonSubTypes = sourceClass.type.getAnnotation(JsonSubTypes.class);
         if (jsonSubTypes != null) {
             for (JsonSubTypes.Type type : jsonSubTypes.value()) {
-                addBeanToQueue(new ClassWithUsage(type.value(), "<subClass>", classWithUsage.beanClass));
+                addBeanToQueue(new SourceType<>(type.value(), sourceClass.type, "<subClass>"));
             }
         }
-        final Class<?> superclass = classWithUsage.beanClass.getSuperclass() == Object.class ? null : classWithUsage.beanClass.getSuperclass();
+        final Class<?> superclass = sourceClass.type.getSuperclass() == Object.class ? null : sourceClass.type.getSuperclass();
         if (superclass != null) {
-            addBeanToQueue(new ClassWithUsage(superclass, "<superClass>", classWithUsage.beanClass));
+            addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
-        return new BeanModel(classWithUsage.beanClass, superclass, properties);
+        return new BeanModel(sourceClass.type, superclass, properties);
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {

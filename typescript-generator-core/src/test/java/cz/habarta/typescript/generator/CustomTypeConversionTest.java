@@ -26,7 +26,7 @@ public class CustomTypeConversionTest {
         final ModelCompiler compiler = new TypeScriptGenerator().getModelCompiler();
         assertEquals("A", compiler.typeFromJava(A.class).toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new TypeScriptGenerator(settings).generateTypeScript(Arrays.asList(A.class), out);
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), out);
         assertTrue(new String(out.toByteArray()).trim().contains("x?: number;"));
     }
 
@@ -65,7 +65,7 @@ public class CustomTypeConversionTest {
         }
         {
             final StringWriter out = new StringWriter();
-            new TypeScriptGenerator(settings).generateTypeScript(Arrays.asList(CustomOptionalUsage.class), out);
+            new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomOptionalUsage.class), out);
             final String dts = out.toString();
             assertTrue(dts.contains("maybeObject?: SomeObject"));
         }
