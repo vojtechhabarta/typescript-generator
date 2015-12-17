@@ -50,7 +50,7 @@ public class JaxrsApplicationScanner {
         discoveredTypes = new ArrayList<>();
         final LinkedHashSet<Class<?>> scannedResources = new LinkedHashSet<>();
         final List<Class<?>> applicationClasses = new ArrayList<>(application.getClasses());
-        applicationClasses.sort(new Comparator<Class<?>>() {
+        Collections.sort(applicationClasses, new Comparator<Class<?>>() {
             @Override
             public int compare(Class<?> o1, Class<?> o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
@@ -74,7 +74,7 @@ public class JaxrsApplicationScanner {
 
     private void scanResource(Class<?> resourceClass) {
         final List<Method> methods = Arrays.asList(resourceClass.getMethods());
-        methods.sort(new Comparator<Method>() {
+        Collections.sort(methods, new Comparator<Method>() {
             @Override
             public int compare(Method o1, Method o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
@@ -88,9 +88,9 @@ public class JaxrsApplicationScanner {
     private void scanResourceMethod(Class<?> resourceClass, Method method) {
         if (isHttpMethod(method)) {
             // JAX-RS specification - 3.3.2.1 Entity Parameters
-            final Parameter entityParameter = getEntityParameter(method);
-            if (entityParameter != null) {
-                foundType(entityParameter.getParameterizedType(), resourceClass, method.getName());
+            final Type entityParameterType = getEntityParameterType(method);
+            if (entityParameterType != null) {
+                foundType(entityParameterType, resourceClass, method.getName());
             }
             // JAX-RS specification - 3.3.3 Return Type
             final Class<?> returnType = method.getReturnType();
@@ -151,9 +151,10 @@ public class JaxrsApplicationScanner {
         return false;
     }
 
-    private static Parameter getEntityParameter(Method method) {
-        for (Parameter parameter : method.getParameters()) {
-            if (!hasAnyAnnotation(parameter, Arrays.asList(
+    private static Type getEntityParameterType(Method method) {
+        final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < method.getParameterCount(); i++) {
+            if (!hasAnyAnnotation(parameterAnnotations[i], Arrays.asList(
                     MatrixParam.class,
                     QueryParam.class,
                     PathParam.class,
@@ -162,16 +163,18 @@ public class JaxrsApplicationScanner {
                     Context.class,
                     FormParam.class
                     ))) {
-                return parameter;
+                return method.getGenericParameterTypes()[i];
             }
         }
         return null;
     }
 
-    private static boolean hasAnyAnnotation(AnnotatedElement annotatedElement, List<Class<? extends Annotation>> annotationClasses) {
+    private static boolean hasAnyAnnotation(Annotation[] parameterAnnotations, List<Class<? extends Annotation>> annotationClasses) {
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
-            if (annotatedElement.isAnnotationPresent(annotationClass)) {
-                return true;
+            for (Annotation parameterAnnotation : parameterAnnotations) {
+                if (annotationClass.isInstance(parameterAnnotation)) {
+                    return true;
+                }
             }
         }
         return false;
