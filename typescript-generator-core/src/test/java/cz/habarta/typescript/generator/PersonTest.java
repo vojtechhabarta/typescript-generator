@@ -9,7 +9,7 @@ public class PersonTest {
     
     @Test
     public void test() {
-        new TypeScriptGenerator().generateTypeScript(Input.from(Person.class), new File("target/person.d.ts"));
+        new TypeScriptGenerator().generateTypeScript(Input.from(Person.class), Output.to(new File("target/person.d.ts")));
     }
 
 }

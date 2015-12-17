@@ -25,7 +25,7 @@ public class StyleConfigurationTest {
 "        s: string;"            + settings.newline +
 "    }"                         + settings.newline +
 "";
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), output, true, 1);
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(output), true, 1);
 
         assertEquals(expected, new String(output.toByteArray()));
     }

@@ -34,7 +34,8 @@ public class GenerateTask extends DefaultTask {
         if (outputFile == null) {
             throw new RuntimeException("Please specify 'outputFile' property.");
         }
-        System.out.println("Output file: " + outputFile);
+
+        TypeScriptGenerator.printVersion();
 
         // class loader
         final List<URL> urls = new ArrayList<>();
@@ -46,11 +47,9 @@ public class GenerateTask extends DefaultTask {
         for (File file : getProject().getConfigurations().getAt("compile").getFiles()) {
             urls.add(file.toURI().toURL());
         }
-        URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+        final URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
-        // input
-        final Input input = Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, classLoader);
-
+        // Settings
         final Settings settings = new Settings();
         settings.jsonLibrary = jsonLibrary;
         settings.namespace = namespace;
@@ -66,7 +65,12 @@ public class GenerateTask extends DefaultTask {
         }
         settings.sortDeclarations = sortDeclarations;
         settings.noFileComment = noFileComment;
-        new TypeScriptGenerator(settings).generateTypeScript(input, getProject().file(outputFile));
+
+        // TypeScriptGenerator
+        new TypeScriptGenerator(settings).generateTypeScript(
+                Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, classLoader),
+                Output.to(getProject().file(outputFile))
+        );
     }
 
 }

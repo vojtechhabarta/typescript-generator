@@ -13,9 +13,9 @@ public class GenericsTest {
         final Settings settings = new Settings();
         settings.noFileComment = true;
 
-        final StringWriter output = new StringWriter();
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), output);
-        final String actual = output.toString().trim();
+        final StringWriter stringWriter = new StringWriter();
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(stringWriter));
+        final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
                 "interface A {" + nl +
@@ -33,9 +33,9 @@ public class GenericsTest {
         settings.noFileComment = true;
         settings.customTypeProcessor = new GenericsTypeProcessor();
 
-        final StringWriter output = new StringWriter();
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), output, true, 0);
-        final String actual = output.toString().trim();
+        final StringWriter stringWriter = new StringWriter();
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(stringWriter), true, 0);
+        final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
                 "export interface IA<U, V> {" + nl +

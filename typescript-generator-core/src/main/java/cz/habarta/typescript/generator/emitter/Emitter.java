@@ -10,7 +10,7 @@ import java.util.*;
 public class Emitter {
 
     private final Settings settings;
-    private PrintWriter writer;
+    private Writer writer;
     private boolean forceExportKeyword;
     private int indent;
 
@@ -18,13 +18,17 @@ public class Emitter {
         this.settings = settings;
     }
 
-    public void emit(TsModel model, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
-        try (PrintWriter printWriter = new PrintWriter(output)) {
-            this.writer = printWriter;
-            this.forceExportKeyword = forceExportKeyword;
-            this.indent = initialIndentationLevel;
-            emitFileComment();
-            emitModule(model);
+    public void emit(TsModel model, Writer output, String outputName, boolean closeOutput, boolean forceExportKeyword, int initialIndentationLevel) {
+        this.writer = output;
+        this.forceExportKeyword = forceExportKeyword;
+        this.indent = initialIndentationLevel;
+        if (outputName != null) {
+            System.out.println("Writing declarations to: " + outputName);
+        }
+        emitFileComment();
+        emitModule(model);
+        if (closeOutput) {
+            close();
         }
     }
 
@@ -108,17 +112,34 @@ public class Emitter {
     }
 
     private void writeIndentedLine(String line) {
-        if (!line.isEmpty()) {
-            for (int i = 0; i < indent; i++) {
-                writer.write(settings.indentString);
+        try {
+            if (!line.isEmpty()) {
+                for (int i = 0; i < indent; i++) {
+                    writer.write(settings.indentString);
+                }
             }
+            writer.write(line);
+            writeNewLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        writer.write(line);
-        writeNewLine();
     }
 
     private void writeNewLine() {
-        writer.write(settings.newline);
+        try {
+            writer.write(settings.newline);
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void close() {
+        try {
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

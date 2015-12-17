@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
 import java.io.*;
-import java.nio.charset.*;
 import java.util.*;
 
 
@@ -26,41 +25,28 @@ public class TypeScriptGenerator {
         this.settings = settings;
     }
 
+    public static void printVersion() {
+        System.out.println("Running TypeScriptGenerator version " + Version);
+    }
+
     public String generateTypeScript(Input input) {
         final StringWriter stringWriter = new StringWriter();
-        generateTypeScript(input, stringWriter);
+        generateTypeScript(input, Output.to(stringWriter));
         return stringWriter.toString();
     }
 
-    public void generateTypeScript(Input input, File file) {
-        try {
-            generateTypeScript(input, new FileOutputStream(file));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void generateTypeScript(Input input, OutputStream output) {
-        generateTypeScript(input, new OutputStreamWriter(output, Charset.forName("UTF-8")));
-    }
-
-    public void generateTypeScript(Input input, Writer output) {
+    public void generateTypeScript(Input input, Output output) {
         generateTypeScript(input, output, false, 0);
     }
 
-    public void generateEmbeddableTypeScript(Input input, OutputStream output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateEmbeddableTypeScript(input, new OutputStreamWriter(output, Charset.forName("UTF-8")), addExportKeyword, initialIndentationLevel);
-    }
-
-    public void generateEmbeddableTypeScript(Input input, Writer output, boolean addExportKeyword, int initialIndentationLevel) {
+    public void generateEmbeddableTypeScript(Input input, Output output, boolean addExportKeyword, int initialIndentationLevel) {
         generateTypeScript(input, output, addExportKeyword, initialIndentationLevel);
     }
 
-    private void generateTypeScript(Input input, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
-        System.out.println("Running TypeScriptGenerator version " + Version);
+    private void generateTypeScript(Input input, Output output, boolean forceExportKeyword, int initialIndentationLevel) {
         final Model model = getModelParser().parseModel(input.getSourceTypes());
         final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
-        getEmitter().emit(tsModel, output, forceExportKeyword, initialIndentationLevel);
+        getEmitter().emit(tsModel, output.getWriter(), output.getName(), output.shouldCloseWriter(), forceExportKeyword, initialIndentationLevel);
     }
 
     public TypeProcessor getTypeProcessor() {
