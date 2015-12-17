@@ -34,7 +34,7 @@ public class GenerateTask extends DefaultTask {
         if (outputFile == null) {
             throw new RuntimeException("Please specify 'outputFile' property.");
         }
-        System.out.println("outputFile: " + outputFile);
+        System.out.println("Output file: " + outputFile);
 
         // class loader
         final List<URL> urls = new ArrayList<>();

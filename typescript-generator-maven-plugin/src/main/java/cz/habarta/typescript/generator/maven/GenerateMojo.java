@@ -5,7 +5,6 @@ import cz.habarta.typescript.generator.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.logging.Logger;
 import org.apache.maven.artifact.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.*;
@@ -16,8 +15,6 @@ import org.apache.maven.project.MavenProject;
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateMojo extends AbstractMojo {
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
 
     /**
      * Output TypeScript declaration file.
@@ -138,7 +135,7 @@ public class GenerateMojo extends AbstractMojo {
     @Override
     public void execute() {
         try {
-            logger.info("outputFile: " + outputFile);
+            System.out.println("Output file: " + outputFile);
 
             // class loader
             final List<URL> urls = new ArrayList<>();

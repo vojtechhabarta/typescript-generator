@@ -6,14 +6,12 @@ import cz.habarta.typescript.generator.parser.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class TypeScriptGenerator {
 
     public static final String Version = getVersion();
 
-    private final Logger logger = Logger.getGlobal();
     private final Settings settings;
     private TypeProcessor typeProcessor = null;
     private ModelParser modelParser = null;
@@ -59,7 +57,7 @@ public class TypeScriptGenerator {
     }
 
     private void generateTypeScript(Input input, Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
-        logger.info("Running TypeScriptGenerator version " + Version);
+        System.out.println("Running TypeScriptGenerator version " + Version);
         final Model model = getModelParser().parseModel(input.getSourceTypes());
         final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
         getEmitter().emit(tsModel, output, forceExportKeyword, initialIndentationLevel);
@@ -79,9 +77,9 @@ public class TypeScriptGenerator {
     public ModelParser getModelParser() {
         if (modelParser == null) {
             if (settings.jsonLibrary == JsonLibrary.jackson2) {
-                modelParser = new Jackson2Parser(logger, settings, getTypeProcessor());
+                modelParser = new Jackson2Parser(settings, getTypeProcessor());
             } else {
-                modelParser = new Jackson1Parser(logger, settings, getTypeProcessor());
+                modelParser = new Jackson1Parser(settings, getTypeProcessor());
             }
         }
         return modelParser;
@@ -89,14 +87,14 @@ public class TypeScriptGenerator {
 
     public ModelCompiler getModelCompiler() {
         if (modelCompiler == null) {
-            modelCompiler = new ModelCompiler(logger, settings, getTypeProcessor());
+            modelCompiler = new ModelCompiler(settings, getTypeProcessor());
         }
         return modelCompiler;
     }
 
     public Emitter getEmitter() {
         if (emitter == null) {
-            emitter = new Emitter(logger, settings);
+            emitter = new Emitter(settings);
         }
         return emitter;
     }

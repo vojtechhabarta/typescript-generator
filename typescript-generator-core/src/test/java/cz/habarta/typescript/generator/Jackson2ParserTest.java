@@ -3,7 +3,6 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,9 +36,8 @@ public class Jackson2ParserTest {
     }
 
     static Jackson2Parser getJackson2Parser() {
-        final Logger logger = Logger.getGlobal();
         final Settings settings = new Settings();
-        return new Jackson2Parser(logger, settings, new DefaultTypeProcessor());
+        return new Jackson2Parser(settings, new DefaultTypeProcessor());
     }
 
     public static class DummyBeanJackson2 {

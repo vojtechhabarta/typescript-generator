@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
-import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,9 +22,8 @@ public class Jackson1ParserTest {
     }
 
     private static Jackson1Parser getJackson1Parser() {
-        final Logger logger = Logger.getGlobal();
         final Settings settings = new Settings();
-        return new Jackson1Parser(logger, settings, new DefaultTypeProcessor());
+        return new Jackson1Parser(settings, new DefaultTypeProcessor());
     }
 
 }

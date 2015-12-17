@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.logging.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.map.*;
@@ -16,8 +15,8 @@ public class Jackson1Parser extends ModelParser {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Jackson1Parser(Logger logger, Settings settings, TypeProcessor typeProcessor) {
-        super(logger, settings, typeProcessor);
+    public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
+        super(settings, typeProcessor);
     }
 
     @Override

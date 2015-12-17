@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ser.*;
 import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class Jackson2Parser extends ModelParser {
@@ -15,8 +14,8 @@ public class Jackson2Parser extends ModelParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
     
 
-    public Jackson2Parser(Logger logger, Settings settings, TypeProcessor typeProcessor) {
-        super(logger, settings, typeProcessor);
+    public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
+        super(settings, typeProcessor);
     }
 
     @Override
@@ -80,9 +79,7 @@ public class Jackson2Parser extends ModelParser {
                 return new BeanHelper((BeanSerializer) jsonSerializer);
             } else {
                 final String jsonSerializerName = jsonSerializer.getClass().getName();
-                final String message = String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass);
-//                throw new RuntimeException(message);
-                logger.warning(message);
+                System.out.println(String.format("Warning: Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
                 return null;
             }
         } catch (JsonMappingException e) {

@@ -5,19 +5,16 @@ import cz.habarta.typescript.generator.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class Emitter {
 
-    private final Logger logger;
     private final Settings settings;
     private PrintWriter writer;
     private boolean forceExportKeyword;
     private int indent;
 
-    public Emitter(Logger logger, Settings settings) {
-        this.logger = logger;
+    public Emitter(Settings settings) {
         this.settings = settings;
     }
 

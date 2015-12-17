@@ -4,18 +4,15 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public abstract class ModelParser {
 
-    protected final Logger logger;
     protected final Settings settings;
     protected final TypeProcessor typeProcessor;
     private final Queue<SourceType<? extends Type>> typeQueue = new LinkedList<>();
 
-    public ModelParser(Logger logger, Settings settings, TypeProcessor typeProcessor) {
-        this.logger = logger;
+    public ModelParser(Settings settings, TypeProcessor typeProcessor) {
         this.settings = settings;
         this.typeProcessor = typeProcessor;
     }
@@ -39,7 +36,7 @@ public abstract class ModelParser {
                     final Class<?> cls = (Class<?>) sourceType.type;
                     final SourceType<Class<?>> sourceClass = new SourceType<Class<?>>(cls, sourceType.usedInClass, sourceType.usedInMember);
                     if (!parsedClasses.containsKey(sourceClass.type)) {
-                        logger.info("Parsing '" + sourceClass.type.getName() + "'" +
+                        System.out.println("Parsing '" + sourceClass.type.getName() + "'" +
                                 (sourceClass.usedInClass != null ? " used in '" + sourceClass.usedInClass.getSimpleName() + "." + sourceClass.usedInMember + "'" : ""));
                         final BeanModel bean = parseBean(sourceClass);
                         parsedClasses.put(cls, bean);

@@ -5,17 +5,14 @@ import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.logging.*;
 
 
 public class ModelCompiler {
 
-    private final Logger logger;
     private final Settings settings;
     private final TypeProcessor typeProcessor;
 
-    public ModelCompiler(Logger logger, Settings settings, TypeProcessor typeProcessor) {
-        this.logger = logger;
+    public ModelCompiler(Settings settings, TypeProcessor typeProcessor) {
         this.settings = settings;
         this.typeProcessor = typeProcessor;
     }
@@ -106,9 +103,9 @@ public class ModelCompiler {
             return result.getTsType();
         } else {
             if (usedInClass != null && usedInProperty != null) {
-                logger.warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
+                System.out.println(String.format("Warning: Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
             } else {
-                logger.warning(String.format("Unsupported type '%s'", javaType));
+                System.out.println(String.format("Warning: Unsupported type '%s'", javaType));
             }
             return TsType.Any;
         }
