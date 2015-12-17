@@ -153,7 +153,7 @@ public class JaxrsApplicationScanner {
 
     private static Type getEntityParameterType(Method method) {
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        for (int i = 0; i < method.getParameterCount(); i++) {
+        for (int i = 0; i < parameterAnnotations.length; i++) {
             if (!hasAnyAnnotation(parameterAnnotations[i], Arrays.asList(
                     MatrixParam.class,
                     QueryParam.class,
