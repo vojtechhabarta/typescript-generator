@@ -1,0 +1,39 @@
+version: 1.4.{build}
+pull_requests:
+  do_not_increment_build_number: true
+skip_tags: true
+environment:
+  JAVA_HOME: C:\Program Files\Java\jdk1.7.0
+install:
+- ps: >-
+    git remote set-url origin https://github.com/vojtechhabarta/typescript-generator.git
+    git config --global credential.helper store
+    Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+build_script:
+- ps: >-
+    Write-Host -ForegroundColor Cyan "Building version: $($env:APPVEYOR_BUILD_VERSION)"
+    choco install maven -y
+    $mvn = "C:\tools\apache-maven-3.3.3\bin\mvn.cmd"
+    &$mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    &$mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
+    {
+       &$mvn --batch-mode site-deploy "-Dgithub.site.oauth2Token=$($env:access_token)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    }
+
+    Write-Host -ForegroundColor Cyan "Archiving artifacts"
+    del target\artifacts -Recurse -Include "maven-metadata.xml*"
+    cd target\artifacts
+    7z a ..\artifacts.zip **
+    cd ..\..
+artifacts:
+- path: target\artifacts.zip
+on_success:
+- ps: >-
+    if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
+    {
+        Write-Host -ForegroundColor Cyan "Tagging version v$($env:APPVEYOR_BUILD_VERSION)"
+        git tag "v$($env:APPVEYOR_BUILD_VERSION)" $env:APPVEYOR_REPO_COMMIT
+        Write-Host -ForegroundColor Cyan "Pushing tag"
+        git push origin "v$($env:APPVEYOR_BUILD_VERSION)" 2>&1 | %{ "$_" }; if ($LASTEXITCODE -ne 0) { throw "Command returned exit code $LASTEXITCODE" } else { Write-Host "Command finished successfully" }
+    }
