@@ -5,12 +5,12 @@ skip_tags: true
 environment:
   JAVA_HOME: C:\Program Files\Java\jdk1.7.0
 install:
-- ps: >-
+- ps: |-
     git remote set-url origin https://github.com/vojtechhabarta/typescript-generator.git
     git config --global credential.helper store
     Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
 build_script:
-- ps: >-
+- ps: |-
     Write-Host -ForegroundColor Cyan "Building version: $($env:APPVEYOR_BUILD_VERSION)"
     choco install maven -y
     $mvn = "C:\tools\apache-maven-3.3.3\bin\mvn.cmd"
@@ -29,7 +29,7 @@ build_script:
 artifacts:
 - path: target\artifacts.zip
 on_success:
-- ps: >-
+- ps: |-
     if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
     {
         Write-Host -ForegroundColor Cyan "Tagging version v$($env:APPVEYOR_BUILD_VERSION)"
