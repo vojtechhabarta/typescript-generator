@@ -18,12 +18,9 @@ import org.junit.*;
 public class JaxrsApplicationScannerTest<T> {
 
     @Test
-    public void testScanJaxrsApplicationTypes() throws Exception {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication());
-        final List<Type> types = new ArrayList<>();
-        for (SourceType<Type> sourceType : sourceTypes) {
-            types.add(sourceType.type);
-        }
+    public void testReturnedTypes() {
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), null);
+        List<Type> types = getTypes(sourceTypes);
         final List<Type> expectedTypes = Arrays.asList(
                 A.class,
                 new TypeReference<List<B>>(){}.getType(),
@@ -40,8 +37,8 @@ public class JaxrsApplicationScannerTest<T> {
     }
 
     @Test
-    public void testScanJaxrsApplicationClasses() throws Exception {
-        final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication());
+    public void testWithParsing() {
+        final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), null);
         final Model model = new TypeScriptGenerator().getModelParser().parseModel(types);
         final ArrayList<Class<?>> classes = new ArrayList<>();
         for (BeanModel beanModel : model.getBeans()) {
@@ -59,6 +56,26 @@ public class JaxrsApplicationScannerTest<T> {
                 I.class
         );
         assertHasSameItems(expectedClasses, classes);
+    }
+
+    @Test
+    public void testExcludedResource() {
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(TestResource1.class.getName()));
+        Assert.assertEquals(0, sourceTypes.size());
+    }
+
+    @Test
+    public void testExcludedType() {
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(A.class.getName()));
+        Assert.assertTrue(!getTypes(sourceTypes).contains(A.class));
+    }
+
+    private List<Type> getTypes(final List<SourceType<Type>> sourceTypes) {
+        final List<Type> types = new ArrayList<>();
+        for (SourceType<Type> sourceType : sourceTypes) {
+            types.add(sourceType.type);
+        }
+        return types;
     }
 
     private static <T> void assertHasSameItems(Collection<? extends T> expected, Collection<? extends T> actual) {

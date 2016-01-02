@@ -12,7 +12,7 @@ import javax.ws.rs.core.*;
 public class JaxrsApplicationScanner {
 
     private final ClassLoader classLoader;
-    private final Set<String> excludedClassNames;
+    private Set<String> excludes;
     private Queue<Class<?>> resourceQueue;
     private List<SourceType<Type>> discoveredTypes;
 
@@ -22,10 +22,9 @@ public class JaxrsApplicationScanner {
 
     public JaxrsApplicationScanner(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.excludedClassNames = new LinkedHashSet<>(getDefaultExcludedClassNames());
     }
 
-    public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName) {
+    public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, List<String> excludedClassNames) {
         System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClassName);
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -34,7 +33,7 @@ public class JaxrsApplicationScanner {
             final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             final Application application = (Application) constructor.newInstance();
-            return scanJaxrsApplication(application);
+            return scanJaxrsApplication(application, excludedClassNames);
         } catch (ReflectiveOperationException e) {
             final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
             final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
@@ -45,9 +44,14 @@ public class JaxrsApplicationScanner {
         }
     }
 
-    List<SourceType<Type>> scanJaxrsApplication(Application application) {
+    List<SourceType<Type>> scanJaxrsApplication(Application application, List<String> excludedClassNames) {
         resourceQueue = new LinkedList<>();
         discoveredTypes = new ArrayList<>();
+        excludes = new LinkedHashSet<>();
+        excludes.addAll(getDefaultExcludedClassNames());
+        if (excludedClassNames != null) {
+            excludes.addAll(excludedClassNames);
+        }
         final LinkedHashSet<Class<?>> scannedResources = new LinkedHashSet<>();
         final List<Class<?>> applicationClasses = new ArrayList<>(application.getClasses());
         Collections.sort(applicationClasses, new Comparator<Class<?>>() {
@@ -63,7 +67,7 @@ public class JaxrsApplicationScanner {
         }
         Class<?> resourceClass;
         while ((resourceClass = resourceQueue.poll()) != null) {
-            if (!scannedResources.contains(resourceClass)) {
+            if (!scannedResources.contains(resourceClass) && !isExcluded(resourceClass)) {
                 System.out.println("Scanning JAX-RS resource: " + resourceClass.getName());
                 scanResource(resourceClass);
                 scannedResources.add(resourceClass);
@@ -118,7 +122,7 @@ public class JaxrsApplicationScanner {
 
     private boolean isExcluded(Type type) {
         final Class<?> cls = getClass(type);
-        if (excludedClassNames.contains(cls.getName())) {
+        if (excludes.contains(cls.getName())) {
             return true;
         }
         for (Class<?> standardEntityClass : getStandardEntityClasses()) {

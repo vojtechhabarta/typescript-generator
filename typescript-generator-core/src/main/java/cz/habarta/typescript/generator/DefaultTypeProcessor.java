@@ -6,7 +6,7 @@ import java.util.*;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
-    
+
     @Override
     public Result processType(Type javaType, Context context) {
         if (KnownTypes.containsKey(javaType)) return new Result(KnownTypes.get(javaType));

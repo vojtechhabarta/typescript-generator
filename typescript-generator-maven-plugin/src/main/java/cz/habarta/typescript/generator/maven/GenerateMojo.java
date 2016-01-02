@@ -32,9 +32,16 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for JSON classes to process.
      * Parameter contains fully-qualified class name.
+     * It is possible to exclude particular REST resource classes using {@link #excludeClasses} parameter.
      */
     @Parameter
     private String classesFromJaxrsApplication;
+
+    /**
+     * List of classes excluded from processing.
+     */
+    @Parameter
+    private List<String> excludeClasses;
 
     /**
      * Library used in JSON classes.
@@ -164,7 +171,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, classLoader),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, excludeClasses, classLoader),
                     Output.to(outputFile)
             );
 

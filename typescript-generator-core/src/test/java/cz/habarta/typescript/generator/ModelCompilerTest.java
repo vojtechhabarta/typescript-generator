@@ -24,9 +24,17 @@ public class ModelCompilerTest {
         Assert.assertEquals("DateAsString", modelCompiler.typeFromJavaWithReplacement(javaType).toString());
     }
 
-    private static ModelCompiler getTestModelCompiler() {
+    @Test
+    public void testExclusion() throws Exception {
+        final ModelCompiler modelCompiler = getTestModelCompiler(Direction.class.getName());
+        final Type javaType = A.class.getField("directions").getGenericType();
+        Assert.assertEquals("{ [index: string]: any }[]", modelCompiler.typeFromJava(javaType).toString());
+    }
+
+    private static ModelCompiler getTestModelCompiler(String... excludedClassNames) {
         final Settings settings = new Settings();
         settings.mapDate = DateMapping.asString;
+        settings.excludedClassNames = Arrays.asList(excludedClassNames);
         return new TypeScriptGenerator(settings).getModelCompiler();
     }
 

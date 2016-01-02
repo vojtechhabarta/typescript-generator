@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import java.util.*;
+
 
 public class Settings {
     public String newline = String.format("%n");
@@ -8,6 +10,7 @@ public class Settings {
     public JsonLibrary jsonLibrary = JsonLibrary.jackson1;
     public String namespace = null;
     public String module = null;
+    public List<String> excludedClassNames = null;
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;

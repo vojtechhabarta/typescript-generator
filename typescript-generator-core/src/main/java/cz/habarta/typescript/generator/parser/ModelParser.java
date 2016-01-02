@@ -34,11 +34,10 @@ public abstract class ModelParser {
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.StructuralType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
-                    final SourceType<Class<?>> sourceClass = new SourceType<Class<?>>(cls, sourceType.usedInClass, sourceType.usedInMember);
-                    if (!parsedClasses.containsKey(sourceClass.type)) {
-                        System.out.println("Parsing '" + sourceClass.type.getName() + "'" +
-                                (sourceClass.usedInClass != null ? " used in '" + sourceClass.usedInClass.getSimpleName() + "." + sourceClass.usedInMember + "'" : ""));
-                        final BeanModel bean = parseBean(sourceClass);
+                    if (!parsedClasses.containsKey(cls)) {
+                        System.out.println("Parsing '" + cls.getName() + "'" +
+                                (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
+                        final BeanModel bean = parseBean(sourceType.asSourceClass());
                         parsedClasses.put(cls, bean);
                     }
                 } else {

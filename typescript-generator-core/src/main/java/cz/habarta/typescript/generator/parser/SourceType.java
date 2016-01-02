@@ -20,4 +20,10 @@ public class SourceType<T extends Type> {
         this.usedInMember = usedInMember;
     }
 
+    @SuppressWarnings("unchecked")
+    public SourceType<Class<?>> asSourceClass() {
+        Class.class.cast(this.type);
+        return (SourceType<Class<?>>) this;
+    }
+
 }

@@ -38,18 +38,18 @@ public class Input {
         }
     }
 
-    private static Input fromJaxrsApplication(String jaxrsApplicationClassName, ClassLoader classLoader) {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner(classLoader).scanJaxrsApplication(jaxrsApplicationClassName);
+    private static Input fromJaxrsApplication(String jaxrsApplicationClassName, List<String> excludedClassNames, ClassLoader classLoader) {
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner(classLoader).scanJaxrsApplication(jaxrsApplicationClassName, excludedClassNames);
         return new Input(sourceTypes);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, String jaxrsApplicationClassName, ClassLoader classLoader) {
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, String jaxrsApplicationClassName, List<String> excludedClassNames, ClassLoader classLoader) {
         final List<SourceType<Type>> types = new ArrayList<>();
         if (classNames != null) {
             types.addAll(fromClassNames(classNames, classLoader).getSourceTypes());
         }
         if (jaxrsApplicationClassName != null) {
-            types.addAll(fromJaxrsApplication(jaxrsApplicationClassName, classLoader).getSourceTypes());
+            types.addAll(fromJaxrsApplication(jaxrsApplicationClassName, excludedClassNames, classLoader).getSourceTypes());
         }
         if (types.isEmpty()) {
             final String errorMessage = "No input classes found.";

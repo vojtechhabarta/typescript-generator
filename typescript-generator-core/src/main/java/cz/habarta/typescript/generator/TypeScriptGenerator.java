@@ -51,11 +51,13 @@ public class TypeScriptGenerator {
 
     public TypeProcessor getTypeProcessor() {
         if (typeProcessor == null) {
+            final List<TypeProcessor> processors = new ArrayList<>();
+            processors.add(new ExcludingTypeProcessor(settings.excludedClassNames));
             if (settings.customTypeProcessor != null) {
-                typeProcessor = new TypeProcessor.Chain(settings.customTypeProcessor, new DefaultTypeProcessor());
-            } else {
-                typeProcessor = new DefaultTypeProcessor();
+                processors.add(settings.customTypeProcessor);
             }
+            processors.add(new DefaultTypeProcessor());
+            typeProcessor = new TypeProcessor.Chain(processors);
         }
         return typeProcessor;
     }
