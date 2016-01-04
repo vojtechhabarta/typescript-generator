@@ -18,10 +18,4 @@ public class TsModel {
         return typeAliases;
     }
 
-    public void sort() {
-        for (TsBeanModel bean : beans) {
-            bean.sort();
-        }
-        Collections.sort(beans);
-    }
 }

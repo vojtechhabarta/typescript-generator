@@ -129,6 +129,12 @@ public class GenerateMojo extends AbstractMojo {
     private boolean sortDeclarations;
 
     /**
+     * If true TypeScript type declarations (interfaces) will be sorted alphabetically.
+     */
+    @Parameter
+    private boolean sortTypeDeclarations;
+
+    /**
      * If true generated file will not contain comment at the top.
      * By default there is a comment with timestamp and typescript-generator version.
      * So it might be useful to suppress this comment if the file is in source control and is regenerated in build.
@@ -167,6 +173,7 @@ public class GenerateMojo extends AbstractMojo {
                 settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
             }
             settings.sortDeclarations = sortDeclarations;
+            settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
 
             // TypeScriptGenerator

@@ -27,6 +27,7 @@ public class GenerateTask extends DefaultTask {
     public DateMapping mapDate;
     public String customTypeProcessor;
     public boolean sortDeclarations;
+    public boolean sortTypeDeclarations;
     public boolean noFileComment;
 
 
@@ -65,6 +66,7 @@ public class GenerateTask extends DefaultTask {
             settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
         }
         settings.sortDeclarations = sortDeclarations;
+        settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
 
         // TypeScriptGenerator

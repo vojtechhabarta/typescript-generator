@@ -40,9 +40,6 @@ public class Emitter {
     }
 
     private void emitModule(TsModel model) {
-        if (settings.sortDeclarations) {
-            model.sort();
-        }
         if (settings.module != null) {
             writeNewLine();
             writeIndentedLine("declare module '" + settings.module + "' {");
@@ -78,12 +75,20 @@ public class Emitter {
 
     private void emitInterfaces(TsModel model) {
         String exportPrefix = forceExportKeyword ? "export " : "";
-        for (TsBeanModel bean : model.getBeans()) {
+        final List<TsBeanModel> beans = model.getBeans();
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(beans);
+        }
+        for (TsBeanModel bean : beans) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
             writeIndentedLine(exportPrefix + "interface " + bean.getName() + parent + " {");
             indent++;
-            for (TsPropertyModel property : bean.getProperties()) {
+            final List<TsPropertyModel> properties = bean.getProperties();
+            if (settings.sortDeclarations) {
+                Collections.sort(properties);
+            }
+            for (TsPropertyModel property : properties) {
                 emitProperty(property);
             }
             indent--;

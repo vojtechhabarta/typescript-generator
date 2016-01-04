@@ -2,9 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class TsBeanModel implements Comparable<TsBeanModel> {
@@ -40,7 +38,4 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
         return name.toString().compareTo(o.name.toString());
     }
 
-    public void sort() {
-        Collections.sort(properties);
-    }
 }
