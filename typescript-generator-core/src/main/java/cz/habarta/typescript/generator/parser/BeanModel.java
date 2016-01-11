@@ -30,7 +30,7 @@ public class BeanModel {
 
     @Override
     public String toString() {
-        return "BeanModel{" + "name=" + beanClass + ", properties=" + properties + '}';
+        return "BeanModel{" + "beanClass=" + beanClass + ", properties=" + properties + '}';
     }
 
 }

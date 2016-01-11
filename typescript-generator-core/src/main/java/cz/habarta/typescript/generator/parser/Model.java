@@ -16,4 +16,18 @@ public class Model {
         return beans;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Model{");
+        sb.append(String.format("%n"));
+        for (BeanModel bean : beans) {
+            sb.append("  ");
+            sb.append(bean);
+            sb.append(String.format("%n"));
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
 }

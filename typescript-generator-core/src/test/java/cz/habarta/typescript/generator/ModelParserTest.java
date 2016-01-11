@@ -1,7 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import cz.habarta.typescript.generator.parser.*;
+import java.lang.reflect.Type;
 import java.util.*;
 import org.junit.*;
 
@@ -10,43 +12,62 @@ public class ModelParserTest {
 
     @Test
     public void testClassDiscovery1() {
-        final Model model = parseModel(RootClass1.class, null);
+        final Model model = parseModel(RootClass1.class);
         Assert.assertEquals(2, model.getBeans().size());
         
     }
 
     @Test
     public void testClassDiscovery2() {
-        final Model model = parseModel(RootClass2.class, null);
+        final Model model = parseModel(RootClass2.class);
         Assert.assertEquals(2, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscovery3() {
-        final Model model = parseModel(RootClass3.class, null);
+        final Model model = parseModel(RootClass3.class);
         Assert.assertEquals(3, model.getBeans().size());
     }
 
     @Test
+    public void testClassDiscoveryExcludeNodeClassA() {
+        final Model model = parseModel(RootClass1.class, NodeClassA.class.getName());
+        Assert.assertEquals(1, model.getBeans().size());
+    }
+
+    @Test
     public void testClassDiscoveryExcludeTag() {
-        final Model model = parseModel(RootClass3.class, Arrays.asList(Tag.class.getName()));
+        final Model model = parseModel(RootClass3.class, Tag.class.getName());
         Assert.assertEquals(2, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscoveryExcludeNodeClassB() {
-        final Model model = parseModel(RootClass3.class, Arrays.asList(NodeClassB.class.getName()));
+        final Model model = parseModel(RootClass3.class, NodeClassB.class.getName());
         Assert.assertEquals(1, model.getBeans().size());
     }
 
-    private Model parseModel(Class<?> rootClass, List<String> excludedClassNames) {
+    @Test
+    public void testExcludedInputDirectly() {
+        final Model model = parseModel(RootClass3.class, RootClass3.class.getName());
+        Assert.assertEquals(0, model.getBeans().size());
+    }
+
+    @Test
+    public void testExcludedInputInList() {
+        final Model model = parseModel(new TypeReference<List<RootClass3>>() {}.getType(), RootClass3.class.getName());
+        Assert.assertEquals(0, model.getBeans().size());
+    }
+
+    private Model parseModel(Type type, String... excludedClassNames) {
         final Settings settings = new Settings();
-        settings.excludedClassNames = excludedClassNames;
+        settings.excludedClassNames = Arrays.asList(excludedClassNames);
         final ModelParser parser = new Jackson2Parser(settings, new TypeProcessor.Chain(
                 new ExcludingTypeProcessor(settings.excludedClassNames),
                 new DefaultTypeProcessor()
         ));
-        return parser.parseModel(rootClass);
+        final Model model = parser.parseModel(type);
+        return model;
     }
 
 }

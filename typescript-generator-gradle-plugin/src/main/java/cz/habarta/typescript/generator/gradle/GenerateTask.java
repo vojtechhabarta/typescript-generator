@@ -53,6 +53,7 @@ public class GenerateTask extends DefaultTask {
 
         // Settings
         final Settings settings = new Settings();
+        settings.excludedClassNames = excludeClasses;
         settings.jsonLibrary = jsonLibrary;
         settings.namespace = namespace;
         settings.module = module;

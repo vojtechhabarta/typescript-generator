@@ -160,6 +160,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // Settings
             final Settings settings = new Settings();
+            settings.excludedClassNames = excludeClasses;
             settings.jsonLibrary = jsonLibrary;
             settings.namespace = namespace != null ? namespace : moduleName;
             settings.module = module;

@@ -31,7 +31,8 @@ public class JaxrsApplicationScannerTest<T> {
                 new TypeReference<List<F>>(){}.getType(),
                 G.class,
                 new TypeReference<Map<String, H>>(){}.getType(),
-                I.class
+                I.class,
+                J[].class
         );
         assertHasSameItems(expectedTypes, types);
     }
@@ -53,7 +54,8 @@ public class JaxrsApplicationScannerTest<T> {
                 F.class,
                 G.class,
                 H.class,
-                I.class
+                I.class,
+                J.class
         );
         assertHasSameItems(expectedClasses, classes);
     }
@@ -66,8 +68,12 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testExcludedType() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(A.class.getName()));
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(
+                A.class.getName(),
+                J.class.getName()
+        ));
         Assert.assertTrue(!getTypes(sourceTypes).contains(A.class));
+        Assert.assertTrue(getTypes(sourceTypes).contains(J[].class));
     }
 
     private List<Type> getTypes(final List<SourceType<Type>> sourceTypes) {
@@ -153,6 +159,9 @@ public class JaxrsApplicationScannerTest<T> {
                 I entityI) {
         }
         @POST
+        public void setJs(J[] js) {
+        }
+        @POST
         public void setStandardEntity(byte[] value) {}
         @POST
         public void setStandardEntity(String value) {}
@@ -202,5 +211,6 @@ public class JaxrsApplicationScannerTest<T> {
     private static class G {}
     private static class H {}
     private static class I {}
+    private static class J {}
 
 }
