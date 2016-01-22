@@ -1,8 +1,10 @@
 package cz.habarta.typescript.generator;
 
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.*;
-import static org.junit.Assert.*;
+
 import org.junit.*;
 
 
@@ -53,6 +55,25 @@ public class GenericsTest {
         assertEquals("IA<{ [index: string]: V }, number[]>", compiler.typeFromJava(A.class.getField("z").getGenericType()).toString());
     }
 
+    @Test
+    public void testWildcardGeneric() {
+        final Settings settings = new Settings();
+        settings.addTypeNamePrefix = "I";
+        settings.noFileComment = true;
+        settings.customTypeProcessor = new GenericsTypeProcessor();
+
+        final StringWriter stringWriter = new StringWriter();
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(C.class), Output.to(stringWriter), true, 0);
+        final String actual = stringWriter.toString().trim();
+        final String nl = settings.newline;
+        final String expected =
+                "export interface IC {" + nl +
+                "    x: string[];" + nl +
+                "}" + nl;
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -62,4 +83,7 @@ public class GenericsTest {
     class B {
     }
 
+    class C {
+        public List<? extends String> x;
+    }
 }
