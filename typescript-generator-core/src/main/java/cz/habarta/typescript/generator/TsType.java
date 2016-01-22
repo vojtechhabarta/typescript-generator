@@ -16,9 +16,22 @@ public abstract class TsType {
     public static final AliasType DateAsNumber = new AliasType("DateAsNumber", "type DateAsNumber = number;");
     public static final AliasType DateAsString = new AliasType("DateAsString", "type DateAsString = string;");
 
+    @Override
+    public boolean equals(Object rhs) {
+        return rhs != null && this.getClass() == rhs.getClass() && this.toString().equals(rhs.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
     public TsType.OptionalType optional() {
         return new TsType.OptionalType(this);
     }
+
+    @Override
+    public abstract String toString();
 
     public static class BasicType extends TsType {
 
@@ -32,7 +45,6 @@ public abstract class TsType {
         public String toString() {
             return name;
         }
-
     }
 
     public static class AliasType extends TsType {
