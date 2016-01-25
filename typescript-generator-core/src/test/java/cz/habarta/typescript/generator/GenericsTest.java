@@ -69,7 +69,7 @@ public class GenericsTest {
         final String expected =
                 "export interface IC {" + nl +
                 "    x: string[];" + nl +
-                "}" + nl;
+                "}";
         System.out.println(actual);
         assertEquals(expected, actual);
     }

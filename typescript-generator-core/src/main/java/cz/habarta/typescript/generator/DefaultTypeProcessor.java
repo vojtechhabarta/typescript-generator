@@ -50,6 +50,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.StructuralType(context.getMappedName(javaClass)), javaClass);
             }
         }
+        if (javaType instanceof WildcardType) {
+            final WildcardType wildcardType = (WildcardType) javaType;
+            final Type[] upperBounds = wildcardType.getUpperBounds();
+            return upperBounds.length > 0
+                    ? context.processType(upperBounds[0])
+                    : new Result(TsType.Any);
+        }
         return null;
     }
 
