@@ -36,19 +36,12 @@ public class ModelCompiler {
 
     private void processProperty(CompilationContext context, PropertyModel property) {
         final TsType originalType = typeFromJava(property.getType(), property.getName(), context.bean.getBeanClass());
-        final LinkedHashSet<TsType.EnumType> replacedEnums = new LinkedHashSet<>();
+        final LinkedHashSet<TsType.EnumType> enums = new LinkedHashSet<>();
         final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
-        final TsType tsType = replaceTypes(originalType, replacedEnums, typeAliases);
-        List<String> comments = null;
-        if (!replacedEnums.isEmpty()) {
-            comments = new ArrayList<>();
-            comments.add("Original type: " + originalType);
-            for (TsType.EnumType replacedEnum : replacedEnums) {
-                comments.add(replacedEnum.toString() + ": " + join(replacedEnum.values, ", "));
-            }
-        }
-        final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, concat(property.getComments(), comments));
+        final TsType tsType = replaceTypes(originalType, enums, typeAliases);
+        final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, property.getComments());
         context.tsBean.getProperties().add(tsPropertyModel);
+        context.tsModel.getEnums().addAll(enums);
         context.tsModel.getTypeAliases().addAll(typeAliases);
     }
 
@@ -131,7 +124,7 @@ public class ModelCompiler {
         return name;
     }
 
-    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> replacedEnums, LinkedHashSet<TsType.AliasType> typeAliases) {
+    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> enums, LinkedHashSet<TsType.AliasType> typeAliases) {
         if (type == TsType.Date) {
             if (settings.mapDate == DateMapping.asNumber) {
                 typeAliases.add(TsType.DateAsNumber);
@@ -144,23 +137,23 @@ public class ModelCompiler {
         }
         if (type instanceof TsType.EnumType) {
             final TsType.EnumType enumType = (TsType.EnumType) type;
-            replacedEnums.add(enumType);
-            return TsType.String;
+            enums.add(enumType);
+            return type;
         }
         if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
-            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, replacedEnums, typeAliases));
+            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, enums, typeAliases));
         }
         if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
             return new TsType.IndexedArrayType(
-                    replaceTypes(indexedArrayType.indexType, replacedEnums, typeAliases),
-                    replaceTypes(indexedArrayType.elementType, replacedEnums, typeAliases));
+                    replaceTypes(indexedArrayType.indexType, enums, typeAliases),
+                    replaceTypes(indexedArrayType.elementType, enums, typeAliases));
         }
         return type;
     }
 
-    static String join(Iterable<? extends Object> values, String delimiter) {
+    public static String join(Iterable<? extends Object> values, String delimiter) {
         final StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Object value : values) {
@@ -168,24 +161,10 @@ public class ModelCompiler {
                 first = false;
             } else {
                 sb.append(delimiter);
-            }
+}
             sb.append(value);
         }
         return sb.toString();
-    }
-
-    private static <T> List<T> concat(List<? extends T> first, List<? extends T> second) {
-        if (first == null && second == null) {
-            return null;
-        }
-        final List<T> result = new ArrayList<>();
-        if (first != null) {
-            result.addAll(first);
-        }
-        if (second != null) {
-            result.addAll(second);
-        }
-        return result;
     }
 
 }

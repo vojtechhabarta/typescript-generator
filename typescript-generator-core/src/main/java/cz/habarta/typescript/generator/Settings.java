@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Settings {
     public String newline = String.format("%n");
+    public String quotes = "\"";
     public String indentString = "    ";
     public JsonLibrary jsonLibrary = JsonLibrary.jackson1;
     public String namespace = null;

@@ -13,7 +13,7 @@ public class ModelCompilerTest {
         final ModelCompiler modelCompiler = getTestModelCompiler();
         final Type javaType = A.class.getField("directions").getGenericType();
         Assert.assertEquals("{ [index: string]: Direction }[]", modelCompiler.typeFromJava(javaType).toString());
-        Assert.assertEquals("{ [index: string]: string }[]", modelCompiler.typeFromJavaWithReplacement(javaType).toString());
+        Assert.assertEquals("{ [index: string]: Direction }[]", modelCompiler.typeFromJavaWithReplacement(javaType).toString());
     }
 
     @Test

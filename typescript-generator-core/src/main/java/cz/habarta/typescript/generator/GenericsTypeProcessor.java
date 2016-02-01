@@ -53,13 +53,13 @@ public class GenericsTypeProcessor implements TypeProcessor {
 
         public final List<TsType> typeArguments;
 
-        public GenericStructuralType(java.lang.String name, List<TsType> typeArguments) {
+        public GenericStructuralType(String name, List<TsType> typeArguments) {
             super(name);
             this.typeArguments = typeArguments;
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return name + "<" + ModelCompiler.join(typeArguments, ", ") + ">";
         }
     }

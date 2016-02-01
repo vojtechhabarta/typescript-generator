@@ -70,6 +70,7 @@ public class Emitter {
 
     private void emitObjects(TsModel model) {
         emitInterfaces(model);
+        emitEnums(model);
         emitTypeAliases(model);
     }
 
@@ -107,6 +108,17 @@ public class Emitter {
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
         writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
+    }
+
+    private void emitEnums(TsModel model) {
+        for (TsType.EnumType enumType : model.getEnums()) {
+            writeNewLine();
+            final ArrayList<String> quotedValues = new ArrayList<>();
+            for (String value : enumType.values) {
+                quotedValues.add(settings.quotes + value + settings.quotes);
+            }
+            writeIndentedLine("type " + enumType.name + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
+        }
     }
 
     private void emitTypeAliases(TsModel model) {
