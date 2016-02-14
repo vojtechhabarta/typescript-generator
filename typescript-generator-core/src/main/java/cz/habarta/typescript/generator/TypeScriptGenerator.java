@@ -23,6 +23,7 @@ public class TypeScriptGenerator {
 
     public TypeScriptGenerator(Settings settings) {
         this.settings = settings;
+        settings.validate();
     }
 
     public static void printVersion() {

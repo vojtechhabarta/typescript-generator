@@ -26,7 +26,7 @@ public class ModelCompiler {
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(typeFromJava(bean.getBeanClass()), typeFromJava(bean.getParent()));
+        final TsBeanModel tsBean = new TsBeanModel(bean, typeFromJava(bean.getBeanClass()), typeFromJava(bean.getParent()));
         context.tsModel.getBeans().add(tsBean);
         context = context.bean(bean, tsBean);
         for (PropertyModel jBean : bean.getProperties()) {
@@ -38,7 +38,8 @@ public class ModelCompiler {
         final TsType originalType = typeFromJava(property.getType(), property.getName(), context.bean.getBeanClass());
         final LinkedHashSet<TsType.EnumType> enums = new LinkedHashSet<>();
         final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
-        final TsType tsType = replaceTypes(originalType, enums, typeAliases);
+        final TsType replacedType = replaceTypes(originalType, enums, typeAliases);
+        final TsType tsType = property.isOptional() ? replacedType.optional() : replacedType;
         final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, property.getComments());
         context.tsBean.getProperties().add(tsPropertyModel);
         context.tsModel.getEnums().addAll(enums);

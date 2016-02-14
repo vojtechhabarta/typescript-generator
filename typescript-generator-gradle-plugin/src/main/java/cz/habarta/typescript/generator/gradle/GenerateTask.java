@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.gradle;
 
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.Input;
+import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -13,6 +14,7 @@ import org.gradle.api.tasks.*;
 public class GenerateTask extends DefaultTask {
 
     public String outputFile;
+    public TypeScriptFormat outputFileType;
     public List<String> classes;
     public String classesFromJaxrsApplication;
     public List<String> excludeClasses;
@@ -29,6 +31,7 @@ public class GenerateTask extends DefaultTask {
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
+    public List<String> extensions;
 
 
     @TaskAction
@@ -53,6 +56,9 @@ public class GenerateTask extends DefaultTask {
 
         // Settings
         final Settings settings = new Settings();
+        if (outputFileType != null) {
+            settings.outputFileType = outputFileType;
+        }
         settings.excludedClassNames = excludeClasses;
         settings.jsonLibrary = jsonLibrary;
         settings.namespace = namespace;
@@ -69,6 +75,13 @@ public class GenerateTask extends DefaultTask {
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
+        if (extensions != null) {
+            settings.extensions = new ArrayList<>();
+            for (String extensionClassName : extensions) {
+                settings.extensions.add((EmitterExtension) classLoader.loadClass(extensionClassName).newInstance());
+            }
+        }
+        settings.validateFileName(new File(outputFile));
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(

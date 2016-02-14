@@ -13,7 +13,6 @@ public class EnumTest {
         settings.noFileComment = true;
         settings.newline = "\n";
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        System.out.println("actual: " + actual);
         final String expected =
                 "\n" +
                 "interface AClass {\n" +

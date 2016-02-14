@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.maven;
 
 import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -22,6 +23,14 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter(required = true)
     private File outputFile;
+
+    /**
+     * Output file format, can be 'declarationFile' (.d.ts) or 'implementationFile' (.ts).
+     * Setting this parameter to 'implementationFile' allows extensions to generate runnable TypeScript code.
+     * Default value is 'declarationFile'.
+     */
+    @Parameter
+    private TypeScriptFormat outputFileType;
 
     /**
      * JSON classes to process.
@@ -142,6 +151,14 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private boolean noFileComment;
 
+    /**
+     * List of extensions specified as fully qualified class name.
+     * Known extensions:
+     * cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension
+     */
+    @Parameter
+    private List<String> extensions;
+
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -160,6 +177,9 @@ public class GenerateMojo extends AbstractMojo {
 
             // Settings
             final Settings settings = new Settings();
+            if (outputFileType != null) {
+                settings.outputFileType = outputFileType;
+            }
             settings.excludedClassNames = excludeClasses;
             settings.jsonLibrary = jsonLibrary;
             settings.namespace = namespace != null ? namespace : moduleName;
@@ -176,6 +196,13 @@ public class GenerateMojo extends AbstractMojo {
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
+            if (extensions != null) {
+                settings.extensions = new ArrayList<>();
+                for (String extensionClassName : extensions) {
+                    settings.extensions.add((EmitterExtension) classLoader.loadClass(extensionClassName).newInstance());
+                }
+            }
+            settings.validateFileName(outputFile);
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(

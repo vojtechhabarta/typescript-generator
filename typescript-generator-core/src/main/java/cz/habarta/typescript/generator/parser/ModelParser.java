@@ -56,12 +56,12 @@ public abstract class ModelParser {
         typeQueue.add(sourceClass);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Class<?> usedInClass) {
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, boolean optional, Class<?> usedInClass) {
         List<Class<?>> classes = discoverClassesUsedInType(type);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, type, null);
+        return new PropertyModel(name, type, optional, null);
     }
 
     private List<Class<?>> discoverClassesUsedInType(Type type) {

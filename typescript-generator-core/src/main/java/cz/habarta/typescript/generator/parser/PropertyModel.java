@@ -9,11 +9,13 @@ public class PropertyModel {
 
     private final String name;
     private final Type type;
+    private final boolean optional;
     private final List<String> comments;
 
-    public PropertyModel(String name, Type type, List<String> comments) {
+    public PropertyModel(String name, Type type, boolean optional, List<String> comments) {
         this.name = name;
         this.type = type;
+        this.optional = optional;
         this.comments = comments;
     }
 
@@ -23,6 +25,10 @@ public class PropertyModel {
 
     public Type getType() {
         return type;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 
     public List<String> getComments() {

@@ -72,6 +72,19 @@ public class Emitter {
         emitInterfaces(model);
         emitEnums(model);
         emitTypeAliases(model);
+        for (EmitterExtension emitterExtension : settings.extensions) {
+            final boolean[] written = {false};
+            emitterExtension.emitObjects(new EmitterExtension.Writer() {
+                @Override
+                public void writeIndentedLine(String line) {
+                    Emitter.this.writeIndentedLine(line);
+                    written[0] = true;
+                }
+            }, settings, model);
+            if (written[0]) {
+                writeNewLine();
+            }
+        }
     }
 
     private void emitInterfaces(TsModel model) {

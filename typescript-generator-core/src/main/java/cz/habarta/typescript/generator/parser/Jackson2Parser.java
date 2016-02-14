@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
 import cz.habarta.typescript.generator.*;
@@ -21,6 +22,12 @@ public class Jackson2Parser extends ModelParser {
     @Override
     protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
+
+        final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
+        if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
+            properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, true, null));
+        }
+
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
@@ -29,7 +36,7 @@ public class Jackson2Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, sourceClass.type));
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, false, sourceClass.type));
                 }
             }
         }

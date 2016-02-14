@@ -30,7 +30,7 @@ public class Jackson1Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, sourceClass.type));
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, false, sourceClass.type));
                 }
             }
         }
