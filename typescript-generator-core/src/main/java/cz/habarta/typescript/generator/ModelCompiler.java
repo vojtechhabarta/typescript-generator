@@ -141,6 +141,10 @@ public class ModelCompiler {
             enums.add(enumType);
             return type;
         }
+        if (type instanceof TsType.OptionalType) {
+            final TsType.OptionalType optionalType = (TsType.OptionalType) type;
+            return new TsType.OptionalType(replaceTypes(optionalType.type, enums, typeAliases));
+        }
         if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
             return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, enums, typeAliases));

@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -45,6 +46,7 @@ public class CustomTypeConversionTest {
     @Test
     public void testCustomOptional() throws Exception {
         final Settings settings = new Settings();
+        settings.mapDate = DateMapping.asString;
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
             public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
@@ -64,10 +66,9 @@ public class CustomTypeConversionTest {
             assertEquals(Arrays.asList(SomeObject.class), result.getDiscoveredClasses());
         }
         {
-            final StringWriter out = new StringWriter();
-            new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomOptionalUsage.class), Output.to(out));
-            final String dts = out.toString();
-            assertTrue(dts.contains("maybeObject?: SomeObject"));
+            final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomOptionalUsage.class));
+            assertTrue(dts.contains("maybeObject?: SomeObject;"));
+            assertTrue(dts.contains("maybeDate?: DateAsString;"));
         }
     }
 
@@ -86,6 +87,7 @@ public class CustomTypeConversionTest {
 
     public static class CustomOptionalUsage {
         public CustomOptional<SomeObject> maybeObject;
+        public CustomOptional<Date> maybeDate;
     }
 
     public static class SomeObject {
