@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "noEmit": true
+    },
+    "files": [
+        "module-usage.ts",
+        "../../../target/test-ts-withoutmodule/test-mn1.d.ts",
+        "../../../target/test-ts-withoutmodule/test-mn2.d.ts",
+        "../../../target/test-ts-withmodule/test-mn3.d.ts",
+        "../../../target/test-ts-withmodule/test-mn4.d.ts",
+        "../../../target/test-ts-withoutmodule/test-mn5.ts",
+        "../../../target/test-ts-withoutmodule/test-mn6.ts",
+        "../../../target/test-ts-withmodule/test-mn7.ts",
+        "../../../target/test-ts-withmodule/test-mn8.ts"
+    ]
+}

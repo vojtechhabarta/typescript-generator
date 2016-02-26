@@ -24,7 +24,7 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
         final TypeProcessor typeProcessor = new DefaultTypeProcessor();
         final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(Point.class);
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
-        new TypeGuardsForJackson2PolymorphismExtension().emitObjects(writer, settings, tsModel);
+        new TypeGuardsForJackson2PolymorphismExtension().emitElements(writer, settings, false, tsModel);
         Assert.assertEquals(8, lines.size());
         Assert.assertEquals("", lines.get(0));
         Assert.assertEquals("function isCartesianPoint(point: Point): point is CartesianPoint {", lines.get(1));
@@ -41,7 +41,6 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
         settings.addTypeNamePrefix = "Json";
         settings.extensions.add(new TypeGuardsForJackson2PolymorphismExtension());
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Point.class));
-        System.out.println("actual: " + actual);
         Assert.assertTrue(actual.contains("type?: string;"));
         Assert.assertTrue(actual.contains("function isJsonCartesianPoint(jsonPoint: JsonPoint): jsonPoint is JsonCartesianPoint {"));
     }

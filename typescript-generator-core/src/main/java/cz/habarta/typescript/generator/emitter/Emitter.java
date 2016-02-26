@@ -40,55 +40,54 @@ public class Emitter {
     }
 
     private void emitModule(TsModel model) {
-        if (settings.module != null) {
+        if (settings.module != null && settings.outputFileType == TypeScriptFormat.declarationFile) {
             writeNewLine();
-            writeIndentedLine("declare module '" + settings.module + "' {");
+            writeIndentedLine("declare module \"" + settings.module + "\" {");
             indent++;
-            emitNamespace(model, true);
+            emitNamespace(model);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
         } else {
-            emitNamespace(model, false);
+            emitNamespace(model);
         }
     }
 
-    private void emitNamespace(TsModel model, boolean ambientContext) {
+    private void emitNamespace(TsModel model) {
         if (settings.namespace != null) {
             writeNewLine();
-            final String declarePrefix = ambientContext ? "" : "declare ";
-            writeIndentedLine(declarePrefix +  "namespace " + settings.namespace + " {");
+            final String prefix = settings.outputFileType == TypeScriptFormat.declarationFile
+                    ? (settings.module != null ? "" : "declare ")
+                    : (settings.module != null ? "export " : "");
+            writeIndentedLine(prefix +  "namespace " + settings.namespace + " {");
             indent++;
-            emitObjects(model);
+            final boolean exportElements = settings.outputFileType == TypeScriptFormat.implementationFile;
+            emitElements(model, exportElements);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
         } else {
-            emitObjects(model);
+            final boolean exportElements = settings.module != null && settings.outputFileType == TypeScriptFormat.implementationFile;
+            emitElements(model, exportElements);
         }
     }
 
-    private void emitObjects(TsModel model) {
-        emitInterfaces(model);
-        emitEnums(model);
-        emitTypeAliases(model);
+    private void emitElements(TsModel model, boolean exportKeyword) {
+        exportKeyword = exportKeyword || forceExportKeyword;
+        emitInterfaces(model, exportKeyword);
+        emitEnums(model, exportKeyword);
+        emitTypeAliases(model, exportKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
-            final boolean[] written = {false};
-            emitterExtension.emitObjects(new EmitterExtension.Writer() {
+            emitterExtension.emitElements(new EmitterExtension.Writer() {
                 @Override
                 public void writeIndentedLine(String line) {
                     Emitter.this.writeIndentedLine(line);
-                    written[0] = true;
                 }
-            }, settings, model);
-            if (written[0]) {
-                writeNewLine();
-            }
+            }, settings, exportKeyword, model);
         }
     }
 
-    private void emitInterfaces(TsModel model) {
-        String exportPrefix = forceExportKeyword ? "export " : "";
+    private void emitInterfaces(TsModel model, boolean exportKeyword) {
         final List<TsBeanModel> beans = model.getBeans();
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(beans);
@@ -96,7 +95,7 @@ public class Emitter {
         for (TsBeanModel bean : beans) {
             writeNewLine();
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
-            writeIndentedLine(exportPrefix + "interface " + bean.getName() + parent + " {");
+            writeIndentedLine(exportKeyword, "interface " + bean.getName() + parent + " {");
             indent++;
             final List<TsPropertyModel> properties = bean.getProperties();
             if (settings.sortDeclarations) {
@@ -123,22 +122,26 @@ public class Emitter {
         writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
     }
 
-    private void emitEnums(TsModel model) {
+    private void emitEnums(TsModel model, boolean exportKeyword) {
         for (TsType.EnumType enumType : model.getEnums()) {
             writeNewLine();
             final ArrayList<String> quotedValues = new ArrayList<>();
             for (String value : enumType.values) {
                 quotedValues.add(settings.quotes + value + settings.quotes);
             }
-            writeIndentedLine("type " + enumType.name + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
+            writeIndentedLine(exportKeyword, "type " + enumType.name + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
         }
     }
 
-    private void emitTypeAliases(TsModel model) {
+    private void emitTypeAliases(TsModel model, boolean exportKeyword) {
         for (TsType.AliasType alias : model.getTypeAliases()) {
             writeNewLine();
-            writeIndentedLine(alias.definition);
+            writeIndentedLine(exportKeyword, alias.definition);
         }
+    }
+
+    private void writeIndentedLine(boolean exportKeyword, String line) {
+        writeIndentedLine((exportKeyword ? "export " : "") + line);
     }
 
     private void writeIndentedLine(String line) {

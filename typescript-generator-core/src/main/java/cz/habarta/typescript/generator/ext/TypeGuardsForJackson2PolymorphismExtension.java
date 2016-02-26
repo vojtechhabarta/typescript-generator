@@ -14,7 +14,7 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
     }
 
     @Override
-    public void emitObjects(Writer writer, Settings settings, TsModel model) {
+    public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
         for (TsBeanModel tsBean : model.getBeans()) {
             if (tsBean.getJavaModel() != null) {
                 final Class<?> beanClass = tsBean.getJavaModel().getBeanClass();
@@ -39,7 +39,7 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
                             final String subTypeName = findTypeName(subType.value(), model);
                             if (baseTypeName != null && subTypeName != null) {
                                 writer.writeIndentedLine("");
-                                emitTypeGuard(writer, settings, baseTypeName, subTypeName, propertyName, propertyValue);
+                                emitTypeGuard(writer, settings, exportKeyword, baseTypeName, subTypeName, propertyName, propertyValue);
                             }
                         }
                     }
@@ -61,9 +61,10 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
 //    function isCartesianPoint(point: Point): point is CartesianPoint {
 //        return point.type === "cartesian";
 //    }
-    static void emitTypeGuard(Writer writer, Settings settings, String baseType, String subType, String propertyName, String propertyValue) {
+    static void emitTypeGuard(Writer writer, Settings settings, boolean exportKeyword, String baseType, String subType, String propertyName, String propertyValue) {
         final String argument = Character.toLowerCase(baseType.charAt(0)) + baseType.substring(1);
-        writer.writeIndentedLine(String.format("function is%s(%s: %s): %s is %s {", subType, argument, baseType, argument, subType));
+        final String exportPrefix = exportKeyword ? "export " : "";
+        writer.writeIndentedLine(String.format(exportPrefix + "function is%s(%s: %s): %s is %s {", subType, argument, baseType, argument, subType));
         writer.writeIndentedLine(String.format("%sreturn %s.%s === %s;", settings.indentString, argument, propertyName, settings.quotes + propertyValue + settings.quotes));
         writer.writeIndentedLine("}");
     }

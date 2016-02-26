@@ -8,7 +8,7 @@ public abstract class EmitterExtension {
 
     public abstract boolean generatesRuntimeCode();
 
-    public void emitObjects(Writer writer, Settings settings, TsModel model) {
+    public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
     }
 
     public static interface Writer {
