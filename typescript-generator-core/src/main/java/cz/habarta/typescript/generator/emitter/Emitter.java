@@ -88,7 +88,7 @@ public class Emitter {
     }
 
     private void emitInterfaces(TsModel model, boolean exportKeyword) {
-        final List<TsBeanModel> beans = model.getBeans();
+        final List<TsBeanModel> beans = new ArrayList<>(model.getBeans());
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(beans);
         }
@@ -123,7 +123,11 @@ public class Emitter {
     }
 
     private void emitEnums(TsModel model, boolean exportKeyword) {
-        for (TsType.EnumType enumType : model.getEnums()) {
+        final ArrayList<TsType.EnumType> enums = new ArrayList<>(model.getEnums());
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(enums);
+        }
+        for (TsType.EnumType enumType : enums) {
             writeNewLine();
             final ArrayList<String> quotedValues = new ArrayList<>();
             for (String value : enumType.values) {
@@ -134,7 +138,11 @@ public class Emitter {
     }
 
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
-        for (TsType.AliasType alias : model.getTypeAliases()) {
+        final ArrayList<TsType.AliasType> aliases = new ArrayList<>(model.getTypeAliases());
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(aliases);
+        }
+        for (TsType.AliasType alias : aliases) {
             writeNewLine();
             writeIndentedLine(exportKeyword, alias.definition);
         }

@@ -47,7 +47,7 @@ public abstract class TsType {
         }
     }
 
-    public static class AliasType extends TsType {
+    public static class AliasType extends TsType implements Comparable<AliasType> {
 
         public final String name;
         public final String definition;
@@ -60,6 +60,11 @@ public abstract class TsType {
         @Override
         public String toString() {
             return name;
+        }
+
+        @Override
+        public int compareTo(AliasType o) {
+            return name.compareTo(o.name);
         }
 
     }
@@ -111,7 +116,7 @@ public abstract class TsType {
 
     }
 
-    public static class EnumType extends TsType {
+    public static class EnumType extends TsType implements Comparable<EnumType> {
 
         public final String name;
         public final List<String> values;
@@ -124,6 +129,11 @@ public abstract class TsType {
         @Override
         public String toString() {
             return name;
+        }
+
+        @Override
+        public int compareTo(EnumType o) {
+            return name.compareTo(o.name);
         }
 
     }
