@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Modules and Namespaces</title>
+    <!--primer-->
+    <link rel="stylesheet" href="primer.css">
+    <link rel="stylesheet" href="user-content.css">
+    <!--highlight.js-->
+    <link rel="stylesheet" href="vs.css">
+    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <style>
+        .container {
+            width: 1280px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+        .markdown-body table tr:nth-child(2n) {
+            background-color: inherit;
+        }
+        .markdown-body pre {
+            background-color: inherit;
+        }
+        .markdown-body pre,
+        .markdown-body table {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .markdown-body table {
+            display: table;
+        }
+        .markdown-body .nested-table tr,
+        .markdown-body .nested-table th,
+        .markdown-body .nested-table td {
+            border-width: 0;
+        }
+        .markdown-body table th,
+        .markdown-body table td {
+            font-weight: normal;
+        }
+        .supported {
+            background-color: #dfd;
+        }
+        .not-supported {
+            background: repeating-linear-gradient(
+                -30deg,
+                #fff,
+                #fff 5px,
+                #eee 5px,
+                #eee 10px
+            );
+        }
+        .settings {
+            color:gray;
+            font-size: smaller;
+        }
+        .legend {
+            margin-top: 25px;
+            overflow: hidden;
+        }
+        .legend span {
+            float: left;
+        }
+        .legend > span {
+            margin-right: 50px;
+        }
+        .legend-box {
+            border: 1px solid lightgray;
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+        }
+    </style></head>
+
+<body>
+    <div class="container markdown-body">
+        <h1>Modules and Namespaces</h1>
+        <p>
+            TypeScript language offers different ways how to organize declarations and code.
+            In addition to "global" scope declarations can also be organized using modules and namespaces.
+            Rows in the table bellow shows these ways by examples.
+            Primarily typescript-generator produces declaration files (left column) but it can be also configured to produce implementation files (right column).
+            Table also contains info how to configure typescript-generator to produce particular variant. Supported variants are marked with green background.
+            Keywords commented out are optional and typescript-generator doesn't emit them.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        declaration file (.d.ts)
+                    </th>
+                    <th>
+                        implementation file (.ts)
+                        <div class="settings">outputFileType = implementationFile</div>
+                    </th>
+                </tr>
+            </thead>
+            <tr>
+                <th>global</th>
+                <td class="supported">
+                    <pre><code class="typescript">/*declare*/ interface Data {}
+</code></pre>
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">interface Data {}
+function test() {}
+</code></pre>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    namespace
+                    <div class="settings">namespace = "NS"</div>
+                </th>
+                <td class="supported">
+                    <pre><code class="typescript">declare namespace NS {
+    /*export*/ interface Data {}
+}
+</code></pre>
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">namespace NS {
+    export interface Data {}
+    export function test() {}
+}
+</code></pre>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    module
+                    <div class="settings">module = "mod"</div>
+                </th>
+                <td style="padding: 0">
+                    <table class="nested-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">
+                                    ambient module
+                                </th>
+                                <th style="width: 50%;">
+                                    regular module
+                                </th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td class="supported">
+                                <pre><code class="typescript">declare module "mod" {
+    /*export*/ interface Data {}
+}
+</code></pre>
+                            </td>
+                            <td class="not-supported">
+                                <pre><code class="typescript">export interface Data {}
+</code></pre>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">export interface Data {}
+export function test() {}
+</code></pre>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    module with namespace
+                    <div class="settings">module = "mod"</div>
+                    <div class="settings">namespace = "NS"</div>
+                </th>
+                <td style="padding: 0">
+                    <table class="nested-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">ambient module</th>
+                                <th style="width: 50%;">regular module</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td class="supported">
+                                <pre><code class="typescript">declare module "mod" {
+    /*export*/ namespace NS {
+        /*export*/ interface Data {}
+    }
+}
+</code></pre>
+                            </td>
+                            <td class="not-supported">
+                                <pre><code class="typescript">export namespace NS {
+    /*export*/ interface Data {}
+}
+</code></pre>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">export namespace NS {
+    export interface Data {}
+    export function test() {}
+}
+</code></pre>
+                </td>
+            </tr>
+        </table>
+        <div class="legend">
+            <span>
+                <span class="legend-box supported"></span>
+                <span>Supported</span>
+            </span>
+            <span>
+                <span class="legend-box not-supported"></span>
+                <span>Not supported</span>
+            </span>
+        </div>
+    </div>
+</body>
+
+</html>
