@@ -11,12 +11,14 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
     private final BeanModel javaModel;
     private final TsType name;
     private final TsType parent;
+    private final List<String> comments;
     private final List<TsPropertyModel> properties = new ArrayList<>();
 
-    public TsBeanModel(BeanModel javaModel, TsType name, TsType parent) {
+    public TsBeanModel(BeanModel javaModel, TsType name, TsType parent, List<String> comments) {
         this.javaModel = javaModel;
         this.name = name;
         this.parent = parent;
+        this.comments = comments;
     }
 
     public BeanModel getJavaModel() {
@@ -29,6 +31,10 @@ public class TsBeanModel implements Comparable<TsBeanModel> {
 
     public TsType getParent() {
         return parent;
+    }
+
+    public List<String> getComments() {
+        return comments;
     }
 
     public List<TsPropertyModel> getProperties() {

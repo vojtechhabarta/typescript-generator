@@ -22,11 +22,14 @@ public class ModelCompiler {
         for (BeanModel bean : model.getBeans()) {
             processBean(context, bean);
         }
+        for (EnumModel enumModel : model.getEnums()) {
+            processEnum(context, enumModel);
+        }
         return context.tsModel;
     }
 
     private void processBean(CompilationContext context, BeanModel bean) {
-        final TsBeanModel tsBean = new TsBeanModel(bean, typeFromJava(bean.getBeanClass()), typeFromJava(bean.getParent()));
+        final TsBeanModel tsBean = new TsBeanModel(bean, typeFromJava(bean.getBeanClass()), typeFromJava(bean.getParent()), bean.getComments());
         context.tsModel.getBeans().add(tsBean);
         context = context.bean(bean, tsBean);
         for (PropertyModel jBean : bean.getProperties()) {
@@ -36,14 +39,17 @@ public class ModelCompiler {
 
     private void processProperty(CompilationContext context, PropertyModel property) {
         final TsType originalType = typeFromJava(property.getType(), property.getName(), context.bean.getBeanClass());
-        final LinkedHashSet<TsType.EnumType> enums = new LinkedHashSet<>();
         final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
-        final TsType replacedType = replaceTypes(originalType, enums, typeAliases);
+        final TsType replacedType = replaceTypes(originalType, typeAliases);
         final TsType tsType = property.isOptional() ? replacedType.optional() : replacedType;
         final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, property.getComments());
         context.tsBean.getProperties().add(tsPropertyModel);
-        context.tsModel.getEnums().addAll(enums);
         context.tsModel.getTypeAliases().addAll(typeAliases);
+    }
+
+    private void processEnum(CompilationContext context, EnumModel enumModel) {
+        final TsEnumModel tsEnum = new TsEnumModel(enumModel, typeFromJava(enumModel.getEnumClass()), enumModel.getComments(), new ArrayList<>(enumModel.getValues()));
+        context.tsModel.getEnums().add(tsEnum);
     }
 
     private static class CompilationContext {
@@ -72,7 +78,7 @@ public class ModelCompiler {
 
     public TsType typeFromJavaWithReplacement(Type javaType) {
         final TsType type = typeFromJava(javaType);
-        return replaceTypes(type, new LinkedHashSet<TsType.EnumType>(), new LinkedHashSet<TsType.AliasType>());
+        return replaceTypes(type, new LinkedHashSet<TsType.AliasType>());
     }
 
     public TsType typeFromJava(Type javaType) {
@@ -125,7 +131,7 @@ public class ModelCompiler {
         return name;
     }
 
-    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.EnumType> enums, LinkedHashSet<TsType.AliasType> typeAliases) {
+    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.AliasType> typeAliases) {
         if (type == TsType.Date) {
             if (settings.mapDate == DateMapping.asNumber) {
                 typeAliases.add(TsType.DateAsNumber);
@@ -136,24 +142,19 @@ public class ModelCompiler {
                 return TsType.DateAsString;
             }
         }
-        if (type instanceof TsType.EnumType) {
-            final TsType.EnumType enumType = (TsType.EnumType) type;
-            enums.add(enumType);
-            return type;
-        }
         if (type instanceof TsType.OptionalType) {
             final TsType.OptionalType optionalType = (TsType.OptionalType) type;
-            return new TsType.OptionalType(replaceTypes(optionalType.type, enums, typeAliases));
+            return new TsType.OptionalType(replaceTypes(optionalType.type, typeAliases));
         }
         if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
-            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, enums, typeAliases));
+            return new TsType.BasicArrayType(replaceTypes(basicArrayType.elementType, typeAliases));
         }
         if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
             return new TsType.IndexedArrayType(
-                    replaceTypes(indexedArrayType.indexType, enums, typeAliases),
-                    replaceTypes(indexedArrayType.elementType, enums, typeAliases));
+                    replaceTypes(indexedArrayType.indexType, typeAliases),
+                    replaceTypes(indexedArrayType.elementType, typeAliases));
         }
         return type;
     }

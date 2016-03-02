@@ -1,8 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-import java.util.*;
-
 
 public abstract class TsType {
 
@@ -116,24 +114,17 @@ public abstract class TsType {
 
     }
 
-    public static class EnumType extends TsType implements Comparable<EnumType> {
+    public static class EnumType extends TsType {
 
         public final String name;
-        public final List<String> values;
 
-        public EnumType(java.lang.String name, List<String> values) {
+        public EnumType(String name) {
             this.name = name;
-            this.values = values;
         }
 
         @Override
         public String toString() {
             return name;
-        }
-
-        @Override
-        public int compareTo(EnumType o) {
-            return name.compareTo(o.name);
         }
 
     }

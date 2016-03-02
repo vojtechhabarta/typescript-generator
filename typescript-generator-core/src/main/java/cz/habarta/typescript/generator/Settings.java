@@ -25,6 +25,7 @@ public class Settings {
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
     public boolean noFileComment = false;
+    public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
 
     public void validate() {

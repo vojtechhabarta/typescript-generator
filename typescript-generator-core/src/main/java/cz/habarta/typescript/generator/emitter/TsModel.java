@@ -8,14 +8,14 @@ import java.util.*;
 public class TsModel {
 
     private final List<TsBeanModel> beans = new ArrayList<>();
-    private final LinkedHashSet<TsType.EnumType> enums = new LinkedHashSet<>();
+    private final List<TsEnumModel> enums = new ArrayList<>();
     private final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
 
     public List<TsBeanModel> getBeans() {
         return beans;
     }
 
-    public LinkedHashSet<TsType.EnumType> getEnums() {
+    public List<TsEnumModel> getEnums() {
         return enums;
     }
 

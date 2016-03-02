@@ -94,6 +94,7 @@ public class Emitter {
         }
         for (TsBeanModel bean : beans) {
             writeNewLine();
+            emitComments(bean.getComments());
             final String parent = bean.getParent() != null ? " extends " + bean.getParent() : "";
             writeIndentedLine(exportKeyword, "interface " + bean.getName() + parent + " {");
             indent++;
@@ -110,30 +111,25 @@ public class Emitter {
     }
 
     private void emitProperty(TsPropertyModel property) {
-        if (property.getComments() != null) {
-            writeIndentedLine("/**");
-            for (String comment : property.getComments()) {
-                writeIndentedLine("  * " + comment);
-            }
-            writeIndentedLine("  */");
-        }
+        emitComments(property.getComments());
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
         writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
     }
 
     private void emitEnums(TsModel model, boolean exportKeyword) {
-        final ArrayList<TsType.EnumType> enums = new ArrayList<>(model.getEnums());
+        final ArrayList<TsEnumModel> enums = new ArrayList<>(model.getEnums());
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(enums);
         }
-        for (TsType.EnumType enumType : enums) {
+        for (TsEnumModel tsEnum : enums) {
             writeNewLine();
             final ArrayList<String> quotedValues = new ArrayList<>();
-            for (String value : enumType.values) {
+            for (String value : tsEnum.getValues()) {
                 quotedValues.add(settings.quotes + value + settings.quotes);
             }
-            writeIndentedLine(exportKeyword, "type " + enumType.name + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
+            emitComments(tsEnum.getComments());
+            writeIndentedLine(exportKeyword, "type " + tsEnum.getName() + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
         }
     }
 
@@ -145,6 +141,16 @@ public class Emitter {
         for (TsType.AliasType alias : aliases) {
             writeNewLine();
             writeIndentedLine(exportKeyword, alias.definition);
+        }
+    }
+
+    private void emitComments(List<String> comments) {
+        if (comments != null) {
+            writeIndentedLine("/**");
+            for (String comment : comments) {
+                writeIndentedLine("  * " + comment);
+            }
+            writeIndentedLine("  */");
         }
     }
 

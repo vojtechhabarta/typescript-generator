@@ -152,6 +152,15 @@ public class GenerateMojo extends AbstractMojo {
     private boolean noFileComment;
 
     /**
+     * List of Javadoc XML files to search for documentation comments.
+     * These files should be created using "com.github.markusbernhardt.xmldoclet.XmlDoclet" (com.github.markusbernhardt:xml-doclet).
+     * Javadoc comments are added to output declarations as JSDoc comments.
+     * For more information see Wiki page https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc.
+     */
+    @Parameter
+    private List<File> javadocXmlFiles;
+
+    /**
      * List of extensions specified as fully qualified class name.
      * Known extensions:
      * cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension
@@ -196,6 +205,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
+            settings.javadocXmlFiles = javadocXmlFiles;
             if (extensions != null) {
                 settings.extensions = new ArrayList<>();
                 for (String extensionClassName : extensions) {

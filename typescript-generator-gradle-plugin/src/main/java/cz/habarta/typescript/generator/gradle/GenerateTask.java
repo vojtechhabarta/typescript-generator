@@ -31,6 +31,7 @@ public class GenerateTask extends DefaultTask {
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
+    public List<File> javadocXmlFiles;
     public List<String> extensions;
 
 
@@ -75,6 +76,7 @@ public class GenerateTask extends DefaultTask {
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
+        settings.javadocXmlFiles = javadocXmlFiles;
         if (extensions != null) {
             settings.extensions = new ArrayList<>();
             for (String extensionClassName : extensions) {

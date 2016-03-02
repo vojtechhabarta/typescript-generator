@@ -17,13 +17,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
             if (javaClass.isEnum()) {
-                @SuppressWarnings("unchecked")
-                final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) javaClass;
-                final List<java.lang.String> values = new ArrayList<>();
-                for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                    values.add(enumConstant.name());
-                }
-                return new Result(new TsType.EnumType(context.getMappedName(javaClass), values));
+                return new Result(new TsType.EnumType(context.getMappedName(javaClass)), javaClass);
             }
             if (Collection.class.isAssignableFrom(javaClass)) {
                 return new Result(new TsType.BasicArrayType(TsType.Any));
