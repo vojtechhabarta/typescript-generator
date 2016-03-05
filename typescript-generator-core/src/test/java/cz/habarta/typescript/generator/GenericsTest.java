@@ -14,6 +14,7 @@ public class GenericsTest {
     public void testDefaultGenerics() throws Exception {
         final Settings settings = new Settings();
         settings.noFileComment = true;
+        settings.customTypeProcessor = new DefaultTypeProcessor();
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(stringWriter));
@@ -33,7 +34,6 @@ public class GenericsTest {
         final Settings settings = new Settings();
         settings.addTypeNamePrefix = "I";
         settings.noFileComment = true;
-        settings.customTypeProcessor = new GenericsTypeProcessor();
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(stringWriter), true, 0);
