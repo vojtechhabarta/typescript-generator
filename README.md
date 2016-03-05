@@ -102,12 +102,17 @@ Direct invocation
 -----------------
 If you do not use Maven or Gradle you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
 
-Releases are available from [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator).
+
+Download
+--------
+Releases are available from Maven Central Repository.
+[Search](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator) for dependency information for your build tool
+or download [typescript-generator-core](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core) directly.
 
 
 Wiki
 ----
-For more detailed description of some topics see [Wiki pages](wiki).
+For more detailed description of some topics see [Wiki pages](../../wiki).
 
 
 Architecture
