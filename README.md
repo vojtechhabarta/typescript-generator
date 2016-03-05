@@ -43,7 +43,7 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
 <plugin>
     <groupId>cz.habarta.typescript-generator</groupId>
     <artifactId>typescript-generator-maven-plugin</artifactId>
-    <version>1.2.x</version>
+    <version>x.y.z</version>
     <executions>
         <execution>
             <id>generate</id>
@@ -77,7 +77,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.2.x'
+        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: 'x.y.z'
     }
 }
 generateTypeScript {
