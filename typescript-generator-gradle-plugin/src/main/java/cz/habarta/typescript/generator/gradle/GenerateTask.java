@@ -40,6 +40,9 @@ public class GenerateTask extends DefaultTask {
         if (outputFile == null) {
             throw new RuntimeException("Please specify 'outputFile' property.");
         }
+        if (jsonLibrary == null) {
+            throw new RuntimeException("Please specify 'jsonLibrary' property.");
+        }
 
         TypeScriptGenerator.printVersion();
 

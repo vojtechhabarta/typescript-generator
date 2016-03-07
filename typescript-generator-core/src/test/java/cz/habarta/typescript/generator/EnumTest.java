@@ -9,9 +9,7 @@ public class EnumTest {
 
     @Test
     public void test() {
-        final Settings settings = new Settings();
-        settings.noFileComment = true;
-        settings.newline = "\n";
+        final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
         final String expected =
                 "\n" +
@@ -26,9 +24,7 @@ public class EnumTest {
 
     @Test
     public void testSingleEnum() {
-        final Settings settings = new Settings();
-        settings.noFileComment = true;
-        settings.newline = "\n";
+        final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
         final String expected =
                 "\n" +

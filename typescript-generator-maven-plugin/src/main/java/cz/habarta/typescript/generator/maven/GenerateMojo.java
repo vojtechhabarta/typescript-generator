@@ -55,9 +55,9 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Library used in JSON classes.
      * Supported values are 'jackson1', 'jackson2'.
-     * Default value is 'jackson1'.
+     * Recommended value is 'jackson2'.
      */
-    @Parameter
+    @Parameter(required = true)
     private JsonLibrary jsonLibrary;
 
     /**

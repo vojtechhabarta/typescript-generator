@@ -32,7 +32,7 @@ public class ModelCompilerTest {
     }
 
     private static ModelCompiler getTestModelCompiler(String... excludedClassNames) {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.mapDate = DateMapping.asString;
         settings.excludedClassNames = Arrays.asList(excludedClassNames);
         return new TypeScriptGenerator(settings).getModelCompiler();

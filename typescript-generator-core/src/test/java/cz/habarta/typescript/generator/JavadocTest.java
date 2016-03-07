@@ -17,7 +17,7 @@ public class JavadocTest {
 
     @Test
     public void testJavadocInModelParser() {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
         final TypeProcessor typeProcessor = new DefaultTypeProcessor();
         {

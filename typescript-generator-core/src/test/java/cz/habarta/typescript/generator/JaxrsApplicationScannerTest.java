@@ -40,7 +40,7 @@ public class JaxrsApplicationScannerTest<T> {
     @Test
     public void testWithParsing() {
         final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), null);
-        final Model model = new TypeScriptGenerator().getModelParser().parseModel(types);
+        final Model model = new TypeScriptGenerator(TestUtils.settings()).getModelParser().parseModel(types);
         final ArrayList<Class<?>> classes = new ArrayList<>();
         for (BeanModel beanModel : model.getBeans()) {
             classes.add(beanModel.getBeanClass());

@@ -12,7 +12,7 @@ public class CustomTypeConversionTest {
 
     @Test
     public void testCustomTypeConversion() {
-        Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         // suppose we want to override how A is parsed
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
@@ -24,7 +24,7 @@ public class CustomTypeConversionTest {
             }
         };
 
-        final ModelCompiler compiler = new TypeScriptGenerator().getModelCompiler();
+        final ModelCompiler compiler = new TypeScriptGenerator(settings).getModelCompiler();
         assertEquals("A", compiler.typeFromJava(A.class).toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(out));
@@ -46,6 +46,7 @@ public class CustomTypeConversionTest {
     @Test
     public void testCustomOptional() throws Exception {
         final Settings settings = new Settings();
+        settings.jsonLibrary = JsonLibrary.jackson2;
         settings.mapDate = DateMapping.asString;
         settings.customTypeProcessor = new TypeProcessor() {
             @Override

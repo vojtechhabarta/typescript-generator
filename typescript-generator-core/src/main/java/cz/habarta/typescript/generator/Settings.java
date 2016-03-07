@@ -11,7 +11,7 @@ public class Settings {
     public String quotes = "\"";
     public String indentString = "    ";
     public TypeScriptFormat outputFileType = TypeScriptFormat.declarationFile;
-    public JsonLibrary jsonLibrary = JsonLibrary.jackson1;
+    public JsonLibrary jsonLibrary = null;
     public String namespace = null;
     public String module = null;
     public List<String> excludedClassNames = null;
@@ -29,6 +29,9 @@ public class Settings {
     public List<EmitterExtension> extensions = new ArrayList<>();
 
     public void validate() {
+        if (jsonLibrary == null) {
+            throw new RuntimeException("Required 'jsonLibrary' is not configured.");
+        }
         if (outputFileType != TypeScriptFormat.implementationFile) {
             for (EmitterExtension emitterExtension : extensions) {
                 if (emitterExtension.generatesRuntimeCode()) {

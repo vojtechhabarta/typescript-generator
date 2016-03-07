@@ -8,11 +8,10 @@ public class StyleConfigurationTest {
 
     @Test
     public void testOutputWithCustomStyle() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Settings settings = new Settings();
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final Settings settings = TestUtils.settings();
         settings.addTypeNamePrefix = "I";
         settings.sortDeclarations = true;
-        settings.noFileComment = true;
 
         String expected = ""    +
 ""                              + settings.newline +
@@ -47,7 +46,7 @@ public class StyleConfigurationTest {
 
     @Test
     public void testTypeNameCustomizations() {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.removeTypeNamePrefix = "Json";
         settings.removeTypeNameSuffix = "Class";
         settings.addTypeNamePrefix = "I";

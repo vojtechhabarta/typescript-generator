@@ -12,8 +12,7 @@ public class GenericsTest {
 
     @Test
     public void testDefaultGenerics() throws Exception {
-        final Settings settings = new Settings();
-        settings.noFileComment = true;
+        final Settings settings = TestUtils.settings();
         settings.customTypeProcessor = new DefaultTypeProcessor();
 
         final StringWriter stringWriter = new StringWriter();
@@ -31,9 +30,8 @@ public class GenericsTest {
 
     @Test
     public void testAdvancedGenerics() throws Exception {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.addTypeNamePrefix = "I";
-        settings.noFileComment = true;
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(stringWriter), true, 0);
@@ -57,9 +55,8 @@ public class GenericsTest {
 
     @Test
     public void testWildcardGeneric() {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.addTypeNamePrefix = "I";
-        settings.noFileComment = true;
         settings.customTypeProcessor = new GenericsTypeProcessor();
 
         final StringWriter stringWriter = new StringWriter();

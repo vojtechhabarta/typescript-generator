@@ -16,9 +16,8 @@ public class SortedTypesTest {
     }
 
     public void assertCorrectOrder(Class<?>... classes) {
-        Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.sortDeclarations = true;
-        settings.noFileComment = true;
         String expected = "" +
 ""                           + settings.newline +
 "interface A {"              + settings.newline +
