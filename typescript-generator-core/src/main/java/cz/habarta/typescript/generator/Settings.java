@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 
@@ -27,6 +28,21 @@ public class Settings {
     public boolean noFileComment = false;
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
+
+    /**
+     * The presence of any annotation in this list on a json property will cause the
+     * typescript generator to treat that property as optional when generating the
+     * corresponding typescript interface.
+     * <p>
+     * Note: When using a {@link cz.habarta.typescript.generator.parser.Jackson1Parser}
+     * to generate your model, any annotation specified here will need to pass the
+     * {@link org.codehaus.jackson.map.AnnotationIntrospector#isHandled} check performed
+     * by the {@link org.codehaus.jackson.map.ObjectMapper} used to construct your model
+     * parser. If you control the annotations in question, the easiest way to do this is
+     * to annotate your annotations as
+     * {@link org.codehaus.jackson.annotate.JacksonAnnotation}s.
+     */
+    public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
 
     public void validate() {
         if (jsonLibrary == null) {
