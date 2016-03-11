@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2016-03-11
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.6.169
+                  <li id="projectVersion">Version: 1.6.170
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.6.169:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.6.170:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -379,6 +379,20 @@ is in source control and is regenerated in build.<br /></td>
           
 <tr class="b">
             
+<td><b><a href="#optionalAnnotations">optionalAnnotations</a></b></td>
+            
+<td><tt>List</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>The presence of any annotation in this list on a JSON property will
+cause the typescript-generator to treat that property as optional
+when generating the corresponding TypeScript interface. Example
+optional annotation: @javax.annotation.Nullable<br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
 <td><tt>TypeScriptFormat</tt></td>
@@ -391,7 +405,7 @@ is in source control and is regenerated in build.<br /></td>
 TypeScript code. Default value is 'declarationFile'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -404,7 +418,7 @@ enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -417,7 +431,7 @@ enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -429,7 +443,7 @@ will be &quot;Data&quot;.<br /></td>
 sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -619,6 +633,19 @@ is in source control and is regenerated in build.</div>
 <ul>
           
 <li><b>Type</b>: <tt>boolean</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="optionalAnnotations">optionalAnnotations</a>:</b></p>
+        
+<div>The presence of any annotation in this list on a JSON property will
+cause the typescript-generator to treat that property as optional
+when generating the corresponding TypeScript interface. Example
+optional annotation: @javax.annotation.Nullable</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.util.List</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
