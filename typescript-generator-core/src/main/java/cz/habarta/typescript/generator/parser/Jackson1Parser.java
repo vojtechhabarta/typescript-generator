@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.*;
 import org.codehaus.jackson.JsonNode;
@@ -13,10 +14,15 @@ import org.codehaus.jackson.type.JavaType;
 
 public class Jackson1Parser extends ModelParser {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
+        this(settings, typeProcessor, new ObjectMapper());
+    }
+
+    public Jackson1Parser(Settings settings, TypeProcessor typeProcessor, ObjectMapper objectMapper) {
         super(settings, typeProcessor);
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -30,7 +36,14 @@ public class Jackson1Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, false, sourceClass.type));
+                    boolean optional = false;
+                    for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
+                        if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
+                            optional = true;
+                            break;
+                        }
+                    }
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type));
                 }
             }
         }

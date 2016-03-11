@@ -6,17 +6,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
 import cz.habarta.typescript.generator.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.*;
 
 
 public class Jackson2Parser extends ModelParser {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    
+    private final ObjectMapper objectMapper;
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
+        this(settings, typeProcessor, new ObjectMapper());
+    }
+
+    public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, ObjectMapper objectMapper) {
         super(settings, typeProcessor);
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -36,7 +41,14 @@ public class Jackson2Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, false, sourceClass.type));
+                    boolean optional = false;
+                    for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
+                        if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
+                            optional = true;
+                            break;
+                        }
+                    }
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type));
                 }
             }
         }
