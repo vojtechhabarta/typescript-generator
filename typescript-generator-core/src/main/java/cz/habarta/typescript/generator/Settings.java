@@ -7,6 +7,11 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 
+/**
+ * @see cz.habarta.typescript.generator.maven.GenerateMojo
+ * @see <a href="https://github.com/vojtechhabarta/typescript-generator">README.md</a> on GitHub or in project root directory
+ * @see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki">Wiki</a> on GitHub
+ */
 public class Settings {
     public String newline = String.format("%n");
     public String quotes = "\"";
@@ -28,21 +33,26 @@ public class Settings {
     public boolean noFileComment = false;
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
-
-    /**
-     * The presence of any annotation in this list on a json property will cause the
-     * typescript generator to treat that property as optional when generating the
-     * corresponding typescript interface.
-     * <p>
-     * Note: When using a {@link cz.habarta.typescript.generator.parser.Jackson1Parser}
-     * to generate your model, any annotation specified here will need to pass the
-     * {@link org.codehaus.jackson.map.AnnotationIntrospector#isHandled} check performed
-     * by the {@link org.codehaus.jackson.map.ObjectMapper} used to construct your model
-     * parser. If you control the annotations in question, the easiest way to do this is
-     * to annotate your annotations as
-     * {@link org.codehaus.jackson.annotate.JacksonAnnotation}s.
-     */
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+
+
+    public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
+        if (customTypeProcessor != null) {
+            this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);
+        }
+    }
+
+    public void loadExtensions(ClassLoader classLoader, List<String> extensions) {
+        if (extensions != null) {
+            this.extensions = loadInstances(classLoader, extensions, EmitterExtension.class);
+        }
+    }
+
+    public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {
+        if (optionalAnnotations != null) {
+            this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
+        }
+    }
 
     public void validate() {
         if (jsonLibrary == null) {
@@ -67,6 +77,48 @@ public class Settings {
         }
         if (outputFileType == TypeScriptFormat.implementationFile && module != null && !outputFile.getName().equals(module + ".ts")) {
             throw new RuntimeException(String.format("Implementation file must be named '%s' when module name is '%s'.", module + ".ts", module));
+        }
+    }
+
+
+    private static <T> List<Class<? extends T>> loadClasses(ClassLoader classLoader, List<String> classNames, Class<T> requiredClassType) {
+        if (classNames == null) {
+            return null;
+        }
+        try {
+            final List<Class<? extends T>> classes = new ArrayList<>();
+            for (String className : classNames) {
+                final Class<?> loadedClass = classLoader.loadClass(className);
+                if (requiredClassType.isAssignableFrom(loadedClass)) {
+                    @SuppressWarnings("unchecked")
+                    final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
+                    classes.add(castedClass);
+                } else {
+                    throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
+                }
+            }
+            return classes;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
+        if (classNames == null) {
+            return null;
+        }
+        final List<T> instances = new ArrayList<>();
+        for (String className : classNames) {
+            instances.add(loadInstance(classLoader, className, requiredType));
+        }
+        return instances;
+    }
+
+    private static <T> T loadInstance(ClassLoader classLoader, String className, Class<T> requiredType) {
+        try {
+            return requiredType.cast(classLoader.loadClass(className).newInstance());
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -3,7 +3,6 @@ package cz.habarta.typescript.generator.gradle;
 
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.Input;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -33,6 +32,7 @@ public class GenerateTask extends DefaultTask {
     public boolean noFileComment;
     public List<File> javadocXmlFiles;
     public List<String> extensions;
+    public List<String> optionalAnnotations;
 
 
     @TaskAction
@@ -73,19 +73,13 @@ public class GenerateTask extends DefaultTask {
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.mapDate = mapDate;
-        if (customTypeProcessor != null) {
-            settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
-        }
+        settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
-        if (extensions != null) {
-            settings.extensions = new ArrayList<>();
-            for (String extensionClassName : extensions) {
-                settings.extensions.add((EmitterExtension) classLoader.loadClass(extensionClassName).newInstance());
-            }
-        }
+        settings.loadExtensions(classLoader, extensions);
+        settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.validateFileName(new File(outputFile));
 
         // TypeScriptGenerator

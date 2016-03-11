@@ -48,6 +48,24 @@ public class OptionalAnnotationTest {
         }
     }
 
+    @Test
+    public void testJavaxNullableWithJackson1() {
+        testJavaxNullableUsingTypeScriptGenerator(JsonLibrary.jackson1);
+    }
+
+    @Test
+    public void testJavaxNullableWithJackson2() {
+        testJavaxNullableUsingTypeScriptGenerator(JsonLibrary.jackson2);
+    }
+
+    private void testJavaxNullableUsingTypeScriptGenerator(JsonLibrary jsonLibrary) {
+        Settings settings = TestUtils.settings();
+        settings.jsonLibrary = jsonLibrary;
+        settings.optionalAnnotations.add(javax.annotation.Nullable.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanWithJavaxNullable.class));
+        Assert.assertTrue(output.contains("property1?: string;"));
+    }
+
     @org.codehaus.jackson.annotate.JacksonAnnotation
     @Retention(RetentionPolicy.RUNTIME)
     static @interface Nullable {
@@ -77,4 +95,10 @@ public class OptionalAnnotationTest {
             return fieldProperty;
         }
     }
+
+    static class BeanWithJavaxNullable {
+        @javax.annotation.Nullable
+        public String property1;
+    }
+
 }

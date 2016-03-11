@@ -13,15 +13,10 @@ import java.util.*;
 
 public class Jackson2Parser extends ModelParser {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
-        this(settings, typeProcessor, new ObjectMapper());
-    }
-
-    public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, ObjectMapper objectMapper) {
         super(settings, typeProcessor);
-        this.objectMapper = objectMapper;
     }
 
     @Override

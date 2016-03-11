@@ -8,21 +8,27 @@ import java.util.*;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.introspect.NopAnnotationIntrospector;
 import org.codehaus.jackson.map.ser.*;
 import org.codehaus.jackson.type.JavaType;
 
 
 public class Jackson1Parser extends ModelParser {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
-        this(settings, typeProcessor, new ObjectMapper());
-    }
-
-    public Jackson1Parser(Settings settings, TypeProcessor typeProcessor, ObjectMapper objectMapper) {
         super(settings, typeProcessor);
-        this.objectMapper = objectMapper;
+        if (!settings.optionalAnnotations.isEmpty()) {
+            final AnnotationIntrospector defaultAnnotationIntrospector = objectMapper.getSerializationConfig().getAnnotationIntrospector();
+            final AnnotationIntrospector allAnnotationIntrospector = new NopAnnotationIntrospector() {
+                @Override
+                public boolean isHandled(Annotation ann) {
+                    return true;
+                }
+            };
+            this.objectMapper.setAnnotationIntrospector(new AnnotationIntrospector.Pair(defaultAnnotationIntrospector, allAnnotationIntrospector));
+        }
     }
 
     @Override

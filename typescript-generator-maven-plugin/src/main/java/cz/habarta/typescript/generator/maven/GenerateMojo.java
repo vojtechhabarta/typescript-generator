@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator.maven;
 
 import cz.habarta.typescript.generator.*;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -168,6 +167,14 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private List<String> extensions;
 
+    /**
+     * The presence of any annotation in this list on a JSON property will cause
+     * the typescript-generator to treat that property as optional when generating
+     * the corresponding TypeScript interface.
+     * Example optional annotation: @javax.annotation.Nullable
+     */
+    @Parameter
+    private List<String> optionalAnnotations;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -199,19 +206,13 @@ public class GenerateMojo extends AbstractMojo {
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.mapDate = mapDate;
-            if (customTypeProcessor != null) {
-                settings.customTypeProcessor = (TypeProcessor) classLoader.loadClass(customTypeProcessor).newInstance();
-            }
+            settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
             settings.javadocXmlFiles = javadocXmlFiles;
-            if (extensions != null) {
-                settings.extensions = new ArrayList<>();
-                for (String extensionClassName : extensions) {
-                    settings.extensions.add((EmitterExtension) classLoader.loadClass(extensionClassName).newInstance());
-                }
-            }
+            settings.loadExtensions(classLoader, extensions);
+            settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.validateFileName(outputFile);
 
             // TypeScriptGenerator
@@ -220,7 +221,7 @@ public class GenerateMojo extends AbstractMojo {
                     Output.to(outputFile)
             );
 
-        } catch (DependencyResolutionRequiredException | ReflectiveOperationException | IOException e) {
+        } catch (DependencyResolutionRequiredException | IOException e) {
             throw new RuntimeException(e);
         }
     }
