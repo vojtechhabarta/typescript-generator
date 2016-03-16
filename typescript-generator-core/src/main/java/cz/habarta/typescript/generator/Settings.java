@@ -16,10 +16,11 @@ public class Settings {
     public String newline = String.format("%n");
     public String quotes = "\"";
     public String indentString = "    ";
-    public TypeScriptFormat outputFileType = TypeScriptFormat.declarationFile;
-    public JsonLibrary jsonLibrary = null;
-    public String namespace = null;
+    public TypeScriptFileType outputFileType = TypeScriptFileType.declarationFile;
+    public TypeScriptOutputKind outputKind = null;
     public String module = null;
+    public String namespace = null;
+    public JsonLibrary jsonLibrary = null;
     public List<String> excludedClassNames = null;
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNamePrefix = null;
@@ -55,13 +56,25 @@ public class Settings {
     }
 
     public void validate() {
-        if (jsonLibrary == null) {
-            throw new RuntimeException("Required 'jsonLibrary' is not configured.");
+        if (outputKind == null) {
+            throw new RuntimeException("Required 'outputKind' parameter is not configured. " + seeLink());
         }
-        if (outputFileType != TypeScriptFormat.implementationFile) {
+        if (outputKind == TypeScriptOutputKind.ambientModule && module == null) {
+            throw new RuntimeException("'module' parameter must be specified for ambient module. " + seeLink());
+        }
+        if (outputKind != TypeScriptOutputKind.ambientModule && module != null) {
+            throw new RuntimeException("'module' parameter is only applicable to ambient modules. " + seeLink());
+        }
+        if (outputKind == TypeScriptOutputKind.ambientModule && outputFileType == TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("Ambient modules are not supported in implementation files. " + seeLink());
+        }
+        if (jsonLibrary == null) {
+            throw new RuntimeException("Required 'jsonLibrary' parameter is not configured.");
+        }
+        if (outputFileType != TypeScriptFileType.implementationFile) {
             for (EmitterExtension emitterExtension : extensions) {
                 if (emitterExtension.generatesRuntimeCode()) {
-                    throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' is not set to 'implementationFile'.",
+                    throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.",
                             emitterExtension.getClass().getSimpleName()));
                 }
             }
@@ -69,17 +82,17 @@ public class Settings {
     }
 
     public void validateFileName(File outputFile) {
-        if (outputFileType == TypeScriptFormat.declarationFile && !outputFile.getName().endsWith(".d.ts")) {
+        if (outputFileType == TypeScriptFileType.declarationFile && !outputFile.getName().endsWith(".d.ts")) {
             throw new RuntimeException("Declaration file must have 'd.ts' extension: " + outputFile);
         }
-        if (outputFileType == TypeScriptFormat.implementationFile && (!outputFile.getName().endsWith(".ts") || outputFile.getName().endsWith(".d.ts"))) {
+        if (outputFileType == TypeScriptFileType.implementationFile && (!outputFile.getName().endsWith(".ts") || outputFile.getName().endsWith(".d.ts"))) {
             throw new RuntimeException("Implementation file must have 'ts' extension: " + outputFile);
-        }
-        if (outputFileType == TypeScriptFormat.implementationFile && module != null && !outputFile.getName().equals(module + ".ts")) {
-            throw new RuntimeException(String.format("Implementation file must be named '%s' when module name is '%s'.", module + ".ts", module));
         }
     }
 
+    private String seeLink() {
+        return "For more information see 'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.";
+    }
 
     private static <T> List<Class<? extends T>> loadClasses(ClassLoader classLoader, List<String> classNames, Class<T> requiredClassType) {
         if (classNames == null) {
@@ -88,6 +101,7 @@ public class Settings {
         try {
             final List<Class<? extends T>> classes = new ArrayList<>();
             for (String className : classNames) {
+                System.out.println("Loading class " + className);
                 final Class<?> loadedClass = classLoader.loadClass(className);
                 if (requiredClassType.isAssignableFrom(loadedClass)) {
                     @SuppressWarnings("unchecked")
@@ -116,6 +130,7 @@ public class Settings {
 
     private static <T> T loadInstance(ClassLoader classLoader, String className, Class<T> requiredType) {
         try {
+            System.out.println("Loading class " + className);
             return requiredType.cast(classLoader.loadClass(className).newInstance());
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

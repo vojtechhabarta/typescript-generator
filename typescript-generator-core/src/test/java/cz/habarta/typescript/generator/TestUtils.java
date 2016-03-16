@@ -9,6 +9,7 @@ public class TestUtils {
 
     public static Settings settings() {
         final Settings settings = new Settings();
+        settings.outputKind = TypeScriptOutputKind.global;
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.noFileComment = true;
         settings.newline = "\n";

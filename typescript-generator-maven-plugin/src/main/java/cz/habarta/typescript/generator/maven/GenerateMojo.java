@@ -18,7 +18,8 @@ import org.apache.maven.project.MavenProject;
 public class GenerateMojo extends AbstractMojo {
 
     /**
-     * Output TypeScript declaration file.
+     * Path and name of generated TypeScript file.
+     * Required parameter.
      */
     @Parameter(required = true)
     private File outputFile;
@@ -29,7 +30,31 @@ public class GenerateMojo extends AbstractMojo {
      * Default value is 'declarationFile'.
      */
     @Parameter
-    private TypeScriptFormat outputFileType;
+    private TypeScriptFileType outputFileType;
+
+    /**
+     * Kind of generated TypeScript output, allowed values are 'global', 'module' or 'ambientModule'.
+     * Value 'global' means that declarations will be in global scope or namespace (no module).
+     * Value 'module' means that generated file will contain top-level 'export' declarations.
+     * Value 'ambientModule' means that generated declarations will be wrapped in 'declare module "mod" { }' declaration.
+     * Required parameter.
+     * For more information see Wiki page 'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.
+     */
+    @Parameter(required = true)
+    private TypeScriptOutputKind outputKind;
+
+    /**
+     * Name of generated ambient module.
+     * Used when 'outputKind' is set to 'ambientModule'.
+     */
+    @Parameter
+    private String module;
+
+    /**
+     * Generates specified namespace. Not recommended to combine with modules. Default is no namespace.
+     */
+    @Parameter
+    private String namespace;
 
     /**
      * JSON classes to process.
@@ -54,30 +79,10 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Library used in JSON classes.
      * Supported values are 'jackson1', 'jackson2'.
-     * Recommended value is 'jackson2'.
+     * Required parameter, recommended value is 'jackson2'.
      */
     @Parameter(required = true)
     private JsonLibrary jsonLibrary;
-
-    /**
-     * Deprecated. Use "namespace" parameter.
-     * @deprecated Use {@link #namespace} instead.
-     */
-    @Parameter
-    @Deprecated
-    private String moduleName;
-
-    /**
-     * TypeScript namespace (previously called "internal module") of generated declarations.
-     */
-    @Parameter
-    private String namespace;
-
-    /**
-     * TypeScript module name (previously called "external module") of generated declarations.
-     */
-    @Parameter
-    private String module;
 
     /**
      * If true declared properties will be optional.
@@ -154,7 +159,7 @@ public class GenerateMojo extends AbstractMojo {
      * List of Javadoc XML files to search for documentation comments.
      * These files should be created using "com.github.markusbernhardt.xmldoclet.XmlDoclet" (com.github.markusbernhardt:xml-doclet).
      * Javadoc comments are added to output declarations as JSDoc comments.
-     * For more information see Wiki page https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc.
+     * For more information see Wiki page 'https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc'.
      */
     @Parameter
     private List<File> javadocXmlFiles;
@@ -196,10 +201,11 @@ public class GenerateMojo extends AbstractMojo {
             if (outputFileType != null) {
                 settings.outputFileType = outputFileType;
             }
+            settings.outputKind = outputKind;
+            settings.module = module;
+            settings.namespace = namespace;
             settings.excludedClassNames = excludeClasses;
             settings.jsonLibrary = jsonLibrary;
-            settings.namespace = namespace != null ? namespace : moduleName;
-            settings.module = module;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;

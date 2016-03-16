@@ -13,13 +13,14 @@ import org.gradle.api.tasks.*;
 public class GenerateTask extends DefaultTask {
 
     public String outputFile;
-    public TypeScriptFormat outputFileType;
+    public TypeScriptFileType outputFileType;
+    public TypeScriptOutputKind outputKind;
+    public String module;
+    public String namespace;
     public List<String> classes;
     public String classesFromJaxrsApplication;
     public List<String> excludeClasses;
     public JsonLibrary jsonLibrary;
-    public String namespace;
-    public String module;
     public boolean declarePropertiesAsOptional;
     public String removeTypeNamePrefix;
     public String removeTypeNameSuffix;
@@ -63,10 +64,11 @@ public class GenerateTask extends DefaultTask {
         if (outputFileType != null) {
             settings.outputFileType = outputFileType;
         }
+        settings.outputKind = outputKind;
+        settings.module = module;
+        settings.namespace = namespace;
         settings.excludedClassNames = excludeClasses;
         settings.jsonLibrary = jsonLibrary;
-        settings.namespace = namespace;
-        settings.module = module;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.removeTypeNamePrefix = removeTypeNamePrefix;
         settings.removeTypeNameSuffix = removeTypeNameSuffix;

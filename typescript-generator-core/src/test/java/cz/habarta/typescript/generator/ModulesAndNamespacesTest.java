@@ -11,30 +11,31 @@ public class ModulesAndNamespacesTest {
 
     @Test
     public void testNamespacesAndModules() {
-        final File withoutModuleDir = new File("target/test-ts-withoutmodule");
-        final File withModuleDir = new File("target/test-ts-withmodule");
-        withoutModuleDir.mkdirs();
-        withModuleDir.mkdirs();
+        final File outputDir = new File("target/test-ts-modules");
+        outputDir.mkdirs();
 
-        file("Test1", null, null, TypeScriptFormat.declarationFile, new File(withoutModuleDir, "test-mn1.d.ts"));
-        file("Test2", null, "NS2", TypeScriptFormat.declarationFile, new File(withoutModuleDir, "test-mn2.d.ts"));
-        file("Test3", "mod3", null, TypeScriptFormat.declarationFile, new File(withModuleDir, "test-mn3.d.ts"));
-        file("Test4", "mod4", "NS4", TypeScriptFormat.declarationFile, new File(withModuleDir, "test-mn4.d.ts"));
+        file("Test1", null, null, TypeScriptOutputKind.global, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn1.d.ts"));
+        file("Test2", null, "NS2", TypeScriptOutputKind.global, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn2.d.ts"));
+        file("Test3a", "mod3a", null, TypeScriptOutputKind.ambientModule, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn3a.d.ts"));
+        file("Test3b", null, null, TypeScriptOutputKind.module, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn3b.d.ts"));
+        file("Test4a", "mod4a", "NS4a", TypeScriptOutputKind.ambientModule, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn4a.d.ts"));
+        file("Test4b", null, "NS4b", TypeScriptOutputKind.module, TypeScriptFileType.declarationFile, new File(outputDir, "test-mn4b.d.ts"));
 
-        file("Test5", null, null, TypeScriptFormat.implementationFile, new File(withoutModuleDir, "test-mn5.ts"));
-        file("Test6", null, "NS6", TypeScriptFormat.implementationFile, new File(withoutModuleDir, "test-mn6.ts"));
-        file("Test7", "mod7", null, TypeScriptFormat.implementationFile, new File(withModuleDir, "test-mn7.ts"));
-        file("Test8", "mod8", "NS8", TypeScriptFormat.implementationFile, new File(withModuleDir, "test-mn8.ts"));
+        file("Test5", null, null, TypeScriptOutputKind.global, TypeScriptFileType.implementationFile, new File(outputDir, "test-mn5.ts"));
+        file("Test6", null, "NS6", TypeScriptOutputKind.global, TypeScriptFileType.implementationFile, new File(outputDir, "test-mn6.ts"));
+        file("Test7", null, null, TypeScriptOutputKind.module, TypeScriptFileType.implementationFile, new File(outputDir, "test-mn7.ts"));
+        file("Test8", null, "NS8", TypeScriptOutputKind.module, TypeScriptFileType.implementationFile, new File(outputDir, "test-mn8.ts"));
     }
 
-    private static void file(String prefix, String module, String namespace, TypeScriptFormat outputFileType, File output) {
+    private static void file(String prefix, String module, String namespace, TypeScriptOutputKind outputKind, TypeScriptFileType outputFileType, File output) {
         final Settings settings = new Settings();
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.addTypeNamePrefix = prefix;
         settings.module = module;
         settings.namespace = namespace;
+        settings.outputKind = outputKind;
         settings.outputFileType = outputFileType;
-        if (outputFileType == TypeScriptFormat.implementationFile) {
+        if (outputFileType == TypeScriptFileType.implementationFile) {
             settings.extensions.add(new TestFunctionExtention());
         }
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(Data.class), Output.to(output));

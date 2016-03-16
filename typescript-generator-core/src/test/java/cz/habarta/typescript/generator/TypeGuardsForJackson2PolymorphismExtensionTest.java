@@ -20,7 +20,7 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
                 lines.add(line);
             }
         };
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         final TypeProcessor typeProcessor = new DefaultTypeProcessor();
         final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(Point.class);
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
@@ -34,10 +34,8 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
 
     @Test
     public void testInTypeScriptGenerator() {
-        final Settings settings = new Settings();
-        settings.newline = "\n";
-        settings.outputFileType = TypeScriptFormat.implementationFile;
-        settings.jsonLibrary = JsonLibrary.jackson2;
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.addTypeNamePrefix = "Json";
         settings.extensions.add(new TypeGuardsForJackson2PolymorphismExtension());
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Point.class));

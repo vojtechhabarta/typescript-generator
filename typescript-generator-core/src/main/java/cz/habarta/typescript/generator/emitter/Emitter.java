@@ -40,9 +40,9 @@ public class Emitter {
     }
 
     private void emitModule(TsModel model) {
-        if (settings.module != null && settings.outputFileType == TypeScriptFormat.declarationFile) {
+        if (settings.outputKind == TypeScriptOutputKind.ambientModule) {
             writeNewLine();
-            writeIndentedLine("declare module \"" + settings.module + "\" {");
+            writeIndentedLine("declare module " + settings.quotes + settings.module + settings.quotes + " {");
             indent++;
             emitNamespace(model);
             indent--;
@@ -56,18 +56,22 @@ public class Emitter {
     private void emitNamespace(TsModel model) {
         if (settings.namespace != null) {
             writeNewLine();
-            final String prefix = settings.outputFileType == TypeScriptFormat.declarationFile
-                    ? (settings.module != null ? "" : "declare ")
-                    : (settings.module != null ? "export " : "");
+            String prefix = "";
+            if (settings.outputFileType == TypeScriptFileType.declarationFile && settings.outputKind == TypeScriptOutputKind.global) {
+                prefix = "declare ";
+            }
+            if (settings.outputKind == TypeScriptOutputKind.module) {
+                prefix = "export ";
+            }
             writeIndentedLine(prefix +  "namespace " + settings.namespace + " {");
             indent++;
-            final boolean exportElements = settings.outputFileType == TypeScriptFormat.implementationFile;
+            final boolean exportElements = settings.outputFileType == TypeScriptFileType.implementationFile;
             emitElements(model, exportElements);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
         } else {
-            final boolean exportElements = settings.module != null && settings.outputFileType == TypeScriptFormat.implementationFile;
+            final boolean exportElements = settings.outputKind == TypeScriptOutputKind.module;
             emitElements(model, exportElements);
         }
     }

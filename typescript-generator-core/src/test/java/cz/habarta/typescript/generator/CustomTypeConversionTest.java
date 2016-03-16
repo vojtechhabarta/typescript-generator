@@ -45,8 +45,7 @@ public class CustomTypeConversionTest {
 
     @Test
     public void testCustomOptional() throws Exception {
-        final Settings settings = new Settings();
-        settings.jsonLibrary = JsonLibrary.jackson2;
+        final Settings settings = TestUtils.settings();
         settings.mapDate = DateMapping.asString;
         settings.customTypeProcessor = new TypeProcessor() {
             @Override

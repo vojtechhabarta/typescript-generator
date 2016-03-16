@@ -24,8 +24,7 @@ public class DateTest {
     }
 
     private static Settings settings(DateMapping mapDate, String namespace) {
-        final Settings settings = new Settings();
-        settings.jsonLibrary = JsonLibrary.jackson2;
+        final Settings settings = TestUtils.settings();
         settings.namespace = namespace;
         settings.mapDate = mapDate;
         return settings;

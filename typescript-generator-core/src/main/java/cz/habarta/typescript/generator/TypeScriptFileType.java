@@ -2,7 +2,7 @@
 package cz.habarta.typescript.generator;
 
 
-public enum TypeScriptFormat {
+public enum TypeScriptFileType {
 
     declarationFile, implementationFile
 
