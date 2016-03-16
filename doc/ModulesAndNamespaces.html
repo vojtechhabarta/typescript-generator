@@ -31,14 +31,14 @@
         .markdown-body table {
             display: table;
         }
-        .markdown-body .nested-table tr,
-        .markdown-body .nested-table th,
-        .markdown-body .nested-table td {
-            border-width: 0;
-        }
         .markdown-body table th,
         .markdown-body table td {
             font-weight: normal;
+        }
+        .markdown-body table td.settings {
+            padding-top: 20px;
+            vertical-align: bottom;
+            border-bottom-color: transparent;
         }
         .supported {
             background-color: #dfd;
@@ -55,6 +55,10 @@
         .settings {
             color:gray;
             font-size: smaller;
+        }
+        .version {
+            font-size: small;
+            color:gray;
         }
         .legend {
             margin-top: 25px;
@@ -76,31 +80,65 @@
 
 <body>
     <div class="container markdown-body">
+        <p>
+            Back to <a href="https://github.com/vojtechhabarta/typescript-generator/wiki">typescript-generator Wiki</a><br>
+            <span class="version">version 1.6.171 and above</span>
+        </p>
         <h1>Modules and Namespaces</h1>
         <p>
             TypeScript language offers different ways how to organize declarations and code.
-            In addition to "global" scope declarations can also be organized using modules and namespaces.
-            Rows in the table bellow shows these ways by examples.
+            In addition to global scope, declarations can also be organized using modules and namespaces.
+            Following parameters controls what kind of output will be generated.
+        </p>
+        <h4>outputFile</h4>
+            Path and name of generated TypeScript file. Required parameter.
+        <h4>outputFileType</h4>
+            TypeScript file type, can be <code>declarationFile</code> (.d.ts) or <code>implementationFile</code> (.ts).<br>
+            Default value is <code>declarationFile</code>.
+        <h4>outputKind</h4>
+            Kind of generated TypeScript output, allowed values are <code>global</code>, <code>module</code> or <code>ambientModule</code>.<br>
+            Value <code>global</code> means that declarations will be in global scope or namespace (no module).<br>
+            Value <code>module</code> means that generated file will contain top-level <code>export</code> declarations.<br>
+            Value <code>ambientModule</code> means that generated declarations will be wrapped in <code>declare module "mod" { }</code> declaration.<br>
+            Required parameter.
+        <h4>module</h4>
+            Name of generated ambient module.<br>
+            Used when <code>outputKind</code> is set to <code>ambientModule</code>.
+        <h4>namespace</h4>
+            Generates specified namespace. Not recommended to combine with modules. Default is no namespace.
+        <h2>Supported output variants</h2>
+        <p>
+            Table bellow shows output variants by examples.
             Primarily typescript-generator produces declaration files (left column) but it can be also configured to produce implementation files (right column).
-            Table also contains info how to configure typescript-generator to produce particular variant. Supported variants are marked with green background.
+            Table also contains info how to configure typescript-generator to produce particular variant.
             Keywords commented out are optional and typescript-generator doesn't emit them.
         </p>
         <table>
             <thead>
                 <tr>
                     <th></th>
-                    <th>
+                    <th colspan="2">
                         declaration file (.d.ts)
                     </th>
                     <th>
                         implementation file (.ts)
-                        <div class="settings">outputFileType = implementationFile</div>
                     </th>
                 </tr>
             </thead>
             <tr>
-                <th>global</th>
-                <td class="supported">
+                <th rowspan="2">
+                    global
+                </th>
+                <td colspan="2" class="settings">
+                    <div>outputKind = global</div>
+                </td>
+                <td class="settings">
+                    <div>outputFileType = implementationFile</div>
+                    <div>outputKind = global</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="supported">
                     <pre><code class="typescript">/*declare*/ interface Data {}
 </code></pre>
                 </td>
@@ -111,11 +149,21 @@ function test() {}
                 </td>
             </tr>
             <tr>
-                <th>
-                    namespace
-                    <div class="settings">namespace = "NS"</div>
+                <th rowspan="2">
+                    global<br>with<br>namespace
                 </th>
-                <td class="supported">
+                <td colspan="2" class="settings">
+                    <div>outputKind = global</div>
+                    <div>namespace = "NS"</div>
+                </td>
+                <td class="settings">
+                    <div>outputFileType = implementationFile</div>
+                    <div>outputKind = global</div>
+                    <div>namespace = "NS"</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="supported">
                     <pre><code class="typescript">declare namespace NS {
     /*export*/ interface Data {}
 }
@@ -130,35 +178,31 @@ function test() {}
                 </td>
             </tr>
             <tr>
-                <th>
+                <th rowspan="2">
                     module
-                    <div class="settings">module = "mod"</div>
                 </th>
-                <td style="padding: 0">
-                    <table class="nested-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50%;">
-                                    ambient module
-                                </th>
-                                <th style="width: 50%;">
-                                    regular module
-                                </th>
-                            </tr>
-                        </thead>
-                        <tr>
-                            <td class="supported">
-                                <pre><code class="typescript">declare module "mod" {
+                <td class="settings">
+                    <div>outputKind = ambientModule</div>
+                    <div>module = "mod"</div>
+                </td>
+                <td class="settings">
+                    <div>outputKind = module</div>
+                </td>
+                <td class="settings">
+                    <div>outputFileType = implementationFile</div>
+                    <div>outputKind = module</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="supported">
+                    <pre><code class="typescript">declare module "mod" {
     /*export*/ interface Data {}
 }
 </code></pre>
-                            </td>
-                            <td class="not-supported">
-                                <pre><code class="typescript">export interface Data {}
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">export interface Data {}
 </code></pre>
-                            </td>
-                        </tr>
-                    </table>
                 </td>
                 <td class="supported">
                     <pre><code class="typescript">export interface Data {}
@@ -167,36 +211,38 @@ export function test() {}
                 </td>
             </tr>
             <tr>
-                <th>
-                    module with namespace
-                    <div class="settings">module = "mod"</div>
-                    <div class="settings">namespace = "NS"</div>
+                <th rowspan="2">
+                    module<br>with<br>namespace
                 </th>
-                <td style="padding: 0">
-                    <table class="nested-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50%;">ambient module</th>
-                                <th style="width: 50%;">regular module</th>
-                            </tr>
-                        </thead>
-                        <tr>
-                            <td class="supported">
-                                <pre><code class="typescript">declare module "mod" {
+                <td class="settings">
+                    <div>outputKind = ambientModule</div>
+                    <div>module = "mod"</div>
+                    <div>namespace = "NS"</div>
+                </td>
+                <td class="settings">
+                    <div>outputKind = module</div>
+                    <div>namespace = "NS"</div>
+                </td>
+                <td class="settings">
+                    <div>outputFileType = implementationFile</div>
+                    <div>outputKind = module</div>
+                    <div>namespace = "NS"</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="supported">
+                    <pre><code class="typescript">declare module "mod" {
     /*export*/ namespace NS {
         /*export*/ interface Data {}
     }
 }
 </code></pre>
-                            </td>
-                            <td class="not-supported">
-                                <pre><code class="typescript">export namespace NS {
+                </td>
+                <td class="supported">
+                    <pre><code class="typescript">export namespace NS {
     /*export*/ interface Data {}
 }
 </code></pre>
-                            </td>
-                        </tr>
-                    </table>
                 </td>
                 <td class="supported">
                     <pre><code class="typescript">export namespace NS {
@@ -212,10 +258,10 @@ export function test() {}
                 <span class="legend-box supported"></span>
                 <span>Supported</span>
             </span>
-            <span>
+            <!--<span>
                 <span class="legend-box not-supported"></span>
                 <span>Not supported</span>
-            </span>
+            </span>-->
         </div>
     </div>
 </body>
