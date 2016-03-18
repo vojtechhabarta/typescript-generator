@@ -123,17 +123,24 @@ public class Emitter {
 
     private void emitEnums(TsModel model, boolean exportKeyword) {
         final ArrayList<TsEnumModel> enums = new ArrayList<>(model.getEnums());
+        if (!enums.isEmpty() && settings.outputKind == TypeScriptOutputKind.module && settings.outputFileType == TypeScriptFileType.declarationFile) {
+            throw new IllegalArgumentException("Tried to output an enum with a top-level export declaration in a " +
+                    "declaration file. This is not valid TypeScript. Either change the outputFileType to " +
+                    "implementationFile, or use another outputKind.");
+        }
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(enums);
         }
         for (TsEnumModel tsEnum : enums) {
             writeNewLine();
-            final ArrayList<String> quotedValues = new ArrayList<>();
-            for (String value : tsEnum.getValues()) {
-                quotedValues.add(settings.quotes + value + settings.quotes);
-            }
             emitComments(tsEnum.getComments());
-            writeIndentedLine(exportKeyword, "type " + tsEnum.getName() + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
+            String exportOrDeclare;
+            if (exportKeyword) {
+                exportOrDeclare = "export";
+            } else {
+                exportOrDeclare = "declare";
+            }
+            writeIndentedLine(exportOrDeclare + " enum " + tsEnum.getName() + " {" + ModelCompiler.join(tsEnum.getValues(), ", ") + "}");
         }
     }
 
