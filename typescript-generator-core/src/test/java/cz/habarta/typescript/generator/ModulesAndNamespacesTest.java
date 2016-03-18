@@ -38,12 +38,19 @@ public class ModulesAndNamespacesTest {
         if (outputFileType == TypeScriptFileType.implementationFile) {
             settings.extensions.add(new TestFunctionExtention());
         }
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(Data.class), Output.to(output));
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(Data.class, Direction.class), Output.to(output));
     }
 
     private static class Data {
     }
 
+    enum Direction {
+        North,
+        East, 
+        South,
+        West
+    }
+    
     private static class TestFunctionExtention extends EmitterExtension {
 
         @Override
