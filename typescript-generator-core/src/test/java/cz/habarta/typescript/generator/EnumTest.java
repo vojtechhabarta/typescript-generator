@@ -1,8 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class EnumTest {
@@ -11,14 +12,12 @@ public class EnumTest {
     public void test() {
         final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected =
-                "\n" +
-                "interface AClass {\n" +
-                "    direction: Direction;\n" +
-                "}\n" +
-                "\n" +
-                "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                .replace("'", "\"");
+        final String expected = "\n" +
+                        "interface AClass {\n" +
+                        "    direction: Direction;\n" +
+                        "}\n" +
+                        "\n" +
+                        "declare enum Direction {North, East, South, West}\n";
         assertEquals(expected, actual);
     }
 
@@ -26,10 +25,20 @@ public class EnumTest {
     public void testSingleEnum() {
         final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
-        final String expected =
-                "\n" +
-                "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                .replace("'", "\"");
+        final String expected = "\n" +
+                        "declare enum Direction {North, East, South, West}\n";
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSingleEnumAsModule() throws Exception {
+        Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
+        final String expected = "\n" +
+                        "export enum Direction {North, East, South, West}\n";
         System.out.println(actual);
         assertEquals(expected, actual);
     }
@@ -40,7 +49,7 @@ public class EnumTest {
 
     enum Direction {
         North,
-        East, 
+        East,
         South,
         West
     }
