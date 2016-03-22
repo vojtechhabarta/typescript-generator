@@ -43,24 +43,24 @@ public class GenericsTypeProcessor implements TypeProcessor {
                 discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
             }
             // result
-            final GenericStructuralType type = new GenericStructuralType(rawTsTypeName, tsTypeArguments);
+            final GenericReferenceType type = new GenericReferenceType(rawTsTypeName, tsTypeArguments);
             return new Result(type, discoveredClasses);
         }
         return null;
     }
 
-    private static class GenericStructuralType extends TsType.StructuralType {
+    private static class GenericReferenceType extends TsType.ReferenceType {
 
         public final List<TsType> typeArguments;
 
-        public GenericStructuralType(String name, List<TsType> typeArguments) {
+        public GenericReferenceType(String name, List<TsType> typeArguments) {
             super(name);
             this.typeArguments = typeArguments;
         }
 
         @Override
         public String toString() {
-            return name + "<" + ModelCompiler.join(typeArguments, ", ") + ">";
+            return name + "<" + Utils.join(typeArguments, ", ") + ">";
         }
     }
     

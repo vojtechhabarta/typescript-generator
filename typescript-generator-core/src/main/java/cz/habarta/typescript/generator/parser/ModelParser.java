@@ -31,33 +31,31 @@ public abstract class ModelParser {
     }
 
     private Model parseQueue() {
-        final Set<Class<?>> parsedClasses = new LinkedHashSet<>();
+        final Set<Type> parsedTypes = new LinkedHashSet<>();
         final List<BeanModel> beans = new ArrayList<>();
         final List<EnumModel> enums = new ArrayList<>();
         SourceType<?> sourceType;
         while ((sourceType = typeQueue.poll()) != null) {
+            if (parsedTypes.contains(sourceType.type)) {
+                continue;
+            }
+            parsedTypes.add(sourceType.type);
             final TypeProcessor.Result result = processType(sourceType.type);
             if (result != null) {
-                if (sourceType.type instanceof Class<?> && (
-                        result.getTsType() instanceof TsType.StructuralType || result.getTsType() instanceof TsType.EnumType)) {
+                if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
-                    if (!parsedClasses.contains(cls)) {
-                        System.out.println("Parsing '" + cls.getName() + "'" +
-                                (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
-                        if (result.getTsType() instanceof TsType.StructuralType) {
-                            final BeanModel bean = parseBean(sourceType.asSourceClass());
-                            beans.add(bean);
-                        }
-                        if (result.getTsType() instanceof TsType.EnumType) {
-                            final EnumModel enumModel = parseEnum(sourceType.asSourceClass());
-                            enums.add(enumModel);
-                        }
-                        parsedClasses.add(cls);
+                    System.out.println("Parsing '" + cls.getName() + "'" +
+                            (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
+                    if (cls.isEnum()) {
+                        final EnumModel enumModel = parseEnum(sourceType.asSourceClass());
+                        enums.add(enumModel);
+                    } else {
+                        final BeanModel bean = parseBean(sourceType.asSourceClass());
+                        beans.add(bean);
                     }
-                } else {
-                    for (Class<?> cls : result.getDiscoveredClasses()) {
-                        typeQueue.add(new SourceType<>(cls, sourceType.usedInClass, sourceType.usedInMember));
-                    }
+                }
+                for (Class<?> cls : result.getDiscoveredClasses()) {
+                    typeQueue.add(new SourceType<>(cls, sourceType.usedInClass, sourceType.usedInMember));
                 }
             }
         }

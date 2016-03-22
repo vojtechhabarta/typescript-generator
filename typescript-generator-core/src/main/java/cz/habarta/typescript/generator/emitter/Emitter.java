@@ -133,16 +133,16 @@ public class Emitter {
                 quotedValues.add(settings.quotes + value + settings.quotes);
             }
             emitComments(tsEnum.getComments());
-            writeIndentedLine(exportKeyword, "type " + tsEnum.getName() + " = " + ModelCompiler.join(quotedValues, " | ") + ";");
+            writeIndentedLine(exportKeyword, "type " + tsEnum.getName() + " = " + Utils.join(quotedValues, " | ") + ";");
         }
     }
 
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
-        final ArrayList<TsType.AliasType> aliases = new ArrayList<>(model.getTypeAliases());
+        final ArrayList<TsAliasModel> aliases = new ArrayList<>(model.getTypeAliases());
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(aliases);
         }
-        for (TsType.AliasType alias : aliases) {
+        for (TsAliasModel alias : aliases) {
             writeNewLine();
             writeIndentedLine(exportKeyword, alias.definition);
         }

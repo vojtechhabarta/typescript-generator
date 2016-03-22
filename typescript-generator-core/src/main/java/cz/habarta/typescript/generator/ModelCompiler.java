@@ -39,7 +39,7 @@ public class ModelCompiler {
 
     private void processProperty(CompilationContext context, PropertyModel property) {
         final TsType originalType = typeFromJava(property.getType(), property.getName(), context.bean.getBeanClass());
-        final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
+        final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>();
         final TsType replacedType = replaceTypes(originalType, typeAliases);
         final TsType tsType = property.isOptional() ? replacedType.optional() : replacedType;
         final TsPropertyModel tsPropertyModel = new TsPropertyModel(property.getName(), tsType, property.getComments());
@@ -78,7 +78,7 @@ public class ModelCompiler {
 
     public TsType typeFromJavaWithReplacement(Type javaType) {
         final TsType type = typeFromJava(javaType);
-        return replaceTypes(type, new LinkedHashSet<TsType.AliasType>());
+        return replaceTypes(type, new LinkedHashSet<TsAliasModel>());
     }
 
     public TsType typeFromJava(Type javaType) {
@@ -131,15 +131,15 @@ public class ModelCompiler {
         return name;
     }
 
-    private TsType replaceTypes(TsType type, LinkedHashSet<TsType.AliasType> typeAliases) {
+    private TsType replaceTypes(TsType type, LinkedHashSet<TsAliasModel> typeAliases) {
         if (type == TsType.Date) {
             if (settings.mapDate == DateMapping.asNumber) {
-                typeAliases.add(TsType.DateAsNumber);
-                return TsType.DateAsNumber;
+                typeAliases.add(TsAliasModel.DateAsNumber);
+                return new TsType.ReferenceType(TsAliasModel.DateAsNumber.name);
             }
             if (settings.mapDate == DateMapping.asString) {
-                typeAliases.add(TsType.DateAsString);
-                return TsType.DateAsString;
+                typeAliases.add(TsAliasModel.DateAsString);
+                return new TsType.ReferenceType(TsAliasModel.DateAsString.name);
             }
         }
         if (type instanceof TsType.OptionalType) {
@@ -157,20 +157,6 @@ public class ModelCompiler {
                     replaceTypes(indexedArrayType.elementType, typeAliases));
         }
         return type;
-    }
-
-    public static String join(Iterable<? extends Object> values, String delimiter) {
-        final StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Object value : values) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(delimiter);
-}
-            sb.append(value);
-        }
-        return sb.toString();
     }
 
 }

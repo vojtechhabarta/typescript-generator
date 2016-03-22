@@ -2,6 +2,10 @@
 package cz.habarta.typescript.generator;
 
 
+/**
+ * Represents TypeScript type.
+ * That means something which can appear in type position (after ":" character).
+ */
 public abstract class TsType {
 
     public static final TsType Any = new BasicType("any");
@@ -10,9 +14,6 @@ public abstract class TsType {
     public static final TsType String = new BasicType("string");
     public static final TsType Date = new BasicType("Date");
     public static final TsType Void = new BasicType("void");
-
-    public static final AliasType DateAsNumber = new AliasType("DateAsNumber", "type DateAsNumber = number;");
-    public static final AliasType DateAsString = new AliasType("DateAsString", "type DateAsString = string;");
 
     @Override
     public boolean equals(Object rhs) {
@@ -45,24 +46,20 @@ public abstract class TsType {
         }
     }
 
-    public static class AliasType extends TsType implements Comparable<AliasType> {
+    /**
+     * Identifier which references some type, for example interface or type alias.
+     */
+    public static class ReferenceType extends TsType {
 
         public final String name;
-        public final String definition;
 
-        public AliasType(String name, String definition) {
+        public ReferenceType(String name) {
             this.name = name;
-            this.definition = definition;
         }
 
         @Override
         public String toString() {
             return name;
-        }
-
-        @Override
-        public int compareTo(AliasType o) {
-            return name.compareTo(o.name);
         }
 
     }
@@ -95,36 +92,6 @@ public abstract class TsType {
         @Override
         public String toString() {
             return "{ [index: " + indexType + "]: " + elementType + " }";
-        }
-
-    }
-
-    public static class StructuralType extends TsType {
-
-        public final String name;
-
-        public StructuralType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
-
-    public static class EnumType extends TsType {
-
-        public final String name;
-
-        public EnumType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
         }
 
     }

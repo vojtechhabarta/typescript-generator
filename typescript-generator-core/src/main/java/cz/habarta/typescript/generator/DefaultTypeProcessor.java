@@ -17,7 +17,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
             if (javaClass.isEnum()) {
-                return new Result(new TsType.EnumType(context.getMappedName(javaClass)), javaClass);
+                return new Result(new TsType.ReferenceType(context.getMappedName(javaClass)), javaClass);
             }
             if (Collection.class.isAssignableFrom(javaClass)) {
                 return new Result(new TsType.BasicArrayType(TsType.Any));
@@ -26,7 +26,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.IndexedArrayType(TsType.String, TsType.Any));
             }
             // consider it structural
-            return new Result(new TsType.StructuralType(context.getMappedName(javaClass)), javaClass);
+            return new Result(new TsType.ReferenceType(context.getMappedName(javaClass)), javaClass);
         }
         if (javaType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
@@ -41,7 +41,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
                 }
                 // consider it structural
-                return new Result(new TsType.StructuralType(context.getMappedName(javaClass)), javaClass);
+                return new Result(new TsType.ReferenceType(context.getMappedName(javaClass)), javaClass);
             }
         }
         if (javaType instanceof WildcardType) {

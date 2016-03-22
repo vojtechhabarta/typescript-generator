@@ -8,16 +8,16 @@ public class TsTypeTest {
 
     @Test
     public void testEquals() {
-        assertEquals(new TsType.StructuralType(new String("Foo")), new TsType.StructuralType("Foo"));
+        assertEquals(new TsType.ReferenceType(new String("Foo")), new TsType.ReferenceType("Foo"));
     }
 
     @Test
     public void testNotEquals() {
-        assertNotEquals(new TsType.StructuralType("Foo"), new TsType.StructuralType("Bar"));
+        assertNotEquals(new TsType.ReferenceType("Foo"), new TsType.ReferenceType("Bar"));
     }
 
     @Test
     public void testNotEqualsNull() {
-        assertNotEquals(new TsType.StructuralType("Foo"), null);
+        assertNotEquals(new TsType.ReferenceType("Foo"), null);
     }
 }

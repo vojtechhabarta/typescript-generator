@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.*;
 import java.util.*;
 
 
@@ -9,7 +8,7 @@ public class TsModel {
 
     private final List<TsBeanModel> beans = new ArrayList<>();
     private final List<TsEnumModel> enums = new ArrayList<>();
-    private final LinkedHashSet<TsType.AliasType> typeAliases = new LinkedHashSet<>();
+    private final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>();
 
     public List<TsBeanModel> getBeans() {
         return beans;
@@ -19,7 +18,7 @@ public class TsModel {
         return enums;
     }
 
-    public LinkedHashSet<TsType.AliasType> getTypeAliases() {
+    public LinkedHashSet<TsAliasModel> getTypeAliases() {
         return typeAliases;
     }
 
