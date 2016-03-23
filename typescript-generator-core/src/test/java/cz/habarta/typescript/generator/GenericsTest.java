@@ -1,11 +1,13 @@
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.*;
-import java.util.*;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.junit.*;
+import org.junit.Test;
 
 
 public class GenericsTest {
@@ -67,7 +69,26 @@ public class GenericsTest {
                 "export interface IC {" + nl +
                 "    x: string[];" + nl +
                 "}";
-        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testNonGenericExtends() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeProcessor = new GenericsTypeProcessor();
+        settings.sortDeclarations = true;
+
+        final StringWriter stringWriter = new StringWriter();
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(E.class), Output.to(stringWriter), true, 0);
+        final String actual = stringWriter.toString().trim();
+        final String nl = settings.newline;
+        final String expected =
+                "export interface D<T> {" + nl +
+                "    x: T;" + nl +
+                "}" + nl +
+                "" + nl +
+                "export interface E extends D<string> {" + nl +
+                "}";
         assertEquals(expected, actual);
     }
 
@@ -82,5 +103,12 @@ public class GenericsTest {
 
     class C {
         public List<? extends String> x;
+    }
+
+    class D<T> {
+        public T x;
+    }
+
+    class E extends D<String> {
     }
 }
