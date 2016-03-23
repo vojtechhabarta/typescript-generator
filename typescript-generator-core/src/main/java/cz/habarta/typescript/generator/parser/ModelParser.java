@@ -76,8 +76,8 @@ public abstract class ModelParser {
         return new EnumModel(sourceClass.type, values, null);
     }
 
-    protected void addBeanToQueue(SourceType<? extends Class<?>> sourceClass) {
-        typeQueue.add(sourceClass);
+    protected void addBeanToQueue(SourceType<? extends Type> sourceType) {
+        typeQueue.add(sourceType);
     }
 
     protected PropertyModel processTypeAndCreateProperty(String name, Type type, boolean optional, Class<?> usedInClass) {

@@ -1,12 +1,10 @@
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 

@@ -1,21 +1,22 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 
 public class BeanModel {
 
     private final Class<?> beanClass;
-    private final Class<?> parent;
+    private final Type parent;
     private final List<PropertyModel> properties;
     private final List<String> comments;
 
-    public BeanModel(Class<?> beanClass, Class<?> parent, List<PropertyModel> properties) {
+    public BeanModel(Class<?> beanClass, Type parent, List<PropertyModel> properties) {
         this(beanClass, parent, properties, null);
     }
 
-    public BeanModel(Class<?> beanClass, Class<?> parent, List<PropertyModel> properties, List<String> comments) {
+    public BeanModel(Class<?> beanClass, Type parent, List<PropertyModel> properties, List<String> comments) {
         this.beanClass = beanClass;
         this.parent = parent;
         this.properties = properties;
@@ -26,7 +27,7 @@ public class BeanModel {
         return beanClass;
     }
 
-    public Class<?> getParent() {
+    public Type getParent() {
         return parent;
     }
 

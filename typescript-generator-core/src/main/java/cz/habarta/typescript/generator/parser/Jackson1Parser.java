@@ -60,7 +60,7 @@ public class Jackson1Parser extends ModelParser {
                 addBeanToQueue(new SourceType<>(type.value(), sourceClass.type, "<subClass>"));
             }
         }
-        final Class<?> superclass = sourceClass.type.getSuperclass() == Object.class ? null : sourceClass.type.getSuperclass();
+        final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
