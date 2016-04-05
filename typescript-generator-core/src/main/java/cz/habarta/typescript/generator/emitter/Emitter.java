@@ -79,7 +79,6 @@ public class Emitter {
     private void emitElements(TsModel model, boolean exportKeyword) {
         exportKeyword = exportKeyword || forceExportKeyword;
         emitInterfaces(model, exportKeyword);
-        emitEnums(model, exportKeyword);
         emitTypeAliases(model, exportKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
             emitterExtension.emitElements(new EmitterExtension.Writer() {
@@ -121,22 +120,6 @@ public class Emitter {
         writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
     }
 
-    private void emitEnums(TsModel model, boolean exportKeyword) {
-        final ArrayList<TsEnumModel> enums = new ArrayList<>(model.getEnums());
-        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
-            Collections.sort(enums);
-        }
-        for (TsEnumModel tsEnum : enums) {
-            writeNewLine();
-            final ArrayList<String> quotedValues = new ArrayList<>();
-            for (String value : tsEnum.getValues()) {
-                quotedValues.add(settings.quotes + value + settings.quotes);
-            }
-            emitComments(tsEnum.getComments());
-            writeIndentedLine(exportKeyword, "type " + tsEnum.getName() + " = " + Utils.join(quotedValues, " | ") + ";");
-        }
-    }
-
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
         final ArrayList<TsAliasModel> aliases = new ArrayList<>(model.getTypeAliases());
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
@@ -144,7 +127,8 @@ public class Emitter {
         }
         for (TsAliasModel alias : aliases) {
             writeNewLine();
-            writeIndentedLine(exportKeyword, alias.definition);
+            emitComments(alias.getComments());
+            writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition() + ";");
         }
     }
 

@@ -1,6 +1,6 @@
 package cz.habarta.typescript.generator;
 
-import java.lang.reflect.*;
+import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -11,8 +11,8 @@ public class DefaultTypeProcessorTest {
     public void testTypeConversion() {
         TypeProcessor converter = new DefaultTypeProcessor();
         final TypeProcessor.Context context = getTestContext(converter);
-        assertEquals("A", converter.processType(A.class, context).getTsType().toString());
-        assertEquals("B", converter.processType(B.class, context).getTsType().toString());
+        assertEquals(context.getSymbol(A.class).toString(), converter.processType(A.class, context).getTsType().toString());
+        assertEquals(context.getSymbol(B.class).toString(), converter.processType(B.class, context).getTsType().toString());
         assertEquals(TsType.Void, converter.processType(void.class, context).getTsType());
     }
 
@@ -40,16 +40,7 @@ public class DefaultTypeProcessorTest {
     }
 
     public static TypeProcessor.Context getTestContext(final TypeProcessor typeProcessor) {
-        return new TypeProcessor.Context() {
-            @Override
-            public String getMappedName(Class<?> cls) {
-                return cls.getSimpleName();
-            }
-            @Override
-            public TypeProcessor.Result processType(Type javaType) {
-                return typeProcessor.processType(javaType, this);
-            }
-        };
+        return new TypeProcessor.Context(new SymbolTable(TestUtils.settings()), typeProcessor);
     }
 
 }

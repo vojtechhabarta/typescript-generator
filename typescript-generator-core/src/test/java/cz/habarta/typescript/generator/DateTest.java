@@ -10,17 +10,31 @@ public class DateTest {
 
     @Test
     public void testDate() {
-        new TypeScriptGenerator(settings(DateMapping.asDate, "AsDate")).generateTypeScript(Input.from(Dates.class), Output.to(new File("target/test-date.d.ts")));
+        final String dts = new TypeScriptGenerator(settings(DateMapping.asDate, "AsDate")).generateTypeScript(Input.from(Dates.class));
+        Assert.assertTrue(dts.contains("date: Date;"));
+        Assert.assertTrue(dts.contains("dateList: Date[];"));
+        Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
+        Assert.assertTrue(dts.contains("dates: Date[];"));
     }
 
     @Test
     public void testDateAsNumber() {
-        new TypeScriptGenerator(settings(DateMapping.asNumber, "AsNumber")).generateTypeScript(Input.from(Dates.class), Output.to(new File("target/test-dateAsNumber.d.ts")));
+        final String dts = new TypeScriptGenerator(settings(DateMapping.asNumber, "AsNumber")).generateTypeScript(Input.from(Dates.class));
+        Assert.assertTrue(dts.contains("date: DateAsNumber;"));
+        Assert.assertTrue(dts.contains("dateList: DateAsNumber[];"));
+        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsNumber[] };"));
+        Assert.assertTrue(dts.contains("dates: DateAsNumber[];"));
+        Assert.assertTrue(dts.contains("type DateAsNumber = number;"));
     }
 
     @Test
     public void testDateAsString() {
-        new TypeScriptGenerator(settings(DateMapping.asString, "AsString")).generateTypeScript(Input.from(Dates.class), Output.to(new File("target/test-dateAsString.d.ts")));
+        final String dts = new TypeScriptGenerator(settings(DateMapping.asString, "AsString")).generateTypeScript(Input.from(Dates.class));
+        Assert.assertTrue(dts.contains("date: DateAsString;"));
+        Assert.assertTrue(dts.contains("dateList: DateAsString[];"));
+        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
+        Assert.assertTrue(dts.contains("dates: DateAsString[];"));
+        Assert.assertTrue(dts.contains("type DateAsString = string;"));
     }
 
     private static Settings settings(DateMapping mapDate, String namespace) {

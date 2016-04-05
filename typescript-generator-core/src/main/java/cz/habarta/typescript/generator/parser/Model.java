@@ -10,6 +10,8 @@ public class Model {
     private final List<EnumModel> enums;
 
     public Model(List<BeanModel> beans, List<EnumModel> enums) {
+        if (beans == null) throw new NullPointerException();
+        if (enums == null) throw new NullPointerException();
         this.beans = beans;
         this.enums = enums;
     }

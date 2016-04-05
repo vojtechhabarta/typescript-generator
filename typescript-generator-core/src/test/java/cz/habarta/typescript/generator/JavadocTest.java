@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
-import cz.habarta.typescript.generator.parser.Javadoc;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.io.File;

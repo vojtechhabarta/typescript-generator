@@ -2,53 +2,36 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
-import cz.habarta.typescript.generator.parser.BeanModel;
 import java.util.*;
 
 
-public class TsBeanModel implements Comparable<TsBeanModel> {
+public class TsBeanModel extends TsDeclarationModel {
 
-    private final BeanModel javaModel;
-    private final TsType name;
     private final TsType parent;
-    private final List<String> comments;
-    private final List<TsPropertyModel> properties = new ArrayList<>();
+    private final List<TsPropertyModel> properties;
 
-    public TsBeanModel(BeanModel javaModel, TsType name, TsType parent, List<String> comments) {
-        this.javaModel = javaModel;
-        this.name = name;
+    public TsBeanModel(TsType name, TsType parent, List<TsPropertyModel> properties, List<String> comments) {
+        super(name, comments);
         this.parent = parent;
-        this.comments = comments;
+        this.properties = properties;
     }
 
-    public BeanModel getJavaModel() {
-        return javaModel;
-    }
-
-    public TsType getName() {
-        return name;
+    public TsBeanModel(Class<?> origin, TsType name, TsType parent, List<TsPropertyModel> properties, List<String> comments) {
+        super(origin, name, comments);
+        this.parent = parent;
+        this.properties = properties;
     }
 
     public TsType getParent() {
         return parent;
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
     public List<TsPropertyModel> getProperties() {
         return properties;
     }
 
-    @Override
-    public String toString() {
-        return "TsBeanModel{" + "name=" + name + ", properties=" + properties + '}';
-    }
-
-    @Override
-    public int compareTo(TsBeanModel o) {
-        return name.toString().compareTo(o.name.toString());
+    public TsBeanModel setProperties(List<TsPropertyModel> properties) {
+        return new TsBeanModel(origin, name, parent, properties, comments);
     }
 
 }

@@ -24,8 +24,7 @@ public class CustomTypeConversionTest {
             }
         };
 
-        final ModelCompiler compiler = new TypeScriptGenerator(settings).getModelCompiler();
-        assertEquals("A", compiler.typeFromJava(A.class).toString());
+        assertEquals("A", TestUtils.compileType(settings, A.class).toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(out));
         assertTrue(new String(out.toByteArray()).trim().contains("x?: number;"));

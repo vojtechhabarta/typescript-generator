@@ -1,6 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.compiler.Symbol;
+import java.util.*;
+
 
 /**
  * Represents TypeScript type.
@@ -51,17 +54,23 @@ public abstract class TsType {
      */
     public static class ReferenceType extends TsType {
 
-        public final String name;
+        public final Symbol symbol;
 
-        public ReferenceType(String name) {
-            this.name = name;
+        public ReferenceType(Symbol symbol) {
+            this.symbol = symbol;
         }
 
         @Override
         public String toString() {
-            return name;
+            return symbol.toString();
         }
 
+    }
+
+    public static class EnumReferenceType extends ReferenceType {
+        public EnumReferenceType(Symbol symbol) {
+            super(symbol);
+        }
     }
 
     public static class BasicArrayType extends TsType {
@@ -96,6 +105,36 @@ public abstract class TsType {
 
     }
 
+    public static class UnionType extends TsType {
+
+        public final List<TsType> types;
+
+        public UnionType(List<? extends TsType> types) {
+            this.types = new ArrayList<>(types);
+        }
+
+        @Override
+        public String toString() {
+            return Utils.join(types, " | ");
+        }
+
+    }
+
+    public static class StringLiteralType extends TsType {
+
+        public final String literal;
+
+        public StringLiteralType(java.lang.String literal) {
+            this.literal = literal;
+        }
+
+        @Override
+        public String toString() {
+            return "\"" + literal + "\"";
+        }
+
+    }
+
     public static class OptionalType extends TsType {
 
         public final TsType type;
@@ -109,6 +148,29 @@ public abstract class TsType {
             return type.toString();
         }
 
+    }
+
+    public static TsType transformTsType(TsType tsType, Transformer transformer) {
+        final TsType type = transformer.transform(tsType);
+        if (type instanceof TsType.OptionalType) {
+            final TsType.OptionalType optionalType = (TsType.OptionalType) type;
+            return new TsType.OptionalType(transformTsType(optionalType.type, transformer));
+        }
+        if (type instanceof TsType.BasicArrayType) {
+            final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
+            return new TsType.BasicArrayType(transformTsType(basicArrayType.elementType, transformer));
+        }
+        if (type instanceof TsType.IndexedArrayType) {
+            final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
+            return new TsType.IndexedArrayType(
+                    transformTsType(indexedArrayType.indexType, transformer),
+                    transformTsType(indexedArrayType.elementType, transformer));
+        }
+        return type;
+    }
+
+    public static interface Transformer {
+        public TsType transform(TsType tsType);
     }
 
 }

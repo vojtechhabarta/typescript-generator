@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.compiler.Symbol;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -33,7 +34,7 @@ public class GenericsTypeProcessor implements TypeProcessor {
         if (!Collection.class.isAssignableFrom(rawType) && !Map.class.isAssignableFrom(rawType)) {
             final List<Class<?>> discoveredClasses = new ArrayList<>();
             // raw type
-            final String rawTsTypeName = context.getMappedName(rawType);
+            final Symbol rawSymbol = context.getSymbol(rawType);
             discoveredClasses.add(rawType);
             // type arguments
             final List<TsType> tsTypeArguments = new ArrayList<>();
@@ -43,7 +44,7 @@ public class GenericsTypeProcessor implements TypeProcessor {
                 discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
             }
             // result
-            final GenericReferenceType type = new GenericReferenceType(rawTsTypeName, tsTypeArguments);
+            final GenericReferenceType type = new GenericReferenceType(rawSymbol, tsTypeArguments);
             return new Result(type, discoveredClasses);
         }
         return null;
@@ -53,14 +54,14 @@ public class GenericsTypeProcessor implements TypeProcessor {
 
         public final List<TsType> typeArguments;
 
-        public GenericReferenceType(String name, List<TsType> typeArguments) {
-            super(name);
+        public GenericReferenceType(Symbol symbol, List<TsType> typeArguments) {
+            super(symbol);
             this.typeArguments = typeArguments;
         }
 
         @Override
         public String toString() {
-            return name + "<" + Utils.join(typeArguments, ", ") + ">";
+            return symbol + "<" + Utils.join(typeArguments, ", ") + ">";
         }
     }
     

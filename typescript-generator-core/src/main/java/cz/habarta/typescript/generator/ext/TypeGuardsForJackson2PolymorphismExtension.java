@@ -16,8 +16,8 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
     @Override
     public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
         for (TsBeanModel tsBean : model.getBeans()) {
-            if (tsBean.getJavaModel() != null) {
-                final Class<?> beanClass = tsBean.getJavaModel().getBeanClass();
+            final Class<?> beanClass = tsBean.getOrigin();
+            if (beanClass != null) {
                 final JsonSubTypes jsonSubTypes = beanClass.getAnnotation(JsonSubTypes.class);
                 final JsonTypeInfo jsonTypeInfo = beanClass.getAnnotation(JsonTypeInfo.class);
                 if (jsonSubTypes != null && jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
@@ -50,7 +50,7 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
 
     static String findTypeName(Class<?> beanClass, TsModel model) {
         for (TsBeanModel bean : model.getBeans()) {
-            if (bean.getJavaModel().getBeanClass().equals(beanClass)) {
+            if (bean.getOrigin().equals(beanClass)) {
                 return bean.getName().toString();
             }
         }

@@ -47,10 +47,9 @@ public class GenericsTest {
                 "export interface IB {" + nl +
                 "}";
         assertEquals(expected, actual);
-        final ModelCompiler compiler = new TypeScriptGenerator(settings).getModelCompiler();
-        assertEquals("IA<string, string>", compiler.typeFromJava(A.class.getField("x").getGenericType()).toString());
-        assertEquals("IA<IA<string, IB>, string[]>", compiler.typeFromJava(A.class.getField("y").getGenericType()).toString());
-        assertEquals("IA<{ [index: string]: V }, number[]>", compiler.typeFromJava(A.class.getField("z").getGenericType()).toString());
+        assertEquals("IA<string, string>", TestUtils.compileType(settings, A.class.getField("x").getGenericType()).toString());
+        assertEquals("IA<IA<string, IB>, string[]>", TestUtils.compileType(settings, A.class.getField("y").getGenericType()).toString());
+        assertEquals("IA<{ [index: string]: V }, number[]>", TestUtils.compileType(settings, A.class.getField("z").getGenericType()).toString());
     }
 
     @Test

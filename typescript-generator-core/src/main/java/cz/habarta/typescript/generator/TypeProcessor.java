@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.Symbol;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -13,9 +15,24 @@ public interface TypeProcessor {
     public Result processType(Type javaType, Context context);
 
 
-    public static interface Context {
-        public String getMappedName(Class<?> cls);
-        public Result processType(Type javaType);
+    public static class Context {
+
+        private final SymbolTable symbolTable;
+        private final TypeProcessor typeProcessor;
+
+        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor) {
+            this.symbolTable = symbolTable;
+            this.typeProcessor = typeProcessor;
+        }
+
+        public Symbol getSymbol(Class<?> cls) {
+            return symbolTable.getSymbol(cls);
+        }
+
+        public Result processType(Type javaType) {
+            return typeProcessor.processType(javaType, this);
+        }
+
     }
 
     public static class Result {

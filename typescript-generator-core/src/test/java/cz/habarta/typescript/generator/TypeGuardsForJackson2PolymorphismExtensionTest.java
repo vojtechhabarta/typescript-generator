@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.*;
+import cz.habarta.typescript.generator.compiler.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension;
 import cz.habarta.typescript.generator.parser.*;

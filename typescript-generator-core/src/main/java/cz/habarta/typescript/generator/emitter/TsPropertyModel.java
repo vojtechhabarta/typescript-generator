@@ -25,6 +25,10 @@ public class TsPropertyModel implements Comparable<TsPropertyModel> {
         return tsType;
     }
 
+    public TsPropertyModel setTsType(TsType type) {
+        return new TsPropertyModel(name, type, comments);
+    }
+
     public List<String> getComments() {
         return comments;
     }

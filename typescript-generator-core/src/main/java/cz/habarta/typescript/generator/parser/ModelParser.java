@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -94,16 +95,7 @@ public abstract class ModelParser {
     }
 
     private TypeProcessor.Result processType(Type type) {
-        return typeProcessor.processType(type, new TypeProcessor.Context() {
-            @Override
-            public String getMappedName(Class<?> cls) {
-                return "NA";
-            }
-            @Override
-            public TypeProcessor.Result processType(Type javaType) {
-                return typeProcessor.processType(javaType, this);
-            }
-        });
+        return typeProcessor.processType(type, new TypeProcessor.Context(new SymbolTable(settings), typeProcessor));
     }
 
 }

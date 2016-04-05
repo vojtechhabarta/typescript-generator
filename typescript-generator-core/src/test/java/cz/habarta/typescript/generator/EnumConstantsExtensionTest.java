@@ -1,18 +1,17 @@
 
 package cz.habarta.typescript.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import cz.habarta.typescript.generator.EnumTest.Direction;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.ext.EnumConstantsExtension;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class EnumConstantsExtensionTest {

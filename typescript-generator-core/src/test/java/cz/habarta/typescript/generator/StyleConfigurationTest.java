@@ -52,7 +52,7 @@ public class StyleConfigurationTest {
         settings.addTypeNamePrefix = "I";
         settings.addTypeNameSuffix = "JSON";
 
-        final TsType tsType = new TypeScriptGenerator(settings).getModelCompiler().typeFromJava(JsonTestClass.class);
+        final TsType tsType = TestUtils.compileType(settings, JsonTestClass.class);
         assertEquals("ITestJSON", tsType.toString());
     }
 

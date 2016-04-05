@@ -1,28 +1,26 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import cz.habarta.typescript.generator.TsType;
+import java.util.List;
 
-public class TsAliasModel implements Comparable<TsAliasModel> {
+
+public class TsAliasModel extends TsDeclarationModel {
     
-    public static final TsAliasModel DateAsNumber = new TsAliasModel("DateAsNumber", "type DateAsNumber = number;");
-    public static final TsAliasModel DateAsString = new TsAliasModel("DateAsString", "type DateAsString = string;");
+    private final TsType definition;
 
-    public final String name;
-    public final String definition;
-
-    public TsAliasModel(String name, String definition) {
-        this.name = name;
+    public TsAliasModel(TsType name, TsType definition, List<String> comments) {
+        super(name, comments);
         this.definition = definition;
     }
 
-    @Override
-    public String toString() {
-        return name;
+    public TsAliasModel(Class<?> origin, TsType name, TsType definition, List<String> comments) {
+        super(origin, name, comments);
+        this.definition = definition;
     }
 
-    @Override
-    public int compareTo(TsAliasModel o) {
-        return name.compareTo(o.name);
+    public TsType getDefinition() {
+        return definition;
     }
 
 }
