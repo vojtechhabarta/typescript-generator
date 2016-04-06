@@ -47,6 +47,13 @@ public class ModelCompiler {
         return tsModel;
     }
 
+    public TsType javaToTypeScript(Type type) {
+        final BeanModel beanModel = new BeanModel(Object.class, Object.class, Collections.singletonList(new PropertyModel("property", type, false, null)));
+        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList());
+        final TsModel tsModel = javaToTypeScript(model);
+        return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
+    }
+
     private TsModel processModel(SymbolTable symbolTable, Model model) {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
