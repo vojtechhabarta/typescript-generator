@@ -1,6 +1,9 @@
 
 package cz.habarta.typescript.generator.ext;
 
+import java.util.Collections;
+import java.util.List;
+
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
@@ -17,7 +20,9 @@ public class EnumConstantsExtension extends EmitterExtension {
     @Override
     public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
         String exportString = exportKeyword ? "export " : "";
-        for (TsEnumModel tsEnum : model.getEnums()) {
+        List<TsEnumModel> enums = model.getEnums();
+        Collections.sort(enums);
+        for (TsEnumModel tsEnum : enums) {
             writer.writeIndentedLine("");
             writer.writeIndentedLine(exportString + "const " + tsEnum.getName() + " = {");
             for (String value : tsEnum.getValues()) {
