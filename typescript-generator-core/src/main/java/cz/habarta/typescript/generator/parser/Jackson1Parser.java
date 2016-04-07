@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
 import org.codehaus.jackson.JsonNode;
@@ -49,7 +50,8 @@ public class Jackson1Parser extends ModelParser {
                             break;
                         }
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type));
+                    final Member originalMember = beanPropertyWriter.getMember().getMember();
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
                 }
             }
         }

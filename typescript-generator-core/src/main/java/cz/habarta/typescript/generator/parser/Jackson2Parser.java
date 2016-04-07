@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
 import cz.habarta.typescript.generator.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -25,7 +26,7 @@ public class Jackson2Parser extends ModelParser {
 
         final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
         if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
-            properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, true, null));
+            properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, true, null, null));
         }
 
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
@@ -43,7 +44,8 @@ public class Jackson2Parser extends ModelParser {
                             break;
                         }
                     }
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type));
+                    final Member originalMember = beanPropertyWriter.getMember().getMember();
+                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
                 }
             }
         }

@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -81,12 +82,12 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, boolean optional, Class<?> usedInClass) {
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, boolean optional, Class<?> usedInClass, Member originalMember) {
         List<Class<?>> classes = discoverClassesUsedInType(type);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, type, optional, null);
+        return new PropertyModel(name, type, optional, originalMember, null);
     }
 
     private List<Class<?>> discoverClassesUsedInType(Type type) {

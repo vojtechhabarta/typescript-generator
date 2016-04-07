@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
@@ -15,7 +16,7 @@ import org.junit.Test;
 public class JavadocTest {
 
     @Test
-    public void testJavadocInModelParser() {
+    public void testJavadoc() {
         final Settings settings = TestUtils.settings();
         settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
         final TypeProcessor typeProcessor = new DefaultTypeProcessor();
@@ -46,6 +47,8 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains("Documentation for documentedField."));
             Assert.assertTrue(generated.contains("Documentation for documentedEnumField."));
             Assert.assertTrue(generated.contains("Documentation for DummyEnum."));
+            Assert.assertTrue(generated.contains("Documentation for getter property."));
+            Assert.assertTrue(generated.contains("Documentation for renamed field."));
         }
     }
 
@@ -64,6 +67,19 @@ public class JavadocTest {
          * Documentation for documentedEnumField.
          */
         public DummyEnum documentedEnumField;
+
+        /**
+         * Documentation for getter property.
+         */
+        public String getGetterPropery() {
+            return null;
+        }
+
+        /**
+         * Documentation for renamed field.
+         */
+        @JsonProperty(value = "newName")
+        public String originalName;
 
     }
 

@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.xmldoclet.Class;
 import cz.habarta.typescript.generator.xmldoclet.Enum;
 import cz.habarta.typescript.generator.xmldoclet.Field;
+import cz.habarta.typescript.generator.xmldoclet.Method;
 import cz.habarta.typescript.generator.xmldoclet.Package;
 import cz.habarta.typescript.generator.xmldoclet.Root;
 import java.io.File;
@@ -59,9 +60,18 @@ public class Javadoc {
     }
 
     private PropertyModel enrichProperty(PropertyModel property, Class dClass) {
-        final Field dField = findJavadocField(property, dClass);
-        final List<String> propertyComments = getPropertyComments(dField);
-        return new PropertyModel(property.getName(), property.getType(), property.isOptional(), concat(propertyComments, property.getComments()));
+        final List<String> propertyComments;
+        if (property.getOriginalMember() instanceof java.lang.reflect.Method) {
+            final Method dMethod = findJavadocMethod(property.getOriginalMember().getName(), dClass);
+            propertyComments = getMethodComments(dMethod);
+        } else if (property.getOriginalMember() instanceof java.lang.reflect.Field) {
+            final Field dField = findJavadocField(property.getOriginalMember().getName(), dClass);
+            propertyComments = getFieldComments(dField);
+        } else {
+            final Field dField = findJavadocField(property.getName(), dClass);
+            propertyComments = getFieldComments(dField);
+        }
+        return property.comments(propertyComments);
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
@@ -86,12 +96,22 @@ public class Javadoc {
         return null;
     }
 
-    private static Field findJavadocField(PropertyModel property, Class dClass) {
-        final String name = property.getName();
+    private static Field findJavadocField(String name, Class dClass) {
         if (dClass != null) {
             for (Field dField : dClass.getField()) {
                 if (dField.getName().equals(name)) {
                     return dField;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static Method findJavadocMethod(String name, Class dClass) {
+        if (dClass != null) {
+            for (Method dMethod : dClass.getMethod()) {
+                if (dMethod.getName().equals(name)) {
+                    return dMethod;
                 }
             }
         }
@@ -118,8 +138,12 @@ public class Javadoc {
         return dClass != null ? getComments(dClass.getComment()) : null;
     }
 
-    private List<String> getPropertyComments(Field dField) {
+    private List<String> getFieldComments(Field dField) {
         return dField != null ? getComments(dField.getComment()) : null;
+    }
+
+    private List<String> getMethodComments(Method dMethod) {
+        return dMethod != null ? getComments(dMethod.getComment()) : null;
     }
 
     private List<String> getEnumComments(Enum dEnum) {
