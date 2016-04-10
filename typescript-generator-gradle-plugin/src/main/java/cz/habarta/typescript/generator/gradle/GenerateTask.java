@@ -18,6 +18,7 @@ public class GenerateTask extends DefaultTask {
     public String module;
     public String namespace;
     public List<String> classes;
+    public List<String> classPatterns;
     public String classesFromJaxrsApplication;
     public List<String> excludeClasses;
     public JsonLibrary jsonLibrary;
@@ -86,7 +87,7 @@ public class GenerateTask extends DefaultTask {
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, excludeClasses, classLoader),
+                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, excludeClasses, classLoader),
                 Output.to(getProject().file(outputFile))
         );
     }
