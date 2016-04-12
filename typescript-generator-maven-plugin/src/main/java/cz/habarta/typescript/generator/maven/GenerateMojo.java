@@ -63,6 +63,17 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
+     * JSON classes to process specified using glog pattern
+     * so it is possible to specify package or class name suffix.
+     * Glob patterns support two wildcards:
+     * Single "*" wildcard matches any character except for "." and "$".
+     * Double "**" wildcard matches any character.
+     * For more information and examples see Wiki page 'https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns'.
+     */
+    @Parameter
+    private List<String> classPatterns;
+
+    /**
      * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for JSON classes to process.
      * Parameter contains fully-qualified class name.
      * It is possible to exclude particular REST resource classes using {@link #excludeClasses} parameter.
@@ -223,7 +234,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classesFromJaxrsApplication, excludeClasses, classLoader),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, excludeClasses, classLoader),
                     Output.to(outputFile)
             );
 
