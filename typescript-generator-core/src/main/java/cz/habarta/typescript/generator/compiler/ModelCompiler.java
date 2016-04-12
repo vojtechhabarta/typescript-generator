@@ -69,7 +69,10 @@ public class ModelCompiler {
 
     private TsBeanModel processBean(SymbolTable symbolTable, BeanModel bean) {
         final TsType beanType = typeFromJava(symbolTable, bean.getBeanClass());
-        final TsType parentType = typeFromJava(symbolTable, bean.getParent());
+        TsType parentType = typeFromJava(symbolTable, bean.getParent());
+        if (parentType != null && parentType.equals(TsType.Any)) {
+            parentType = null;
+        }
         final List<TsPropertyModel> properties = new ArrayList<>();
         for (PropertyModel property : bean.getProperties()) {
             properties.add(processProperty(symbolTable, bean, property));
