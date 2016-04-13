@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import java.lang.reflect.*;
+import java.math.*;
 import java.util.*;
 
 
@@ -56,6 +57,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
 
     private static Map<Type, TsType> getKnownTypes() {
         final Map<Type, TsType> knownTypes = new LinkedHashMap<>();
+        // java.lang
         knownTypes.put(Object.class, TsType.Any);
         knownTypes.put(Byte.class, TsType.Number);
         knownTypes.put(Byte.TYPE, TsType.Number);
@@ -74,9 +76,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(Character.class, TsType.String);
         knownTypes.put(Character.TYPE, TsType.String);
         knownTypes.put(String.class, TsType.String);
-        knownTypes.put(Date.class, TsType.Date);
         knownTypes.put(void.class, TsType.Void);
         knownTypes.put(Void.class, TsType.Void);
+        // other java packages
+        knownTypes.put(BigDecimal.class, TsType.Number);
+        knownTypes.put(BigInteger.class, TsType.Number);
+        knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(UUID.class, TsType.String);
         return knownTypes;
     }
 
