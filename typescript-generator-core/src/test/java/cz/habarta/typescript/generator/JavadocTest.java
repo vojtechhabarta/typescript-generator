@@ -40,7 +40,7 @@ public class JavadocTest {
             Assert.assertNull(property.getComments());
         }
         {
-            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJavadoc.class));
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class));
             System.out.println(generated);
             Assert.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
             Assert.assertTrue(generated.contains("Second line."));
@@ -49,6 +49,8 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains("Documentation for DummyEnum."));
             Assert.assertTrue(generated.contains("Documentation for getter property."));
             Assert.assertTrue(generated.contains("Documentation for renamed field."));
+            Assert.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
+            Assert.assertTrue(generated.contains("Documentation for interface getter property."));
         }
     }
 
@@ -80,6 +82,18 @@ public class JavadocTest {
          */
         @JsonProperty(value = "newName")
         public String originalName;
+
+    }
+
+    /**
+     * Documentation for InterfaceWithJavadoc.
+     */
+    public static interface InterfaceWithJavadoc {
+
+        /**
+         * Documentation for interface getter property.
+         */
+        public String getGetterPropery();
 
     }
 
