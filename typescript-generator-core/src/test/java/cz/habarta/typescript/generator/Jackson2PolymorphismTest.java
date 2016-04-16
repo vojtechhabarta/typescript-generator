@@ -11,7 +11,6 @@ public class Jackson2PolymorphismTest {
     @Test
     public void test() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(BadFieldClass.class));
-        System.out.println(output);
         Assert.assertTrue(output.contains("\"@class\""));
     }
 

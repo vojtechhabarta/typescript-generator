@@ -30,7 +30,6 @@ public class EnumTest {
                 "\n" +
                 "type Direction = 'North' | 'East' | 'South' | 'West';\n"
                 .replace("'", "\"");
-        System.out.println(actual);
         assertEquals(expected, actual);
     }
 
