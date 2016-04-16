@@ -117,7 +117,29 @@ public class Emitter {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
-        writeIndentedLine(property.getName() + questionMark + ": " + tsType + ";");
+        writeIndentedLine(toPropertyName(property.getName()) + questionMark + ": " + tsType + ";");
+    }
+
+    private String toPropertyName(String name) {
+        return isValidIdentifierName(name) ? name : (settings.quotes + name + settings.quotes);
+    }
+
+    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
+    // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-names-and-keywords
+    private static boolean isValidIdentifierName(String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        final char start = name.charAt(0);
+        if (!Character.isUnicodeIdentifierStart(start) && start != '$' && start != '_') {
+            return false;
+        }
+        for (char c : name.substring(1).toCharArray()) {
+            if (!Character.isUnicodeIdentifierPart(c) && c != '$' && c != '_' && c != '\u200C' && c != '\u200D') {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
