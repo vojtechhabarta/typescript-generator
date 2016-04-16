@@ -158,9 +158,9 @@ public class Emitter {
         if (comments != null) {
             writeIndentedLine("/**");
             for (String comment : comments) {
-                writeIndentedLine("  * " + comment);
+                writeIndentedLine(" * " + comment);
             }
-            writeIndentedLine("  */");
+            writeIndentedLine(" */");
         }
     }
 

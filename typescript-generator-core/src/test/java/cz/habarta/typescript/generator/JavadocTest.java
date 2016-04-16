@@ -41,7 +41,6 @@ public class JavadocTest {
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class));
-            System.out.println(generated);
             Assert.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
             Assert.assertTrue(generated.contains("Second line."));
             Assert.assertTrue(generated.contains("Documentation for documentedField."));
@@ -51,6 +50,8 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains("Documentation for renamed field."));
             Assert.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
             Assert.assertTrue(generated.contains("Documentation for interface getter property."));
+            Assert.assertTrue(generated.contains("@return value of getterPropery"));
+            Assert.assertTrue(generated.contains("@deprecated replaced by something else"));
         }
     }
 
@@ -92,7 +93,10 @@ public class JavadocTest {
 
         /**
          * Documentation for interface getter property.
+         * @return value of getterPropery
+         * @deprecated replaced by something else
          */
+        @Deprecated
         public String getGetterPropery();
 
     }

@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.xmldoclet.Interface;
 import cz.habarta.typescript.generator.xmldoclet.Method;
 import cz.habarta.typescript.generator.xmldoclet.Package;
 import cz.habarta.typescript.generator.xmldoclet.Root;
+import cz.habarta.typescript.generator.xmldoclet.TagInfo;
 import java.io.File;
 import java.util.*;
 import javax.xml.bind.JAXB;
@@ -53,45 +54,50 @@ public class Javadoc {
         if (bean.getBeanClass().isInterface()) {
             final Interface dInterface = findJavadocInterface(bean.getBeanClass(), dRoots);
             if (dInterface != null) {
-                return enrichBean(bean, dInterface.getComment(), dInterface.getField(), dInterface.getMethod());
+                return enrichBean(bean, dInterface.getComment(), dInterface.getTag(), dInterface.getField(), dInterface.getMethod());
             }
         } else {
             final Class dClass = findJavadocClass(bean.getBeanClass(), dRoots);
             if (dClass != null) {
-                return enrichBean(bean, dClass.getComment(), dClass.getField(), dClass.getMethod());
+                return enrichBean(bean, dClass.getComment(), dClass.getTag(), dClass.getField(), dClass.getMethod());
             }
         }
         return bean;
     }
 
-    private BeanModel enrichBean(BeanModel bean, String beanComment, List<Field> dFields, List<Method> dMethods) {
+    private BeanModel enrichBean(BeanModel bean, String beanComment, List<TagInfo> tags, List<Field> dFields, List<Method> dMethods) {
         final List<PropertyModel> enrichedProperties = new ArrayList<>();
         for (PropertyModel property : bean.getProperties()) {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return new BeanModel(bean.getBeanClass(), bean.getParent(), enrichedProperties, concat(getComments(beanComment), bean.getComments()));
+        return new BeanModel(bean.getBeanClass(), bean.getParent(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
         final String propertyComment;
+        final List<TagInfo> tags;
         if (property.getOriginalMember() instanceof java.lang.reflect.Method) {
             final Method dMethod = findJavadocMethod(property.getOriginalMember().getName(), dMethods);
             propertyComment = dMethod != null ? dMethod.getComment() : null;
+            tags = dMethod != null ? dMethod.getTag() : null;
         } else if (property.getOriginalMember() instanceof java.lang.reflect.Field) {
             final Field dField = findJavadocField(property.getOriginalMember().getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
+            tags = dField != null ? dField.getTag() : null;
         } else {
             final Field dField = findJavadocField(property.getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
+            tags = dField != null ? dField.getTag() : null;
         }
-        return property.comments(getComments(propertyComment));
+        return property.comments(getComments(propertyComment, tags));
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
         final Enum dEnum = findJavadocEnum(enumModel.getEnumClass(), dRoots);
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
-        return new EnumModel(enumModel.getEnumClass(), enumModel.getValues(), concat(getComments(enumComment), enumModel.getComments()));
+        final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
+        return new EnumModel(enumModel.getEnumClass(), enumModel.getValues(), concat(getComments(enumComment, tags), enumModel.getComments()));
     }
 
     // finders
@@ -160,7 +166,7 @@ public class Javadoc {
         return null;
     }
 
-    private List<String> getComments(String dComments) {
+    private List<String> getComments(String dComments, List<TagInfo> tags) {
         if (dComments == null) {
             return null;
         }
@@ -168,6 +174,9 @@ public class Javadoc {
         final List<String> result = new ArrayList<>();
         for (String line : lines) {
             result.add(line.trim());
+        }
+        for (TagInfo tag : tags) {
+            result.add(tag.getName() + " " + tag.getText());
         }
         return result;
     }
