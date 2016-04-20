@@ -43,6 +43,9 @@ public class ModelCompiler {
         TsModel tsModel = processModel(symbolTable, model);
         tsModel = transformDates(symbolTable, tsModel);
         tsModel = transformEnums(tsModel);
+        if (settings.experimentalInlineEnums) {
+            tsModel = inlineEnums(tsModel, symbolTable);
+        }
         symbolTable.resolveSymbolNames(settings);
         return tsModel;
     }
@@ -148,6 +151,31 @@ public class ModelCompiler {
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));
         }
         return tsModel.setTypeAliases(new ArrayList<>(typeAliases));
+    }
+
+    private TsModel inlineEnums(final TsModel tsModel, final SymbolTable symbolTable) {
+        final Set<TsAliasModel> inlinedAliases = new LinkedHashSet<>();
+        final TsModel newTsModel = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
+            @Override
+            public TsType transform(TsType tsType) {
+                if (tsType instanceof TsType.EnumReferenceType) {
+                    final TsType.ReferenceType reference = (TsType.ReferenceType) tsType;
+                    final Class<?> cls = symbolTable.getSymbolClass(reference.symbol);
+                    if (cls != null) {
+                        for (TsAliasModel alias : tsModel.getTypeAliases()) {
+                            if (alias.getOrigin() == cls) {
+                                inlinedAliases.add(alias);
+                                return alias.getDefinition();
+                            }
+                        }
+                    }
+                }
+                return tsType;
+            }
+        });
+        final ArrayList<TsAliasModel> aliases = new ArrayList<>(tsModel.getTypeAliases());
+        aliases.removeAll(inlinedAliases);
+        return newTsModel.setTypeAliases(aliases);
     }
 
     private static TsModel transformBeanPropertyTypes(TsModel tsModel, TsType.Transformer transformer) {

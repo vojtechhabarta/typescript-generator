@@ -192,6 +192,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private List<String> optionalAnnotations;
 
+    /**
+     * Defines enum type on places where the enum is used (inline).
+     * (Without this flag enum type is created once as type alias and is referenced from places where the enum is used.)
+     */
+    @Parameter
+    private boolean experimentalInlineEnums;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -230,6 +237,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.experimentalInlineEnums = experimentalInlineEnums;
             settings.validateFileName(outputFile);
 
             // TypeScriptGenerator

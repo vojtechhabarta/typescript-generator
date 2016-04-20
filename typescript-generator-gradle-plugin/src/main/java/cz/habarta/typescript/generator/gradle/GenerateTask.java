@@ -35,7 +35,7 @@ public class GenerateTask extends DefaultTask {
     public List<File> javadocXmlFiles;
     public List<String> extensions;
     public List<String> optionalAnnotations;
-
+    public boolean experimentalInlineEnums;
 
     @TaskAction
     public void generate() throws Exception {
@@ -83,6 +83,7 @@ public class GenerateTask extends DefaultTask {
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, extensions);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.experimentalInlineEnums = experimentalInlineEnums;
         settings.validateFileName(new File(outputFile));
 
         // TypeScriptGenerator

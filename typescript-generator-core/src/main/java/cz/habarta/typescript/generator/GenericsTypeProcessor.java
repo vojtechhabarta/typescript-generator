@@ -60,8 +60,8 @@ public class GenericsTypeProcessor implements TypeProcessor {
         }
 
         @Override
-        public String toString() {
-            return symbol + "<" + Utils.join(typeArguments, ", ") + ">";
+        public String format(Settings settings) {
+            return symbol + "<" + Utils.join(format(typeArguments, settings), ", ") + ">";
         }
     }
     

@@ -117,7 +117,7 @@ public class Emitter {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
-        writeIndentedLine(toPropertyName(property.getName()) + questionMark + ": " + tsType + ";");
+        writeIndentedLine(toPropertyName(property.getName()) + questionMark + ": " + tsType.format(settings) + ";");
     }
 
     private String toPropertyName(String name) {
@@ -150,7 +150,7 @@ public class Emitter {
         for (TsAliasModel alias : aliases) {
             writeNewLine();
             emitComments(alias.getComments());
-            writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition() + ";");
+            writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition().format(settings) + ";");
         }
     }
 

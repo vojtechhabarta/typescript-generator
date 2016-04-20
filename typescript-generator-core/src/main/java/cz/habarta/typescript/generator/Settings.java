@@ -35,6 +35,7 @@ public class Settings {
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+    public boolean experimentalInlineEnums = false;
 
 
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {

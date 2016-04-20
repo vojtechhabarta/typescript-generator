@@ -32,8 +32,20 @@ public abstract class TsType {
         return new TsType.OptionalType(this);
     }
 
+    public abstract String format(Settings settings);
+
+    protected static List<String> format(List<TsType> types, Settings settings) {
+        final List<String> formatted = new ArrayList<>();
+        for (TsType type : types) {
+            formatted.add(type.format(settings));
+        }
+        return formatted;
+    }
+
     @Override
-    public abstract String toString();
+    public String toString() {
+        return format(new Settings());
+    }
 
     public static class BasicType extends TsType {
 
@@ -44,7 +56,7 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
+        public String format(Settings settings) {
             return name;
         }
     }
@@ -61,7 +73,7 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
+        public String format(Settings settings) {
             return symbol.toString();
         }
 
@@ -82,8 +94,8 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
-            return elementType + "[]";
+        public String format(Settings settings) {
+            return elementType.format(settings) + "[]";
         }
 
     }
@@ -99,8 +111,8 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
-            return "{ [index: " + indexType + "]: " + elementType + " }";
+        public String format(Settings settings) {
+            return "{ [index: " + indexType.format(settings) + "]: " + elementType.format(settings) + " }";
         }
 
     }
@@ -114,8 +126,8 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
-            return Utils.join(types, " | ");
+        public String format(Settings settings) {
+            return Utils.join(format(types, settings), " | ");
         }
 
     }
@@ -124,13 +136,13 @@ public abstract class TsType {
 
         public final String literal;
 
-        public StringLiteralType(java.lang.String literal) {
+        public StringLiteralType(String literal) {
             this.literal = literal;
         }
 
         @Override
-        public String toString() {
-            return "\"" + literal + "\"";
+        public String format(Settings settings) {
+            return settings.quotes + literal + settings.quotes;
         }
 
     }
@@ -144,8 +156,8 @@ public abstract class TsType {
         }
 
         @Override
-        public String toString() {
-            return type.toString();
+        public String format(Settings settings) {
+            return type.format(settings);
         }
 
     }

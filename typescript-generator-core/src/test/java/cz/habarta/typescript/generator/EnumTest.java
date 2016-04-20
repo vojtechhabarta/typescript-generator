@@ -11,14 +11,14 @@ public class EnumTest {
     public void test() {
         final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected =
+        final String expected = (
                 "\n" +
                 "interface AClass {\n" +
                 "    direction: Direction;\n" +
                 "}\n" +
                 "\n" +
                 "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                .replace("'", "\"");
+                ).replace("'", "\"");
         assertEquals(expected, actual);
     }
 
@@ -26,11 +26,25 @@ public class EnumTest {
     public void testSingleEnum() {
         final Settings settings = TestUtils.settings();
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
-        final String expected =
+        final String expected = (
                 "\n" +
                 "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                .replace("'", "\"");
+                ).replace("'", "\"");
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void inlineEnumTest() {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        settings.experimentalInlineEnums = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
+        final String expected =
+                "\n" +
+                "interface AClass {\n" +
+                "    direction: 'North' | 'East' | 'South' | 'West';\n" +
+                "}\n";
+        assertEquals(expected, output);
     }
 
     private static class AClass {

@@ -22,6 +22,15 @@ public class SymbolTable {
         return symbols.get(cls);
     }
 
+    public Class<?> getSymbolClass(Symbol symbol) {
+        for (Map.Entry<Class<?>, Symbol> entry : symbols.entrySet()) {
+            if (entry.getValue() == symbol) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public Symbol getSyntheticSymbol(String name) {
         if (!syntheticSymbols.containsKey(name)) {
             syntheticSymbols.put(name, new Symbol(name));
