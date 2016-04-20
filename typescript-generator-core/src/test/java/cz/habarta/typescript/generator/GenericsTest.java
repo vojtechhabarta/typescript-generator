@@ -1,11 +1,16 @@
 package cz.habarta.typescript.generator;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 
 public class GenericsTest {
@@ -89,6 +94,28 @@ public class GenericsTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testImplements() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeProcessor = new GenericsTypeProcessor();
+        settings.sortDeclarations = true;
+
+        final StringWriter stringWriter = new StringWriter();
+        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(IA.class), Output.to(stringWriter), true, 0);
+        final String actual = stringWriter.toString().trim();
+        final String nl = settings.newline;
+        final String expected =
+                "export interface IA implements IB {" + nl +
+                "    x: T;" + nl +
+                "}" + nl +
+                "" + nl +
+                "export interface IB {" + nl +
+                "    type: string;" + nl +
+                "    x: number;" + nl +
+                "}";
+        assertEquals(expected, actual);
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -107,5 +134,13 @@ public class GenericsTest {
     }
 
     class E extends D<String> {
+    }
+
+    abstract class IA implements IB {
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", include = As.EXTERNAL_PROPERTY, visible = false)
+    interface IB {
+        public int getX();
     }
 }
