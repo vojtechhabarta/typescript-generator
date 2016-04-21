@@ -20,7 +20,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.2-SNAPSHOT'
+        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.7-SNAPSHOT'
     }
 }
 
@@ -30,8 +30,8 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.Person'
     ]
     jsonLibrary = 'jackson2'
+    outputKind = 'global'
     namespace = 'GradleSample';
-//    module = 'my-module'
 //    declarePropertiesAsOptional = false
 //    removeTypeNameSuffix = 'Json'
 //    mapDate = 'asNumber'

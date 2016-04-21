@@ -33,7 +33,7 @@ public class GenerateTask extends DefaultTask {
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
     public List<File> javadocXmlFiles;
-    public List<String> extensions;
+    public List<String> extensionClasses;
     public List<String> optionalAnnotations;
     public boolean experimentalInlineEnums;
 
@@ -81,7 +81,7 @@ public class GenerateTask extends DefaultTask {
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
-        settings.loadExtensions(classLoader, extensions);
+        settings.loadExtensions(classLoader, extensionClasses);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.experimentalInlineEnums = experimentalInlineEnums;
         settings.validateFileName(new File(outputFile));
