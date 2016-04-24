@@ -71,7 +71,7 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return new BeanModel(bean.getBeanClass(), bean.getParent(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
+        return new BeanModel(bean.getBeanClass(), bean.getParent(), bean.getInterfaces(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {

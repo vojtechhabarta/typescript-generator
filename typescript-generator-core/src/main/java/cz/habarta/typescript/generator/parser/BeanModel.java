@@ -9,16 +9,18 @@ public class BeanModel {
 
     private final Class<?> beanClass;
     private final Type parent;
+    private final List<Type> interfaces;
     private final List<PropertyModel> properties;
     private final List<String> comments;
 
-    public BeanModel(Class<?> beanClass, Type parent, List<PropertyModel> properties) {
-        this(beanClass, parent, properties, null);
+    public BeanModel(Class<?> beanClass, Type parent, List<Type> interfaces, List<PropertyModel> properties) {
+        this(beanClass, parent, interfaces, properties, null);
     }
 
-    public BeanModel(Class<?> beanClass, Type parent, List<PropertyModel> properties, List<String> comments) {
+    public BeanModel(Class<?> beanClass, Type parent, List<Type> interfaces, List<PropertyModel> properties, List<String> comments) {
         this.beanClass = beanClass;
         this.parent = parent;
+        this.interfaces = interfaces;
         this.properties = properties;
         this.comments = comments;
     }
@@ -29,6 +31,10 @@ public class BeanModel {
 
     public Type getParent() {
         return parent;
+    }
+
+    public List<Type> getInterfaces() {
+        return interfaces;
     }
 
     public List<PropertyModel> getProperties() {

@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.*;
 import org.codehaus.jackson.map.introspect.NopAnnotationIntrospector;
 import org.codehaus.jackson.map.ser.*;
@@ -35,6 +36,12 @@ public class Jackson1Parser extends ModelParser {
     @Override
     protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
+
+        final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
+        if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
+            properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, true, null, null));
+        }
+
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
@@ -66,14 +73,21 @@ public class Jackson1Parser extends ModelParser {
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
-        return new BeanModel(sourceClass.type, superclass, properties);
+        final List<Type> interfaces = Arrays.asList(sourceClass.type.getGenericInterfaces());
+        for (Type aInterface : interfaces) {
+            addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
+        }
+        return new BeanModel(sourceClass.type, superclass, interfaces, properties);
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {
-        if (cls.getSuperclass() == Object.class) {
-            return false;
-        } else {
-            final BeanHelper beanHelper = getBeanHelper(cls.getSuperclass());
+        final List<Class<?>> parents = new ArrayList<>();
+        if (cls.getSuperclass() != Object.class) {
+            parents.add(cls.getSuperclass());
+        }
+        parents.addAll(Arrays.asList(cls.getInterfaces()));
+        for (Class<?> parent : parents) {
+            final BeanHelper beanHelper = getBeanHelper(parent);
             if (beanHelper != null) {
                 for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                     if (beanPropertyWriter.getName().equals(property)) {
@@ -81,8 +95,8 @@ public class Jackson1Parser extends ModelParser {
                     }
                 }
             }
-            return false;
         }
+        return false;
     }
 
     private BeanHelper getBeanHelper(Class<?> beanClass) {

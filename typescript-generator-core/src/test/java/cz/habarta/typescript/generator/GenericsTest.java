@@ -1,16 +1,11 @@
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Test;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import java.io.StringWriter;
+import java.util.*;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 
 public class GenericsTest {
@@ -99,19 +94,19 @@ public class GenericsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeProcessor = new GenericsTypeProcessor();
         settings.sortDeclarations = true;
+        settings.excludedClassNames = Arrays.asList(Comparable.class.getName());
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(IA.class), Output.to(stringWriter), true, 0);
         final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
-                "export interface IA implements IB {" + nl +
-                "    x: T;" + nl +
+                "export interface IA extends IB<string> {" + nl +
                 "}" + nl +
                 "" + nl +
-                "export interface IB {" + nl +
-                "    type: string;" + nl +
-                "    x: number;" + nl +
+                "export interface IB<T> {" + nl +
+                "    type?: string;" + nl +
+                "    x: T;" + nl +
                 "}";
         assertEquals(expected, actual);
     }
@@ -136,11 +131,11 @@ public class GenericsTest {
     class E extends D<String> {
     }
 
-    abstract class IA implements IB {
+    abstract class IA implements IB<String>, Comparable<IA> {
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", include = As.EXTERNAL_PROPERTY, visible = false)
-    interface IB {
-        public int getX();
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", include = As.PROPERTY, visible = false)
+    interface IB<T> {
+        public T getX();
     }
 }

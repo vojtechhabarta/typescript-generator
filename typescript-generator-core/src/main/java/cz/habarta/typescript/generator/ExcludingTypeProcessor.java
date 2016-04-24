@@ -17,13 +17,11 @@ public class ExcludingTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
-        if (javaType instanceof Class<?>) {
-            final Class<?> classType = (Class<?>) javaType;
-            if (excludedClassNames.contains(classType.getName())) {
-                return new Result(TsType.Any);
-            }
+        final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+        if (rawClass != null && excludedClassNames.contains(rawClass.getName())) {
+            return new Result(TsType.Any);
         }
         return null;
     }
-    
+
 }

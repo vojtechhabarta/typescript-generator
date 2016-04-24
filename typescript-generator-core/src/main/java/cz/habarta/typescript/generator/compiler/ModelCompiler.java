@@ -51,7 +51,7 @@ public class ModelCompiler {
     }
 
     public TsType javaToTypeScript(Type type) {
-        final BeanModel beanModel = new BeanModel(Object.class, Object.class, Collections.singletonList(new PropertyModel("property", type, false, null, null)));
+        final BeanModel beanModel = new BeanModel(Object.class, Object.class, Collections.<Type>emptyList(), Collections.singletonList(new PropertyModel("property", type, false, null, null)));
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList());
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -76,11 +76,18 @@ public class ModelCompiler {
         if (parentType != null && parentType.equals(TsType.Any)) {
             parentType = null;
         }
+        final List<TsType> interfaces = new ArrayList<>();
+        for (Type aInterface : bean.getInterfaces()) {
+            final TsType interfaceType = typeFromJava(symbolTable, aInterface);
+            if (!interfaceType.equals(TsType.Any)) {
+                interfaces.add(interfaceType);
+            }
+        }
         final List<TsPropertyModel> properties = new ArrayList<>();
         for (PropertyModel property : bean.getProperties()) {
             properties.add(processProperty(symbolTable, bean, property));
         }
-        return new TsBeanModel(bean.getBeanClass(), beanType, parentType, properties, bean.getComments());
+        return new TsBeanModel(bean.getBeanClass(), beanType, parentType, interfaces, properties, bean.getComments());
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property) {

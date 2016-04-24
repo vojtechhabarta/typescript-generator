@@ -121,8 +121,8 @@ public class JaxrsApplicationScanner {
     }
 
     private boolean isExcluded(Type type) {
-        final Class<?> cls = getClass(type);
-        if (excludes.contains(cls.getName())) {
+        final Class<?> cls = Utils.getRawClassOrNull(type);
+        if (cls != null && excludes.contains(cls.getName())) {
             return true;
         }
         for (Class<?> standardEntityClass : getStandardEntityClasses()) {
@@ -131,19 +131,6 @@ public class JaxrsApplicationScanner {
             }
         }
         return false;
-    }
-
-    private Class<?> getClass(Type type) {
-        if (type instanceof Class<?>) {
-            return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            final ParameterizedType parameterizedType = (ParameterizedType) type;
-            final Type rawType = parameterizedType.getRawType();
-            if (rawType instanceof Class<?>) {
-                return (Class<?>) rawType;
-            }
-        }
-        return null;
     }
 
     private static boolean isHttpMethod(Method method) {

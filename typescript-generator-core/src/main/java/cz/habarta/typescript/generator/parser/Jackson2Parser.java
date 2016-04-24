@@ -60,14 +60,21 @@ public class Jackson2Parser extends ModelParser {
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
-        return new BeanModel(sourceClass.type, superclass, properties);
+        final List<Type> interfaces = Arrays.asList(sourceClass.type.getGenericInterfaces());
+        for (Type aInterface : interfaces) {
+            addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
+        }
+        return new BeanModel(sourceClass.type, superclass, interfaces, properties);
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {
-        if (cls.getSuperclass() == Object.class) {
-            return false;
-        } else {
-            final BeanHelper beanHelper = getBeanHelper(cls.getSuperclass());
+        final List<Class<?>> parents = new ArrayList<>();
+        if (cls.getSuperclass() != Object.class) {
+            parents.add(cls.getSuperclass());
+        }
+        parents.addAll(Arrays.asList(cls.getInterfaces()));
+        for (Class<?> parent : parents) {
+            final BeanHelper beanHelper = getBeanHelper(parent);
             if (beanHelper != null) {
                 for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                     if (beanPropertyWriter.getName().equals(property)) {
@@ -75,8 +82,8 @@ public class Jackson2Parser extends ModelParser {
                     }
                 }
             }
-            return false;
         }
+        return false;
     }
 
     private BeanHelper getBeanHelper(Class<?> beanClass) {
