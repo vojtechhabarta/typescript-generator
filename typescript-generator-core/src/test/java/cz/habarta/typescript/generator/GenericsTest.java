@@ -105,7 +105,7 @@ public class GenericsTest {
                 "}" + nl +
                 "" + nl +
                 "export interface IB<T> {" + nl +
-                "    type?: string;" + nl +
+                "    type: string;" + nl +
                 "    x: T;" + nl +
                 "}";
         assertEquals(expected, actual);
