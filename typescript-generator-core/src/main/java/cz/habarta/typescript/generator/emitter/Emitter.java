@@ -26,6 +26,7 @@ public class Emitter {
             System.out.println("Writing declarations to: " + outputName);
         }
         emitFileComment();
+        emitReferences();
         emitModule(model);
         if (closeOutput) {
             close();
@@ -36,6 +37,14 @@ public class Emitter {
         if (!settings.noFileComment) {
             final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             writeIndentedLine("// Generated using typescript-generator version " + TypeScriptGenerator.Version + " on " + timestamp + ".");
+        }
+    }
+
+    private void emitReferences() {
+        if (settings.references != null) {
+            for (String reference : settings.references) {
+                writeIndentedLine(String.format("///<reference path='%s' />", reference));
+            }
         }
     }
 

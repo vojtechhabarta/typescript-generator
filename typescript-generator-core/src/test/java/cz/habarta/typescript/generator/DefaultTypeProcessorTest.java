@@ -1,11 +1,14 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
+import org.junit.Test;
+
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 public class DefaultTypeProcessorTest {
 
@@ -18,6 +21,7 @@ public class DefaultTypeProcessorTest {
         assertEquals(TsType.Void, converter.processType(void.class, context).getTsType());
         assertEquals(TsType.Number, converter.processType(BigDecimal.class, context).getTsType());
         assertEquals(TsType.String, converter.processType(UUID.class, context).getTsType());
+        assertEquals(TsType.Date, converter.processType(ZonedDateTime.class, context).getTsType());
     }
 
     @Test
