@@ -58,6 +58,9 @@ public class TypeScriptGenerator {
             if (settings.customTypeProcessor != null) {
                 processors.add(settings.customTypeProcessor);
             }
+            if (settings.customMappings != null) {
+                processors.add(new CustomMappingTypeProcessor(settings.customMappings));
+            }
             processors.add(new GenericsTypeProcessor());
             processors.add(new DefaultTypeProcessor());
             typeProcessor = new TypeProcessor.Chain(processors);

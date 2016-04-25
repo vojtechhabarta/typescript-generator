@@ -27,6 +27,8 @@ public class Settings {
     public String removeTypeNameSuffix = null;
     public String addTypeNamePrefix = null;
     public String addTypeNameSuffix = null;
+    public List<String> references = null;
+    public List<String> customMappings = null;
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;

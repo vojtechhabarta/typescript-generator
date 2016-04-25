@@ -199,6 +199,21 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private boolean experimentalInlineEnums;
 
+	/**
+     * List of references, which should be included as &quot;///<reference path='filepath'&quot; />
+     */
+    @Parameter
+    private List<String> references;
+
+	/**
+     * Definition of custom mappings to override any class-mapping to a designated value.
+     * Format Class:TypeScriptMapping.
+     * E.g. mapping a java.time.ZonedDateTime to a Date would result in:
+     * &quot;java.time.ZonedDateTime:Date&quot;
+     */
+    @Parameter
+    private List<String> customMappings;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -229,6 +244,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
+            settings.references = references;
+            settings.customMappings = customMappings;
             settings.mapDate = mapDate;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
