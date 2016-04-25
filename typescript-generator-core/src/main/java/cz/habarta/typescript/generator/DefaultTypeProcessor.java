@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import java.lang.reflect.*;
 import java.math.*;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 
@@ -82,6 +83,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(BigDecimal.class, TsType.Number);
         knownTypes.put(BigInteger.class, TsType.Number);
         knownTypes.put(Date.class, TsType.Date);
+        knownTypes.put(ZonedDateTime.class, TsType.Date);
         knownTypes.put(UUID.class, TsType.String);
         return knownTypes;
     }
