@@ -130,6 +130,14 @@ public class GenerateMojo extends AbstractMojo {
     private String addTypeNameSuffix;
 
     /**
+     * Specifies custom TypeScript name for Java classes.
+     * Multiple mappings can be specified, each using this format: "javaClassName:typescriptName".
+     * This takes precedence over other naming settings.
+     */
+    @Parameter
+    private List<String> customTypeNaming;
+
+    /**
      * Specifies how {@link java.util.Date} will be mapped.
      * Supported values are 'asDate', 'asNumber, 'asString'.
      * Default value is 'asDate'.
@@ -229,6 +237,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
+            settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
             settings.mapDate = mapDate;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;

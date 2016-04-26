@@ -27,6 +27,7 @@ public class Settings {
     public String removeTypeNameSuffix = null;
     public String addTypeNamePrefix = null;
     public String addTypeNameSuffix = null;
+    public Map<String, String> customTypeNaming = new LinkedHashMap<>();
     public DateMapping mapDate = DateMapping.asDate;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
@@ -54,6 +55,20 @@ public class Settings {
         if (optionalAnnotations != null) {
             this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
         }
+    }
+
+    public static Map<String, String> convertToMap(List<String> mappings) {
+        final Map<String, String> result = new LinkedHashMap<>();
+        if (mappings != null) {
+            for (String mapping : mappings) {
+                final String[] values = mapping.split(":", 2);
+                if (values.length < 2) {
+                    throw new RuntimeException("Invalid mapping format: " + mapping);
+                }
+                result.put(values[0].trim(), values[1].trim());
+            }
+        }
+        return result;
     }
 
     public void validate() {

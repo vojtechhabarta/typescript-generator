@@ -27,6 +27,7 @@ public class GenerateTask extends DefaultTask {
     public String removeTypeNameSuffix;
     public String addTypeNamePrefix;
     public String addTypeNameSuffix;
+    public List<String> customTypeNaming;
     public DateMapping mapDate;
     public String customTypeProcessor;
     public boolean sortDeclarations;
@@ -75,6 +76,7 @@ public class GenerateTask extends DefaultTask {
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
+        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
         settings.mapDate = mapDate;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;

@@ -39,17 +39,42 @@ public class SymbolTable {
     }
 
     public void resolveSymbolNames(Settings settings) {
-//        TODO check for conflicts
+        final Map<String, List<Class<?>>> names = new LinkedHashMap<>();
         for (Map.Entry<Class<?>, Symbol> entry : symbols.entrySet()) {
             final Class<?> cls = entry.getKey();
             final Symbol symbol = entry.getValue();
-            symbol.name = getMappedName(cls);
+            final String name = getMappedName(cls);
+            symbol.name = name;
+            if (!names.containsKey(name)) {
+                names.put(name, new ArrayList<Class<?>>());
+            }
+            names.get(name).add(cls);
+        }
+        reportConflicts(names);
+    }
+
+    private static void reportConflicts(Map<String, List<Class<?>>> names) {
+        boolean conflict = false;
+        for (Map.Entry<String, List<Class<?>>> entry : names.entrySet()) {
+            final String name = entry.getKey();
+            final List<Class<?>> classes = entry.getValue();
+            if (classes.size() > 1) {
+                System.out.println(String.format("Multiple classes are mapped to '%s' name. Conflicting classes: %s", name, classes));
+                conflict = true;
+            }
+        }
+        if (conflict) {
+            throw new NameConflictException("Multiple classes are mapped to the same name. You can use 'customTypeNaming' setting to resolve conflicts or exclude conflicting class if it was added accidentally.");
         }
     }
 
     private String getMappedName(Class<?> cls) {
         if (cls == null) {
             return null;
+        }
+        final String customName = settings.customTypeNaming.get(cls.getName());
+        if (customName != null) {
+            return customName;
         }
         String name = cls.getSimpleName();
         if (settings.removeTypeNamePrefix != null && name.startsWith(settings.removeTypeNamePrefix)) {
@@ -65,6 +90,28 @@ public class SymbolTable {
             name = name + settings.addTypeNameSuffix;
         }
         return name;
+    }
+
+
+    public static class NameConflictException extends RuntimeException {
+        
+        private static final long serialVersionUID = 1L;
+
+        public NameConflictException() {
+        }
+
+        public NameConflictException(String message) {
+            super(message);
+        }
+
+        public NameConflictException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public NameConflictException(Throwable cause) {
+            super(cause);
+        }
+
     }
 
 }
