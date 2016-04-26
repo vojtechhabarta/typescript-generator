@@ -99,4 +99,13 @@ public abstract class ModelParser {
         return typeProcessor.processType(type, new TypeProcessor.Context(new SymbolTable(settings), typeProcessor));
     }
 
+    public static boolean containsProperty(List<PropertyModel> properties, String propertyName) {
+        for (PropertyModel property : properties) {
+            if (property.getName().equals(propertyName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

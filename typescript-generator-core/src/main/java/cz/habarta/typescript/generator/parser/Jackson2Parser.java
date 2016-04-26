@@ -24,11 +24,6 @@ public class Jackson2Parser extends ModelParser {
     protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
 
-        final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
-        if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
-            properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, false, null, null));
-        }
-
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
@@ -47,6 +42,13 @@ public class Jackson2Parser extends ModelParser {
                     final Member originalMember = beanPropertyWriter.getMember().getMember();
                     properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
                 }
+            }
+        }
+
+        final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
+        if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
+            if (!containsProperty(properties, jsonTypeInfo.property())) {
+                properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, false, null, null));
             }
         }
 
