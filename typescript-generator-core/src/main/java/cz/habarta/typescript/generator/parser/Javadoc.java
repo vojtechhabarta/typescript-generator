@@ -166,17 +166,27 @@ public class Javadoc {
         return null;
     }
 
-    private List<String> getComments(String dComments, List<TagInfo> tags) {
-        if (dComments == null) {
+    private static List<String> getComments(String dComments, List<TagInfo> tags) {
+        if (dComments == null && (tags == null || tags.isEmpty())) {
             return null;
         }
-        final String[] lines = dComments.split("\\r\\n|\\n|\\r");
         final List<String> result = new ArrayList<>();
+        if (dComments != null) {
+            result.addAll(splitMultiline(dComments));
+        }
+        if (tags != null) {
+            for (TagInfo tag : tags) {
+                result.addAll(splitMultiline(tag.getName() + " " + tag.getText()));
+            }
+        }
+        return result;
+    }
+
+    private static List<String> splitMultiline(String comments) {
+        final List<String> result = new ArrayList<>();
+        final String[] lines = comments.split("\\r\\n|\\n|\\r");
         for (String line : lines) {
             result.add(line.trim());
-        }
-        for (TagInfo tag : tags) {
-            result.add(tag.getName() + " " + tag.getText());
         }
         return result;
     }
