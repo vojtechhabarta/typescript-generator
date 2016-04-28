@@ -26,6 +26,8 @@ public class Emitter {
             System.out.println("Writing declarations to: " + outputName);
         }
         emitFileComment();
+        emitReferences();
+        emitImports();
         emitModule(model);
         if (closeOutput) {
             close();
@@ -39,10 +41,28 @@ public class Emitter {
         }
     }
 
+    private void emitReferences() {
+        if (settings.referencedFiles != null && !settings.referencedFiles.isEmpty()) {
+            writeNewLine();
+            for (String reference : settings.referencedFiles) {
+                writeIndentedLine("/// <reference path=" + quote(reference) + " />");
+            }
+        }
+    }
+
+    private void emitImports() {
+        if (settings.importDeclarations != null && !settings.importDeclarations.isEmpty()) {
+            writeNewLine();
+            for (String importDeclaration : settings.importDeclarations) {
+                writeIndentedLine(importDeclaration + ";");
+            }
+        }
+    }
+
     private void emitModule(TsModel model) {
         if (settings.outputKind == TypeScriptOutputKind.ambientModule) {
             writeNewLine();
-            writeIndentedLine("declare module " + settings.quotes + settings.module + settings.quotes + " {");
+            writeIndentedLine("declare module " + quote(settings.module) + " {");
             indent++;
             emitNamespace(model);
             indent--;
@@ -122,7 +142,7 @@ public class Emitter {
     }
 
     private String toPropertyName(String name) {
-        return isValidIdentifierName(name) ? name : (settings.quotes + name + settings.quotes);
+        return isValidIdentifierName(name) ? name : quote(name);
     }
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
@@ -190,6 +210,10 @@ public class Emitter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String quote(String value) {
+        return settings.quotes + value + settings.quotes;
     }
 
     private void close() {

@@ -138,6 +138,29 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> customTypeNaming;
 
     /**
+     * List of files which will be referenced using triple-slash directive: /// &lt;reference path="file" />.
+     * This can be used with "customTypeMappings" to provide needed TypeScript types.
+     */
+    @Parameter
+    private List<String> referencedFiles;
+
+    /**
+     * List of import declarations which will be added to generated output.
+     * This can be used with "customTypeMappings" to provide needed TypeScript types.
+     */
+    @Parameter
+    private List<String> importDeclarations;
+
+    /**
+     * List of custom mappings.
+     * Each item specifies TypeScript type which will be used for particular Java class.
+     * Item format is: "javaClass:typescriptType".
+     * For example mapping "ZonedDateTime" to "string" would be added as "java.time.ZonedDateTime:string".
+     */
+    @Parameter
+    private List<String> customTypeMappings;
+
+    /**
      * Specifies how {@link java.util.Date} will be mapped.
      * Supported values are 'asDate', 'asNumber, 'asString'.
      * Default value is 'asDate'.
@@ -238,6 +261,9 @@ public class GenerateMojo extends AbstractMojo {
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+            settings.referencedFiles = referencedFiles;
+            settings.importDeclarations = importDeclarations;
+            settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
             settings.mapDate = mapDate;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;

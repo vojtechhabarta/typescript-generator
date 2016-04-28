@@ -28,6 +28,9 @@ public class GenerateTask extends DefaultTask {
     public String addTypeNamePrefix;
     public String addTypeNameSuffix;
     public List<String> customTypeNaming;
+    public List<String> referencedFiles;
+    public List<String> importDeclarations;
+    public List<String> customTypeMappings;
     public DateMapping mapDate;
     public String customTypeProcessor;
     public boolean sortDeclarations;
@@ -77,6 +80,9 @@ public class GenerateTask extends DefaultTask {
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.referencedFiles = referencedFiles;
+        settings.importDeclarations = importDeclarations;
+        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
         settings.mapDate = mapDate;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
