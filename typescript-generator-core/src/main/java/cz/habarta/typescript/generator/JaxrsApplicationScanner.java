@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -11,40 +12,45 @@ import javax.ws.rs.core.*;
 
 public class JaxrsApplicationScanner {
 
-    private final ClassLoader classLoader;
     private Set<String> excludes;
     private Queue<Class<?>> resourceQueue;
     private List<SourceType<Type>> discoveredTypes;
 
-    public JaxrsApplicationScanner() {
-        this (JaxrsApplicationScanner.class.getClassLoader());
-    }
-
-    public JaxrsApplicationScanner(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
     public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, List<String> excludedClassNames) {
-        System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClassName);
-        final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(classLoader);
-            final Class<?> jaxrsApplicationClass = classLoader.loadClass(jaxrsApplicationClassName);
-            final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            final Application application = (Application) constructor.newInstance();
-            return scanJaxrsApplication(application, excludedClassNames);
+            final List<Class<?>> resourceClasses = jaxrsApplicationClassName != null
+                    ? scanJaxrsApplicationForJaxrsResources(jaxrsApplicationClassName)
+                    : scanClasspathForJaxrsResources();
+            return scanJaxrsApplication(resourceClasses, excludedClassNames);
         } catch (ReflectiveOperationException e) {
             final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
             final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
             System.out.println(message);
             throw new RuntimeException(message, e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
     }
 
-    List<SourceType<Type>> scanJaxrsApplication(Application application, List<String> excludedClassNames) {
+    private static List<Class<?>> scanJaxrsApplicationForJaxrsResources(String jaxrsApplicationClassName) throws ReflectiveOperationException {
+        System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClassName);
+        final Class<?> jaxrsApplicationClass = Thread.currentThread().getContextClassLoader().loadClass(jaxrsApplicationClassName);
+        final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final Application application = (Application) constructor.newInstance();
+        return new ArrayList<>(application.getClasses());
+    }
+
+    private static List<Class<?>> scanClasspathForJaxrsResources() throws ReflectiveOperationException {
+        final FastClasspathScanner scanner = new FastClasspathScanner().scan();
+        final List<String> namesOfResourceClasses = scanner.getNamesOfClassesWithAnnotation(Path.class);
+        final List<Class<?>> classes = new ArrayList<>();
+        for (String className : namesOfResourceClasses) {
+            classes.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+        }
+        System.out.println(String.format("Found: %d root resources.", classes.size()));
+        return classes;
+    }
+
+    List<SourceType<Type>> scanJaxrsApplication(List<Class<?>> resourceClasses, List<String> excludedClassNames) {
         resourceQueue = new LinkedList<>();
         discoveredTypes = new ArrayList<>();
         excludes = new LinkedHashSet<>();
@@ -53,16 +59,15 @@ public class JaxrsApplicationScanner {
             excludes.addAll(excludedClassNames);
         }
         final LinkedHashSet<Class<?>> scannedResources = new LinkedHashSet<>();
-        final List<Class<?>> applicationClasses = new ArrayList<>(application.getClasses());
-        Collections.sort(applicationClasses, new Comparator<Class<?>>() {
+        Collections.sort(resourceClasses, new Comparator<Class<?>>() {
             @Override
             public int compare(Class<?> o1, Class<?> o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
         });
-        for (Class<?> applicationClass : applicationClasses) {
-            if (applicationClass.isAnnotationPresent(Path.class)) {
-                resourceQueue.add(applicationClass);
+        for (Class<?> resourceClass : resourceClasses) {
+            if (resourceClass.isAnnotationPresent(Path.class)) {
+                resourceQueue.add(resourceClass);
             }
         }
         Class<?> resourceClass;

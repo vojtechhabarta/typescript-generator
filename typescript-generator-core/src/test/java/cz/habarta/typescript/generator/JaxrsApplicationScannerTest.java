@@ -19,7 +19,7 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testReturnedTypes() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), null);
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), null);
         List<Type> types = getTypes(sourceTypes);
         final List<Type> expectedTypes = Arrays.asList(
                 A.class,
@@ -38,8 +38,17 @@ public class JaxrsApplicationScannerTest<T> {
     }
 
     @Test
-    public void testWithParsing() {
-        final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), null);
+    public void testWithParsingWithExplicitApplication() {
+        testWithParsing(TestApplication.class.getName());
+    }
+
+    @Test
+    public void testWithParsingWithDefaultApplication() {
+        testWithParsing(null);
+    }
+
+    private void testWithParsing(String applicationClass) {
+        final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(applicationClass, null);
         final Model model = new TypeScriptGenerator(TestUtils.settings()).getModelParser().parseModel(types);
         final ArrayList<Class<?>> classes = new ArrayList<>();
         for (BeanModel beanModel : model.getBeans()) {
@@ -62,13 +71,13 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testExcludedResource() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(TestResource1.class.getName()));
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), Arrays.asList(TestResource1.class.getName()));
         Assert.assertEquals(0, sourceTypes.size());
     }
 
     @Test
     public void testExcludedType() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(new TestApplication(), Arrays.asList(
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), Arrays.asList(
                 A.class.getName(),
                 J.class.getName()
         ));
