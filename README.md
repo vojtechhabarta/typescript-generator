@@ -33,6 +33,9 @@ Supported types include:
 - enum
 - array
 - `List` and `Map` (including derived interfaces and implementation classes)
+- customized type mapping
+
+For more details see [Type Mapping Wiki page](../../wiki/Type-Mapping).
 
 
 Maven
@@ -51,11 +54,13 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
                 <goal>generate</goal>
             </goals>
             <configuration>
+                <jsonLibrary>jackson2</jsonLibrary>
                 <classes>
                     <class>cz.habarta.typescript.generator.Person</class>
                 </classes>
-                <namespace>Rest</namespace>
                 <outputFile>target/rest.d.ts</outputFile>
+                <outputKind>global</outputKind>
+                <namespace>Rest</namespace>
             </configuration>
         </execution>
     </executions>
@@ -81,16 +86,13 @@ buildscript {
     }
 }
 generateTypeScript {
-    outputFile = 'build/sample.d.ts'
+    jsonLibrary = 'jackson2'
     classes = [
         'cz.habarta.typescript.generator.sample.Person'
     ]
-    jsonLibrary = 'jackson2'
+    outputFile = 'build/sample.d.ts'
+    outputKind = 'global'
     namespace = 'Rest';
-//    module = 'my-module'
-//    declarePropertiesAsOptional = false
-//    removeTypeNameSuffix = 'Json'
-//    mapDate = 'asNumber'
 }
 ```
 
@@ -101,6 +103,30 @@ Gradle plugin has the same features as Maven plugin, for detailed description se
 Direct invocation
 -----------------
 If you do not use Maven or Gradle you can invoke typescript-generator directly using `TypeScriptGenerator.generateTypeScript()` method.
+
+
+Input classes
+-------------
+Input classes can be specified using several parameters:
+- **`classes`** - list of fully qualified class names, includes all listed classes and their dependencies, `$` character is used for nested classes like `com.example.ClassName$NestedClassName`
+- **`classPatterns`** - list of glob patterns like `com.example.*Json`, includes all classes matched by the pattern, supported are `*` and `**` wildcards
+- **`classesFromJaxrsApplication`** - fully qualified name of JAX-RS application class, all classes used by application resources will be included, recommended if you have JAX-RS application class
+- **`classesFromAutomaticJaxrsApplication`** - value `true` will include classes from automatically discovered REST resources, recommended if you have JAX-RS application without `Application` subclass
+- **`excludeClasses`** - list of fully qualified class names, excluded classes will be mapped to TypeScript `any` type, if exluded class is a resource then this resource will not be scanned for used classes
+
+> Note: it is possible to use multiple parameters at the same time.
+
+For more details see [Class Names Glob Patterns](../../wiki/Class-Names-Glob-Patterns) and [JAX RS Application](../../wiki/JAX-RS-Application) Wiki pages.
+
+
+Output parameters
+-----------------
+Output is configured using several parameters, two of them are mandatory:
+- `outputFile` - specifies path and name of output file 
+- `outputKind` - determines if and how module will be generated
+    - values are: `global`, `module`, `ambientModule`
+
+For more details see [Modules and Namespaces](http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html) page.
 
 
 Download
