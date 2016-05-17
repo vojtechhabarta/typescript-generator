@@ -90,6 +90,20 @@ public class ModelCompiler {
         return new TsBeanModel(bean.getBeanClass(), beanType, parentType, interfaces, properties, bean.getComments());
     }
 
+    private TsBeanModel processEnumBean(SymbolTable symbolTable, BeanModel bean) {
+        final TypeProcessor.Context context = new TypeProcessor.Context(symbolTable, typeProcessor);
+        Symbol symbol = context.getSymbol(bean.getBeanClass());
+        TsType enumValueType = new TsType.EnumValueReferenceType(symbol);
+
+        TsType parentType = null;
+        final List<TsType> interfaces = new ArrayList<>();
+        final List<TsPropertyModel> properties = new ArrayList<>();
+        for (PropertyModel property : bean.getProperties()) {
+            properties.add(processProperty(symbolTable, bean, property));
+        }
+        return new TsBeanModel(bean.getBeanClass(), enumValueType, parentType, interfaces, properties, bean.getComments());
+    }
+
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property) {
         final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getBeanClass());
         final TsType tsType = property.isOptional() ? type.optional() : type;
@@ -98,7 +112,8 @@ public class ModelCompiler {
 
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
         final TsType enumType = typeFromJava(symbolTable, enumModel.getEnumClass());
-        return new TsEnumModel(enumModel.getEnumClass(), enumType, enumModel.getComments(), new ArrayList<>(enumModel.getValues()));
+        TsBeanModel beanModel = processEnumBean(symbolTable, enumModel.getValueModel());
+        return new TsEnumModel(enumModel.getEnumClass(), enumType, enumModel.getComments(), new ArrayList<>(enumModel.getValues()), beanModel);
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {
@@ -141,7 +156,7 @@ public class ModelCompiler {
                     }
                 }
                 return type;
-                
+
             }
         });
         return model.setTypeAliases(new ArrayList<>(typeAliases));
@@ -149,6 +164,7 @@ public class ModelCompiler {
 
     private TsModel transformEnums(TsModel tsModel) {
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
+        final LinkedHashSet<TsBeanModel> beanModels = new LinkedHashSet<>(tsModel.getBeans());
         for (TsEnumModel enumModel : tsModel.getEnums()) {
             final List<TsType> values = new ArrayList<>();
             for (String value : enumModel.getValues()) {
@@ -156,8 +172,15 @@ public class ModelCompiler {
             }
             final TsType union = new TsType.UnionType(values);
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));
+
+            if (this.settings.enumValueModel) {
+                TsBeanModel beanModel = enumModel.getValueModel();
+                beanModels.add(beanModel);
+            }
         }
-        return tsModel.setTypeAliases(new ArrayList<>(typeAliases));
+        TsModel updatedModel = tsModel.setTypeAliases(new ArrayList<>(typeAliases));
+        updatedModel = updatedModel.setBeans(new ArrayList<>(beanModels));
+        return updatedModel;
     }
 
     private TsModel inlineEnums(final TsModel tsModel, final SymbolTable symbolTable) {

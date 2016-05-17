@@ -40,6 +40,8 @@ public class Settings {
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean experimentalInlineEnums = false;
+    public boolean enumValueModel = false;
+    public String addEnumValueSuffix = "Value";
 
 
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {

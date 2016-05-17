@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -68,14 +69,31 @@ public abstract class ModelParser {
 
     protected EnumModel parseEnum(SourceType<Class<?>> sourceClass) {
         final List<String> values = new ArrayList<>();
+        final List<PropertyModel> properties = new ArrayList<>();
+        BeanModel beanModel = null;
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")
             final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) sourceClass.type;
-            for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                values.add(enumConstant.name());
+            Field[] fields = enumClass.getDeclaredFields();
+            for (Field field : fields) {
+                Class<?> fieldType = field.getType();
+                String name = field.getName();
+
+                if ("$VALUES".equals(name)) {
+                    // Special case: enum values
+                    continue;
+                } else if (fieldType == enumClass) {
+                    // enum constant
+                    values.add(name);
+                } else {
+                    // enum field
+                    PropertyModel propertyModel = new PropertyModel(name, fieldType, false, field, null);
+                    properties.add(propertyModel);
+                }
             }
+            beanModel = new BeanModel(enumClass, null, new ArrayList<Type>(), properties);
         }
-        return new EnumModel(sourceClass.type, values, null);
+        return new EnumModel(sourceClass.type, values, null, beanModel);
     }
 
     protected void addBeanToQueue(SourceType<? extends Type> sourceType) {

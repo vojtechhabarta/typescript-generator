@@ -97,7 +97,9 @@ public class Javadoc {
         final Enum dEnum = findJavadocEnum(enumModel.getEnumClass(), dRoots);
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
-        return new EnumModel(enumModel.getEnumClass(), enumModel.getValues(), concat(getComments(enumComment, tags), enumModel.getComments()));
+        return new EnumModel(enumModel.getEnumClass(), enumModel.getValues(),
+                concat(getComments(enumComment, tags), enumModel.getComments()),
+                enumModel.getValueModel());
     }
 
     // finders

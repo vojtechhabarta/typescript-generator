@@ -85,6 +85,21 @@ public abstract class TsType {
         }
     }
 
+    public static class EnumValueReferenceType extends ReferenceType {
+
+        public EnumValueReferenceType(Symbol symbol) {
+            super(symbol);
+        }
+
+        @Override
+        public java.lang.String format(Settings settings) {
+            String enumTypeName = super.format(settings);
+            String suffix = settings.addEnumValueSuffix;
+            return enumTypeName + suffix;
+        }
+
+    }
+
     public static class BasicArrayType extends TsType {
 
         public final TsType elementType;
