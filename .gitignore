@@ -10,3 +10,7 @@ release.properties
 **.classpath
 **.project
 **.settings
+
+# JetBrain IntelliJ
+.idea/
+**.iml

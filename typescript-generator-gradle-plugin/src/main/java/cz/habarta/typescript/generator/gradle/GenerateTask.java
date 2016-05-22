@@ -22,6 +22,7 @@ public class GenerateTask extends DefaultTask {
     public String classesFromJaxrsApplication;
     public boolean classesFromAutomaticJaxrsApplication;
     public List<String> excludeClasses;
+    public List<String> annotationFilters;
     public JsonLibrary jsonLibrary;
     public boolean declarePropertiesAsOptional;
     public String removeTypeNamePrefix;
@@ -41,6 +42,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
     public boolean experimentalInlineEnums;
+    public boolean displaySerializerWarning = true;
 
     @TaskAction
     public void generate() throws Exception {
@@ -91,8 +93,10 @@ public class GenerateTask extends DefaultTask {
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, extensionClasses);
+        settings.loadAnnotationFilters(classLoader, annotationFilters);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.experimentalInlineEnums = experimentalInlineEnums;
+        settings.displaySerializerWarning = displaySerializerWarning;
         settings.validateFileName(new File(outputFile));
 
         // TypeScriptGenerator

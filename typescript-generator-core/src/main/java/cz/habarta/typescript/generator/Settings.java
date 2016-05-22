@@ -38,8 +38,10 @@ public class Settings {
     public boolean noFileComment = false;
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
+    public List<Class<? extends Annotation>> annotationFilters = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean experimentalInlineEnums = false;
+    public boolean displaySerializerWarning = true;
 
 
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
@@ -51,6 +53,12 @@ public class Settings {
     public void loadExtensions(ClassLoader classLoader, List<String> extensions) {
         if (extensions != null) {
             this.extensions = loadInstances(classLoader, extensions, EmitterExtension.class);
+        }
+    }
+
+    public void loadAnnotationFilters(ClassLoader classLoader, List<String> annotationFilters) {
+        if (annotationFilters != null) {
+            this.annotationFilters = loadClasses(classLoader, annotationFilters, Annotation.class);
         }
     }
 

@@ -32,6 +32,19 @@ public class Jackson2Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
+                    boolean isInAnnotationFilter = settings.annotationFilters.isEmpty();
+                    if (!isInAnnotationFilter) {
+                        for (Class<? extends Annotation> optionalAnnotation : settings.annotationFilters) {
+                            if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
+                                isInAnnotationFilter = true;
+                                break;
+                            }
+                        }
+                        if (!isInAnnotationFilter) {
+                            System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from annotationFilters!");
+                            continue;
+                        }
+                    }
                     boolean optional = false;
                     for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
                         if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
@@ -104,7 +117,9 @@ public class Jackson2Parser extends ModelParser {
                 return new BeanHelper((BeanSerializer) jsonSerializer);
             } else {
                 final String jsonSerializerName = jsonSerializer.getClass().getName();
-                System.out.println(String.format("Warning: Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
+                if (settings.displaySerializerWarning) {
+                    System.out.println(String.format("Warning: Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
+                }
                 return null;
             }
         } catch (JsonMappingException e) {
