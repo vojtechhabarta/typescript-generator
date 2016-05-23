@@ -45,6 +45,19 @@ public class Jackson1Parser extends ModelParser {
                     if (propertyType == JsonNode.class) {
                         propertyType = Object.class;
                     }
+                    boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
+                    if (!isInAnnotationFilter) {
+                        for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
+                            if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
+                                isInAnnotationFilter = true;
+                                break;
+                            }
+                        }
+                        if (!isInAnnotationFilter) {
+                            System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
+                            continue;
+                        }
+                    }
                     boolean optional = false;
                     for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
                         if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {

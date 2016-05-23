@@ -95,6 +95,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> excludeClasses;
 
     /**
+     * If this list is not empty then TypeScript will only be generated for
+     * methods with one of the annotations defined in this list
+     */
+    @Parameter
+    private List<String> includePropertyAnnotations;
+
+    /**
      * Library used in JSON classes.
      * Supported values are 'jackson1', 'jackson2'.
      * Required parameter, recommended value is 'jackson2'.
@@ -237,6 +244,12 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private boolean experimentalInlineEnums;
 
+    /**
+     * Display warnings when bean serializer is not found.
+     */
+    @Parameter(defaultValue = "true")
+    private boolean displaySerializerWarning;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -278,8 +291,10 @@ public class GenerateMojo extends AbstractMojo {
             settings.noFileComment = noFileComment;
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions);
+            settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.experimentalInlineEnums = experimentalInlineEnums;
+            settings.displaySerializerWarning = displaySerializerWarning;
             settings.validateFileName(outputFile);
 
             // TypeScriptGenerator
