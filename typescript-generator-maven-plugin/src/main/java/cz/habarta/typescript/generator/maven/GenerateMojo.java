@@ -99,7 +99,7 @@ public class GenerateMojo extends AbstractMojo {
      * methods with one of the annotations defined in this list
      */
     @Parameter
-    private List<String> annotationFilters;
+    private List<String> includePropertyAnnotations;
 
     /**
      * Library used in JSON classes.
@@ -291,7 +291,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.noFileComment = noFileComment;
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions);
-            settings.loadAnnotationFilters(classLoader, annotationFilters);
+            settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.experimentalInlineEnums = experimentalInlineEnums;
             settings.displaySerializerWarning = displaySerializerWarning;

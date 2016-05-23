@@ -22,7 +22,7 @@ public class GenerateTask extends DefaultTask {
     public String classesFromJaxrsApplication;
     public boolean classesFromAutomaticJaxrsApplication;
     public List<String> excludeClasses;
-    public List<String> annotationFilters;
+    public List<String> includePropertyAnnotations;
     public JsonLibrary jsonLibrary;
     public boolean declarePropertiesAsOptional;
     public String removeTypeNamePrefix;
@@ -93,7 +93,7 @@ public class GenerateTask extends DefaultTask {
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, extensionClasses);
-        settings.loadAnnotationFilters(classLoader, annotationFilters);
+        settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.experimentalInlineEnums = experimentalInlineEnums;
         settings.displaySerializerWarning = displaySerializerWarning;
