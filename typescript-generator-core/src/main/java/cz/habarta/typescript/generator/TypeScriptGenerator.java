@@ -68,13 +68,22 @@ public class TypeScriptGenerator {
 
     public ModelParser getModelParser() {
         if (modelParser == null) {
-            if (settings.jsonLibrary == JsonLibrary.jackson2) {
-                modelParser = new Jackson2Parser(settings, getTypeProcessor());
-            } else {
-                modelParser = new Jackson1Parser(settings, getTypeProcessor());
-            }
+            modelParser = createModelParser();
         }
         return modelParser;
+    }
+
+    private ModelParser createModelParser() {
+        switch (settings.jsonLibrary) {
+            case jackson1:
+                return new Jackson1Parser(settings, getTypeProcessor());
+            case jackson2:
+                return new Jackson2Parser(settings, getTypeProcessor());
+            case jaxb:
+                return new Jackson2Parser(settings, getTypeProcessor(), /*useJaxbAnnotations*/ true);
+            default:
+                throw new RuntimeException();
+        }
     }
 
     public ModelCompiler getModelCompiler() {

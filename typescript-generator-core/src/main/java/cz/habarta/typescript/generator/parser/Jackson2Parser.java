@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import cz.habarta.typescript.generator.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -17,7 +18,15 @@ public class Jackson2Parser extends ModelParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
+        this(settings, typeProcessor, false);
+    }
+
+    public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
         super(settings, typeProcessor);
+        if (useJaxbAnnotations) {
+            AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
+            objectMapper.setAnnotationIntrospector(introspector);
+        }
     }
 
     @Override

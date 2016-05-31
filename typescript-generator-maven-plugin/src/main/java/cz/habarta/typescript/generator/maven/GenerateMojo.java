@@ -103,7 +103,10 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Library used in JSON classes.
-     * Supported values are 'jackson1', 'jackson2'.
+     * Supported values are
+     * 'jackson1' (annotations from 'org.codehaus.jackson.annotate' package),
+     * 'jackson2' (annotations from 'com.fasterxml.jackson.annotation' package),
+     * `jaxb` (annotations from 'javax.xml.bind.annotation' package).
      * Required parameter, recommended value is 'jackson2'.
      */
     @Parameter(required = true)
