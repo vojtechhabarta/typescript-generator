@@ -63,7 +63,7 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
-     * JSON classes to process specified using glog pattern
+     * JSON classes to process specified using glob pattern
      * so it is possible to specify package or class name suffix.
      * Glob patterns support two wildcards:
      * Single "*" wildcard matches any character except for "." and "$".
