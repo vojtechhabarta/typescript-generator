@@ -52,7 +52,7 @@ public class JaxrsApplicationScannerTest<T> {
         final Model model = new TypeScriptGenerator(TestUtils.settings()).getModelParser().parseModel(types);
         final ArrayList<Class<?>> classes = new ArrayList<>();
         for (BeanModel beanModel : model.getBeans()) {
-            classes.add(beanModel.getBeanClass());
+            classes.add(beanModel.getOrigin());
         }
         final List<Class<?>> expectedClasses = Arrays.asList(
                 A.class,

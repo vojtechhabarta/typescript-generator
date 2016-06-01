@@ -71,7 +71,7 @@ public class ModelCompiler {
     }
 
     private TsBeanModel processBean(SymbolTable symbolTable, BeanModel bean) {
-        final TsType beanType = typeFromJava(symbolTable, bean.getBeanClass());
+        final TsType beanType = typeFromJava(symbolTable, bean.getOrigin());
         TsType parentType = typeFromJava(symbolTable, bean.getParent());
         if (parentType != null && parentType.equals(TsType.Any)) {
             parentType = null;
@@ -87,18 +87,18 @@ public class ModelCompiler {
         for (PropertyModel property : bean.getProperties()) {
             properties.add(processProperty(symbolTable, bean, property));
         }
-        return new TsBeanModel(bean.getBeanClass(), beanType, parentType, interfaces, properties, bean.getComments());
+        return new TsBeanModel(bean.getOrigin(), beanType, parentType, interfaces, properties, bean.getComments());
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property) {
-        final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getBeanClass());
+        final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         return new TsPropertyModel(property.getName(), tsType, property.getComments());
     }
 
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
-        final TsType enumType = typeFromJava(symbolTable, enumModel.getEnumClass());
-        return new TsEnumModel(enumModel.getEnumClass(), enumType, enumModel.getComments(), new ArrayList<>(enumModel.getValues()));
+        final TsType enumType = typeFromJava(symbolTable, enumModel.getOrigin());
+        return new TsEnumModel(enumModel.getOrigin(), enumType, enumModel.getComments(), new ArrayList<>(enumModel.getValues()));
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {

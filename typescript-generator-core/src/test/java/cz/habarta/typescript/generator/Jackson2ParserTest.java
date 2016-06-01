@@ -16,7 +16,7 @@ public class Jackson2ParserTest {
         final Model model = jacksonParser.parseModel(bean);
         Assert.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals("DummyBean", beanModel.getBeanClass().getSimpleName());
+        Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
         Assert.assertTrue(beanModel.getProperties().size() > 0);
         Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
     }
@@ -27,7 +27,7 @@ public class Jackson2ParserTest {
         final Model model = jacksonParser.parseModel(DummyBeanJackson2.class);
         Assert.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals("DummyBeanJackson2", beanModel.getBeanClass().getSimpleName());
+        Assert.assertEquals("DummyBeanJackson2", beanModel.getOrigin().getSimpleName());
         Assert.assertTrue(beanModel.getProperties().size() > 0);
         Assert.assertEquals("changedNameProperty", beanModel.getProperties().get(0).getName());
     }

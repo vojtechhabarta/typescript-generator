@@ -5,28 +5,21 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 
-public class BeanModel {
+public class BeanModel extends DeclarationModel {
 
-    private final Class<?> beanClass;
     private final Type parent;
     private final List<Type> interfaces;
     private final List<PropertyModel> properties;
-    private final List<String> comments;
 
-    public BeanModel(Class<?> beanClass, Type parent, List<Type> interfaces, List<PropertyModel> properties) {
-        this(beanClass, parent, interfaces, properties, null);
+    public BeanModel(Class<?> origin, Type parent, List<Type> interfaces, List<PropertyModel> properties) {
+        this(origin, parent, interfaces, properties, null);
     }
 
-    public BeanModel(Class<?> beanClass, Type parent, List<Type> interfaces, List<PropertyModel> properties, List<String> comments) {
-        this.beanClass = beanClass;
+    public BeanModel(Class<?> origin, Type parent, List<Type> interfaces, List<PropertyModel> properties, List<String> comments) {
+        super (origin, comments);
         this.parent = parent;
         this.interfaces = interfaces;
         this.properties = properties;
-        this.comments = comments;
-    }
-
-    public Class<?> getBeanClass() {
-        return beanClass;
     }
 
     public Type getParent() {
@@ -41,13 +34,9 @@ public class BeanModel {
         return properties;
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
     @Override
     public String toString() {
-        return "BeanModel{" + "beanClass=" + beanClass + ", properties=" + properties + '}';
+        return "BeanModel{" + "origin=" + getOrigin() + ", properties=" + properties + '}';
     }
 
 }

@@ -51,13 +51,13 @@ public class Javadoc {
     }
 
     private BeanModel enrichBean(BeanModel bean) {
-        if (bean.getBeanClass().isInterface()) {
-            final Interface dInterface = findJavadocInterface(bean.getBeanClass(), dRoots);
+        if (bean.getOrigin().isInterface()) {
+            final Interface dInterface = findJavadocInterface(bean.getOrigin(), dRoots);
             if (dInterface != null) {
                 return enrichBean(bean, dInterface.getComment(), dInterface.getTag(), dInterface.getField(), dInterface.getMethod());
             }
         } else {
-            final Class dClass = findJavadocClass(bean.getBeanClass(), dRoots);
+            final Class dClass = findJavadocClass(bean.getOrigin(), dRoots);
             if (dClass != null) {
                 return enrichBean(bean, dClass.getComment(), dClass.getTag(), dClass.getField(), dClass.getMethod());
             }
@@ -71,7 +71,7 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return new BeanModel(bean.getBeanClass(), bean.getParent(), bean.getInterfaces(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
+        return new BeanModel(bean.getOrigin(), bean.getParent(), bean.getInterfaces(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
@@ -94,10 +94,10 @@ public class Javadoc {
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
-        final Enum dEnum = findJavadocEnum(enumModel.getEnumClass(), dRoots);
+        final Enum dEnum = findJavadocEnum(enumModel.getOrigin(), dRoots);
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
-        return new EnumModel(enumModel.getEnumClass(), enumModel.getValues(), concat(getComments(enumComment, tags), enumModel.getComments()));
+        return new EnumModel(enumModel.getOrigin(), enumModel.getValues(), concat(getComments(enumComment, tags), enumModel.getComments()));
     }
 
     // finders
