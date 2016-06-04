@@ -52,7 +52,7 @@ public class ModelCompiler {
 
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, Collections.<Type>emptyList(), Collections.singletonList(new PropertyModel("property", type, false, null, null)));
-        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList());
+        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel<?>>emptyList());
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
     }
@@ -62,8 +62,8 @@ public class ModelCompiler {
         for (BeanModel bean : model.getBeans()) {
             beans.add(processBean(symbolTable, bean));
         }
-        final List<TsEnumModel> enums = new ArrayList<>();
-        for (EnumModel enumModel : model.getEnums()) {
+        final List<TsEnumModel<?>> enums = new ArrayList<>();
+        for (EnumModel<?> enumModel : model.getEnums()) {
             enums.add(processEnum(symbolTable, enumModel));
         }
         final List<TsAliasModel> typeAliases = new ArrayList<>();
@@ -96,9 +96,9 @@ public class ModelCompiler {
         return new TsPropertyModel(property.getName(), tsType, property.getComments());
     }
 
-    private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
+    private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {
         final TsType enumType = typeFromJava(symbolTable, enumModel.getOrigin());
-        return new TsEnumModel(enumModel.getOrigin(), enumType, enumModel.getComments(), new ArrayList<>(enumModel.getValues()));
+        return TsEnumModel.fromEnumModel(enumType, enumModel);
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {
@@ -149,10 +149,10 @@ public class ModelCompiler {
 
     private TsModel transformEnums(TsModel tsModel) {
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
-        for (TsEnumModel enumModel : tsModel.getEnums()) {
+        for (TsEnumModel<String> enumModel : tsModel.getEnums(EnumKind.StringBased)) {
             final List<TsType> values = new ArrayList<>();
-            for (String value : enumModel.getValues()) {
-                values.add(new TsType.StringLiteralType(value));
+            for (EnumMemberModel<String> member : enumModel.getMembers()) {
+                values.add(new TsType.StringLiteralType(member.getEnumValue()));
             }
             final TsType union = new TsType.UnionType(values);
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));

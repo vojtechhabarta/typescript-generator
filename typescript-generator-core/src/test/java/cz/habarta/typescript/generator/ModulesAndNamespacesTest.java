@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import java.io.File;
@@ -38,7 +39,7 @@ public class ModulesAndNamespacesTest {
         if (outputFileType == TypeScriptFileType.implementationFile) {
             settings.extensions.add(new TestFunctionExtention());
         }
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(Data.class, Direction.class), Output.to(output));
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(Data.class, Direction.class, Align.class), Output.to(output));
     }
 
     private static class Data {
@@ -50,7 +51,13 @@ public class ModulesAndNamespacesTest {
         South,
         West
     }
-    
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    enum Align {
+        Left,
+        Right
+    }
+
     private static class TestFunctionExtention extends EmitterExtension {
 
         @Override

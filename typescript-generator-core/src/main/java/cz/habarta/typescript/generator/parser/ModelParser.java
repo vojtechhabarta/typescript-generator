@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
 import java.lang.reflect.Member;
@@ -35,7 +37,7 @@ public abstract class ModelParser {
     private Model parseQueue() {
         final Set<Type> parsedTypes = new LinkedHashSet<>();
         final List<BeanModel> beans = new ArrayList<>();
-        final List<EnumModel> enums = new ArrayList<>();
+        final List<EnumModel<?>> enums = new ArrayList<>();
         SourceType<?> sourceType;
         while ((sourceType = typeQueue.poll()) != null) {
             if (parsedTypes.contains(sourceType.type)) {
@@ -49,7 +51,7 @@ public abstract class ModelParser {
                     System.out.println("Parsing '" + cls.getName() + "'" +
                             (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
                     if (cls.isEnum()) {
-                        final EnumModel enumModel = parseEnum(sourceType.asSourceClass());
+                        final EnumModel<?> enumModel = parseEnum(sourceType.asSourceClass());
                         enums.add(enumModel);
                     } else {
                         final BeanModel bean = parseBean(sourceType.asSourceClass());
@@ -66,16 +68,16 @@ public abstract class ModelParser {
 
     protected abstract BeanModel parseBean(SourceType<Class<?>> sourceClass);
 
-    protected EnumModel parseEnum(SourceType<Class<?>> sourceClass) {
-        final List<String> values = new ArrayList<>();
+    protected EnumModel<?> parseEnum(SourceType<Class<?>> sourceClass) {
+        final List<EnumMemberModel<String>> values = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")
             final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) sourceClass.type;
             for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                values.add(enumConstant.name());
+                values.add(new EnumMemberModel<>(enumConstant.name(), enumConstant.name(), null));
             }
         }
-        return new EnumModel(sourceClass.type, values, null);
+        return new EnumModel<>(sourceClass.type, EnumKind.StringBased, values, null);
     }
 
     protected void addBeanToQueue(SourceType<? extends Type> sourceType) {

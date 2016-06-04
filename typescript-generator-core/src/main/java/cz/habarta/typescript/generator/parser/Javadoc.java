@@ -1,8 +1,10 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.xmldoclet.Class;
 import cz.habarta.typescript.generator.xmldoclet.Enum;
+import cz.habarta.typescript.generator.xmldoclet.EnumConstant;
 import cz.habarta.typescript.generator.xmldoclet.Field;
 import cz.habarta.typescript.generator.xmldoclet.Interface;
 import cz.habarta.typescript.generator.xmldoclet.Method;
@@ -38,13 +40,13 @@ public class Javadoc {
 
     public Model enrichModel(Model model) {
         final List<BeanModel> dBeans = new ArrayList<>();
-        final List<EnumModel> dEnums = new ArrayList<>();
+        final List<EnumModel<?>> dEnums = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
             final BeanModel dBean = enrichBean(bean);
             dBeans.add(dBean);
         }
-        for (EnumModel enumModel : model.getEnums()) {
-            final EnumModel dEnumModel = enrichEnum(enumModel);
+        for (EnumModel<?> enumModel : model.getEnums()) {
+            final EnumModel<?> dEnumModel = enrichEnum(enumModel);
             dEnums.add(dEnumModel);
         }
         return new Model(dBeans, dEnums);
@@ -71,7 +73,7 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return new BeanModel(bean.getOrigin(), bean.getParent(), bean.getInterfaces(), enrichedProperties, concat(getComments(beanComment, tags), bean.getComments()));
+        return bean.withProperties(enrichedProperties).withComments(concat(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
@@ -90,14 +92,26 @@ public class Javadoc {
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
         }
-        return property.comments(getComments(propertyComment, tags));
+        return property.withComments(getComments(propertyComment, tags));
     }
 
-    private EnumModel enrichEnum(EnumModel enumModel) {
+    private <T> EnumModel<T> enrichEnum(EnumModel<T> enumModel) {
         final Enum dEnum = findJavadocEnum(enumModel.getOrigin(), dRoots);
+        final List<EnumMemberModel<T>> enrichedMembers = new ArrayList<>();
+        for (EnumMemberModel<T> member : enumModel.getMembers()) {
+            final EnumMemberModel<T> enrichedMember = enrichEnumMember(member, dEnum);
+            enrichedMembers.add(enrichedMember);
+        }
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
-        return new EnumModel(enumModel.getOrigin(), enumModel.getValues(), concat(getComments(enumComment, tags), enumModel.getComments()));
+        return enumModel.withMembers(enrichedMembers).withComments(concat(getComments(enumComment, tags), enumModel.getComments()));
+    }
+
+    private <T> EnumMemberModel<T> enrichEnumMember(EnumMemberModel<T> enumMember, Enum dEnum) {
+        final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
+        final List<TagInfo> tags = dConstant != null ? dConstant.getTag(): null;
+        final String memberComment = dConstant != null ? dConstant.getComment() : null;
+        return enumMember.withComments(getComments(memberComment, tags));
     }
 
     // finders
@@ -160,6 +174,17 @@ public class Javadoc {
                     if (dEnum.getQualified().equals(name)) {
                         return dEnum;
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static EnumConstant findJavadocEnumConstant(String name, Enum dEnum) {
+        if (dEnum != null) {
+            for (EnumConstant dEnumConstant : dEnum.getConstant()) {
+                if (dEnumConstant.getName().equals(name)) {
+                    return dEnumConstant;
                 }
             }
         }

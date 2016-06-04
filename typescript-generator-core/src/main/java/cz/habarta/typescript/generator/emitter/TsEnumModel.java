@@ -2,25 +2,34 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.compiler.EnumKind;
+import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.parser.EnumModel;
 import java.util.List;
 
 
-public class TsEnumModel extends TsDeclarationModel {
+// T extends String | Number
+public class TsEnumModel<T> extends TsDeclarationModel {
     
-    private final List<String> values;
+    private final EnumKind<T> kind;
+    private final List<EnumMemberModel<T>> members;
 
-    public TsEnumModel(TsType name, List<String> comments, List<String> values) {
-        super(name, comments);
-        this.values = values;
-    }
-
-    public TsEnumModel(Class<?> origin, TsType name, List<String> comments, List<String> values) {
+    public TsEnumModel(Class<?> origin, TsType name, EnumKind<T> kind, List<EnumMemberModel<T>> members, List<String> comments) {
         super(origin, name, comments);
-        this.values = values;
+        this.kind = kind;
+        this.members = members;
     }
 
-    public List<String> getValues() {
-        return values;
+    public static <T> TsEnumModel<T> fromEnumModel(TsType name, EnumModel<T> enumModel) {
+        return new TsEnumModel<>(enumModel.getOrigin(), name, enumModel.getKind(), enumModel.getMembers(), enumModel.getComments());
+    }
+
+    public EnumKind<T> getKind() {
+        return kind;
+    }
+
+    public List<EnumMemberModel<T>> getMembers() {
+        return members;
     }
 
 }

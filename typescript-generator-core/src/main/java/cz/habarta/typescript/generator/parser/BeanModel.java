@@ -34,6 +34,15 @@ public class BeanModel extends DeclarationModel {
         return properties;
     }
 
+    public BeanModel withProperties(List<PropertyModel> properties) {
+        return new BeanModel(origin, parent, interfaces, properties, comments);
+    }
+
+    @Override
+    public BeanModel withComments(List<String> comments) {
+        return new BeanModel(origin, parent, interfaces, properties, comments);
+    }
+
     @Override
     public String toString() {
         return "BeanModel{" + "origin=" + getOrigin() + ", properties=" + properties + '}';

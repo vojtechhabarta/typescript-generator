@@ -7,9 +7,9 @@ import java.util.*;
 public class Model {
 
     private final List<BeanModel> beans;
-    private final List<EnumModel> enums;
+    private final List<EnumModel<?>> enums;
 
-    public Model(List<BeanModel> beans, List<EnumModel> enums) {
+    public Model(List<BeanModel> beans, List<EnumModel<?>> enums) {
         if (beans == null) throw new NullPointerException();
         if (enums == null) throw new NullPointerException();
         this.beans = beans;
@@ -20,7 +20,7 @@ public class Model {
         return beans;
     }
 
-    public List<EnumModel> getEnums() {
+    public List<EnumModel<?>> getEnums() {
         return enums;
     }
 
@@ -34,7 +34,7 @@ public class Model {
             sb.append(bean);
             sb.append(String.format("%n"));
         }
-        for (EnumModel enumModel : enums) {
+        for (EnumModel<?> enumModel : enums) {
             sb.append("  ");
             sb.append(enumModel);
             sb.append(String.format("%n"));

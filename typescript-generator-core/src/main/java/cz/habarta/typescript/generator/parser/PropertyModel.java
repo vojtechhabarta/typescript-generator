@@ -46,7 +46,7 @@ public class PropertyModel {
         return comments;
     }
 
-    public PropertyModel comments(List<String> comments) {
+    public PropertyModel withComments(List<String> comments) {
         return new PropertyModel(name, type, optional, originalMember, comments);
     }
 

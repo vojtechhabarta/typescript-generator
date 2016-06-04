@@ -29,7 +29,7 @@ public class JavadocTest {
             Assert.assertEquals("Documentation for documentedField.", property1.getComments().get(0));
             final PropertyModel property2 = bean.getProperties().get(1);
             Assert.assertEquals("Documentation for documentedEnumField.", property2.getComments().get(0));
-            final EnumModel enumModel = model.getEnums().get(0);
+            final EnumModel<?> enumModel = model.getEnums().get(0);
             Assert.assertEquals("Documentation for DummyEnum.", enumModel.getComments().get(0));
         }
         {

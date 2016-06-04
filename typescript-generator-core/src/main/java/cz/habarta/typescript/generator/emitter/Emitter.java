@@ -2,6 +2,8 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.compiler.EnumKind;
+import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -86,20 +88,22 @@ public class Emitter {
             writeIndentedLine(prefix +  "namespace " + settings.namespace + " {");
             indent++;
             final boolean exportElements = settings.outputFileType == TypeScriptFileType.implementationFile;
-            emitElements(model, exportElements);
+            emitElements(model, exportElements, false);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
         } else {
             final boolean exportElements = settings.outputKind == TypeScriptOutputKind.module;
-            emitElements(model, exportElements);
+            final boolean declareElements = settings.outputKind == TypeScriptOutputKind.global;
+            emitElements(model, exportElements, declareElements);
         }
     }
 
-    private void emitElements(TsModel model, boolean exportKeyword) {
+    private void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         exportKeyword = exportKeyword || forceExportKeyword;
         emitInterfaces(model, exportKeyword);
         emitTypeAliases(model, exportKeyword);
+        emitNumberEnums(model, exportKeyword, declareKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
             emitterExtension.emitElements(new EmitterExtension.Writer() {
                 @Override
@@ -172,6 +176,25 @@ public class Emitter {
             writeNewLine();
             emitComments(alias.getComments());
             writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition().format(settings) + ";");
+        }
+    }
+
+    private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
+        final ArrayList<TsEnumModel<Number>> enums = new ArrayList<>(model.getEnums(EnumKind.NumberBased));
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(enums);
+        }
+        for (TsEnumModel<Number> enumModel : enums) {
+            writeNewLine();
+            emitComments(enumModel.getComments());
+            writeIndentedLine(exportKeyword, (declareKeyword ? "declare " : "") + "const enum " + enumModel.getName() + " {");
+            indent++;
+            for (EnumMemberModel<Number> member : enumModel.getMembers()) {
+                emitComments(member.getComments());
+                writeIndentedLine(member.getPropertyName() + " = " + member.getEnumValue() + ",");
+            }
+            indent--;
+            writeIndentedLine("}");
         }
     }
 
