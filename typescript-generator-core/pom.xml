@@ -32,7 +32,7 @@
         <dependency>
             <groupId>io.github.lukehutch</groupId>
             <artifactId>fast-classpath-scanner</artifactId>
-            <version>1.9.18</version>
+            <version>1.9.19</version>
         </dependency>
         <!--test dependencies-->
         <dependency>
