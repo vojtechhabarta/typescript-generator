@@ -37,6 +37,8 @@ Supported types include:
 
 For more details see [Type Mapping Wiki page](../../wiki/Type-Mapping).
 
+> Note: typescript-generator works with compiled classes using Java reflection. It doesn't use source files (except for Javadoc feature).
+In Maven plugin this means either classes compiled from source files in the same module or classes added using `<dependency>` element.
 
 Maven
 -----
