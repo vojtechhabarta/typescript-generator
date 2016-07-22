@@ -12,7 +12,7 @@ install:
 build_script:
 - ps: |-
     Write-Host -ForegroundColor Cyan "Building version: $($env:APPVEYOR_BUILD_VERSION)"
-    choco install maven -y
+    choco install maven -version 3.3.9 -y
     $mvn = "C:\tools\apache-maven-3.3.3\bin\mvn.cmd"
     &$mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     &$mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
