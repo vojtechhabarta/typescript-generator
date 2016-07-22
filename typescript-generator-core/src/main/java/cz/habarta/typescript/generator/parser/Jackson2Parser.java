@@ -107,11 +107,13 @@ public class Jackson2Parser extends ModelParser {
         }
         parents.addAll(Arrays.asList(cls.getInterfaces()));
         for (Class<?> parent : parents) {
-            final BeanHelper beanHelper = getBeanHelper(parent);
-            if (beanHelper != null) {
-                for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                    if (beanPropertyWriter.getName().equals(property)) {
-                        return true;
+            if (settings.excludedClassNames == null || !settings.excludedClassNames.contains(parent.getName())) {
+                final BeanHelper beanHelper = getBeanHelper(parent);
+                if (beanHelper != null) {
+                    for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
+                        if (beanPropertyWriter.getName().equals(property)) {
+                            return true;
+                        }
                     }
                 }
             }
