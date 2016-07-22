@@ -102,7 +102,7 @@ public class Jackson2Parser extends ModelParser {
 
     private boolean isParentProperty(String property, Class<?> cls) {
         final List<Class<?>> parents = new ArrayList<>();
-        if (cls.getSuperclass() != Object.class) {
+        if (cls.getSuperclass() != null && cls.getSuperclass() != Object.class) {
             parents.add(cls.getSuperclass());
         }
         parents.addAll(Arrays.asList(cls.getInterfaces()));
