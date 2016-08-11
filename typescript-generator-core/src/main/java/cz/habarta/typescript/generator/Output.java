@@ -31,6 +31,7 @@ public class Output {
 
     public static Output to(File file) {
         try {
+            file.getParentFile().mkdirs();
             return new Output(new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8")), file.toString(), true);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
