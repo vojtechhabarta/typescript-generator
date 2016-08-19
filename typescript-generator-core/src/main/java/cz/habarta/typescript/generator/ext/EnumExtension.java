@@ -30,7 +30,7 @@ public class EnumExtension extends EmitterExtension {
     Collections.sort(enums);
     for (TsEnumModel<String> tsEnum : enums) {
       writer.writeIndentedLine("");
-      writer.writeIndentedLine(exportString + "enum " + tsEnum.getName() + " {");
+      writer.writeIndentedLine(exportString + "const enum " + tsEnum.getName() + " {");
       int length = tsEnum.getMembers().size();
       int i=0;
       for (EnumMemberModel<String> member : tsEnum.getMembers()) {

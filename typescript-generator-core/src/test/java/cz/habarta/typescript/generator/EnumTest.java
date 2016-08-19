@@ -44,7 +44,7 @@ public class EnumTest {
                 "    direction: Direction;\n" +
                 "}\n" +
                 "\n" +
-                "enum Direction { North, East, South, West }\n";
+                "const enum Direction { North, East, South, West }\n";
         assertEquals(expected, output);
     }
 
@@ -55,7 +55,7 @@ public class EnumTest {
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
         final String expected = (
             "\n" +
-                "enum Direction { North, East, South, West }\n"
+                "const enum Direction { North, East, South, West }\n"
         );
         assertEquals(expected, actual);
     }

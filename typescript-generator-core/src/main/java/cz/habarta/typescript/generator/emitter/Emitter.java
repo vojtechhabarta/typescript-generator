@@ -188,7 +188,7 @@ public class Emitter {
         for (TsAliasModel alias : aliases) {
             writeNewLine();
             emitComments(alias.getComments());
-            writeIndentedLine(exportKeyword, "enum " + alias.getName() + " { " + alias.getDefinition().format(settings) + " }");
+            writeIndentedLine(exportKeyword, "const enum " + alias.getName() + " { " + alias.getDefinition().format(settings) + " }");
         }
     }
 
