@@ -132,6 +132,36 @@ public abstract class TsType {
 
     }
 
+    public static class CommaSeparatedType extends TsType {
+
+        public final List<TsType> types;
+
+        public CommaSeparatedType(List<? extends TsType> types) {
+            this.types = new ArrayList<>(types);
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return Utils.join(format(types, settings), ", ");
+        }
+
+    }
+
+    public static class LiteralType extends TsType {
+
+        public final String literal;
+
+        public LiteralType(String literal) {
+            this.literal = literal;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return literal;
+        }
+
+    }
+
     public static class StringLiteralType extends TsType {
 
         public final String literal;

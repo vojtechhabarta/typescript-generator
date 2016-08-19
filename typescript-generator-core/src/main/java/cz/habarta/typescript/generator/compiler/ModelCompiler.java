@@ -42,6 +42,9 @@ public class ModelCompiler {
         final SymbolTable symbolTable = new SymbolTable(settings);
         TsModel tsModel = processModel(symbolTable, model);
         tsModel = transformDates(symbolTable, tsModel);
+        if (settings.typescriptEnums) {
+            tsModel = transformTypeScriptEnums(tsModel);
+        } else
         tsModel = transformEnums(tsModel);
         if (settings.experimentalInlineEnums) {
             tsModel = inlineEnums(tsModel, symbolTable);
@@ -158,6 +161,19 @@ public class ModelCompiler {
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));
         }
         return tsModel.setTypeAliases(new ArrayList<>(typeAliases));
+    }
+
+    private TsModel transformTypeScriptEnums(TsModel tsModel) {
+        final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
+        for (TsEnumModel<String> enumModel : tsModel.getEnums(EnumKind.StringBased)) {
+            final List<TsType> values = new ArrayList<>();
+            for (EnumMemberModel<String> member : enumModel.getMembers()) {
+                values.add(new TsType.LiteralType(member.getEnumValue()));
+            }
+            final TsType union = new TsType.CommaSeparatedType(values);
+            typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));
+        }
+        return tsModel.setTsEnums(new ArrayList<>(typeAliases));
     }
 
     private TsModel inlineEnums(final TsModel tsModel, final SymbolTable symbolTable) {

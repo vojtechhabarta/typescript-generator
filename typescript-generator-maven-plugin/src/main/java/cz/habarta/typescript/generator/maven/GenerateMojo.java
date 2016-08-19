@@ -227,6 +227,8 @@ public class GenerateMojo extends AbstractMojo {
      * List of extensions specified as fully qualified class name.
      * Known extensions:
      * cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension
+     * cz.habarta.typescript.generator.ext.EnumConstantsExtension
+     * cz.habarta.typescript.generator.ext.EnumExtension
      */
     @Parameter
     private List<String> extensions;
@@ -246,6 +248,13 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private boolean experimentalInlineEnums;
+
+    /**
+     * Defines enum type on places where the enum is used.
+     * (Without this flag a type is created.)
+     */
+    @Parameter
+    private boolean typescriptEnums;
 
     /**
      * Display warnings when bean serializer is not found.
@@ -297,6 +306,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.experimentalInlineEnums = experimentalInlineEnums;
+            settings.typescriptEnums = typescriptEnums;
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.validateFileName(outputFile);
 

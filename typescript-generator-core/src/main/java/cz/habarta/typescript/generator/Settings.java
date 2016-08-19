@@ -41,6 +41,7 @@ public class Settings {
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean experimentalInlineEnums = false;
+    public boolean typescriptEnums = false;
     public boolean displaySerializerWarning = true;
 
 
