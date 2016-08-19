@@ -103,6 +103,7 @@ public class Emitter {
         exportKeyword = exportKeyword || forceExportKeyword;
         emitInterfaces(model, exportKeyword);
         emitTypeAliases(model, exportKeyword);
+        emitEnums(model, exportKeyword);
         emitNumberEnums(model, exportKeyword, declareKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
             emitterExtension.emitElements(new EmitterExtension.Writer() {
@@ -176,6 +177,18 @@ public class Emitter {
             writeNewLine();
             emitComments(alias.getComments());
             writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition().format(settings) + ";");
+        }
+    }
+
+    private void emitEnums(TsModel model, boolean exportKeyword) {
+        final ArrayList<TsAliasModel> aliases = new ArrayList<>(model.getTsEnums());
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(aliases);
+        }
+        for (TsAliasModel alias : aliases) {
+            writeNewLine();
+            emitComments(alias.getComments());
+            writeIndentedLine(exportKeyword, "const enum " + alias.getName() + " { " + alias.getDefinition().format(settings) + " }");
         }
     }
 

@@ -34,6 +34,33 @@ public class EnumTest {
     }
 
     @Test
+    public void typescriptEnumTest() {
+        final Settings settings = TestUtils.settings();
+        settings.typescriptEnums = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
+        final String expected =
+            "\n" +
+                "interface AClass {\n" +
+                "    direction: Direction;\n" +
+                "}\n" +
+                "\n" +
+                "const enum Direction { North, East, South, West }\n";
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testSingletypescriptEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.typescriptEnums = true;
+        final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
+        final String expected = (
+            "\n" +
+                "const enum Direction { North, East, South, West }\n"
+        );
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void inlineEnumTest() {
         final Settings settings = TestUtils.settings();
         settings.quotes = "'";

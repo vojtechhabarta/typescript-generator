@@ -10,18 +10,24 @@ public class TsModel {
     private final List<TsBeanModel> beans;
     private final List<TsEnumModel<?>> enums;
     private final List<TsAliasModel> typeAliases;
+    private final List<TsAliasModel> tsEnums;
 
     public TsModel() {
-        this (new ArrayList<TsBeanModel>(), new ArrayList<TsEnumModel<?>>(), new ArrayList<TsAliasModel>());
+        this (new ArrayList<TsBeanModel>(), new ArrayList<TsEnumModel<?>>(), new ArrayList<TsAliasModel>(), new ArrayList<TsAliasModel>());
     }
 
     public TsModel(List<TsBeanModel> beans, List<TsEnumModel<?>> enums, List<TsAliasModel> typeAliases) {
+        this (beans, enums, typeAliases, new ArrayList<TsAliasModel>());
+    }
+
+    public TsModel(List<TsBeanModel> beans, List<TsEnumModel<?>> enums, List<TsAliasModel> typeAliases, List<TsAliasModel> tsEnums) {
         if (beans == null) throw new NullPointerException();
         if (enums == null) throw new NullPointerException();
         if (typeAliases == null) throw new NullPointerException();
         this.beans = beans;
         this.enums = enums;
         this.typeAliases = typeAliases;
+        this.tsEnums = tsEnums;
     }
 
     public List<TsBeanModel> getBeans() {
@@ -29,7 +35,7 @@ public class TsModel {
     }
 
     public TsModel setBeans(List<TsBeanModel> beans) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, tsEnums);
     }
 
     public List<TsEnumModel<?>> getEnums() {
@@ -48,7 +54,7 @@ public class TsModel {
     }
 
     public TsModel setEnums(List<TsEnumModel<?>> enums) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, tsEnums);
     }
 
     public List<TsAliasModel> getTypeAliases() {
@@ -56,7 +62,15 @@ public class TsModel {
     }
 
     public TsModel setTypeAliases(List<TsAliasModel> typeAliases) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, tsEnums);
+    }
+
+    public List<TsAliasModel> getTsEnums() {
+        return tsEnums;
+    }
+
+    public TsModel setTsEnums(List<TsAliasModel> tsEnums) {
+        return new TsModel(beans, enums, typeAliases, tsEnums);
     }
 
 }

@@ -42,6 +42,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
     public boolean experimentalInlineEnums;
+    public boolean typescriptEnums;
     public boolean displaySerializerWarning = true;
 
     @TaskAction
@@ -96,6 +97,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.experimentalInlineEnums = experimentalInlineEnums;
+        settings.typescriptEnums = typescriptEnums;
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.validateFileName(new File(outputFile));
 
