@@ -21,7 +21,7 @@
             <plugin>
                 <groupId>cz.habarta.typescript-generator</groupId>
                 <artifactId>typescript-generator-maven-plugin</artifactId>
-                <version>1.7-SNAPSHOT</version>
+                <version>1.10-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate</id>
@@ -35,6 +35,7 @@
                             </classes>
                             <outputFile>target/sample.d.ts</outputFile>
                             <outputKind>module</outputKind>
+                            <typescriptEnums>true</typescriptEnums>
                         </configuration>
                     </execution>
                 </executions>
