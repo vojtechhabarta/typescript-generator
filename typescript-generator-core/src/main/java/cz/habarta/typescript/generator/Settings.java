@@ -32,6 +32,7 @@ public class Settings {
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
     public DateMapping mapDate = DateMapping.asDate;
+    public EnumMapping mapEnum = EnumMapping.asUnion;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
@@ -40,7 +41,6 @@ public class Settings {
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
-    public boolean experimentalInlineEnums = false;
     public boolean displaySerializerWarning = true;
 
 

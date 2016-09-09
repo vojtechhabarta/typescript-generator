@@ -34,6 +34,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> importDeclarations;
     public List<String> customTypeMappings;
     public DateMapping mapDate;
+    public EnumMapping mapEnum;
     public String customTypeProcessor;
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
@@ -41,7 +42,6 @@ public class GenerateTask extends DefaultTask {
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
-    public boolean experimentalInlineEnums;
     public boolean displaySerializerWarning = true;
 
     @TaskAction
@@ -87,6 +87,7 @@ public class GenerateTask extends DefaultTask {
         settings.importDeclarations = importDeclarations;
         settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
         settings.mapDate = mapDate;
+        settings.mapEnum = mapEnum;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
@@ -95,7 +96,6 @@ public class GenerateTask extends DefaultTask {
         settings.loadExtensions(classLoader, extensionClasses);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
-        settings.experimentalInlineEnums = experimentalInlineEnums;
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.validateFileName(new File(outputFile));
 

@@ -179,11 +179,22 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies how {@link java.util.Date} will be mapped.
-     * Supported values are 'asDate', 'asNumber, 'asString'.
+     * Supported values are 'asDate', 'asNumber', 'asString'.
      * Default value is 'asDate'.
      */
     @Parameter
     private DateMapping mapDate;
+
+    /**
+     * Specifies how enums will be mapped.
+     * Supported values are 'asUnion', 'asInlineUnion', 'asNumberBasedEnum'.
+     * Default value is 'asUnion'.
+     * Value 'asUnion' creates type alias to union of string enum values.
+     * Value 'asInlineUnion' creates union of enum values on places where the enum is used.
+     * Value 'asNumberBasedEnum' creates enum of named number values.
+     */
+    @Parameter
+    private EnumMapping mapEnum;
 
     /**
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
@@ -241,13 +252,6 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
-     * Defines enum type on places where the enum is used (inline).
-     * (Without this flag enum type is created once as type alias and is referenced from places where the enum is used.)
-     */
-    @Parameter
-    private boolean experimentalInlineEnums;
-
-    /**
      * Display warnings when bean serializer is not found.
      */
     @Parameter(defaultValue = "true")
@@ -288,6 +292,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.importDeclarations = importDeclarations;
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
             settings.mapDate = mapDate;
+            settings.mapEnum = mapEnum;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;
@@ -296,7 +301,6 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadExtensions(classLoader, extensions);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
-            settings.experimentalInlineEnums = experimentalInlineEnums;
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.validateFileName(outputFile);
 

@@ -180,18 +180,23 @@ public class Emitter {
     }
 
     private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        final ArrayList<TsEnumModel<Number>> enums = new ArrayList<>(model.getEnums(EnumKind.NumberBased));
+        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum
+                ? new ArrayList<>(model.getEnums())
+                : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(enums);
         }
-        for (TsEnumModel<Number> enumModel : enums) {
+        for (TsEnumModel<?> enumModel : enums) {
             writeNewLine();
             emitComments(enumModel.getComments());
             writeIndentedLine(exportKeyword, (declareKeyword ? "declare " : "") + "const enum " + enumModel.getName() + " {");
             indent++;
-            for (EnumMemberModel<Number> member : enumModel.getMembers()) {
+            for (EnumMemberModel<?> member : enumModel.getMembers()) {
                 emitComments(member.getComments());
-                writeIndentedLine(member.getPropertyName() + " = " + member.getEnumValue() + ",");
+                final String initializer = enumModel.getKind() == EnumKind.NumberBased
+                        ? " = " + member.getEnumValue()
+                        : "";
+                writeIndentedLine(member.getPropertyName() + initializer + ",");
             }
             indent--;
             writeIndentedLine("}");

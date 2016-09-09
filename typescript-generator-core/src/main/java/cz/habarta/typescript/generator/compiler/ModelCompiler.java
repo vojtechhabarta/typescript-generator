@@ -42,8 +42,10 @@ public class ModelCompiler {
         final SymbolTable symbolTable = new SymbolTable(settings);
         TsModel tsModel = processModel(symbolTable, model);
         tsModel = transformDates(symbolTable, tsModel);
-        tsModel = transformEnums(tsModel);
-        if (settings.experimentalInlineEnums) {
+        if (settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
+            tsModel = transformEnumsToUnions(tsModel);
+        }
+        if (settings.mapEnum == EnumMapping.asInlineUnion) {
             tsModel = inlineEnums(tsModel, symbolTable);
         }
         symbolTable.resolveSymbolNames(settings);
@@ -147,7 +149,7 @@ public class ModelCompiler {
         return model.setTypeAliases(new ArrayList<>(typeAliases));
     }
 
-    private TsModel transformEnums(TsModel tsModel) {
+    private TsModel transformEnumsToUnions(TsModel tsModel) {
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         for (TsEnumModel<String> enumModel : tsModel.getEnums(EnumKind.StringBased)) {
             final List<TsType> values = new ArrayList<>();

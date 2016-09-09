@@ -21,13 +21,14 @@
             <plugin>
                 <groupId>cz.habarta.typescript-generator</groupId>
                 <artifactId>typescript-generator-maven-plugin</artifactId>
-                <version>1.7-SNAPSHOT</version>
+                <version>1.10-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <phase>process-classes</phase>
                         <configuration>
                             <jsonLibrary>jackson2</jsonLibrary>
                             <classes>
