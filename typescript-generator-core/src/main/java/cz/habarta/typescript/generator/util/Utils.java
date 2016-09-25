@@ -1,5 +1,5 @@
 
-package cz.habarta.typescript.generator;
+package cz.habarta.typescript.generator.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

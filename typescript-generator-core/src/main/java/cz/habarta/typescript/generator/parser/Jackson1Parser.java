@@ -92,7 +92,7 @@ public class Jackson1Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        return new BeanModel(sourceClass.type, superclass, interfaces, properties);
+        return new BeanModel(sourceClass.type, superclass, null, null, null, interfaces, properties, null);
     }
 
     private boolean isParentProperty(String property, Class<?> cls) {

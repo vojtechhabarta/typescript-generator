@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.*;
 

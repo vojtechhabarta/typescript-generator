@@ -31,8 +31,9 @@ public class Settings {
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
-    public DateMapping mapDate = DateMapping.asDate;
-    public EnumMapping mapEnum = EnumMapping.asUnion;
+    public DateMapping mapDate; // default is DateMapping.asDate
+    public EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public boolean disableTaggedUnions = false;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;

@@ -20,6 +20,15 @@ public class Model {
         return beans;
     }
 
+    public BeanModel getBean(Class<?> beanClass) {
+        for (BeanModel bean : beans) {
+            if (bean.getOrigin().equals(beanClass)) {
+                return bean;
+            }
+        }
+        return null;
+    }
+
     public List<EnumModel<?>> getEnums() {
         return enums;
     }

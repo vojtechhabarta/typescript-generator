@@ -12,7 +12,7 @@ public class GenericsTypeProcessor implements TypeProcessor {
     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
         if (javaType instanceof TypeVariable) {
             final TypeVariable<?> typeVariable = (TypeVariable) javaType;
-            return new Result(new GenericVariableType(typeVariable.getName()));
+            return new Result(new TsType.GenericVariableType(typeVariable.getName()));
         }
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
@@ -44,33 +44,10 @@ public class GenericsTypeProcessor implements TypeProcessor {
                 discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
             }
             // result
-            final GenericReferenceType type = new GenericReferenceType(rawSymbol, tsTypeArguments);
+            final TsType.GenericReferenceType type = new TsType.GenericReferenceType(rawSymbol, tsTypeArguments);
             return new Result(type, discoveredClasses);
         }
         return null;
-    }
-
-    private static class GenericReferenceType extends TsType.ReferenceType {
-
-        public final List<TsType> typeArguments;
-
-        public GenericReferenceType(Symbol symbol, List<TsType> typeArguments) {
-            super(symbol);
-            this.typeArguments = typeArguments;
-        }
-
-        @Override
-        public String format(Settings settings) {
-            return symbol + "<" + Utils.join(format(typeArguments, settings), ", ") + ">";
-        }
-    }
-    
-    private static class GenericVariableType extends TsType.BasicType {
-
-        public GenericVariableType(String name) {
-            super(name);
-        }
-
     }
 
 }
