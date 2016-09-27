@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.emitter;
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.text.*;
 import java.util.*;

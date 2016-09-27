@@ -35,6 +35,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> customTypeMappings;
     public DateMapping mapDate;
     public EnumMapping mapEnum;
+    public boolean disableTaggedUnions;
     public String customTypeProcessor;
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
@@ -88,6 +89,7 @@ public class GenerateTask extends DefaultTask {
         settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
+        settings.disableTaggedUnions = disableTaggedUnions;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;

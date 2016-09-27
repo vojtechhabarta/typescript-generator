@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.Symbol;
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
 
 
@@ -75,6 +76,29 @@ public abstract class TsType {
         @Override
         public String format(Settings settings) {
             return symbol.toString();
+        }
+
+    }
+
+    public static class GenericReferenceType extends TsType.ReferenceType {
+
+        public final List<TsType> typeArguments;
+
+        public GenericReferenceType(Symbol symbol, List<TsType> typeArguments) {
+            super(symbol);
+            this.typeArguments = typeArguments;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return symbol + "<" + Utils.join(format(typeArguments, settings), ", ") + ">";
+        }
+    }
+    
+    public static class GenericVariableType extends TsType.BasicType {
+
+        public GenericVariableType(String name) {
+            super(name);
         }
 
     }

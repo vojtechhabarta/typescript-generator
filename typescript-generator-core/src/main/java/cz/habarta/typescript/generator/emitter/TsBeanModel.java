@@ -8,22 +8,28 @@ import java.util.*;
 public class TsBeanModel extends TsDeclarationModel {
 
     private final TsType parent;
+    private final List<Class<?>> taggedUnionClasses;
     private final List<TsType> interfaces;
     private final List<TsPropertyModel> properties;
 
-    public TsBeanModel(TsType name, TsType parent, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
-        this(null, name, parent, interfaces, properties, comments);
+    public TsBeanModel(TsType name, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
+        this(null, name, parent, taggedUnionClasses, interfaces, properties, comments);
     }
 
-    public TsBeanModel(Class<?> origin, TsType name, TsType parent, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
+    public TsBeanModel(Class<?> origin, TsType name, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
         super(origin, name, comments);
         this.parent = parent;
+        this.taggedUnionClasses = taggedUnionClasses;
         this.interfaces = interfaces;
         this.properties = properties;
     }
 
     public TsType getParent() {
         return parent;
+    }
+
+    public List<Class<?>> getTaggedUnionClasses() {
+        return taggedUnionClasses;
     }
 
     public List<TsType> getInterfaces() {
@@ -43,8 +49,8 @@ public class TsBeanModel extends TsDeclarationModel {
         return properties;
     }
 
-    public TsBeanModel setProperties(List<TsPropertyModel> properties) {
-        return new TsBeanModel(origin, name, parent, interfaces, properties, comments);
+    public TsBeanModel withProperties(List<TsPropertyModel> properties) {
+        return new TsBeanModel(origin, name, parent, taggedUnionClasses, interfaces, properties, comments);
     }
 
 }

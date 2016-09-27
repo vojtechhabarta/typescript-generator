@@ -197,6 +197,12 @@ public class GenerateMojo extends AbstractMojo {
     private EnumMapping mapEnum;
 
     /**
+     * If true tagged unions will not be generated for Jackson 2 polymorphic types.
+     */
+    @Parameter
+    private boolean disableTaggedUnions;
+
+    /**
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
      * This allows to customize how Java types are mapped to TypeScript.
      * For example it is possible to implement TypeProcessor
@@ -293,6 +299,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
+            settings.disableTaggedUnions = disableTaggedUnions;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;

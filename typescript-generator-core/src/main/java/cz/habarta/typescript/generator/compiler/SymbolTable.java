@@ -2,13 +2,17 @@
 package cz.habarta.typescript.generator.compiler;
 
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.util.Pair;
 import java.util.*;
 
 
+/**
+ * Name table.
+ */
 public class SymbolTable {
 
     private final Settings settings;
-    private final LinkedHashMap<Class<?>, Symbol> symbols = new LinkedHashMap<>();
+    private final LinkedHashMap<Pair<Class<?>, String>, Symbol> symbols = new LinkedHashMap<>();
     private final LinkedHashMap<String, Symbol> syntheticSymbols = new LinkedHashMap<>();
 
     public SymbolTable(Settings settings) {
@@ -16,16 +20,26 @@ public class SymbolTable {
     }
 
     public Symbol getSymbol(Class<?> cls) {
-        if (!symbols.containsKey(cls)) {
-            symbols.put(cls, new Symbol("$" + cls.getName().replace('.', '$') + "$"));
+        return getSymbol(cls, null);
+    }
+
+    public Symbol getSymbol(Class<?> cls, String suffix) {
+        final Pair<Class<?>, String> key = Pair.<Class<?>, String>of(cls, suffix);
+        if (!symbols.containsKey(key)) {
+            final String suffixString = suffix != null ? suffix : "";
+            symbols.put(key, new Symbol("$" + cls.getName().replace('.', '$') + suffixString + "$"));
         }
-        return symbols.get(cls);
+        return symbols.get(key);
+    }
+
+    public Symbol hasSymbol(Class<?> cls, String suffix) {
+        return symbols.get(Pair.<Class<?>, String>of(cls, suffix));
     }
 
     public Class<?> getSymbolClass(Symbol symbol) {
-        for (Map.Entry<Class<?>, Symbol> entry : symbols.entrySet()) {
+        for (Map.Entry<Pair<Class<?>, String>, Symbol> entry : symbols.entrySet()) {
             if (entry.getValue() == symbol) {
-                return entry.getKey();
+                return entry.getKey().getValue1();
             }
         }
         return null;
@@ -38,12 +52,14 @@ public class SymbolTable {
         return syntheticSymbols.get(name);
     }
 
-    public void resolveSymbolNames(Settings settings) {
+    public void resolveSymbolNames() {
         final Map<String, List<Class<?>>> names = new LinkedHashMap<>();
-        for (Map.Entry<Class<?>, Symbol> entry : symbols.entrySet()) {
-            final Class<?> cls = entry.getKey();
+        for (Map.Entry<Pair<Class<?>, String>, Symbol> entry : symbols.entrySet()) {
+            final Class<?> cls = entry.getKey().getValue1();
+            final String suffix = entry.getKey().getValue2();
             final Symbol symbol = entry.getValue();
-            final String name = getMappedName(cls);
+            final String suffixString = suffix != null ? suffix : "";
+            final String name = getMappedName(cls) + suffixString;
             symbol.name = name;
             if (!names.containsKey(name)) {
                 names.put(name, new ArrayList<Class<?>>());

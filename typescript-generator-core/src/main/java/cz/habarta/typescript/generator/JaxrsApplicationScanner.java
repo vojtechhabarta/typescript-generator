@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Utils;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
