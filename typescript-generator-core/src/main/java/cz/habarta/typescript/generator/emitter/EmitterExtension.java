@@ -6,7 +6,7 @@ import cz.habarta.typescript.generator.Settings;
 
 public abstract class EmitterExtension {
 
-    public abstract boolean generatesRuntimeCode();
+    public abstract EmitterExtensionFeatures getFeatures();
 
     public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
     }

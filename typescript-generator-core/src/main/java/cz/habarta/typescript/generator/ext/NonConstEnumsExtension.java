@@ -12,12 +12,13 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class EnumConstantsExtension extends EmitterExtension {
+public class NonConstEnumsExtension extends EmitterExtension {
 
     @Override
     public EmitterExtensionFeatures getFeatures() {
         final EmitterExtensionFeatures features = new EmitterExtensionFeatures();
         features.generatesRuntimeCode = true;
+        features.overridesStringEnums = true;
         return features;
     }
 
@@ -28,9 +29,9 @@ public class EnumConstantsExtension extends EmitterExtension {
         Collections.sort(enums);
         for (TsEnumModel<String> tsEnum : enums) {
             writer.writeIndentedLine("");
-            writer.writeIndentedLine(exportString + "const " + tsEnum.getName() + " = {");
+            writer.writeIndentedLine(exportString + "enum " + tsEnum.getName() + " {");
             for (EnumMemberModel<String> member : tsEnum.getMembers()) {
-                writer.writeIndentedLine(settings.indentString + member.getPropertyName() + ": " + "<" + tsEnum.getName() + ">\"" + member.getEnumValue() + "\",");
+                writer.writeIndentedLine(settings.indentString + member.getPropertyName() + ",");
             }
             writer.writeIndentedLine("}");
         }

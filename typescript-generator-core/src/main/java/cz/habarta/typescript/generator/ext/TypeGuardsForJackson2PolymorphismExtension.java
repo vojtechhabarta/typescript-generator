@@ -9,8 +9,10 @@ import cz.habarta.typescript.generator.emitter.*;
 public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension {
 
     @Override
-    public boolean generatesRuntimeCode() {
-        return true;
+    public EmitterExtensionFeatures getFeatures() {
+        final EmitterExtensionFeatures features = new EmitterExtensionFeatures();
+        features.generatesRuntimeCode = true;
+        return features;
     }
 
     @Override

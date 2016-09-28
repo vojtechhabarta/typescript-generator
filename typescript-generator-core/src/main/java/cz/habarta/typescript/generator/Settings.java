@@ -101,7 +101,7 @@ public class Settings {
         }
         if (outputFileType != TypeScriptFileType.implementationFile) {
             for (EmitterExtension emitterExtension : extensions) {
-                if (emitterExtension.generatesRuntimeCode()) {
+                if (emitterExtension.getFeatures().generatesRuntimeCode) {
                     throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.",
                             emitterExtension.getClass().getSimpleName()));
                 }
@@ -116,6 +116,15 @@ public class Settings {
         if (outputFileType == TypeScriptFileType.implementationFile && (!outputFile.getName().endsWith(".ts") || outputFile.getName().endsWith(".d.ts"))) {
             throw new RuntimeException("Implementation file must have 'ts' extension: " + outputFile);
         }
+    }
+
+    public boolean areDefaultStringEnumsOverriddenByExtension() {
+        for (EmitterExtension extension : extensions) {
+            if (extension.getFeatures().overridesStringEnums) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String seeLink() {
