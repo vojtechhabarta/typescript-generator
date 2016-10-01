@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import java.io.File;
 import org.junit.Test;
@@ -61,8 +62,10 @@ public class ModulesAndNamespacesTest {
     private static class TestFunctionExtention extends EmitterExtension {
 
         @Override
-        public boolean generatesRuntimeCode() {
-            return true;
+        public EmitterExtensionFeatures getFeatures() {
+            final EmitterExtensionFeatures features = new EmitterExtensionFeatures();
+            features.generatesRuntimeCode = true;
+            return features;
         }
 
         @Override

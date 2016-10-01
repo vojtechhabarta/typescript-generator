@@ -46,11 +46,13 @@ public class ModelCompiler {
         tsModel = transformDates(symbolTable, tsModel);
 
         // enums
-        if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
-            tsModel = transformEnumsToUnions(tsModel);
-        }
-        if (settings.mapEnum == EnumMapping.asInlineUnion) {
-            tsModel = inlineEnums(tsModel, symbolTable);
+        if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
+            if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
+                tsModel = transformEnumsToUnions(tsModel);
+            }
+            if (settings.mapEnum == EnumMapping.asInlineUnion) {
+                tsModel = inlineEnums(tsModel, symbolTable);
+            }
         }
 
         // tagged unions
