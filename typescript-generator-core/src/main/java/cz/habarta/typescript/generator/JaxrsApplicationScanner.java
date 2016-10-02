@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import java.lang.annotation.*;
@@ -13,16 +14,17 @@ import javax.ws.rs.core.*;
 
 public class JaxrsApplicationScanner {
 
-    private Set<String> excludes;
+    private Predicate<String> isClassNameExcluded;
+    private Set<String> defaultExcludes;
     private Queue<Class<?>> resourceQueue;
     private List<SourceType<Type>> discoveredTypes;
 
-    public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, List<String> excludedClassNames) {
+    public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, Predicate<String> isClassNameExcluded) {
         try {
             final List<Class<?>> resourceClasses = jaxrsApplicationClassName != null
                     ? scanJaxrsApplicationForJaxrsResources(jaxrsApplicationClassName)
                     : scanClasspathForJaxrsResources();
-            return scanJaxrsApplication(resourceClasses, excludedClassNames);
+            return scanJaxrsApplication(resourceClasses, isClassNameExcluded);
         } catch (ReflectiveOperationException e) {
             final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
             final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
@@ -51,14 +53,11 @@ public class JaxrsApplicationScanner {
         return classes;
     }
 
-    List<SourceType<Type>> scanJaxrsApplication(List<Class<?>> resourceClasses, List<String> excludedClassNames) {
+    List<SourceType<Type>> scanJaxrsApplication(List<Class<?>> resourceClasses, Predicate<String> isClassNameExcluded) {
         resourceQueue = new LinkedList<>();
         discoveredTypes = new ArrayList<>();
-        excludes = new LinkedHashSet<>();
-        excludes.addAll(getDefaultExcludedClassNames());
-        if (excludedClassNames != null) {
-            excludes.addAll(excludedClassNames);
-        }
+        this.isClassNameExcluded = isClassNameExcluded;
+        this.defaultExcludes = new LinkedHashSet<>(getDefaultExcludedClassNames());
         final LinkedHashSet<Class<?>> scannedResources = new LinkedHashSet<>();
         Collections.sort(resourceClasses, new Comparator<Class<?>>() {
             @Override
@@ -128,7 +127,10 @@ public class JaxrsApplicationScanner {
 
     private boolean isExcluded(Type type) {
         final Class<?> cls = Utils.getRawClassOrNull(type);
-        if (cls != null && excludes.contains(cls.getName())) {
+        if (cls != null && isClassNameExcluded != null && isClassNameExcluded.test(cls.getName())) {
+            return true;
+        }
+        if (cls != null && defaultExcludes.contains(cls.getName())) {
             return true;
         }
         for (Class<?> standardEntityClass : getStandardEntityClasses()) {

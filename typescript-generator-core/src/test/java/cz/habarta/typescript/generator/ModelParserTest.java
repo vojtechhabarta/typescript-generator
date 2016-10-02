@@ -61,9 +61,9 @@ public class ModelParserTest {
 
     private Model parseModel(Type type, String... excludedClassNames) {
         final Settings settings = new Settings();
-        settings.excludedClassNames = Arrays.asList(excludedClassNames);
+        settings.setExcludeFilter(Arrays.asList(excludedClassNames), null);
         final ModelParser parser = new Jackson2Parser(settings, new TypeProcessor.Chain(
-                new ExcludingTypeProcessor(settings.excludedClassNames),
+                new ExcludingTypeProcessor(settings.getExcludeFilter()),
                 new DefaultTypeProcessor()
         ));
         final Model model = parser.parseModel(type);

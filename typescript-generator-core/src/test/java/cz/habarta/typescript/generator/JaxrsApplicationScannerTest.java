@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.core.type.*;
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Predicate;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -71,16 +72,20 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testExcludedResource() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), Arrays.asList(TestResource1.class.getName()));
+        final Predicate<String> excludeFilter = Settings.createExcludeFilter(Arrays.asList(
+                TestResource1.class.getName()
+        ), null);
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
         Assert.assertEquals(0, sourceTypes.size());
     }
 
     @Test
     public void testExcludedType() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), Arrays.asList(
+        final Predicate<String> excludeFilter = Settings.createExcludeFilter(Arrays.asList(
                 A.class.getName(),
                 J.class.getName()
-        ));
+        ), null);
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
         Assert.assertTrue(!getTypes(sourceTypes).contains(A.class));
         Assert.assertTrue(getTypes(sourceTypes).contains(J[].class));
     }

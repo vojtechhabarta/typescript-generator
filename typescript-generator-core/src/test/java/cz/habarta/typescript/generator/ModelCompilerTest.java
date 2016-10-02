@@ -29,10 +29,18 @@ public class ModelCompilerTest {
         Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
     }
 
+    @Test
+    public void testExclusionPattern() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.setExcludeFilter(null, Arrays.asList("**Direction"));
+        final Type javaType = A.class.getField("directions").getGenericType();
+        Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
+    }
+
     private static Settings getTestSettings(String... excludedClassNames) {
         final Settings settings = TestUtils.settings();
         settings.mapDate = DateMapping.asString;
-        settings.excludedClassNames = Arrays.asList(excludedClassNames);
+        settings.setExcludeFilter(Arrays.asList(excludedClassNames), null);
         return settings;
     }
 
