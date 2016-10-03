@@ -63,7 +63,7 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
-     * JSON classes to process specified using glob pattern
+     * JSON classes to process specified using glob patterns
      * so it is possible to specify package or class name suffix.
      * Glob patterns support two wildcards:
      * Single "*" wildcard matches any character except for "." and "$".
@@ -93,6 +93,12 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> excludeClasses;
+
+    /**
+     * Excluded classes specified using glob patterns.
+     */
+    @Parameter
+    private List<String> excludeClassPatterns;
 
     /**
      * If this list is not empty then TypeScript will only be generated for
@@ -286,7 +292,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.outputKind = outputKind;
             settings.module = module;
             settings.namespace = namespace;
-            settings.excludedClassNames = excludeClasses;
+            settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
@@ -313,7 +319,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, excludeClasses, classLoader),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
                     Output.to(outputFile)
             );
 

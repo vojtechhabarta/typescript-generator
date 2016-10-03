@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Predicate;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import java.lang.reflect.*;
 import java.util.*;
@@ -58,12 +59,12 @@ public class Input {
         return fromClassNames(classNames);
     }
 
-    private static Input fromJaxrsApplication(String jaxrsApplicationClassName, List<String> excludedClassNames) {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(jaxrsApplicationClassName, excludedClassNames);
+    private static Input fromJaxrsApplication(String jaxrsApplicationClassName, Predicate<String> isClassNameExcluded) {
+        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded);
         return new Input(sourceTypes);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName, boolean automaticJaxrsApplication, List<String> excludedClassNames, ClassLoader classLoader) {
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName, boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, ClassLoader classLoader) {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
@@ -75,10 +76,10 @@ public class Input {
                 types.addAll(fromClassNamePatterns(classNamePatterns).getSourceTypes());
             }
             if (jaxrsApplicationClassName != null) {
-                types.addAll(fromJaxrsApplication(jaxrsApplicationClassName, excludedClassNames).getSourceTypes());
+                types.addAll(fromJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded).getSourceTypes());
             }
             if (automaticJaxrsApplication) {
-                types.addAll(fromJaxrsApplication(null, excludedClassNames).getSourceTypes());
+                types.addAll(fromJaxrsApplication(null, isClassNameExcluded).getSourceTypes());
             }
             if (types.isEmpty()) {
                 final String errorMessage = "No input classes found.";
@@ -92,20 +93,31 @@ public class Input {
     }
 
     static List<String> filterClassNames(List<String> classNames, List<String> globs) {
+        final List<Pattern> regexps = globsToRegexps(globs);
+        final List<String> result = new ArrayList<>();
+        for (String className : classNames) {
+            if (classNameMatches(className, regexps)) {
+                result.add(className);
+            }
+        }
+        return result;
+    }
+
+    static boolean classNameMatches(String className, List<Pattern> regexps) {
+        for (Pattern regexp : regexps) {
+            if (regexp.matcher(className).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static List<Pattern> globsToRegexps(List<String> globs) {
         final List<Pattern> regexps = new ArrayList<>();
         for (String glob : globs) {
             regexps.add(globToRegexp(glob));
         }
-        final List<String> result = new ArrayList<>();
-        for (String className : classNames) {
-            for (Pattern regexp : regexps) {
-                if (regexp.matcher(className).matches()) {
-                    result.add(className);
-                    break;
-                }
-            }
-        }
-        return result;
+        return regexps;
     }
 
     /**

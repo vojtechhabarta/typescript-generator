@@ -22,6 +22,7 @@ public class GenerateTask extends DefaultTask {
     public String classesFromJaxrsApplication;
     public boolean classesFromAutomaticJaxrsApplication;
     public List<String> excludeClasses;
+    public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
     public JsonLibrary jsonLibrary;
     public boolean declarePropertiesAsOptional;
@@ -76,7 +77,7 @@ public class GenerateTask extends DefaultTask {
         settings.outputKind = outputKind;
         settings.module = module;
         settings.namespace = namespace;
-        settings.excludedClassNames = excludeClasses;
+        settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.removeTypeNamePrefix = removeTypeNamePrefix;
@@ -103,7 +104,7 @@ public class GenerateTask extends DefaultTask {
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, excludeClasses, classLoader),
+                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
                 Output.to(getProject().file(outputFile))
         );
     }

@@ -94,7 +94,7 @@ public class GenericsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeProcessor = new GenericsTypeProcessor();
         settings.sortDeclarations = true;
-        settings.excludedClassNames = Arrays.asList(Comparable.class.getName());
+        settings.setExcludeFilter(Arrays.asList(Comparable.class.getName()), null);
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(IA.class), Output.to(stringWriter), true, 0);

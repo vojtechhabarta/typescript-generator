@@ -2,9 +2,11 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.util.Predicate;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -21,7 +23,7 @@ public class Settings {
     public String module = null;
     public String namespace = null;
     public JsonLibrary jsonLibrary = null;
-    public List<String> excludedClassNames = null;
+    private Predicate<String> excludeFilter = null;
     public boolean declarePropertiesAsOptional = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;
@@ -116,6 +118,28 @@ public class Settings {
         if (outputFileType == TypeScriptFileType.implementationFile && (!outputFile.getName().endsWith(".ts") || outputFile.getName().endsWith(".d.ts"))) {
             throw new RuntimeException("Implementation file must have 'ts' extension: " + outputFile);
         }
+    }
+
+    public Predicate<String> getExcludeFilter() {
+        if (excludeFilter == null) {
+            setExcludeFilter(null, null);
+        }
+        return excludeFilter;
+    }
+
+    public void setExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
+        this.excludeFilter = createExcludeFilter(excludedClasses, excludedClassPatterns);
+    }
+
+    public static Predicate<String> createExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
+        final Set<String> names = new LinkedHashSet<>(excludedClasses != null ? excludedClasses : Collections.<String>emptyList());
+        final List<Pattern> patterns = Input.globsToRegexps(excludedClassPatterns != null ? excludedClassPatterns : Collections.<String>emptyList());
+        return new Predicate<String>() {
+            @Override
+            public boolean test(String className) {
+                return names.contains(className) || Input.classNameMatches(className, patterns);
+            }
+        };
     }
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {

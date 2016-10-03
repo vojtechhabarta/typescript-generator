@@ -54,7 +54,7 @@ public class TypeScriptGenerator {
     public TypeProcessor getTypeProcessor() {
         if (typeProcessor == null) {
             final List<TypeProcessor> processors = new ArrayList<>();
-            processors.add(new ExcludingTypeProcessor(settings.excludedClassNames));
+            processors.add(new ExcludingTypeProcessor(settings.getExcludeFilter()));
             if (settings.customTypeProcessor != null) {
                 processors.add(settings.customTypeProcessor);
             }
