@@ -181,7 +181,7 @@ public class Emitter {
     }
 
     private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum
+        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum && !settings.areDefaultStringEnumsOverriddenByExtension()
                 ? new ArrayList<>(model.getEnums())
                 : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
