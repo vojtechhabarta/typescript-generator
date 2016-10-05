@@ -119,7 +119,11 @@ public abstract class TsType {
 
         @Override
         public String format(Settings settings) {
-            return elementType.format(settings) + "[]";
+            // https://github.com/Microsoft/TypeScript/pull/914
+            // TypeScript Specification A.1
+            return elementType instanceof UnionType
+                    ? "(" + elementType.format(settings) + ")" + "[]"
+                    : elementType.format(settings) + "[]";
         }
 
     }
