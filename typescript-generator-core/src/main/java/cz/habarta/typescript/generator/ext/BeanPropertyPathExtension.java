@@ -131,7 +131,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
     }
 
     private static void createBeanFieldConstant(Writer writer, boolean exportKeyword, TsBeanModel bean) {
-        writer.writeIndentedLine(exportKeyword ? "export " : ""
+        writer.writeIndentedLine((exportKeyword ? "export " : "")
             + "const " + getBeanModelClassName(bean) + " = new " + getBeanModelClassName(bean) + "Fields();");
     }
 }
