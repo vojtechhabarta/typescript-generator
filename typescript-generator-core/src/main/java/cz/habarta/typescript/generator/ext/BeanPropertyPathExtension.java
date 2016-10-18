@@ -37,8 +37,11 @@ public class BeanPropertyPathExtension extends EmitterExtension {
     @Override
     public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
         emitFieldsClass(writer, settings);
+
+        Set<TsBeanModel> emittedBeans = new HashSet<>();
         for (TsBeanModel bean : model.getBeans()) {
-            writeBeanFieldSpecs(writer, settings, model, bean);
+            emittedBeans.addAll(
+                writeBeanAndParentsFieldSpecs(writer, settings, model, emittedBeans, bean));
         }
         for (TsBeanModel bean : model.getBeans()) {
             createBeanFieldConstant(writer, bean);
@@ -68,19 +71,34 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         }
     }
 
-    private static void writeBeanFieldSpecs(Writer writer, Settings settings, TsModel model, TsBeanModel bean) {
+    /**
+     * Emits a bean and its parent beans before if needed.
+     * Returns the list of beans that were emitted.
+     */
+    private static Set<TsBeanModel> writeBeanAndParentsFieldSpecs(
+        Writer writer, Settings settings, TsModel model, Set<TsBeanModel> emittedSoFar, TsBeanModel bean) {
+        if (emittedSoFar.contains(bean)) {
+            return new HashSet<>();
+        }
+        final TsBeanModel parentBean = getBeanModelByType(model, bean.getParent());
+        final Set<TsBeanModel> emittedBeans = parentBean != null
+            ? writeBeanAndParentsFieldSpecs(writer, settings, model, emittedSoFar, parentBean)
+            : new HashSet<TsBeanModel>();
+        final String parentClassName = parentBean != null
+            ? getBeanModelClassName(parentBean) + "Fields"
+            : "Fields";
         writer.writeIndentedLine("");
-        writer.writeIndentedLine("class " + getBeanModelClassName(bean) + "Fields extends Fields {");
-        writer.writeIndentedLine(settings.indentString + "constructor(parent?: Fields, name?: string) { super(parent, name); }");
-        TsBeanModel curBean = bean;
-        while (curBean != null) {
-            for (TsPropertyModel property : curBean.getProperties()) {
-                writeBeanProperty(writer, settings, model, curBean, property);
-            }
-            // also add inherited fields if any
-            curBean = getBeanModelByType(model, curBean.getParent());
+        writer.writeIndentedLine(
+            "class " + getBeanModelClassName(bean) + "Fields extends " + parentClassName + " {");
+        writer.writeIndentedLine(
+            settings.indentString + "constructor(parent?: Fields, name?: string) { super(parent, name); }");
+        for (TsPropertyModel property : bean.getProperties()) {
+            writeBeanProperty(writer, settings, model, bean, property);
         }
         writer.writeIndentedLine("}");
+
+        emittedBeans.add(bean);
+        return emittedBeans;
     }
 
     private static TsBeanModel getBeanModelByType(TsModel model, TsType type) {
