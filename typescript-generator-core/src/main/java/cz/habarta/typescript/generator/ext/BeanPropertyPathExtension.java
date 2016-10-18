@@ -44,7 +44,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
                 writeBeanAndParentsFieldSpecs(writer, settings, model, emittedBeans, bean));
         }
         for (TsBeanModel bean : model.getBeans()) {
-            createBeanFieldConstant(writer, bean);
+            createBeanFieldConstant(writer, exportKeyword, bean);
         }
     }
 
@@ -130,7 +130,8 @@ public class BeanPropertyPathExtension extends EmitterExtension {
             settings.indentString + property.getName() + " = new " + fieldClassName + "Fields(this, \"" + property.getName() + "\");");
     }
 
-    private static void createBeanFieldConstant(Writer writer, TsBeanModel bean) {
-        writer.writeIndentedLine("export const " + getBeanModelClassName(bean) + " = new " + getBeanModelClassName(bean) + "Fields();");
+    private static void createBeanFieldConstant(Writer writer, boolean exportKeyword, TsBeanModel bean) {
+        writer.writeIndentedLine(exportKeyword ? "export " : ""
+            + "const " + getBeanModelClassName(bean) + " = new " + getBeanModelClassName(bean) + "Fields();");
     }
 }
