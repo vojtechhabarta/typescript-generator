@@ -45,7 +45,7 @@ public class Settings {
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean displaySerializerWarning = true;
-
+    public ClassType classType = null;
 
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
         if (customTypeProcessor != null) {

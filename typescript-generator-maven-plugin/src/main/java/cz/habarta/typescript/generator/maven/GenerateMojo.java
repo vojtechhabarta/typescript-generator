@@ -264,6 +264,14 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
+     * Generate Java type as class if set to 'asClass', or as interface is set to 'asInterface').
+     * Default behaviour (if parameter not set) is to generate types as classes.
+     */
+    @Parameter(required = false)
+    private ClassType classType;
+
+
+    /**
      * Display warnings when bean serializer is not found.
      */
     @Parameter(defaultValue = "true")
@@ -316,6 +324,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.validateFileName(outputFile);
+            settings.classType = classType;
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
