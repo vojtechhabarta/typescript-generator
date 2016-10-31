@@ -155,7 +155,9 @@ public abstract class TsType {
 
         @Override
         public String format(Settings settings) {
-            return Utils.join(format(types, settings), " | ");
+            return types.isEmpty()
+                    ? "never"
+                    : Utils.join(format(types, settings), " | ");
         }
 
     }
