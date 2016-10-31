@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -69,6 +71,39 @@ public class EnumTest {
         assertEquals(expected, output);
     }
 
+    @Test
+    public void testEnumWithJsonPropertyAnnotations() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonPropertyAnnotations.class));
+        final String expected = (
+                "\n" +
+                "type SideWithJsonPropertyAnnotations = 'left-side' | 'right-side';\n"
+                ).replace("'", "\"");
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testEnumWithJsonValueAnnotation() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueAnnotations.class));
+        final String expected = (
+                "\n" +
+                "type SideWithJsonValueAnnotations = 'left-side' | 'right-side';\n"
+                ).replace("'", "\"");
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testEmptyEnum() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EmptyEnum.class));
+        final String expected = (
+                "\n" +
+                "type EmptyEnum = never;\n"
+                ).replace("'", "\"");
+        assertEquals(expected, output);
+    }
+
     private static class AClass {
         public Direction direction;
     }
@@ -78,6 +113,34 @@ public class EnumTest {
         East, 
         South,
         West
+    }
+
+    enum SideWithJsonPropertyAnnotations {
+        @JsonProperty("left-side")
+        Left,
+        @JsonProperty("right-side")
+        Right
+    }
+
+    enum SideWithJsonValueAnnotations {
+        @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
+        Left("left-side"),
+        @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
+        Right("right-side");
+
+        private final String jsonValue;
+
+        private SideWithJsonValueAnnotations(String jsonValue) {
+            this.jsonValue = jsonValue;
+        }
+
+        @JsonValue
+        public Object getJsonValue() {
+            return jsonValue;
+        }
+    }
+
+    enum EmptyEnum {
     }
 
 }

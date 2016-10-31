@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -255,46 +256,79 @@ public class Jackson2Parser extends ModelParser {
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_FLOAT ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_INT);
+
+        final List<EnumMemberModel<String>> stringMembers = new ArrayList<>();
+        final List<EnumMemberModel<Number>> numberMembers = new ArrayList<>();
+        if (sourceClass.type.isEnum()) {
+            final Class<?> enumClass = (Class<?>) sourceClass.type;
+
+            try {
+                Method valueMethod = null;
+                final BeanInfo beanInfo = Introspector.getBeanInfo(enumClass);
+                for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+                    final Method readMethod = propertyDescriptor.getReadMethod();
+                    if (readMethod.isAnnotationPresent(JsonValue.class)) {
+                        valueMethod = readMethod;
+                    }
+                }
+
+                int index = 0;
+                for (Field field : enumClass.getFields()) {
+                    if (field.isEnumConstant()) {
+                        if (isNumberBased) {
+                            final Number value = getNumberEnumValue(field, valueMethod, index++);
+                            numberMembers.add(new EnumMemberModel<>(field.getName(), value, null));
+                        } else {
+                            final String value = getStringEnumValue(field, valueMethod);
+                            stringMembers.add(new EnumMemberModel<>(field.getName(), value, null));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(String.format("Cannot get enum values for '%s' enum", enumClass.getName()));
+                e.printStackTrace(System.out);
+            }
+        }
+
         if (isNumberBased) {
-            return parseNumberEnum(sourceClass);
+            return new EnumModel<>(sourceClass.type, EnumKind.NumberBased, numberMembers, null);
         } else {
-            return super.parseEnum(sourceClass);
+            return new EnumModel<>(sourceClass.type, EnumKind.StringBased, stringMembers, null);
         }
     }
 
-    private EnumModel<Number> parseNumberEnum(SourceType<Class<?>> sourceClass) {
-        final Class<?> enumClass = sourceClass.type;
-        final List<EnumMemberModel<Number>> members = new ArrayList<>();
-
-        try {
-            Method valueMethod = null;
-            final BeanInfo beanInfo = Introspector.getBeanInfo(enumClass);
-            for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
-                final Method readMethod = propertyDescriptor.getReadMethod();
-                if (readMethod.isAnnotationPresent(JsonValue.class)) {
-                    valueMethod = readMethod;
-                }
+    private Number getNumberEnumValue(Field field, Method valueMethod, int index) throws Exception {
+        if (valueMethod != null) {
+            final Object valueObject = invokeJsonValueMethod(field, valueMethod);
+            if (valueObject instanceof Number) {
+                return (Number) valueObject;
             }
-
-            int index = 0;
-            for (Field field : enumClass.getFields()) {
-                if (field.isEnumConstant()) {
-                    final Number value;
-                    if (valueMethod != null) {
-                        final Object constant = field.get(null);
-                        value = (Number) valueMethod.invoke(constant);
-                    } else {
-                        value = index++;
-                    }
-                    members.add(new EnumMemberModel<>(field.getName(), value, null));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(String.format("Cannot get enum values for '%s' enum", enumClass.getName()));
-            e.printStackTrace(System.out);
         }
+        return index;
+    }
 
-        return new EnumModel<>(enumClass, EnumKind.NumberBased, members, null);
+    private String getStringEnumValue(Field field, Method valueMethod) throws Exception {
+        if (valueMethod != null) {
+            final Object valueObject = invokeJsonValueMethod(field, valueMethod);
+            if (valueObject instanceof String) {
+                return (String) valueObject;
+            }
+        }
+        if (field.isAnnotationPresent(JsonProperty.class)) {
+            final JsonProperty jsonProperty = field.getAnnotation(JsonProperty.class);
+            if (!jsonProperty.value().equals(JsonProperty.USE_DEFAULT_NAME)) {
+                return jsonProperty.value();
+            }
+        }
+        return field.getName();
+    }
+
+    private Object invokeJsonValueMethod(Field field, Method valueMethod) throws ReflectiveOperationException {
+        field.setAccessible(true);
+        final Object constant = field.get(null);
+        valueMethod.setAccessible(true);
+        final Object valueObject = valueMethod.invoke(constant);
+        return valueObject;
     }
 
 }
