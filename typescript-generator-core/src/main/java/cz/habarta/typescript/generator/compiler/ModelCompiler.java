@@ -86,12 +86,11 @@ public class ModelCompiler {
     private Map<Type, List<BeanModel>> createChildrenMap(Model model) {
         final Map<Type, List<BeanModel>> children = new LinkedHashMap<>();
         for (BeanModel bean : model.getBeans()) {
-            final Type parent = bean.getParent();
-            if (parent != null) {
-                if (!children.containsKey(parent)) {
-                    children.put(parent, new ArrayList<BeanModel>());
+            for (Type ancestor : bean.getDirectAncestors()) {
+                if (!children.containsKey(ancestor)) {
+                    children.put(ancestor, new ArrayList<BeanModel>());
                 }
-                children.get(parent).add(bean);
+                children.get(ancestor).add(bean);
             }
         }
         return children;

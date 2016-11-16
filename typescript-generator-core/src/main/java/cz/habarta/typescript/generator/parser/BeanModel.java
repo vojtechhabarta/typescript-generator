@@ -2,7 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.*;
 
 
 public class BeanModel extends DeclarationModel {
@@ -42,6 +42,15 @@ public class BeanModel extends DeclarationModel {
 
     public List<Type> getInterfaces() {
         return interfaces;
+    }
+
+    public List<Type> getDirectAncestors() {
+        final List<Type> ancestors = new ArrayList<>();
+        if (parent != null) {
+            ancestors.add(parent);
+        }
+        ancestors.addAll(interfaces);
+        return ancestors;
     }
 
     public List<PropertyModel> getProperties() {

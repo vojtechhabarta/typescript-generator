@@ -88,8 +88,8 @@ public class Jackson2Parser extends ModelParser {
             // this is parent
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             discriminantLiteral = null;
-        } else if (isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
-            // this is child
+        } else if (!sourceClass.type.isInterface() && isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
+            // this is child class
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             discriminantLiteral = getTypeName(sourceClass.type);
         } else {

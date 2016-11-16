@@ -40,7 +40,7 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
         settings.addTypeNamePrefix = "Json";
         settings.extensions.add(new TypeGuardsForJackson2PolymorphismExtension());
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Point.class));
-        Assert.assertTrue(actual.contains("type: string;"));
+        Assert.assertTrue(actual.contains("type: \"cartesian\" | \"polar\";"));
         Assert.assertTrue(actual.contains("function isJsonCartesianPoint(jsonPoint: JsonPoint): jsonPoint is JsonCartesianPoint {"));
     }
 

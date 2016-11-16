@@ -40,6 +40,35 @@ public class TaggedUnionsTest {
         public double radius;
     }
 
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(CSquare2.class),
+        @JsonSubTypes.Type(CRectangle2.class),
+        @JsonSubTypes.Type(CCircle2.class),
+    })
+    private static interface IShape2 {
+    }
+
+    private static interface IQuadrilateral2 extends IShape2 {
+    }
+
+    @JsonTypeName("square")
+    private static class CSquare2 implements IQuadrilateral2 {
+        public double size;
+    }
+
+    @JsonTypeName("rectangle")
+    private static class CRectangle2 implements IQuadrilateral2 {
+        public double width;
+        public double height;
+    }
+
+    @JsonTypeName("circle")
+    private static class CCircle2 implements IShape2 {
+        public double radius;
+    }
+
     @Test
     public void testTaggedUnions() {
         final Settings settings = TestUtils.settings();
@@ -71,6 +100,41 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "type ShapeUnion = Square | Rectangle | Circle;\n" +
+                ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testTaggedUnionsWithInterfaces() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(IShape2.class));
+        final String expected = (
+                "\n" +
+                "interface IShape2 {\n" +
+                "    kind: 'circle' | 'square' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface CSquare2 extends IQuadrilateral2 {\n" +
+                "    kind: 'square';\n" +
+                "    size: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface CRectangle2 extends IQuadrilateral2 {\n" +
+                "    kind: 'rectangle';\n" +
+                "    width: number;\n" +
+                "    height: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface CCircle2 extends IShape2 {\n" +
+                "    kind: 'circle';\n" +
+                "    radius: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface IQuadrilateral2 extends IShape2 {\n" +
+                "}\n" +
+                "\n" +
+                "type IShape2Union = CSquare2 | CRectangle2 | CCircle2;\n" +
                 ""
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
