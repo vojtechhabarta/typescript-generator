@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -88,7 +89,7 @@ public class Jackson2Parser extends ModelParser {
             // this is parent
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             discriminantLiteral = null;
-        } else if (!sourceClass.type.isInterface() && isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
+        } else if (!sourceClass.type.isInterface() && !Modifier.isAbstract(sourceClass.type.getModifiers()) && isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             discriminantLiteral = getTypeName(sourceClass.type);
