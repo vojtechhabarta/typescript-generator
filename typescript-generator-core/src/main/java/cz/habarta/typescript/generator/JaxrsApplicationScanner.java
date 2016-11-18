@@ -128,7 +128,7 @@ public class JaxrsApplicationScanner {
     private boolean isExcluded(Type type) {
         final Class<?> cls = Utils.getRawClassOrNull(type);
         if (cls == null) {
-            return true;
+            return false;
         }
         if (isClassNameExcluded != null && isClassNameExcluded.test(cls.getName())) {
             return true;
