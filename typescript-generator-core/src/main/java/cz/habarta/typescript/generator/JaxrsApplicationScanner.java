@@ -127,12 +127,16 @@ public class JaxrsApplicationScanner {
 
     private boolean isExcluded(Type type) {
         final Class<?> cls = Utils.getRawClassOrNull(type);
-        if (cls != null && isClassNameExcluded != null && isClassNameExcluded.test(cls.getName())) {
+        if (cls == null) {
+            return false;
+        }
+        if (isClassNameExcluded != null && isClassNameExcluded.test(cls.getName())) {
             return true;
         }
-        if (cls != null && defaultExcludes.contains(cls.getName())) {
+        if (defaultExcludes.contains(cls.getName())) {
             return true;
         }
+
         for (Class<?> standardEntityClass : getStandardEntityClasses()) {
             if (standardEntityClass.isAssignableFrom(cls)) {
                 return true;
