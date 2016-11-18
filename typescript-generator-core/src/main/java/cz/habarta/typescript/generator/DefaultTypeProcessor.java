@@ -41,6 +41,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[1]);
                     return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
                 }
+                if (javaClass.getName().equals("java.util.Optional")) {
+                    return context.processType(parameterizedType.getActualTypeArguments()[0]);
+                }
                 // consider it structural
                 return new Result(new TsType.ReferenceType(context.getSymbol(javaClass)), javaClass);
             }

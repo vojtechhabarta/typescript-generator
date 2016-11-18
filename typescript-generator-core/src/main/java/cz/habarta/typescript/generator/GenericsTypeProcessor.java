@@ -11,7 +11,7 @@ public class GenericsTypeProcessor implements TypeProcessor {
     @Override
     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
         if (javaType instanceof TypeVariable) {
-            final TypeVariable<?> typeVariable = (TypeVariable) javaType;
+            final TypeVariable<?> typeVariable = (TypeVariable<?>) javaType;
             return new Result(new TsType.GenericVariableType(typeVariable.getName()));
         }
         if (javaType instanceof Class) {
@@ -31,7 +31,7 @@ public class GenericsTypeProcessor implements TypeProcessor {
     }
 
     private Result processGenericClass(Class<?> rawType, Type[] typeArguments, TypeProcessor.Context context) {
-        if (!Collection.class.isAssignableFrom(rawType) && !Map.class.isAssignableFrom(rawType)) {
+        if (!Collection.class.isAssignableFrom(rawType) && !Map.class.isAssignableFrom(rawType) && !rawType.getName().equals("java.util.Optional")) {
             final List<Class<?>> discoveredClasses = new ArrayList<>();
             // raw type
             final Symbol rawSymbol = context.getSymbol(rawType);
