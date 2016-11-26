@@ -22,7 +22,7 @@ public class SortedTypesTest {
 ""                           + settings.newline +
 "interface A {"              + settings.newline +
 "    x: number;"             + settings.newline +
-"    y: number;"             + settings.newline +
+"    yyy: number;"           + settings.newline +
 "}"                          + settings.newline +
 ""                           + settings.newline +
 "interface B {"              + settings.newline +
@@ -35,7 +35,7 @@ public class SortedTypesTest {
     }
 
     public static class A {
-        public int getY() {
+        public int getYYY() {
             return -1;
         }
         public int getX() {

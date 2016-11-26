@@ -49,34 +49,32 @@ public class Jackson2Parser extends ModelParser {
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                if (!isParentProperty(beanPropertyWriter.getName(), sourceClass.type)) {
-                    Type propertyType = beanPropertyWriter.getGenericPropertyType();
-                    if (propertyType == JsonNode.class) {
-                        propertyType = Object.class;
-                    }
-                    boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
-                    if (!isInAnnotationFilter) {
-                        for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
-                            if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                                isInAnnotationFilter = true;
-                                break;
-                            }
-                        }
-                        if (!isInAnnotationFilter) {
-                            System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
-                            continue;
-                        }
-                    }
-                    boolean optional = false;
-                    for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
+                Type propertyType = beanPropertyWriter.getGenericPropertyType();
+                if (propertyType == JsonNode.class) {
+                    propertyType = Object.class;
+                }
+                boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
+                if (!isInAnnotationFilter) {
+                    for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
                         if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                            optional = true;
+                            isInAnnotationFilter = true;
                             break;
                         }
                     }
-                    final Member originalMember = beanPropertyWriter.getMember().getMember();
-                    properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
+                    if (!isInAnnotationFilter) {
+                        System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
+                        continue;
+                    }
                 }
+                boolean optional = false;
+                for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
+                    if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
+                        optional = true;
+                        break;
+                    }
+                }
+                final Member originalMember = beanPropertyWriter.getMember().getMember();
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
             }
         }
 
@@ -119,27 +117,6 @@ public class Jackson2Parser extends ModelParser {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
-    }
-
-    private boolean isParentProperty(String property, Class<?> cls) {
-        final List<Class<?>> parents = new ArrayList<>();
-        if (cls.getSuperclass() != null && cls.getSuperclass() != Object.class) {
-            parents.add(cls.getSuperclass());
-        }
-        parents.addAll(Arrays.asList(cls.getInterfaces()));
-        for (Class<?> parent : parents) {
-            if (!settings.getExcludeFilter().test(parent.getName())) {
-                final BeanHelper beanHelper = getBeanHelper(parent);
-                if (beanHelper != null) {
-                    for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                        if (beanPropertyWriter.getName().equals(property)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private static boolean isSupported(JsonTypeInfo jsonTypeInfo) {

@@ -44,7 +44,7 @@ public class BeanModel extends DeclarationModel {
         return interfaces;
     }
 
-    public List<Type> getDirectAncestors() {
+    public List<Type> getParentAndInterfaces() {
         final List<Type> ancestors = new ArrayList<>();
         if (parent != null) {
             ancestors.add(parent);

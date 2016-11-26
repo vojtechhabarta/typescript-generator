@@ -26,7 +26,7 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Output file format, can be 'declarationFile' (.d.ts) or 'implementationFile' (.ts).
-     * Setting this parameter to 'implementationFile' allows extensions to generate runnable TypeScript code.
+     * Setting this parameter to 'implementationFile' allows to generate runnable TypeScript code.
      * Default value is 'declarationFile'.
      */
     @Parameter
@@ -203,6 +203,15 @@ public class GenerateMojo extends AbstractMojo {
     private EnumMapping mapEnum;
 
     /**
+     * Specifies whether classes will be mapped to classes or interfaces.
+     * Supported values are 'asInterfaces', 'asClasses'.
+     * Default value is 'asInterfaces'.
+     * Value 'asClasses' can only be used in implementation files (.ts).
+     */
+    @Parameter
+    private ClassMapping mapClasses;
+
+    /**
      * If true tagged unions will not be generated for Jackson 2 polymorphic types.
      */
     @Parameter
@@ -305,6 +314,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
+            settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;

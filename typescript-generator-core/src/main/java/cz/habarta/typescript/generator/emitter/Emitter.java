@@ -102,7 +102,7 @@ public class Emitter {
 
     private void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         exportKeyword = exportKeyword || forceExportKeyword;
-        emitInterfaces(model, exportKeyword);
+        emitBeans(model, exportKeyword);
         emitTypeAliases(model, exportKeyword);
         emitNumberEnums(model, exportKeyword, declareKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
@@ -115,23 +115,18 @@ public class Emitter {
         }
     }
 
-    private void emitInterfaces(TsModel model, boolean exportKeyword) {
-        final List<TsBeanModel> beans = new ArrayList<>(model.getBeans());
-        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
-            Collections.sort(beans);
-        }
-        for (TsBeanModel bean : beans) {
+    private void emitBeans(TsModel model, boolean exportKeyword) {
+        for (TsBeanModel bean : model.getBeans()) {
             writeNewLine();
             emitComments(bean.getComments());
-            final List<TsType> parents = bean.getParentAndInterfaces();
-            final String extendsClause = parents.isEmpty() ? "" : " extends " + Utils.join(parents, ", ");
-            writeIndentedLine(exportKeyword, "interface " + bean.getName() + extendsClause + " {");
+            final String declarationType = bean.isClass() ? "class" : "interface";
+            final List<TsType> extendsList = bean.getExtendsList();
+            final List<TsType> implementsList = bean.getImplementsList();
+            final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
+            final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
+            writeIndentedLine(exportKeyword, declarationType + " " + bean.getName() + extendsClause + implementsClause + " {");
             indent++;
-            final List<TsPropertyModel> properties = bean.getProperties();
-            if (settings.sortDeclarations) {
-                Collections.sort(properties);
-            }
-            for (TsPropertyModel property : properties) {
+            for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
             }
             indent--;
@@ -169,11 +164,7 @@ public class Emitter {
     }
 
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
-        final ArrayList<TsAliasModel> aliases = new ArrayList<>(model.getTypeAliases());
-        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
-            Collections.sort(aliases);
-        }
-        for (TsAliasModel alias : aliases) {
+        for (TsAliasModel alias : model.getTypeAliases()) {
             writeNewLine();
             emitComments(alias.getComments());
             writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition().format(settings) + ";");
@@ -184,9 +175,6 @@ public class Emitter {
         final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum && !settings.areDefaultStringEnumsOverriddenByExtension()
                 ? new ArrayList<>(model.getEnums())
                 : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
-        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
-            Collections.sort(enums);
-        }
         for (TsEnumModel<?> enumModel : enums) {
             writeNewLine();
             emitComments(enumModel.getComments());

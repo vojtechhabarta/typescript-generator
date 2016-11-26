@@ -57,7 +57,7 @@ public class EnumConstantsExtensionTest {
 
     @Test
     public void testSorting() {
-        final Settings settings = new Settings();
+        final Settings settings = TestUtils.settings();
         settings.sortDeclarations = false;
         settings.newline = "\n";
         settings.outputFileType = TypeScriptFileType.implementationFile;

@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -41,6 +42,8 @@ public class ModelCompiler {
     public TsModel javaToTypeScript(Model model) {
         final SymbolTable symbolTable = new SymbolTable(settings);
         TsModel tsModel = processModel(symbolTable, model);
+        tsModel = removeInheritedProperties(symbolTable, tsModel);
+        tsModel = addImplementedProperties(symbolTable, tsModel);
 
         // dates
         tsModel = transformDates(symbolTable, tsModel);
@@ -59,6 +62,7 @@ public class ModelCompiler {
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
         symbolTable.resolveSymbolNames();
+        tsModel = sortDeclarations(symbolTable, tsModel);
         return tsModel;
     }
 
@@ -86,7 +90,7 @@ public class ModelCompiler {
     private Map<Type, List<BeanModel>> createChildrenMap(Model model) {
         final Map<Type, List<BeanModel>> children = new LinkedHashMap<>();
         for (BeanModel bean : model.getBeans()) {
-            for (Type ancestor : bean.getDirectAncestors()) {
+            for (Type ancestor : bean.getParentAndInterfaces()) {
                 if (!children.containsKey(ancestor)) {
                     children.put(ancestor, new ArrayList<BeanModel>());
                 }
@@ -128,7 +132,8 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, null));
         }
 
-        return new TsBeanModel(bean.getOrigin(), beanType, parentType, bean.getTaggedUnionClasses(), interfaces, properties, bean.getComments());
+        final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
+        return new TsBeanModel(bean.getOrigin(), isClass, beanType, parentType, bean.getTaggedUnionClasses(), interfaces, properties, bean.getComments());
     }
 
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
@@ -185,6 +190,76 @@ public class ModelCompiler {
         }
     }
 
+    private TsModel removeInheritedProperties(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsBeanModel> beans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            final Map<String, TsType> inheritedPropertyTypes = getInheritedProperties(symbolTable, tsModel, bean.getParentAndInterfaces());
+            final List<TsPropertyModel> properties = new ArrayList<>();
+            for (TsPropertyModel property : bean.getProperties()) {
+                if (!Objects.equals(property.getTsType(), inheritedPropertyTypes.get(property.getName()))) {
+                    properties.add(property);
+                }
+            }
+            beans.add(bean.withProperties(properties));
+        }
+        return tsModel.setBeans(beans);
+    }
+
+    private TsModel addImplementedProperties(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsBeanModel> beans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            if (bean.isClass()) {
+                final List<TsPropertyModel> resultProperties = new ArrayList<>(bean.getProperties());
+                
+                final Set<String> classPropertyNames = new LinkedHashSet<>();
+                for (TsPropertyModel property : bean.getProperties()) {
+                    classPropertyNames.add(property.getName());
+                }
+                classPropertyNames.addAll(getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent())).keySet());
+                
+                final List<TsPropertyModel> implementedProperties = getImplementedProperties(symbolTable, tsModel, bean.getInterfaces());
+                Collections.reverse(implementedProperties);
+                for (TsPropertyModel implementedProperty : implementedProperties) {
+                    if (!classPropertyNames.contains(implementedProperty.getName())) {
+                        resultProperties.add(0, implementedProperty);
+                        classPropertyNames.add(implementedProperty.getName());
+                    }
+                }
+                
+                beans.add(bean.withProperties(resultProperties));
+            } else {
+                beans.add(bean);
+            }
+        }
+        return tsModel.setBeans(beans);
+    }
+
+    private static Map<String, TsType> getInheritedProperties(SymbolTable symbolTable, TsModel tsModel, List<TsType> parents) {
+        final Map<String, TsType> properties = new LinkedHashMap<>();
+        for (TsType parentType : parents) {
+            final TsBeanModel parent = tsModel.getBean(getOriginClass(symbolTable, parentType));
+            if (parent != null) {
+                properties.putAll(getInheritedProperties(symbolTable, tsModel, parent.getParentAndInterfaces()));
+                for (TsPropertyModel property : parent.getProperties()) {
+                    properties.put(property.getName(), property.getTsType());
+                }
+            }
+        }
+        return properties;
+    }
+
+    private static List<TsPropertyModel> getImplementedProperties(SymbolTable symbolTable, TsModel tsModel, List<TsType> interfaces) {
+        final List<TsPropertyModel> properties = new ArrayList<>();
+        for (TsType aInterface : interfaces) {
+            final TsBeanModel bean = tsModel.getBean(getOriginClass(symbolTable, aInterface));
+            if (bean != null) {
+                properties.addAll(getImplementedProperties(symbolTable, tsModel, bean.getInterfaces()));
+                properties.addAll(bean.getProperties());
+            }
+        }
+        return properties;
+    }
+
     private TsModel transformDates(SymbolTable symbolTable, TsModel tsModel) {
         final TsAliasModel dateAsNumber = new TsAliasModel(new TsType.ReferenceType(symbolTable.getSyntheticSymbol("DateAsNumber")), TsType.Number, null);
         final TsAliasModel dateAsString = new TsAliasModel(new TsType.ReferenceType(symbolTable.getSyntheticSymbol("DateAsString")), TsType.String, null);
@@ -228,15 +303,10 @@ public class ModelCompiler {
             @Override
             public TsType transform(TsType tsType) {
                 if (tsType instanceof TsType.EnumReferenceType) {
-                    final TsType.ReferenceType reference = (TsType.ReferenceType) tsType;
-                    final Class<?> cls = symbolTable.getSymbolClass(reference.symbol);
-                    if (cls != null) {
-                        for (TsAliasModel alias : tsModel.getTypeAliases()) {
-                            if (alias.getOrigin() == cls) {
-                                inlinedAliases.add(alias);
-                                return alias.getDefinition();
-                            }
-                        }
+                    final TsAliasModel alias = tsModel.getTypeAlias(getOriginClass(symbolTable, tsType));
+                    if (alias != null) {
+                        inlinedAliases.add(alias);
+                        return alias.getDefinition();
                     }
                 }
                 return tsType;
@@ -271,20 +341,53 @@ public class ModelCompiler {
         final TsModel model = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
             public TsType transform(TsType tsType) {
-                if (tsType instanceof TsType.ReferenceType) {
-                    final TsType.ReferenceType referenceType = (TsType.ReferenceType) tsType;
-                    if (!(referenceType instanceof TsType.GenericReferenceType)) {
-                        final Class<?> cls = symbolTable.getSymbolClass(referenceType.symbol);
-                        final Symbol unionSymbol = symbolTable.hasSymbol(cls, "Union");
-                        if (unionSymbol != null) {
-                            return new TsType.ReferenceType(unionSymbol);
-                        }
+                final Class<?> cls = getOriginClass(symbolTable, tsType);
+                if (cls != null && !(tsType instanceof TsType.GenericReferenceType)) {
+                    final Symbol unionSymbol = symbolTable.hasSymbol(cls, "Union");
+                    if (unionSymbol != null) {
+                        return new TsType.ReferenceType(unionSymbol);
                     }
                 }
                 return tsType;
             }
         });
         return model.setTypeAliases(new ArrayList<>(typeAliases));
+    }
+
+    private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsBeanModel> beans = tsModel.getBeans();
+        final List<TsAliasModel> aliases = tsModel.getTypeAliases();
+        final List<TsEnumModel<?>> enums = tsModel.getEnums();
+        if (settings.sortDeclarations) {
+            for (TsBeanModel bean : beans) {
+                Collections.sort(bean.getProperties());
+            }
+        }
+        if (settings.sortDeclarations || settings.sortTypeDeclarations) {
+            Collections.sort(beans);
+            Collections.sort(aliases);
+            Collections.sort(enums);
+        }
+        final LinkedHashSet<TsBeanModel> orderedBeans = new LinkedHashSet<>();
+        for (TsBeanModel bean : beans) {
+            addOrderedClass(symbolTable, tsModel, bean, orderedBeans);
+        }
+        return tsModel
+                    .setBeans(new ArrayList<>(orderedBeans))
+                    .setTypeAliases(aliases)
+                    .setEnums(enums);
+    }
+
+    private static void addOrderedClass(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean, LinkedHashSet<TsBeanModel> orderedBeans) {
+        // for classes first add their parents to ordered list
+        if (bean.isClass() && bean.getParent() != null) {
+            final TsBeanModel parentBean = tsModel.getBean(getOriginClass(symbolTable, bean.getParent()));
+            if (parentBean != null) {
+                addOrderedClass(symbolTable, tsModel, parentBean, orderedBeans);
+            }
+        }
+        // add current bean to the ordered list
+        orderedBeans.add(bean);
     }
 
     private static TsModel transformBeanPropertyTypes(TsModel tsModel, TsType.Transformer transformer) {
@@ -298,6 +401,14 @@ public class ModelCompiler {
             newBeans.add(bean.withProperties(newProperties));
         }
         return tsModel.setBeans(newBeans);
+    }
+
+    private static Class<?> getOriginClass(SymbolTable symbolTable, TsType type) {
+        if (type instanceof TsType.ReferenceType) {
+            final TsType.ReferenceType referenceType = (TsType.ReferenceType) type;
+            return symbolTable.getSymbolClass(referenceType.symbol);
+        }
+        return null;
     }
 
 }

@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.*;
 
 
 public class Utils {
@@ -35,6 +36,10 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static <T> List<T> listFromNullable(T item) {
+        return item != null ? Arrays.asList(item) : Collections.<T>emptyList();
     }
 
 }

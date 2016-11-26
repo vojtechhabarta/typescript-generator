@@ -35,6 +35,7 @@ public class Settings {
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public boolean disableTaggedUnions = false;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
@@ -107,6 +108,9 @@ public class Settings {
                     throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.",
                             emitterExtension.getClass().getSimpleName()));
                 }
+            }
+            if (mapClasses == ClassMapping.asClasses) {
+                throw new RuntimeException("'mapClasses' parameter is set to `asClasses` which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
             }
         }
     }
