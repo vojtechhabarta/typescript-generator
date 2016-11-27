@@ -28,6 +28,17 @@ public class TsModel {
         return beans;
     }
 
+    public TsBeanModel getBean(Class<?> origin) {
+        if (origin != null) {
+            for (TsBeanModel bean : beans) {
+                if (Objects.equals(bean.getOrigin(), origin)) {
+                    return bean;
+                }
+            }
+        }
+        return null;
+    }
+
     public TsModel setBeans(List<TsBeanModel> beans) {
         return new TsModel(beans, enums, typeAliases);
     }
@@ -53,6 +64,17 @@ public class TsModel {
 
     public List<TsAliasModel> getTypeAliases() {
         return typeAliases;
+    }
+
+    public TsAliasModel getTypeAlias(Class<?> origin) {
+        if (origin != null) {
+            for (TsAliasModel alias : typeAliases) {
+                if (Objects.equals(alias.getOrigin(), origin)) {
+                    return alias;
+                }
+            }
+        }
+        return null;
     }
 
     public TsModel setTypeAliases(List<TsAliasModel> typeAliases) {
