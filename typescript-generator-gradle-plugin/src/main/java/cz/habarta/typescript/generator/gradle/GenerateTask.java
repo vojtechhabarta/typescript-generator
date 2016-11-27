@@ -45,6 +45,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
     public boolean displaySerializerWarning = true;
+    public ClassType classType;
 
     @TaskAction
     public void generate() throws Exception {
@@ -101,6 +102,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.validateFileName(new File(outputFile));
+        settings.classType = classType;
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(

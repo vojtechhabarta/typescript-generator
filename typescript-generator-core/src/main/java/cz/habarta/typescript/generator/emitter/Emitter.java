@@ -125,7 +125,7 @@ public class Emitter {
             emitComments(bean.getComments());
             final List<TsType> parents = bean.getParentAndInterfaces();
             final String extendsClause = parents.isEmpty() ? "" : " extends " + Utils.join(parents, ", ");
-            writeIndentedLine(exportKeyword, "interface " + bean.getName() + extendsClause + " {");
+            writeIndentedLine(exportKeyword, (settings.classType != null ? settings.classType.getKeyword() : "interface") + " " + bean.getName() + extendsClause + " {");
             indent++;
             final List<TsPropertyModel> properties = bean.getProperties();
             if (settings.sortDeclarations) {
