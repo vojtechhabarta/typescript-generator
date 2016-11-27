@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2016-11-27
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.13.245
+                  <li id="projectVersion">Version: 1.13.246
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.13.245:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.13.246:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -455,6 +455,20 @@ Wiki page
           
 <tr class="b">
             
+<td><b><a href="#mapClasses">mapClasses</a></b></td>
+            
+<td><tt>ClassMapping</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>Specifies whether classes will be mapped to classes or interfaces.
+Supported values are 'asInterfaces', 'asClasses'. Default value is
+'asInterfaces'. Value 'asClasses' can only be used in
+implementation files (.ts).<br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td><b><a href="#mapDate">mapDate</a></b></td>
             
 <td><tt>DateMapping</tt></td>
@@ -465,7 +479,7 @@ Wiki page
 are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#mapEnum">mapEnum</a></b></td>
             
@@ -481,7 +495,7 @@ the enum is used. Value 'asNumberBasedEnum' creates enum of named
 number values.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#module">module</a></b></td>
             
@@ -493,7 +507,7 @@ number values.<br /></td>
 'ambientModule'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#namespace">namespace</a></b></td>
             
@@ -505,7 +519,7 @@ number values.<br /></td>
 modules. Default is no namespace.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#noFileComment">noFileComment</a></b></td>
             
@@ -519,7 +533,7 @@ version. So it might be useful to suppress this comment if the file
 is in source control and is regenerated in build.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#optionalAnnotations">optionalAnnotations</a></b></td>
             
@@ -533,7 +547,7 @@ when generating the corresponding TypeScript interface. Example
 optional annotation: @javax.annotation.Nullable<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
@@ -543,11 +557,11 @@ optional annotation: @javax.annotation.Nullable<br /></td>
             
 <td>Output file format, can be 'declarationFile' (.d.ts) or
 'implementationFile' (.ts). Setting this parameter to
-'implementationFile' allows extensions to generate runnable
-TypeScript code. Default value is 'declarationFile'.<br /></td>
+'implementationFile' allows to generate runnable TypeScript code.
+Default value is 'declarationFile'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#referencedFiles">referencedFiles</a></b></td>
             
@@ -560,7 +574,7 @@ directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
 with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -573,7 +587,7 @@ enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -586,7 +600,7 @@ enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -598,7 +612,7 @@ will be &quot;Data&quot;.<br /></td>
 sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -845,6 +859,19 @@ package). Required parameter, recommended value is 'jackson2'.</div>
           
 <li><b>Required</b>: <tt>Yes</tt></li>
         </ul><hr />
+<p><b><a name="mapClasses">mapClasses</a>:</b></p>
+        
+<div>Specifies whether classes will be mapped to classes or interfaces.
+Supported values are 'asInterfaces', 'asClasses'. Default value is
+'asInterfaces'. Value 'asClasses' can only be used in
+implementation files (.ts).</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>cz.habarta.typescript.generator.ClassMapping</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
 <p><b><a name="mapDate">mapDate</a>:</b></p>
         
 <div>Specifies how <tt>Date</tt> will be mapped. Supported values
@@ -933,8 +960,8 @@ optional annotation: @javax.annotation.Nullable</div>
         
 <div>Output file format, can be 'declarationFile' (.d.ts) or
 'implementationFile' (.ts). Setting this parameter to
-'implementationFile' allows extensions to generate runnable
-TypeScript code. Default value is 'declarationFile'.</div>
+'implementationFile' allows to generate runnable TypeScript code.
+Default value is 'declarationFile'.</div>
         
 <ul>
           
