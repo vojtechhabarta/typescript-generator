@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.core.type.*;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -40,16 +41,15 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testWithParsingWithExplicitApplication() {
-        testWithParsing(TestApplication.class.getName());
+        testWithParsing(JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class.getName(), null));
     }
 
     @Test
     public void testWithParsingWithDefaultApplication() {
-        testWithParsing(null);
+        testWithParsing(JaxrsApplicationScanner.scanJaxrsApplication(new FastClasspathScanner().scan(), null));
     }
 
-    private void testWithParsing(String applicationClass) {
-        final List<SourceType<Type>> types = new JaxrsApplicationScanner().scanJaxrsApplication(applicationClass, null);
+    private void testWithParsing(List<SourceType<Type>> types) {
         final Model model = new TypeScriptGenerator(TestUtils.settings()).getModelParser().parseModel(types);
         final ArrayList<Class<?>> classes = new ArrayList<>();
         for (BeanModel beanModel : model.getBeans()) {

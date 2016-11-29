@@ -30,6 +30,60 @@ public class Input {
         return new Input(sourceTypes);
     }
 
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName, boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, ClassLoader classLoader) {
+        final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            final List<SourceType<Type>> types = new ArrayList<>();
+            if (classNames != null) {
+                types.addAll(fromClassNames(classNames).getSourceTypes());
+            }
+            if (classNamePatterns != null) {
+                types.addAll(fromClassNamePatterns(scanClasspath(), classNamePatterns).getSourceTypes());
+            }
+            if (jaxrsApplicationClassName != null) {
+                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded));
+            }
+            if (automaticJaxrsApplication) {
+                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(scanClasspath(), isClassNameExcluded));
+            }
+            if (types.isEmpty()) {
+                final String errorMessage = "No input classes found.";
+                System.out.println(errorMessage);
+                throw new RuntimeException(errorMessage);
+            }
+            return new Input(types);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+        }
+    }
+
+    private static FastClasspathScanner scanClasspath() {
+        if (fastClasspathScanner == null) {
+            System.out.println("Scanning classpath");
+            final Date scanStart = new Date();
+            final FastClasspathScanner scanner = new FastClasspathScanner().scan();
+            final int count = scanner.getNamesOfAllClasses().size();
+            final Date scanEnd = new Date();
+            final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
+            System.out.println(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+            fastClasspathScanner = scanner;
+        }
+        return fastClasspathScanner;
+    }
+
+    private static FastClasspathScanner fastClasspathScanner = null;
+
+    private static Input fromClassNamePatterns(FastClasspathScanner scanner, List<String> classNamePatterns) {
+        final List<String> allClassNames = new ArrayList<>();
+        allClassNames.addAll(scanner.getNamesOfAllStandardClasses());
+        allClassNames.addAll(scanner.getNamesOfAllInterfaceClasses());
+        Collections.sort(allClassNames);
+        final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
+        System.out.println(String.format("Found %d classes matching pattern.", classNames.size()));
+        return fromClassNames(classNames);
+    }
+
     private static Input fromClassNames(List<String> classNames) {
         try {
             final List<SourceType<Type>> types = new ArrayList<>();
@@ -44,51 +98,6 @@ public class Input {
             return new Input(types);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static Input fromClassNamePatterns(List<String> classNamePatterns) {
-        System.out.println("Scanning classpath");
-        final FastClasspathScanner scanner = new FastClasspathScanner().scan();
-        final List<String> allClassNames = new ArrayList<>();
-        allClassNames.addAll(scanner.getNamesOfAllStandardClasses());
-        allClassNames.addAll(scanner.getNamesOfAllInterfaceClasses());
-        Collections.sort(allClassNames);
-        final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
-        System.out.println(String.format("Matched: %d, total: %d.", classNames.size(), allClassNames.size()));
-        return fromClassNames(classNames);
-    }
-
-    private static Input fromJaxrsApplication(String jaxrsApplicationClassName, Predicate<String> isClassNameExcluded) {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded);
-        return new Input(sourceTypes);
-    }
-
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName, boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, ClassLoader classLoader) {
-        final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(classLoader);
-            final List<SourceType<Type>> types = new ArrayList<>();
-            if (classNames != null) {
-                types.addAll(fromClassNames(classNames).getSourceTypes());
-            }
-            if (classNamePatterns != null) {
-                types.addAll(fromClassNamePatterns(classNamePatterns).getSourceTypes());
-            }
-            if (jaxrsApplicationClassName != null) {
-                types.addAll(fromJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded).getSourceTypes());
-            }
-            if (automaticJaxrsApplication) {
-                types.addAll(fromJaxrsApplication(null, isClassNameExcluded).getSourceTypes());
-            }
-            if (types.isEmpty()) {
-                final String errorMessage = "No input classes found.";
-                System.out.println(errorMessage);
-                throw new RuntimeException(errorMessage);
-            }
-            return new Input(types);
-        } finally {
-            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
     }
 

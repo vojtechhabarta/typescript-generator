@@ -19,38 +19,39 @@ public class JaxrsApplicationScanner {
     private Queue<Class<?>> resourceQueue;
     private List<SourceType<Type>> discoveredTypes;
 
-    public List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, Predicate<String> isClassNameExcluded) {
+    public static List<SourceType<Type>> scanJaxrsApplication(String jaxrsApplicationClassName, Predicate<String> isClassNameExcluded) {
         try {
-            final List<Class<?>> resourceClasses = jaxrsApplicationClassName != null
-                    ? scanJaxrsApplicationForJaxrsResources(jaxrsApplicationClassName)
-                    : scanClasspathForJaxrsResources();
-            return scanJaxrsApplication(resourceClasses, isClassNameExcluded);
+            System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClassName);
+            final Class<?> jaxrsApplicationClass = Thread.currentThread().getContextClassLoader().loadClass(jaxrsApplicationClassName);
+            final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            final Application application = (Application) constructor.newInstance();
+            final List<Class<?>> resourceClasses = new ArrayList<>(application.getClasses());
+            return new JaxrsApplicationScanner().scanJaxrsApplication(resourceClasses, isClassNameExcluded);
         } catch (ReflectiveOperationException e) {
-            final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
-            final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
-            System.out.println(message);
-            throw new RuntimeException(message, e);
+            throw reportError(e);
         }
     }
 
-    private static List<Class<?>> scanJaxrsApplicationForJaxrsResources(String jaxrsApplicationClassName) throws ReflectiveOperationException {
-        System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClassName);
-        final Class<?> jaxrsApplicationClass = Thread.currentThread().getContextClassLoader().loadClass(jaxrsApplicationClassName);
-        final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        final Application application = (Application) constructor.newInstance();
-        return new ArrayList<>(application.getClasses());
+    public static List<SourceType<Type>> scanJaxrsApplication(FastClasspathScanner scanner, Predicate<String> isClassNameExcluded) {
+        try {
+            final List<String> namesOfResourceClasses = scanner.getNamesOfClassesWithAnnotation(Path.class);
+            final List<Class<?>> resourceClasses = new ArrayList<>();
+            for (String className : namesOfResourceClasses) {
+                resourceClasses.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+            }
+            System.out.println(String.format("Found %d root resources.", resourceClasses.size()));
+            return new JaxrsApplicationScanner().scanJaxrsApplication(resourceClasses, isClassNameExcluded);
+        } catch (ReflectiveOperationException e) {
+            throw reportError(e);
+        }
     }
 
-    private static List<Class<?>> scanClasspathForJaxrsResources() throws ReflectiveOperationException {
-        final FastClasspathScanner scanner = new FastClasspathScanner().scan();
-        final List<String> namesOfResourceClasses = scanner.getNamesOfClassesWithAnnotation(Path.class);
-        final List<Class<?>> classes = new ArrayList<>();
-        for (String className : namesOfResourceClasses) {
-            classes.add(Thread.currentThread().getContextClassLoader().loadClass(className));
-        }
-        System.out.println(String.format("Found: %d root resources.", classes.size()));
-        return classes;
+    private static RuntimeException reportError(ReflectiveOperationException e) {
+        final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
+        final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
+        System.out.println(message);
+        return new RuntimeException(message, e);
     }
 
     List<SourceType<Type>> scanJaxrsApplication(List<Class<?>> resourceClasses, Predicate<String> isClassNameExcluded) {
