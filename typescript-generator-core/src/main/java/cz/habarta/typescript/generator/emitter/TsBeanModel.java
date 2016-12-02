@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
 
@@ -9,14 +10,16 @@ import java.util.*;
 public class TsBeanModel extends TsDeclarationModel {
 
     private final boolean isClass;
+    private final List<TsType.GenericVariableType> typeParameters;
     private final TsType parent;
     private final List<Class<?>> taggedUnionClasses;
     private final List<TsType> interfaces;
     private final List<TsPropertyModel> properties;
 
-    public TsBeanModel(Class<?> origin, boolean isClass, TsType name, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
+    public TsBeanModel(Class<?> origin, boolean isClass, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
         super(origin, name, comments);
         this.isClass = isClass;
+        this.typeParameters = typeParameters;
         this.parent = parent;
         this.taggedUnionClasses = taggedUnionClasses;
         this.interfaces = interfaces;
@@ -25,6 +28,10 @@ public class TsBeanModel extends TsDeclarationModel {
 
     public boolean isClass() {
         return isClass;
+    }
+
+    public List<TsType.GenericVariableType> getTypeParameters() {
+        return typeParameters;
     }
 
     public TsType getParent() {
@@ -65,7 +72,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withProperties(List<TsPropertyModel> properties) {
-        return new TsBeanModel(origin, isClass, name, parent, taggedUnionClasses, interfaces, properties, comments);
+        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, comments);
     }
 
 }

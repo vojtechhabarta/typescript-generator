@@ -26,7 +26,15 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (Map.class.isAssignableFrom(javaClass)) {
                 return new Result(new TsType.IndexedArrayType(TsType.String, TsType.Any));
             }
-            // consider it structural
+            // generic structural type used without type arguments
+            if (javaClass.getTypeParameters().length > 0) {
+                final List<TsType> tsTypeArguments = new ArrayList<>();
+                for (int i = 0; i < javaClass.getTypeParameters().length; i++) {
+                    tsTypeArguments.add(TsType.Any);
+                }
+                return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments));
+            }
+            // structural type
             return new Result(new TsType.ReferenceType(context.getSymbol(javaClass)), javaClass);
         }
         if (javaType instanceof ParameterizedType) {
@@ -44,9 +52,21 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 if (javaClass.getName().equals("java.util.Optional")) {
                     return context.processType(parameterizedType.getActualTypeArguments()[0]);
                 }
-                // consider it structural
-                return new Result(new TsType.ReferenceType(context.getSymbol(javaClass)), javaClass);
+                // generic structural type
+                final List<Class<?>> discoveredClasses = new ArrayList<>();
+                discoveredClasses.add(javaClass);
+                final List<TsType> tsTypeArguments = new ArrayList<>();
+                for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
+                    final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
+                    tsTypeArguments.add(typeArgumentResult.getTsType());
+                    discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
+                }
+                return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments), discoveredClasses);
             }
+        }
+        if (javaType instanceof TypeVariable) {
+            final TypeVariable<?> typeVariable = (TypeVariable<?>) javaType;
+            return new Result(new TsType.GenericVariableType(typeVariable.getName()));
         }
         if (javaType instanceof WildcardType) {
             final WildcardType wildcardType = (WildcardType) javaType;

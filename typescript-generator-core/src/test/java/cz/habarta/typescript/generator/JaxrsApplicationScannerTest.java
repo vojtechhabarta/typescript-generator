@@ -21,7 +21,7 @@ public class JaxrsApplicationScannerTest<T> {
 
     @Test
     public void testReturnedTypes() {
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), null);
+        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class.getName(), null);
         List<Type> types = getTypes(sourceTypes);
         final List<Type> expectedTypes = Arrays.asList(
                 A.class,
@@ -75,7 +75,7 @@ public class JaxrsApplicationScannerTest<T> {
         final Predicate<String> excludeFilter = Settings.createExcludeFilter(Arrays.asList(
                 TestResource1.class.getName()
         ), null);
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
+        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
         Assert.assertEquals(0, sourceTypes.size());
     }
 
@@ -85,7 +85,7 @@ public class JaxrsApplicationScannerTest<T> {
                 A.class.getName(),
                 J.class.getName()
         ), null);
-        final List<SourceType<Type>> sourceTypes = new JaxrsApplicationScanner().scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
+        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class.getName(), excludeFilter);
         Assert.assertTrue(!getTypes(sourceTypes).contains(A.class));
         Assert.assertTrue(getTypes(sourceTypes).contains(J[].class));
     }

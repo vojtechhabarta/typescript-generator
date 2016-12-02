@@ -1,17 +1,13 @@
 package cz.habarta.typescript.generator.ext;
 
-import java.util.*;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
-import cz.habarta.typescript.generator.TsType.GenericReferenceType;
-import cz.habarta.typescript.generator.compiler.EnumKind;
-import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
-import cz.habarta.typescript.generator.emitter.TsEnumModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.emitter.TsPropertyModel;
+import java.util.*;
 
 /**
  * Emitter which generates type-safe property path getters.
@@ -110,15 +106,8 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         return null;
     }
 
-    /**
-     * return a class name formatted for rendering in code
-     * as part of another class name (so, for generics, strip
-     * the type arguments)
-     */
     private static String getBeanModelClassName(TsBeanModel bean) {
-        return bean.getName() instanceof GenericReferenceType
-            ? ((GenericReferenceType)bean.getName()).symbol.toString()
-            : bean.getName().toString();
+        return bean.getName().toString();
     }
 
     private static void writeBeanProperty(

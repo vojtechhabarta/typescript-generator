@@ -1,21 +1,21 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.*;
 
 
 public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
 
     protected final Class<?> origin;
-    protected final TsType name;
+    protected final Symbol name;
     protected final List<String> comments;
 
-    public TsDeclarationModel(TsType name, List<String> comments) {
+    public TsDeclarationModel(Symbol name, List<String> comments) {
         this(null, name, comments);
     }
 
-    public TsDeclarationModel(Class<?> origin, TsType name, List<String> comments) {
+    public TsDeclarationModel(Class<?> origin, Symbol name, List<String> comments) {
         this.origin = origin;
         this.name = name;
         this.comments = comments;
@@ -25,7 +25,7 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
         return origin;
     }
 
-    public TsType getName() {
+    public Symbol getName() {
         return name;
     }
 

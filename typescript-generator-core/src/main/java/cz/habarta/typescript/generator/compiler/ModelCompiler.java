@@ -100,8 +100,13 @@ public class ModelCompiler {
         return children;
     }
 
-    private TsBeanModel processBean(SymbolTable symbolTable, Map<Type, List<BeanModel>> children, BeanModel bean) {
-        final TsType beanType = typeFromJava(symbolTable, bean.getOrigin());
+    private <T> TsBeanModel processBean(SymbolTable symbolTable, Map<Type, List<BeanModel>> children, BeanModel bean) {
+        final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
+        final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
+        final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
+        for (TypeVariable<?> typeParameter : bean.getOrigin().getTypeParameters()) {
+            typeParameters.add(new TsType.GenericVariableType(typeParameter.getName()));
+        }
         TsType parentType = typeFromJava(symbolTable, bean.getParent());
         if (parentType != null && parentType.equals(TsType.Any)) {
             parentType = null;
@@ -132,8 +137,7 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, null));
         }
 
-        final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
-        return new TsBeanModel(bean.getOrigin(), isClass, beanType, parentType, bean.getTaggedUnionClasses(), interfaces, properties, bean.getComments());
+        return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, bean.getComments());
     }
 
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
@@ -164,8 +168,8 @@ public class ModelCompiler {
     }
 
     private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {
-        final TsType enumType = typeFromJava(symbolTable, enumModel.getOrigin());
-        return TsEnumModel.fromEnumModel(enumType, enumModel);
+        final Symbol beanIdentifier = symbolTable.getSymbol(enumModel.getOrigin());
+        return TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {
@@ -261,8 +265,8 @@ public class ModelCompiler {
     }
 
     private TsModel transformDates(SymbolTable symbolTable, TsModel tsModel) {
-        final TsAliasModel dateAsNumber = new TsAliasModel(new TsType.ReferenceType(symbolTable.getSyntheticSymbol("DateAsNumber")), TsType.Number, null);
-        final TsAliasModel dateAsString = new TsAliasModel(new TsType.ReferenceType(symbolTable.getSyntheticSymbol("DateAsString")), TsType.String, null);
+        final TsAliasModel dateAsNumber = new TsAliasModel(symbolTable.getSyntheticSymbol("DateAsNumber"), TsType.Number, null);
+        final TsAliasModel dateAsString = new TsAliasModel(symbolTable.getSyntheticSymbol("DateAsString"), TsType.String, null);
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         final TsModel model = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
@@ -270,11 +274,11 @@ public class ModelCompiler {
                 if (type == TsType.Date) {
                     if (settings.mapDate == DateMapping.asNumber) {
                         typeAliases.add(dateAsNumber);
-                        return dateAsNumber.getName();
+                        return new TsType.ReferenceType(dateAsNumber.getName());
                     }
                     if (settings.mapDate == DateMapping.asString) {
                         typeAliases.add(dateAsString);
-                        return dateAsString.getName();
+                        return new TsType.ReferenceType(dateAsString.getName());
                     }
                 }
                 return type;
@@ -325,16 +329,14 @@ public class ModelCompiler {
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         for (TsBeanModel bean : tsModel.getBeans()) {
             if (bean.getTaggedUnionClasses() != null) {
-                if (bean.getName() instanceof TsType.ReferenceType) {
-                    final TsType.ReferenceType unionName = new TsType.ReferenceType(symbolTable.getSymbol(bean.getOrigin(), "Union"));
-                    final List<TsType> unionTypes = new ArrayList<>();
-                    for (Class<?> cls : bean.getTaggedUnionClasses()) {
-                        final TsType type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
-                        unionTypes.add(type);
-                    }
-                    final TsType.UnionType union = new TsType.UnionType(unionTypes);
-                    typeAliases.add(new TsAliasModel(bean.getOrigin(), unionName, union, null));
+                final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
+                final List<TsType> unionTypes = new ArrayList<>();
+                for (Class<?> cls : bean.getTaggedUnionClasses()) {
+                    final TsType type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
+                    unionTypes.add(type);
                 }
+                final TsType.UnionType union = new TsType.UnionType(unionTypes);
+                typeAliases.add(new TsAliasModel(bean.getOrigin(), unionName, union, null));
             }
         }
         // use tagged unions
