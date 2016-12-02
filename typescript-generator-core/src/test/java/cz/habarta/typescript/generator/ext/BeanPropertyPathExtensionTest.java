@@ -1,6 +1,9 @@
 package cz.habarta.typescript.generator.ext;
 
 import java.util.Arrays;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
@@ -20,14 +23,19 @@ public class BeanPropertyPathExtensionTest {
     static class ClassA {
         public String field1;
         public ClassB field2;
+        public ClassC field3;
     }
 
     static class ClassB {
         public int field1;
     }
 
+    static class ClassC extends ClassB {
+        public int field4;
+    }
+
     @Test
-    public void basicTest() {
+    public void basicTest() throws Exception {
         final StringBuilder data = new StringBuilder();
         final EmitterExtension.Writer writer = new EmitterExtension.Writer() {
             @Override
@@ -42,8 +50,9 @@ public class BeanPropertyPathExtensionTest {
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
         new BeanPropertyPathExtension().emitElements(writer, settings, false, tsModel);
         String dataStr = data.toString();
-        Assert.assertEquals(29, dataStr.split("\n").length);
-        Assert.assertTrue(dataStr.contains("class ClassAFields"));
-        Assert.assertTrue(dataStr.contains("class ClassBFields"));
+        final String expected = new String(
+            Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource("ext/expected.ts").toURI())));
+        Assert.assertEquals(expected, dataStr);
     }
 }

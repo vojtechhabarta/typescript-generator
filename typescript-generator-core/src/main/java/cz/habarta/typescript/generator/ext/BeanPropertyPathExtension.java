@@ -141,8 +141,13 @@ public class BeanPropertyPathExtension extends EmitterExtension {
 
     private static TsBeanModel getBeanModelByType(TsModel model, TsType type) {
         TsType originalType = extractOriginalTsType(type);
+        if (!(originalType instanceof TsType.ReferenceType)) {
+            return null;
+        }
+        TsType.ReferenceType originalTypeBean = (TsType.ReferenceType)originalType;
+
         for (TsBeanModel curBean : model.getBeans()) {
-            if (curBean.getName().equals(originalType)) {
+            if (curBean.getName().equals(originalTypeBean.symbol)) {
                 return curBean;
             }
         }
