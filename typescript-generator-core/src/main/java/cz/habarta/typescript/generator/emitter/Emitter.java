@@ -120,11 +120,12 @@ public class Emitter {
             writeNewLine();
             emitComments(bean.getComments());
             final String declarationType = bean.isClass() ? "class" : "interface";
+            final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
             final List<TsType> extendsList = bean.getExtendsList();
             final List<TsType> implementsList = bean.getImplementsList();
             final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
             final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
-            writeIndentedLine(exportKeyword, declarationType + " " + bean.getName() + extendsClause + implementsClause + " {");
+            writeIndentedLine(exportKeyword, declarationType + " " + bean.getName() + typeParameters + extendsClause + implementsClause + " {");
             indent++;
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);

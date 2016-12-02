@@ -26,4 +26,9 @@ public class SourceType<T extends Type> {
         return (SourceType<Class<?>>) this;
     }
 
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
 }

@@ -11,24 +11,6 @@ import static org.junit.Assert.assertEquals;
 public class GenericsTest {
 
     @Test
-    public void testDefaultGenerics() throws Exception {
-        final Settings settings = TestUtils.settings();
-        settings.customTypeProcessor = new DefaultTypeProcessor();
-
-        final StringWriter stringWriter = new StringWriter();
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(stringWriter));
-        final String actual = stringWriter.toString().trim();
-        final String nl = settings.newline;
-        final String expected =
-                "interface A {" + nl +
-                "    x: A;" + nl +
-                "    y: A;" + nl +
-                "    z: A;" + nl +
-                "}";
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void testAdvancedGenerics() throws Exception {
         final Settings settings = TestUtils.settings();
         settings.addTypeNamePrefix = "I";
@@ -56,7 +38,6 @@ public class GenericsTest {
     public void testWildcardGeneric() {
         final Settings settings = TestUtils.settings();
         settings.addTypeNamePrefix = "I";
-        settings.customTypeProcessor = new GenericsTypeProcessor();
 
         final StringWriter stringWriter = new StringWriter();
         new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(C.class), Output.to(stringWriter), true, 0);
@@ -72,7 +53,6 @@ public class GenericsTest {
     @Test
     public void testNonGenericExtends() {
         final Settings settings = TestUtils.settings();
-        settings.customTypeProcessor = new GenericsTypeProcessor();
         settings.sortDeclarations = true;
 
         final StringWriter stringWriter = new StringWriter();
@@ -84,7 +64,10 @@ public class GenericsTest {
                 "    x: T;" + nl +
                 "}" + nl +
                 "" + nl +
-                "export interface E extends D<string> {" + nl +
+                "export interface E extends D<F> {" + nl +
+                "}" + nl +
+                "" + nl +
+                "export interface F {" + nl +
                 "}";
         assertEquals(expected, actual);
     }
@@ -92,7 +75,6 @@ public class GenericsTest {
     @Test
     public void testImplements() {
         final Settings settings = TestUtils.settings();
-        settings.customTypeProcessor = new GenericsTypeProcessor();
         settings.sortDeclarations = true;
         settings.setExcludeFilter(Arrays.asList(Comparable.class.getName()), null);
 
@@ -112,6 +94,25 @@ public class GenericsTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testGenericsWithoutTypeArgument() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Table.class, Page1.class, Page2.class));
+        final String expected =
+                "interface Table<T> {\n" +
+                "    rows: T[];\n" +
+                "}\n" +
+                "\n" +
+                "interface Page1 {\n" +
+                "    stringTable: Table<string>;\n" +
+                "}\n" +
+                "\n" +
+                "interface Page2 {\n" +
+                "    someTable: Table<any>;\n" +
+                "}";
+        assertEquals(expected, output.trim());
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -129,7 +130,10 @@ public class GenericsTest {
         public T x;
     }
 
-    class E extends D<String> {
+    class E extends D<F> {
+    }
+
+    class F {
     }
 
     abstract class IA implements IB<String>, Comparable<IA> {
@@ -139,4 +143,18 @@ public class GenericsTest {
     interface IB<T> {
         public T getX();
     }
+
+    class Table<T> {
+        public List<T> rows;
+    }
+
+    class Page1 {
+        public Table<String> stringTable;
+    }
+
+    class Page2 {
+        @SuppressWarnings("rawtypes")
+        public Table someTable;
+    }
+
 }
