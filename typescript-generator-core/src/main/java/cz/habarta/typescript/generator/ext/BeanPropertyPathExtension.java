@@ -158,6 +158,10 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         TsPropertyModel property) {
         TsBeanModel fieldBeanModel = getBeanModelByType(model, property.getTsType());
         String fieldClassName = fieldBeanModel != null ? getBeanModelClassName(fieldBeanModel) : "";
+        // if a class has a field of its own type, we get stackoverflow exception
+        if (fieldClassName.equals(bean.getName().toString())) {
+            fieldClassName = "";
+        }
         writer.writeIndentedLine(
             settings.indentString + property.getName() + " = new " + fieldClassName + "Fields(this, \"" + property.getName() + "\");");
     }
