@@ -97,9 +97,52 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         return emittedBeans;
     }
 
+    /**
+     * is this type an 'original' TS type, or a contextual information?
+     * null, undefined and optional info are not original types, everything
+     * else is original
+     */
+    private static boolean isOriginalTsType(TsType type) {
+        if (type instanceof TsType.BasicType) {
+            TsType.BasicType basicType = (TsType.BasicType)type;
+            return !(basicType.name.equals("null") || basicType.name.equals("undefined"));
+        }
+        return true;
+    }
+
+    /**
+     * If the type is optional of number|null|undefined, or list of
+     * of integer, we want to be able to recognize it as number
+     * to link the member to another class.
+     * => extract the original type while ignoring the |null|undefined
+     * and optional informations.
+     */
+    private static TsType extractOriginalTsType(TsType type) {
+        if (type instanceof TsType.OptionalType) {
+            return extractOriginalTsType(((TsType.OptionalType)type).type);
+        }
+        if (type instanceof TsType.UnionType) {
+            TsType.UnionType union = (TsType.UnionType)type;
+            List<TsType> originalTypes = new ArrayList<>();
+            for (TsType curType : union.types) {
+                if (isOriginalTsType(curType)) {
+                    originalTypes.add(curType);
+                }
+            }
+            return originalTypes.size() == 1
+                ? extractOriginalTsType(originalTypes.get(0))
+                : type;
+        }
+        if (type instanceof TsType.BasicArrayType) {
+            return extractOriginalTsType(((TsType.BasicArrayType)type).elementType);
+        }
+        return type;
+    }
+
     private static TsBeanModel getBeanModelByType(TsModel model, TsType type) {
+        TsType originalType = extractOriginalTsType(type);
         for (TsBeanModel curBean : model.getBeans()) {
-            if (curBean.getName().equals(type)) {
+            if (curBean.getName().equals(originalType)) {
                 return curBean;
             }
         }
