@@ -1,20 +1,14 @@
 package cz.habarta.typescript.generator.ext;
 
-import java.util.Arrays;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsModel;
-import cz.habarta.typescript.generator.ext.BeanPropertyPathExtension;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
-import java.util.ArrayList;
-import java.util.List;
+import cz.habarta.typescript.generator.util.Utils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,9 +44,7 @@ public class BeanPropertyPathExtensionTest {
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
         new BeanPropertyPathExtension().emitElements(writer, settings, false, tsModel);
         String dataStr = data.toString();
-        final String expected = new String(
-            Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource("ext/expected.ts").toURI())));
-        Assert.assertEquals(expected, dataStr);
+        final String expected = Utils.readString(getClass().getResourceAsStream("/ext/expected.ts"), "\n");
+        Assert.assertEquals(expected.trim(), dataStr.trim());
     }
 }

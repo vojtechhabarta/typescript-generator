@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.util;
 
+import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -40,6 +41,19 @@ public class Utils {
 
     public static <T> List<T> listFromNullable(T item) {
         return item != null ? Arrays.asList(item) : Collections.<T>emptyList();
+    }
+
+    public static String readString(InputStream stream) {
+        final Scanner s = new Scanner(stream, "UTF-8").useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+    public static String readString(InputStream stream, String lineEndings) {
+        return normalizeLineEndings(readString(stream), lineEndings);
+    }
+
+    private static String normalizeLineEndings(String text, String lineEndings) {
+        return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
     }
 
 }
