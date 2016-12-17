@@ -1,5 +1,5 @@
 
-class Fields {
+export class Fields {
     protected $$parent: Fields | undefined;
     protected $$name: string;
     constructor(parent?: Fields, name?: string) {

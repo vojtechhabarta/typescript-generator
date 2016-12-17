@@ -46,7 +46,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
 
     private static void emitFieldsClass(Writer writer, Settings settings) {
         List<String> fieldsClassLines = Arrays.asList(
-            "class Fields {",
+            "export class Fields {",
             "    protected $$parent: Fields | undefined;",
             "    protected $$name: string;",
             "    constructor(parent?: Fields, name?: string) {",
