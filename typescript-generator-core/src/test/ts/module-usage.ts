@@ -1,4 +1,11 @@
 
+/// <reference path="../../../target/test-ts-modules/test-mn1.d.ts" />
+/// <reference path="../../../target/test-ts-modules/test-mn2.d.ts" />
+/// <reference path="../../../target/test-ts-modules/test-mn3a.d.ts" />
+/// <reference path="../../../target/test-ts-modules/test-mn4a.d.ts" />
+/// <reference path="../../../target/test-ts-modules/test-mn5.ts" />
+/// <reference path="../../../target/test-ts-modules/test-mn6.ts" />
+
 // declaration files
 
 var a1: Test1Data;
