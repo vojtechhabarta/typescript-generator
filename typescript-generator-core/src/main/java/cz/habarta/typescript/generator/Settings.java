@@ -48,6 +48,10 @@ public class Settings {
     public boolean displaySerializerWarning = true;
 
 
+    public void setStringQuotes(StringQuotes quotes) {
+        this.quotes = quotes == StringQuotes.singleQuotes ? "'" : "\"";
+    }
+
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
         if (customTypeProcessor != null) {
             this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);

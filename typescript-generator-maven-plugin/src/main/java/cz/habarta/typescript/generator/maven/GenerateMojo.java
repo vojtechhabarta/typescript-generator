@@ -273,6 +273,14 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
+     * Specifies how strings will be quoted.
+     * Supported values are 'doubleQuotes', 'singleQuotes'.
+     * Default value is 'doubleQuotes'.
+     */
+    @Parameter
+    private StringQuotes stringQuotes;
+
+    /**
      * Display warnings when bean serializer is not found.
      */
     @Parameter(defaultValue = "true")
@@ -324,6 +332,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadExtensions(classLoader, extensions);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.validateFileName(outputFile);
 

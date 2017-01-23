@@ -45,6 +45,7 @@ public class GenerateTask extends DefaultTask {
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
+    public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
 
     @TaskAction
@@ -101,6 +102,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadExtensions(classLoader, extensionClasses);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.setStringQuotes(stringQuotes);
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.validateFileName(new File(outputFile));
 
