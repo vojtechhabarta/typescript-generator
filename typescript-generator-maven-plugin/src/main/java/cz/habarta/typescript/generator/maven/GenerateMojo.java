@@ -218,6 +218,12 @@ public class GenerateMojo extends AbstractMojo {
     private boolean disableTaggedUnions;
 
     /**
+     * If true interface for JAX-RS REST application will be generated.
+     */
+    @Parameter
+    private boolean experimentalJaxrsApplicationInterface;
+
+    /**
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
      * This allows to customize how Java types are mapped to TypeScript.
      * For example it is possible to implement TypeProcessor
@@ -316,6 +322,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapEnum = mapEnum;
             settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
+            settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;

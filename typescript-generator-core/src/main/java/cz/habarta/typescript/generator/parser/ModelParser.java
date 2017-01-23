@@ -35,15 +35,24 @@ public abstract class ModelParser {
     }
 
     private Model parseQueue() {
+        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings.getExcludeFilter());
         final Set<Type> parsedTypes = new LinkedHashSet<>();
         final List<BeanModel> beans = new ArrayList<>();
         final List<EnumModel<?>> enums = new ArrayList<>();
-        SourceType<?> sourceType;
+        SourceType<? extends Type> sourceType;
         while ((sourceType = typeQueue.poll()) != null) {
             if (parsedTypes.contains(sourceType.type)) {
                 continue;
             }
             parsedTypes.add(sourceType.type);
+
+            // JAX-RS resource
+            final JaxrsApplicationParser.Result jaxrsResult = jaxrsApplicationParser.tryParse(sourceType);
+            if (jaxrsResult != null) {
+                typeQueue.addAll(jaxrsResult.discoveredTypes);
+                continue;
+            }
+
             final TypeProcessor.Result result = processType(sourceType.type);
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
@@ -63,7 +72,7 @@ public abstract class ModelParser {
                 }
             }
         }
-        return new Model(beans, enums);
+        return new Model(beans, enums, jaxrsApplicationParser.getModel());
     }
 
     protected abstract BeanModel parseBean(SourceType<Class<?>> sourceClass);

@@ -3,21 +3,22 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.Symbol;
-import java.util.List;
+import java.util.*;
 
 
 public class TsAliasModel extends TsDeclarationModel {
     
+    private final List<TsType.GenericVariableType> typeParameters;
     private final TsType definition;
 
-    public TsAliasModel(Symbol name, TsType definition, List<String> comments) {
-        super(name, comments);
+    public TsAliasModel(Class<?> origin, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType definition, List<String> comments) {
+        super(origin, name, comments);
+        this.typeParameters = typeParameters != null ? typeParameters : Collections.<TsType.GenericVariableType>emptyList();
         this.definition = definition;
     }
 
-    public TsAliasModel(Class<?> origin, Symbol name, TsType definition, List<String> comments) {
-        super(origin, name, comments);
-        this.definition = definition;
+    public List<TsType.GenericVariableType> getTypeParameters() {
+        return typeParameters;
     }
 
     public TsType getDefinition() {

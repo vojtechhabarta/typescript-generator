@@ -45,6 +45,11 @@ public class ModelCompiler {
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
 
+        // JAX-RS
+        if (settings.generateJaxrsApplicationInterface) {
+            tsModel = createJaxrsInterface(symbolTable, tsModel, model);
+        }
+
         // dates
         tsModel = transformDates(symbolTable, tsModel);
 
@@ -68,7 +73,7 @@ public class ModelCompiler {
 
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(), Collections.singletonList(new PropertyModel("property", type, false, null, null)), null);
-        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel<?>>emptyList());
+        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel<?>>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
     }
@@ -137,7 +142,7 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, null));
         }
 
-        return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, bean.getComments());
+        return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, bean.getComments());
     }
 
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
@@ -264,9 +269,92 @@ public class ModelCompiler {
         return properties;
     }
 
+    private TsModel createJaxrsInterface(SymbolTable symbolTable, TsModel tsModel, Model model) {
+        final Symbol responseSymbol = symbolTable.getSyntheticSymbol("RestResponse");
+        final TsType.GenericVariableType varR = new TsType.GenericVariableType("R");
+        final TsType.GenericReferenceType responseTypeDefinition = new TsType.GenericReferenceType(symbolTable.getSyntheticSymbol("Promise"), Arrays.<TsType>asList(varR));
+        final TsAliasModel responseTypeAlias = new TsAliasModel(null, responseSymbol, Arrays.asList(varR), responseTypeDefinition, null);
+        tsModel.getTypeAliases().add(responseTypeAlias);
+        final JaxrsApplicationModel jaxrsApplication = model.getJaxrsApplication();
+        if (jaxrsApplication == null || jaxrsApplication.getMethods().isEmpty()) {
+            return tsModel;
+        }
+        final String applicationPath = jaxrsApplication.getApplicationPath();
+        final String pathPrefix = applicationPath != null && !applicationPath.isEmpty() ? applicationPath + "/" : "";
+        final List<TsMethodModel> methods = new ArrayList<>();
+        final Map<String, Long> methodNamesCount = groupingByMethodName(jaxrsApplication.getMethods());
+        for (JaxrsMethodModel method : jaxrsApplication.getMethods()) {
+            final boolean createLongName = methodNamesCount.get(method.getName()) > 1;
+            methods.add(processJaxrsMethod(symbolTable, pathPrefix, responseSymbol, method, createLongName));
+        }
+        final String applicationName = jaxrsApplication.getApplicationName() != null ? jaxrsApplication.getApplicationName() : "RestApplication";
+        final TsBeanModel interfaceModel = new TsBeanModel(null, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, methods, null);
+        tsModel.getBeans().add(interfaceModel);
+        return tsModel;
+    }
+
+    private static Map<String, Long> groupingByMethodName(List<JaxrsMethodModel> methods) {
+//        return methods.stream().collect(Collectors.groupingBy(JaxrsMethodModel::getName, Collectors.counting()));
+        final Map<String, Long> methodNamesCount = new LinkedHashMap<>();
+        for (JaxrsMethodModel method : methods) {
+            final String name = method.getName();
+            final long count = methodNamesCount.containsKey(name) ? methodNamesCount.get(name) : 0;
+            methodNamesCount.put(name, count + 1);
+        }
+        return methodNamesCount;
+    }
+        
+
+    private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName) {
+        final List<String> comments = new ArrayList<>();
+        final String path = pathPrefix + method.getPath();
+        comments.add("HTTP " + method.getHttpMethod() + " /" + path);
+        final List<TsParameterModel> parameters = new ArrayList<>();
+        // path params
+        for (MethodParameterModel parameter : method.getPathParams()) {
+            parameters.add(processParameter(symbolTable, method, parameter));
+        }
+        // query params
+        final List<MethodParameterModel> queryParams = method.getQueryParams();
+        if (queryParams != null && !queryParams.isEmpty()) {
+            final List<TsProperty> properties = new ArrayList<>();
+            for (MethodParameterModel queryParam : queryParams) {
+                final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
+                properties.add(new TsProperty(queryParam.getName(), new TsType.OptionalType(type)));
+            }
+            final TsParameterModel queryParameter = new TsParameterModel("queryParams", new TsType.OptionalType(new TsType.ObjectType(properties)));
+            parameters.add(queryParameter);
+        }
+        // entity param
+        if (method.getEntityParam() != null) {
+            parameters.add(processParameter(symbolTable, method, method.getEntityParam()));
+        }
+        // return type
+        final TsType returnType = typeFromJava(symbolTable, method.getReturnType(), method.getName(), method.getOriginClass());
+        final TsType wrappedReturnType = new TsType.GenericReferenceType(responseSymbol, Arrays.asList(returnType));
+        // method name
+        final String nameSuffix;
+        if (createLongName) {
+            nameSuffix = "$" + method.getHttpMethod() + "$" + path
+                    .replaceAll(JaxrsApplicationParser.PathParamPattern.pattern(), "${" + JaxrsApplicationParser.PathParamNameGroupName + "}")
+                    .replaceAll("/", "_")
+                    .replaceAll("\\W", "");
+        } else {
+            nameSuffix = "";
+        }
+        // method
+        final TsMethodModel tsMethodModel = new TsMethodModel(method.getName() + nameSuffix, wrappedReturnType, parameters, comments);
+        return tsMethodModel;
+    }
+
+    private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {
+        final TsType parameterType = typeFromJava(symbolTable, parameter.getType(), method.getName(), method.getOriginClass());
+        return new TsParameterModel(parameter.getName(), parameterType);
+    }
+
     private TsModel transformDates(SymbolTable symbolTable, TsModel tsModel) {
-        final TsAliasModel dateAsNumber = new TsAliasModel(symbolTable.getSyntheticSymbol("DateAsNumber"), TsType.Number, null);
-        final TsAliasModel dateAsString = new TsAliasModel(symbolTable.getSyntheticSymbol("DateAsString"), TsType.String, null);
+        final TsAliasModel dateAsNumber = new TsAliasModel(null, symbolTable.getSyntheticSymbol("DateAsNumber"), null, TsType.Number, null);
+        final TsAliasModel dateAsString = new TsAliasModel(null, symbolTable.getSyntheticSymbol("DateAsString"), null, TsType.String, null);
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         final TsModel model = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
@@ -296,7 +384,7 @@ public class ModelCompiler {
                 values.add(new TsType.StringLiteralType(member.getEnumValue()));
             }
             final TsType union = new TsType.UnionType(values);
-            typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), union, enumModel.getComments()));
+            typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), null, union, enumModel.getComments()));
         }
         return tsModel.setTypeAliases(new ArrayList<>(typeAliases));
     }
@@ -328,7 +416,7 @@ public class ModelCompiler {
         // create tagged unions
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         for (TsBeanModel bean : tsModel.getBeans()) {
-            if (bean.getTaggedUnionClasses() != null) {
+            if (!bean.getTaggedUnionClasses().isEmpty()) {
                 final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
@@ -336,7 +424,7 @@ public class ModelCompiler {
                     unionTypes.add(type);
                 }
                 final TsType.UnionType union = new TsType.UnionType(unionTypes);
-                typeAliases.add(new TsAliasModel(bean.getOrigin(), unionName, union, null));
+                typeAliases.add(new TsAliasModel(bean.getOrigin(), unionName, null, union, null));
             }
         }
         // use tagged unions
@@ -400,7 +488,17 @@ public class ModelCompiler {
                 final TsType newType = TsType.transformTsType(property.getTsType(), transformer);
                 newProperties.add(property.setTsType(newType));
             }
-            newBeans.add(bean.withProperties(newProperties));
+            final List<TsMethodModel> newMethods = new ArrayList<>();
+            for (TsMethodModel method : bean.getMethods()) {
+                final List<TsParameterModel> newParameters = new ArrayList<>();
+                for (TsParameterModel parameter : method.getParameters()) {
+                    final TsType newParameterType = TsType.transformTsType(parameter.getTsType(), transformer);
+                    newParameters.add(new TsParameterModel(parameter.getName(), newParameterType));
+                }
+                final TsType newReturnType = TsType.transformTsType(method.getReturnType(), transformer);
+                newMethods.add(new TsMethodModel(method.getName(), newReturnType, newParameters, method.getComments()));
+            }
+            newBeans.add(bean.withProperties(newProperties).withMethods(newMethods));
         }
         return tsModel.setBeans(newBeans);
     }

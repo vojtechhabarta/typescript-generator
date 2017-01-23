@@ -38,6 +38,7 @@ public class GenerateTask extends DefaultTask {
     public EnumMapping mapEnum;
     public ClassMapping mapClasses;
     public boolean disableTaggedUnions;
+    public boolean experimentalJaxrsApplicationInterface;
     public String customTypeProcessor;
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
@@ -93,6 +94,7 @@ public class GenerateTask extends DefaultTask {
         settings.mapEnum = mapEnum;
         settings.mapClasses = mapClasses;
         settings.disableTaggedUnions = disableTaggedUnions;
+        settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;

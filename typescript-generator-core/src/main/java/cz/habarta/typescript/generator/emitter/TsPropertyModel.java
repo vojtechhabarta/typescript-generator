@@ -1,46 +1,36 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import cz.habarta.typescript.generator.TsProperty;
 import cz.habarta.typescript.generator.TsType;
 import java.util.List;
 
 
-public class TsPropertyModel implements Comparable<TsPropertyModel> {
+public class TsPropertyModel extends TsProperty implements Comparable<TsProperty> {
 
-    private final String name;
-    private final TsType tsType;
-    private final List<String> comments;
+    public final List<String> comments;
 
     public TsPropertyModel(String name, TsType tsType, List<String> comments) {
-        this.name = name;
-        this.tsType = tsType;
+        super(name, tsType);
         this.comments = comments;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TsType getTsType() {
-        return tsType;
-    }
-
-    public TsPropertyModel setTsType(TsType type) {
-        return new TsPropertyModel(name, type, comments);
     }
 
     public List<String> getComments() {
         return comments;
     }
 
-    @Override
-    public String toString() {
-        return "TsPropertyModel{" + "name=" + name + ", tsType=" + tsType + '}';
+    public TsPropertyModel setTsType(TsType type) {
+        return new TsPropertyModel(getName(), type, getComments());
     }
 
     @Override
-    public int compareTo(TsPropertyModel o) {
+    public int compareTo(TsProperty o) {
         return name.compareTo(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "TsPropertyModel{" + "name=" + name + ", tsType=" + tsType + '}';
     }
 
 }

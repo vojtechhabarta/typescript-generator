@@ -34,4 +34,17 @@ public class TsTypeTest {
         assertEquals("{ [index: string]: string | number }", new IndexedArrayType(String, new UnionType(Arrays.asList(String, Number))).format(settings));
     }
 
+    @Test
+    public void testObjectType() {
+        final Settings settings = TestUtils.settings();
+        assertEquals("{ a: string; b: string | number; c: {}; d: { x: string; }; }", new TsType.ObjectType(Arrays.asList(
+                new TsProperty("a", String),
+                new TsProperty("b", new UnionType(Arrays.asList(String, Number))),
+                new TsProperty("c", new ObjectType(Arrays.<TsProperty>asList())),
+                new TsProperty("d", new ObjectType(Arrays.asList(
+                        new TsProperty("x", String)
+                )))
+        )).format(settings));
+    }
+
 }

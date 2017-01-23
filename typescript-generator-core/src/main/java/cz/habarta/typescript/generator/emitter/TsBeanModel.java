@@ -15,15 +15,17 @@ public class TsBeanModel extends TsDeclarationModel {
     private final List<Class<?>> taggedUnionClasses;
     private final List<TsType> interfaces;
     private final List<TsPropertyModel> properties;
+    private final List<TsMethodModel> methods;
 
-    public TsBeanModel(Class<?> origin, boolean isClass, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<String> comments) {
+    public TsBeanModel(Class<?> origin, boolean isClass, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, List<TsMethodModel> methods, List<String> comments) {
         super(origin, name, comments);
         this.isClass = isClass;
-        this.typeParameters = typeParameters;
+        this.typeParameters = Utils.listFromNullable(typeParameters);
         this.parent = parent;
-        this.taggedUnionClasses = taggedUnionClasses;
-        this.interfaces = interfaces;
-        this.properties = properties;
+        this.taggedUnionClasses = Utils.listFromNullable(taggedUnionClasses);
+        this.interfaces = Utils.listFromNullable(interfaces);
+        this.properties = Utils.listFromNullable(properties);
+        this.methods = Utils.listFromNullable(methods);
     }
 
     public boolean isClass() {
@@ -72,7 +74,15 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withProperties(List<TsPropertyModel> properties) {
-        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, comments);
+        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, methods, comments);
+    }
+
+    public List<TsMethodModel> getMethods() {
+        return methods;
+    }
+
+    public TsBeanModel withMethods(List<TsMethodModel> methods) {
+        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, methods, comments);
     }
 
 }

@@ -42,10 +42,10 @@ public class Input {
                 types.addAll(fromClassNamePatterns(scanClasspath(), classNamePatterns).getSourceTypes());
             }
             if (jaxrsApplicationClassName != null) {
-                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded));
+                types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)).sourceTypes);
             }
             if (automaticJaxrsApplication) {
-                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(scanClasspath(), isClassNameExcluded));
+                types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(scanClasspath(), isClassNameExcluded));
             }
             if (types.isEmpty()) {
                 final String errorMessage = "No input classes found.";
