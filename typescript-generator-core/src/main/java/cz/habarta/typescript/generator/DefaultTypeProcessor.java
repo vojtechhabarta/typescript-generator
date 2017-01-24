@@ -26,6 +26,11 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (Map.class.isAssignableFrom(javaClass)) {
                 return new Result(new TsType.IndexedArrayType(TsType.String, TsType.Any));
             }
+            if (javaClass.getName().equals("java.util.OptionalInt") ||
+                    javaClass.getName().equals("java.util.OptionalLong") ||
+                    javaClass.getName().equals("java.util.OptionalDouble")) {
+                return new Result(TsType.Number);
+            }
             // generic structural type used without type arguments
             if (javaClass.getTypeParameters().length > 0) {
                 final List<TsType> tsTypeArguments = new ArrayList<>();

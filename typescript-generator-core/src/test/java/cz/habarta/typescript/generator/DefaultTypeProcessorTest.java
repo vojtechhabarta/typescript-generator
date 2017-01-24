@@ -2,8 +2,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -18,6 +17,11 @@ public class DefaultTypeProcessorTest {
         assertEquals(TsType.Void, converter.processType(void.class, context).getTsType());
         assertEquals(TsType.Number, converter.processType(BigDecimal.class, context).getTsType());
         assertEquals(TsType.String, converter.processType(UUID.class, context).getTsType());
+
+        // uncomment on Java 8
+//        assertEquals(TsType.Number, converter.processType(OptionalInt.class, context).getTsType());
+//        assertEquals(TsType.Number, converter.processType(OptionalLong.class, context).getTsType());
+//        assertEquals(TsType.Number, converter.processType(OptionalDouble.class, context).getTsType());
     }
 
     @Test
