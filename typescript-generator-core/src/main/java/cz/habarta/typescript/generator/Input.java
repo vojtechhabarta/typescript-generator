@@ -34,18 +34,19 @@ public class Input {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
+            final ClasspathScanner classpathScanner = new ClasspathScanner();
             final List<SourceType<Type>> types = new ArrayList<>();
             if (classNames != null) {
                 types.addAll(fromClassNames(classNames).getSourceTypes());
             }
             if (classNamePatterns != null) {
-                types.addAll(fromClassNamePatterns(scanClasspath(), classNamePatterns).getSourceTypes());
+                types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns).getSourceTypes());
             }
             if (jaxrsApplicationClassName != null) {
                 types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(jaxrsApplicationClassName, isClassNameExcluded));
             }
             if (automaticJaxrsApplication) {
-                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(scanClasspath(), isClassNameExcluded));
+                types.addAll(JaxrsApplicationScanner.scanJaxrsApplication(classpathScanner.scanClasspath(), isClassNameExcluded));
             }
             if (types.isEmpty()) {
                 final String errorMessage = "No input classes found.";
@@ -58,21 +59,25 @@ public class Input {
         }
     }
 
-    private static FastClasspathScanner scanClasspath() {
-        if (fastClasspathScanner == null) {
-            System.out.println("Scanning classpath");
-            final Date scanStart = new Date();
-            final FastClasspathScanner scanner = new FastClasspathScanner().scan();
-            final int count = scanner.getNamesOfAllClasses().size();
-            final Date scanEnd = new Date();
-            final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
-            System.out.println(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
-            fastClasspathScanner = scanner;
-        }
-        return fastClasspathScanner;
-    }
+    private static class ClasspathScanner {
 
-    private static FastClasspathScanner fastClasspathScanner = null;
+        private FastClasspathScanner fastClasspathScanner = null;
+
+        public FastClasspathScanner scanClasspath() {
+            if (fastClasspathScanner == null) {
+                System.out.println("Scanning classpath");
+                final Date scanStart = new Date();
+                final FastClasspathScanner scanner = new FastClasspathScanner().scan();
+                final int count = scanner.getNamesOfAllClasses().size();
+                final Date scanEnd = new Date();
+                final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
+                System.out.println(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+                fastClasspathScanner = scanner;
+            }
+            return fastClasspathScanner;
+        }
+
+    }
 
     private static Input fromClassNamePatterns(FastClasspathScanner scanner, List<String> classNamePatterns) {
         final List<String> allClassNames = new ArrayList<>();
