@@ -32,6 +32,7 @@ public class Emitter {
         emitReferences();
         emitImports();
         emitModule(model);
+        emitUmdNamespace();
         if (closeOutput) {
             close();
         }
@@ -148,7 +149,7 @@ public class Emitter {
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
     // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-names-and-keywords
-    private static boolean isValidIdentifierName(String name) {
+    public static boolean isValidIdentifierName(String name) {
         if (name == null || name.isEmpty()) {
             return false;
         }
@@ -190,6 +191,13 @@ public class Emitter {
             }
             indent--;
             writeIndentedLine("}");
+        }
+    }
+
+    private void emitUmdNamespace() {
+        if (settings.umdNamespace != null) {
+            writeNewLine();
+            writeIndentedLine("export as namespace " + settings.umdNamespace + ";");
         }
     }
 

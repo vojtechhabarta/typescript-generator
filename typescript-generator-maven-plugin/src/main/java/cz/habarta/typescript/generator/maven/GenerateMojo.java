@@ -57,6 +57,13 @@ public class GenerateMojo extends AbstractMojo {
     private String namespace;
 
     /**
+     * Turns proper module into UMD (Universal Module Definition) with specified namespace.
+     * Only applicable to declaration files.
+     */
+    @Parameter
+    private String umdNamespace;
+
+    /**
      * JSON classes to process.
      */
     @Parameter
@@ -309,6 +316,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.outputKind = outputKind;
             settings.module = module;
             settings.namespace = namespace;
+            settings.umdNamespace = umdNamespace;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
