@@ -17,6 +17,7 @@ public class GenerateTask extends DefaultTask {
     public TypeScriptOutputKind outputKind;
     public String module;
     public String namespace;
+    public String umdNamespace;
     public List<String> classes;
     public List<String> classPatterns;
     public String classesFromJaxrsApplication;
@@ -79,6 +80,7 @@ public class GenerateTask extends DefaultTask {
         settings.outputKind = outputKind;
         settings.module = module;
         settings.namespace = namespace;
+        settings.umdNamespace = umdNamespace;
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;

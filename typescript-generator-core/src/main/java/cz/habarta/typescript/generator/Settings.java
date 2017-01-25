@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.util.Predicate;
 import java.io.File;
@@ -22,6 +23,7 @@ public class Settings {
     public TypeScriptOutputKind outputKind = null;
     public String module = null;
     public String namespace = null;
+    public String umdNamespace = null;
     public JsonLibrary jsonLibrary = null;
     private Predicate<String> excludeFilter = null;
     public boolean declarePropertiesAsOptional = false;
@@ -102,6 +104,15 @@ public class Settings {
         }
         if (outputKind == TypeScriptOutputKind.ambientModule && outputFileType == TypeScriptFileType.implementationFile) {
             throw new RuntimeException("Ambient modules are not supported in implementation files. " + seeLink());
+        }
+        if (outputKind != TypeScriptOutputKind.module && umdNamespace != null) {
+            throw new RuntimeException("'umdNamespace' parameter is only applicable to modules. " + seeLink());
+        }
+        if (outputFileType == TypeScriptFileType.implementationFile && umdNamespace != null) {
+            throw new RuntimeException("'umdNamespace' parameter is not applicable to implementation files. " + seeLink());
+        }
+        if (umdNamespace != null && !Emitter.isValidIdentifierName(umdNamespace)) {
+            throw new RuntimeException("Value of 'umdNamespace' parameter is not valid identifier: " + umdNamespace + ". " + seeLink());
         }
         if (jsonLibrary == null) {
             throw new RuntimeException("Required 'jsonLibrary' parameter is not configured.");
