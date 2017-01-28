@@ -12,4 +12,7 @@ public class Person {
     public List<String> tags;
     public Map<String, String> emails;
 
+    @javax.persistence.Transient
+    public String excluded;
+
 }

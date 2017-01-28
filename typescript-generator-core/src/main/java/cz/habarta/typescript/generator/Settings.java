@@ -48,6 +48,8 @@ public class Settings {
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean displaySerializerWarning = true;
+    public boolean disableJackson2ModuleDiscovery = false;
+    public ClassLoader classLoader = null;
 
 
     public void setStringQuotes(StringQuotes quotes) {

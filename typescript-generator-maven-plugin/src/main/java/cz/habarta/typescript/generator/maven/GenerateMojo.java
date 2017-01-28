@@ -293,6 +293,12 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "true")
     private boolean displaySerializerWarning;
 
+    /**
+     * Turns off Jackson2 automatic module discovery.
+     */
+    @Parameter
+    private boolean disableJackson2ModuleDiscovery;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -342,6 +348,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
+            settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+            settings.classLoader = classLoader;
             settings.validateFileName(outputFile);
 
             // TypeScriptGenerator

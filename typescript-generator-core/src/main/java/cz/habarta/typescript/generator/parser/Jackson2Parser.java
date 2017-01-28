@@ -36,6 +36,9 @@ public class Jackson2Parser extends ModelParser {
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
         super(settings, typeProcessor);
+        if (!settings.disableJackson2ModuleDiscovery) {
+            objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
+        }
         if (useJaxbAnnotations) {
             AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
             objectMapper.setAnnotationIntrospector(introspector);

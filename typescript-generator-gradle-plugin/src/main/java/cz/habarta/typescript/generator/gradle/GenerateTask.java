@@ -48,6 +48,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> optionalAnnotations;
     public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
+    public boolean disableJackson2ModuleDiscovery;
 
     @TaskAction
     public void generate() throws Exception {
@@ -106,6 +107,8 @@ public class GenerateTask extends DefaultTask {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.setStringQuotes(stringQuotes);
         settings.displaySerializerWarning = displaySerializerWarning;
+        settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+        settings.classLoader = classLoader;
         settings.validateFileName(new File(outputFile));
 
         // TypeScriptGenerator
