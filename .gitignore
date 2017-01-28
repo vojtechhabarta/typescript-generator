@@ -1,16 +1,24 @@
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+
+# Gradle
 /sample-gradle/.gradle/
 /sample-gradle/.nb-gradle/
 /sample-gradle/build/
+
+# NetBeans
+nbactions.xml
+
+# Eclipse
 **.classpath
 **.project
 **.settings
 
-# JetBrain IntelliJ
+# JetBrains IntelliJ
 .idea/
 **.iml
