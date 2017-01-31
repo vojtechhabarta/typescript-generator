@@ -38,7 +38,7 @@ public class Jackson2Parser extends ModelParser {
         super(settings, typeProcessor);
         if (!settings.disableJackson2ModuleDiscovery) {
             objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
-        }
+            }
         if (useJaxbAnnotations) {
             AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
             objectMapper.setAnnotationIntrospector(introspector);
@@ -52,7 +52,8 @@ public class Jackson2Parser extends ModelParser {
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                Type propertyType = beanPropertyWriter.getGenericPropertyType();
+                final Member propertyMember = beanPropertyWriter.getMember().getMember();
+                Type propertyType = getGenericType(propertyMember);
                 if (propertyType == JsonNode.class) {
                     propertyType = Object.class;
                 }
@@ -120,6 +121,16 @@ public class Jackson2Parser extends ModelParser {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
+    }
+
+    private static Type getGenericType(Member member) {
+        if (member instanceof Method) {
+            return ((Method) member).getGenericReturnType();
+        }
+        if (member instanceof Field) {
+            return ((Field) member).getGenericType();
+        }
+        return null;
     }
 
     private static boolean isSupported(JsonTypeInfo jsonTypeInfo) {
