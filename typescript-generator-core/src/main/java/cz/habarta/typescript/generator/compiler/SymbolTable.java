@@ -8,7 +8,6 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 
 /**
@@ -102,7 +101,7 @@ public class SymbolTable {
             try {
                 final CustomTypeNamingFunction function = getCustomTypeNamingFunction();
                 final Object getNameResult = function.getName(cls.getName(), cls.getSimpleName());
-                if (getNameResult != null && !ScriptObjectMirror.isUndefined(getNameResult)) {
+                if (getNameResult != null && !isUndefined(getNameResult)) {
                     return (String) getNameResult;
                 }
             } catch (ScriptException e) {
@@ -123,6 +122,16 @@ public class SymbolTable {
             name = name + settings.addTypeNameSuffix;
         }
         return name;
+    }
+
+    private static boolean isUndefined(Object variable) {
+        // Java 8
+//        return ScriptObjectMirror.isUndefined(variable);
+
+        // Hack for Java 7, it should match both:
+        // org.mozilla.javascript.Undefined (Java 7)
+        // jdk.nashorn.internal.runtime.Undefined (Java 8)
+        return variable != null && variable.getClass().getSimpleName().equals("Undefined");
     }
 
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
