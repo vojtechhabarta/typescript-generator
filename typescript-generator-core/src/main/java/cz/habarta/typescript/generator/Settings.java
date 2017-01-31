@@ -32,6 +32,7 @@ public class Settings {
     public String addTypeNamePrefix = null;
     public String addTypeNameSuffix = null;
     public Map<String, String> customTypeNaming = new LinkedHashMap<>();
+    public String customTypeNamingFunction = null;
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();

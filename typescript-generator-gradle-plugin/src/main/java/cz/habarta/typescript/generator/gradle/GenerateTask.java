@@ -32,6 +32,7 @@ public class GenerateTask extends DefaultTask {
     public String addTypeNamePrefix;
     public String addTypeNameSuffix;
     public List<String> customTypeNaming;
+    public String customTypeNamingFunction;
     public List<String> referencedFiles;
     public List<String> importDeclarations;
     public List<String> customTypeMappings;
@@ -90,6 +91,7 @@ public class GenerateTask extends DefaultTask {
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
         settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.customTypeNamingFunction = customTypeNamingFunction;
         settings.referencedFiles = referencedFiles;
         settings.importDeclarations = importDeclarations;
         settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
