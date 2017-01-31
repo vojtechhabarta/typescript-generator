@@ -160,12 +160,21 @@ public class GenerateMojo extends AbstractMojo {
     private String addTypeNameSuffix;
 
     /**
-     * Specifies custom TypeScript name for Java classes.
+     * Specifies custom TypeScript names for Java classes.
      * Multiple mappings can be specified, each using this format: "javaClassName:typescriptName".
      * This takes precedence over other naming settings.
      */
     @Parameter
     private List<String> customTypeNaming;
+
+    /**
+     * Specifies JavaScript function for getting custom TypeScript names for Java classes.
+     * Function can return undefined if default name should be used.
+     * Function signature: <code>function getName(className: string, classSimpleName: string): string | null | undefined;</code>
+     * Example function: <code>function(name, simpleName) { if (name.startsWith('cz.')) return 'Test' + simpleName; }</code>
+     */
+    @Parameter
+    private String customTypeNamingFunction;
 
     /**
      * List of files which will be referenced using triple-slash directive: /// &lt;reference path="file" />.
@@ -331,6 +340,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.addTypeNamePrefix = addTypeNamePrefix;
             settings.addTypeNameSuffix = addTypeNameSuffix;
             settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+            settings.customTypeNamingFunction = customTypeNamingFunction;
             settings.referencedFiles = referencedFiles;
             settings.importDeclarations = importDeclarations;
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);

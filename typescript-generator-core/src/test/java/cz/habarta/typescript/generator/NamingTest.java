@@ -38,4 +38,22 @@ public class NamingTest {
         }
     }
 
+    @Test
+    public void testTypeNamingFunction() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeNamingFunction = "function(name, simpleName) { if (name.indexOf('cz.') === 0) return 'Test' + simpleName; }";
+        final SymbolTable symbolTable = new SymbolTable(settings);
+        final String name = symbolTable.getMappedName(A.class);
+        Assert.assertEquals("TestA", name);
+    }
+
+    @Test
+    public void testTypeNamingFunctionReturnsUndefined() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeNamingFunction = "function() {}";
+        final SymbolTable symbolTable = new SymbolTable(settings);
+        final String name = symbolTable.getMappedName(A.class);
+        Assert.assertEquals("A", name);
+    }
+
 }

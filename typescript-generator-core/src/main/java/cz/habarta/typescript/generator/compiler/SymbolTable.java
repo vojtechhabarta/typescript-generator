@@ -4,6 +4,10 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.util.Pair;
 import java.util.*;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 
 /**
@@ -14,6 +18,7 @@ public class SymbolTable {
     private final Settings settings;
     private final LinkedHashMap<Pair<Class<?>, String>, Symbol> symbols = new LinkedHashMap<>();
     private final LinkedHashMap<String, Symbol> syntheticSymbols = new LinkedHashMap<>();
+    private CustomTypeNamingFunction customTypeNamingFunction;
 
     public SymbolTable(Settings settings) {
         this.settings = settings;
@@ -80,17 +85,28 @@ public class SymbolTable {
             }
         }
         if (conflict) {
-            throw new NameConflictException("Multiple classes are mapped to the same name. You can use 'customTypeNaming' setting to resolve conflicts or exclude conflicting class if it was added accidentally.");
+            throw new NameConflictException("Multiple classes are mapped to the same name. You can use 'customTypeNaming' or 'customTypeNamingFunction' settings to resolve conflicts or exclude conflicting class if it was added accidentally.");
         }
     }
 
-    private String getMappedName(Class<?> cls) {
+    public String getMappedName(Class<?> cls) {
         if (cls == null) {
             return null;
         }
         final String customName = settings.customTypeNaming.get(cls.getName());
         if (customName != null) {
             return customName;
+        }
+        if (settings.customTypeNamingFunction != null) {
+            try {
+                final CustomTypeNamingFunction function = getCustomTypeNamingFunction();
+                final Object getNameResult = function.getName(cls.getName(), cls.getSimpleName());
+                if (getNameResult != null && !isUndefined(getNameResult)) {
+                    return (String) getNameResult;
+                }
+            } catch (ScriptException e) {
+                throw new RuntimeException("Evaluating 'customTypeNamingFunction' failed.", e);
+            }
         }
         String name = cls.getSimpleName();
         if (settings.removeTypeNamePrefix != null && name.startsWith(settings.removeTypeNamePrefix)) {
@@ -108,6 +124,30 @@ public class SymbolTable {
         return name;
     }
 
+    private static boolean isUndefined(Object variable) {
+        // Java 8
+//        return ScriptObjectMirror.isUndefined(variable);
+
+        // Hack for Java 7, it should match both:
+        // org.mozilla.javascript.Undefined (Java 7)
+        // jdk.nashorn.internal.runtime.Undefined (Java 8)
+        return variable != null && variable.getClass().getSimpleName().equals("Undefined");
+    }
+
+    private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
+        if (customTypeNamingFunction == null) {
+            final ScriptEngineManager manager = new ScriptEngineManager();
+            final ScriptEngine engine = manager.getEngineByName("javascript");
+            engine.eval("var getName = " + settings.customTypeNamingFunction);
+            final Invocable invocable = (Invocable) engine;
+            customTypeNamingFunction = invocable.getInterface(CustomTypeNamingFunction.class);
+        }
+        return customTypeNamingFunction;
+    }
+
+    public static interface CustomTypeNamingFunction {
+        public Object getName(String className, String classSimpleName);
+    }
 
     public static class NameConflictException extends RuntimeException {
         
