@@ -192,6 +192,29 @@ public abstract class TsType {
 
     }
 
+    public static class ObjectType extends TsType {
+
+        public final List<TsProperty> properties;
+
+        public ObjectType(List<TsProperty> properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            final List<String> props = new ArrayList<>();
+            for (TsProperty property : properties) {
+                props.add(property.format(settings));
+            }
+            if (props.isEmpty()) {
+                return "{}";
+            } else {
+                return "{ " + Utils.join(props, " ") + " }";
+            }
+        }
+
+    }
+
     public static TsType transformTsType(TsType tsType, Transformer transformer) {
         final TsType type = transformer.transform(tsType);
         if (type instanceof TsType.OptionalType) {
@@ -207,6 +230,14 @@ public abstract class TsType {
             return new TsType.IndexedArrayType(
                     transformTsType(indexedArrayType.indexType, transformer),
                     transformTsType(indexedArrayType.elementType, transformer));
+        }
+        if (type instanceof TsType.ObjectType) {
+            final TsType.ObjectType objectType = (TsType.ObjectType) type;
+            final List<TsProperty> properties = new ArrayList<>();
+            for (TsProperty property : objectType.properties) {
+                properties.add(new TsProperty(property.name, transformTsType(property.tsType, transformer)));
+            }
+            return new TsType.ObjectType(properties);
         }
         return type;
     }

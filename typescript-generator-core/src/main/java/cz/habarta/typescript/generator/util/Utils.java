@@ -43,6 +43,10 @@ public class Utils {
         return item != null ? Arrays.asList(item) : Collections.<T>emptyList();
     }
 
+    public static <T> List<T> listFromNullable(List<T> list) {
+        return list != null ? list : Collections.<T>emptyList();
+    }
+
     public static String readString(InputStream stream) {
         final Scanner s = new Scanner(stream, "UTF-8").useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";

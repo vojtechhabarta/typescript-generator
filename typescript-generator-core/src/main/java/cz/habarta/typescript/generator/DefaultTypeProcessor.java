@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.math.*;
 import java.util.*;
@@ -11,6 +13,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
     @Override
     public Result processType(Type javaType, Context context) {
         if (KnownTypes.containsKey(javaType)) return new Result(KnownTypes.get(javaType));
+        // map JAX-RS standard types to `any`
+        for (Class<?> cls : JaxrsApplicationParser.getStandardEntityClasses()) {
+            final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+            if (rawClass != null && cls.isAssignableFrom(rawClass)) {
+                return new Result(TsType.Any);
+            }
+        }
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
             if (javaClass.isArray()) {

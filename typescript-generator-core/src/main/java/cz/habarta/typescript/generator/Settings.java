@@ -40,6 +40,7 @@ public class Settings {
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public boolean disableTaggedUnions = false;
+    public boolean generateJaxrsApplicationInterface = false;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;

@@ -15,7 +15,6 @@ public class Jackson1ParserTest {
         final Model model = jacksonParser.parseModel(bean);
         Assert.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        System.out.println("beanModel: " + beanModel);
         Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
         Assert.assertTrue(beanModel.getProperties().size() > 0);
         Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());

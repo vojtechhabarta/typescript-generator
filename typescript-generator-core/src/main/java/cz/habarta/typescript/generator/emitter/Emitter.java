@@ -49,7 +49,7 @@ public class Emitter {
         if (settings.referencedFiles != null && !settings.referencedFiles.isEmpty()) {
             writeNewLine();
             for (String reference : settings.referencedFiles) {
-                writeIndentedLine("/// <reference path=" + quote(reference) + " />");
+                writeIndentedLine("/// <reference path=" + quote(reference, settings) + " />");
             }
         }
     }
@@ -66,7 +66,7 @@ public class Emitter {
     private void emitModule(TsModel model) {
         if (settings.outputKind == TypeScriptOutputKind.ambientModule) {
             writeNewLine();
-            writeIndentedLine("declare module " + quote(settings.module) + " {");
+            writeIndentedLine("declare module " + quote(settings.module, settings) + " {");
             indent++;
             emitNamespace(model);
             indent--;
@@ -131,6 +131,9 @@ public class Emitter {
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
             }
+            for (TsMethodModel method : bean.getMethods()) {
+                emitMethod(method);
+            }
             indent--;
             writeIndentedLine("}");
         }
@@ -140,11 +143,11 @@ public class Emitter {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
-        writeIndentedLine(toPropertyName(property.getName()) + questionMark + ": " + tsType.format(settings) + ";");
+        writeIndentedLine(toValidName(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
     }
 
-    private String toPropertyName(String name) {
-        return isValidIdentifierName(name) ? name : quote(name);
+    public static String toValidName(String name, Settings settings) {
+        return isValidIdentifierName(name) ? name : quote(name, settings);
     }
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
@@ -165,11 +168,24 @@ public class Emitter {
         return true;
     }
 
+    private void emitMethod(TsMethodModel method) {
+        emitComments(method.getComments());
+        final List<String> parameters = new ArrayList<>();
+        for (TsParameterModel parameter : method.getParameters()) {
+            final String questionMark = (parameter.getTsType() instanceof TsType.OptionalType) ? "?" : "";
+            parameters.add(parameter.getName() + questionMark + ": " + parameter.getTsType());
+        }
+        writeIndentedLine(method.getName() + "(" + Utils.join(parameters, ", ") + "): " + method.getReturnType() + ";");
+    }
+
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
         for (TsAliasModel alias : model.getTypeAliases()) {
             writeNewLine();
             emitComments(alias.getComments());
-            writeIndentedLine(exportKeyword, "type " + alias.getName() + " = " + alias.getDefinition().format(settings) + ";");
+            final String genericParameters = alias.getTypeParameters().isEmpty()
+                    ? ""
+                    : "<" + Utils.join(alias.getTypeParameters(), ", ") + ">";
+            writeIndentedLine(exportKeyword, "type " + alias.getName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
         }
     }
 
@@ -238,7 +254,7 @@ public class Emitter {
         }
     }
 
-    private String quote(String value) {
+    private static String quote(String value, Settings settings) {
         return settings.quotes + value + settings.quotes;
     }
 
