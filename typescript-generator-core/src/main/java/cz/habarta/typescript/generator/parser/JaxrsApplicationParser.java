@@ -175,12 +175,6 @@ public class JaxrsApplicationParser {
         }
     }
 
-    private static String trimSlash(String path) {
-        final int begin = path.startsWith("/") ? 1 : 0;
-        final int end = path.length() - (path.endsWith("/") ? 1 : 0);
-        return path.substring(begin, end);
-    }
-
     private void foundType(Result result, Type type, Class<?> usedInClass, String usedInMember) {
         if (!isExcluded(type)) {
             result.discoveredTypes.add(new SourceType<>(type, usedInClass, usedInMember));
@@ -278,8 +272,7 @@ public class JaxrsApplicationParser {
         public final Map<String, Type> pathParamTypes;
 
         public ResourceContext(String path) {
-            this.path = path;
-            this.pathParamTypes = new LinkedHashMap<>();
+            this(path, new LinkedHashMap<String, Type>());
         }
 
         private ResourceContext(String path, Map<String, Type> pathParamTypes) {
@@ -288,8 +281,8 @@ public class JaxrsApplicationParser {
         }
 
         ResourceContext subPath(Path pathAnnotation) {
-            final String subPath = path + (pathAnnotation != null ? "/" + trimSlash(pathAnnotation.value()) : "");
-            return new ResourceContext(subPath, pathParamTypes);
+            final String subPath = pathAnnotation != null ? pathAnnotation.value() : null;
+            return new ResourceContext(Utils.joinPath(path, subPath), pathParamTypes);
         }
 
         ResourceContext subPathParamTypes(Map<String, Type> subPathParamTypes) {

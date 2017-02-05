@@ -287,12 +287,11 @@ public class ModelCompiler {
         tsModel.getTypeAliases().add(responseTypeAlias);
         // application interface
         final String applicationPath = jaxrsApplication.getApplicationPath();
-        final String pathPrefix = applicationPath != null && !applicationPath.isEmpty() ? applicationPath + "/" : "";
         final List<TsMethodModel> methods = new ArrayList<>();
         final Map<String, Long> methodNamesCount = groupingByMethodName(jaxrsApplication.getMethods());
         for (JaxrsMethodModel method : jaxrsApplication.getMethods()) {
             final boolean createLongName = methodNamesCount.get(method.getName()) > 1;
-            methods.add(processJaxrsMethod(symbolTable, pathPrefix, responseSymbol, method, createLongName));
+            methods.add(processJaxrsMethod(symbolTable, applicationPath, responseSymbol, method, createLongName));
         }
         final String applicationName = jaxrsApplication.getApplicationName() != null ? jaxrsApplication.getApplicationName() : "RestApplication";
         final TsBeanModel interfaceModel = new TsBeanModel(null, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, methods, null);
@@ -301,6 +300,7 @@ public class ModelCompiler {
     }
 
     private static Map<String, Long> groupingByMethodName(List<JaxrsMethodModel> methods) {
+        // Java 8
 //        return methods.stream().collect(Collectors.groupingBy(JaxrsMethodModel::getName, Collectors.counting()));
         final Map<String, Long> methodNamesCount = new LinkedHashMap<>();
         for (JaxrsMethodModel method : methods) {
@@ -314,7 +314,7 @@ public class ModelCompiler {
 
     private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName) {
         final List<String> comments = new ArrayList<>();
-        final String path = pathPrefix + method.getPath();
+        final String path = Utils.joinPath(pathPrefix, method.getPath());
         comments.add("HTTP " + method.getHttpMethod() + " /" + path);
         final List<TsParameterModel> parameters = new ArrayList<>();
         // path params

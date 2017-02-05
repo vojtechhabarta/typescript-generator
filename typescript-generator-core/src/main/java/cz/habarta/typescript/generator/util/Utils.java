@@ -26,6 +26,28 @@ public class Utils {
         return sb.toString();
     }
 
+    public static String joinPath(String part1, String part2) {
+        final List<String> parts = new ArrayList<>();
+        addPathPart(parts, part1);
+        addPathPart(parts, part2);
+        return join(parts, "/");
+    }
+
+    private static void addPathPart(List<String> parts, String part) {
+        if (part != null) {
+            final String trimmed = trimSlash(part);
+            if (!trimmed.isEmpty()) {
+                parts.add(trimmed);
+            }
+        }
+    }
+
+    private static String trimSlash(String path) {
+        path = path.startsWith("/") ? path.substring(1) : path;
+        path = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+        return path;
+    }
+
     public static Class<?> getRawClassOrNull(Type type) {
         if (type instanceof Class<?>) {
             return (Class<?>) type;
