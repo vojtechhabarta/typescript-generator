@@ -271,6 +271,7 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
+        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
         Assert.assertTrue(errorMessage, output.contains("interface Organization"));
         Assert.assertTrue(errorMessage, output.contains("interface OrganizationApplication"));
         Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/organizations/{ organizationCode : [a-z]+ }/{organizationId}"));
@@ -294,6 +295,18 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("person$GET$conflict(): RestResponse<Person>;"));
         Assert.assertTrue(errorMessage, output.contains("person$GET$conflict_search(queryParams?: { search?: string; }): RestResponse<Person>;"));
         Assert.assertTrue(errorMessage, output.contains("person$GET$conflict_personId(personId: number): RestResponse<Person>;"));
+    }
+
+    @Test
+    public void customizationsTest() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        settings.restResponseType = "AxiosPromise";
+        settings.restOptionsType = "AxiosRequestConfig";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
+        Assert.assertTrue(errorMessage, output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }, options?: AxiosRequestConfig): RestResponse<Organization[]>;"));
     }
 
     @ApplicationPath("api")

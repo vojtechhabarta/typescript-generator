@@ -41,6 +41,8 @@ public class Settings {
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public boolean disableTaggedUnions = false;
     public boolean generateJaxrsApplicationInterface = false;
+    public String restResponseType = null;
+    public String restOptionsType = null;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;

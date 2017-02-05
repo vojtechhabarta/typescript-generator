@@ -62,6 +62,20 @@ public abstract class TsType {
         }
     }
 
+    public static class VerbatimType extends TsType {
+
+        public final String verbatimType;
+
+        public VerbatimType(String verbatimType) {
+            this.verbatimType = verbatimType;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return verbatimType;
+        }
+    }
+
     /**
      * Identifier which references some type, for example interface or type alias.
      */

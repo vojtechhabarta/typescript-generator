@@ -41,6 +41,8 @@ public class GenerateTask extends DefaultTask {
     public ClassMapping mapClasses;
     public boolean disableTaggedUnions;
     public boolean experimentalJaxrsApplicationInterface;
+    public String restResponseType;
+    public String restOptionsType;
     public String customTypeProcessor;
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
@@ -101,6 +103,8 @@ public class GenerateTask extends DefaultTask {
         settings.mapClasses = mapClasses;
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
+        settings.restResponseType = restResponseType;
+        settings.restOptionsType = restOptionsType;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;

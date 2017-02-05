@@ -240,6 +240,23 @@ public class GenerateMojo extends AbstractMojo {
     private boolean experimentalJaxrsApplicationInterface;
 
     /**
+     * Specifies HTTP response type in JAXRS application.
+     * Default value is <code>Promise&amp;R></code> which means data object returned asynchronously.
+     * Useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>)
+     * is returned instead of actual response data.
+     */
+    @Parameter
+    private String restResponseType;
+
+    /**
+     * Specifies HTTP request options type in JAXRS application.
+     * By default no <code>options</code> parameter is generated.
+     * Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>).
+     */
+    @Parameter
+    private String restOptionsType;
+
+    /**
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
      * This allows to customize how Java types are mapped to TypeScript.
      * For example it is possible to implement TypeProcessor
@@ -355,6 +372,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
+            settings.restResponseType = restResponseType;
+            settings.restOptionsType = restOptionsType;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;

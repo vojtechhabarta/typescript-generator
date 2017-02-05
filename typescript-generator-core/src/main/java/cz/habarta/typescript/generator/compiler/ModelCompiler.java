@@ -270,15 +270,22 @@ public class ModelCompiler {
     }
 
     private TsModel createJaxrsInterface(SymbolTable symbolTable, TsModel tsModel, Model model) {
-        final Symbol responseSymbol = symbolTable.getSyntheticSymbol("RestResponse");
-        final TsType.GenericVariableType varR = new TsType.GenericVariableType("R");
-        final TsType.GenericReferenceType responseTypeDefinition = new TsType.GenericReferenceType(symbolTable.getSyntheticSymbol("Promise"), Arrays.<TsType>asList(varR));
-        final TsAliasModel responseTypeAlias = new TsAliasModel(null, responseSymbol, Arrays.asList(varR), responseTypeDefinition, null);
-        tsModel.getTypeAliases().add(responseTypeAlias);
         final JaxrsApplicationModel jaxrsApplication = model.getJaxrsApplication();
         if (jaxrsApplication == null || jaxrsApplication.getMethods().isEmpty()) {
             return tsModel;
         }
+        // response type
+        final Symbol responseSymbol = symbolTable.getSyntheticSymbol("RestResponse");
+        final TsType.GenericVariableType varR = new TsType.GenericVariableType("R");
+        final TsAliasModel responseTypeAlias;
+        if (settings.restResponseType != null) {
+            responseTypeAlias = new TsAliasModel(null, responseSymbol, Arrays.asList(varR), new TsType.VerbatimType(settings.restResponseType), null);
+        } else {
+            final TsType.GenericReferenceType responseTypeDefinition = new TsType.GenericReferenceType(symbolTable.getSyntheticSymbol("Promise"), Arrays.<TsType>asList(varR));
+            responseTypeAlias = new TsAliasModel(null, responseSymbol, Arrays.asList(varR), responseTypeDefinition, null);
+        }
+        tsModel.getTypeAliases().add(responseTypeAlias);
+        // application interface
         final String applicationPath = jaxrsApplication.getApplicationPath();
         final String pathPrefix = applicationPath != null && !applicationPath.isEmpty() ? applicationPath + "/" : "";
         final List<TsMethodModel> methods = new ArrayList<>();
@@ -314,6 +321,10 @@ public class ModelCompiler {
         for (MethodParameterModel parameter : method.getPathParams()) {
             parameters.add(processParameter(symbolTable, method, parameter));
         }
+        // entity param
+        if (method.getEntityParam() != null) {
+            parameters.add(processParameter(symbolTable, method, method.getEntityParam()));
+        }
         // query params
         final List<MethodParameterModel> queryParams = method.getQueryParams();
         if (queryParams != null && !queryParams.isEmpty()) {
@@ -325,9 +336,9 @@ public class ModelCompiler {
             final TsParameterModel queryParameter = new TsParameterModel("queryParams", new TsType.OptionalType(new TsType.ObjectType(properties)));
             parameters.add(queryParameter);
         }
-        // entity param
-        if (method.getEntityParam() != null) {
-            parameters.add(processParameter(symbolTable, method, method.getEntityParam()));
+        if (settings.restOptionsType != null) {
+            final TsParameterModel optionsParameter = new TsParameterModel("options", new TsType.OptionalType(new TsType.VerbatimType(settings.restOptionsType)));
+            parameters.add(optionsParameter);
         }
         // return type
         final TsType returnType = typeFromJava(symbolTable, method.getReturnType(), method.getName(), method.getOriginClass());
