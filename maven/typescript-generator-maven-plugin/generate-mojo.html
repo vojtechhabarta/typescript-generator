@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2017-02-06
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.16.277
+                  <li id="projectVersion">Version: 1.16.279
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.16.277:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.16.279:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -175,17 +175,6 @@ package). Required parameter, recommended value is 'jackson2'.<br /></td>
           </tr>
           
 <tr class="a">
-            
-<td><b><a href="#outputFile">outputFile</a></b></td>
-            
-<td><tt>File</tt></td>
-            
-<td><tt>-</tt></td>
-            
-<td>Path and name of generated TypeScript file. Required parameter.<br /></td>
-          </tr>
-          
-<tr class="b">
             
 <td><b><a href="#outputKind">outputKind</a></b></td>
             
@@ -588,6 +577,17 @@ optional annotation: @javax.annotation.Nullable<br /></td>
           
 <tr class="b">
             
+<td><b><a href="#outputFile">outputFile</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>Path and name of generated TypeScript file.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
 <td><tt>TypeScriptFileType</tt></td>
@@ -600,7 +600,7 @@ optional annotation: @javax.annotation.Nullable<br /></td>
 Default value is 'declarationFile'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#referencedFiles">referencedFiles</a></b></td>
             
@@ -613,7 +613,7 @@ directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
 with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -626,7 +626,7 @@ enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -639,7 +639,7 @@ enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#restOptionsType">restOptionsType</a></b></td>
             
@@ -653,7 +653,7 @@ passing additional parameters to underlying HTTP request method
 (like jQuery ajax settings or <tt>AxiosRequestConfig</tt>).<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#restResponseType">restResponseType</a></b></td>
             
@@ -669,7 +669,7 @@ object (like <tt>XMLHttpRequest</tt> or
 data.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -681,7 +681,7 @@ data.<br /></td>
 sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -693,7 +693,7 @@ sorted alphabetically.<br /></td>
 alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#stringQuotes">stringQuotes</a></b></td>
             
@@ -705,7 +705,7 @@ alphabetically.<br /></td>
 'doubleQuotes', 'singleQuotes'. Default value is 'doubleQuotes'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#umdNamespace">umdNamespace</a></b></td>
             
@@ -1077,13 +1077,13 @@ optional annotation: @javax.annotation.Nullable</div>
         </ul><hr />
 <p><b><a name="outputFile">outputFile</a>:</b></p>
         
-<div>Path and name of generated TypeScript file. Required parameter.</div>
+<div>Path and name of generated TypeScript file.</div>
         
 <ul>
           
 <li><b>Type</b>: <tt>java.io.File</tt></li>
           
-<li><b>Required</b>: <tt>Yes</tt></li>
+<li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
 <p><b><a name="outputFileType">outputFileType</a>:</b></p>
         
