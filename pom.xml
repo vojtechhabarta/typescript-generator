@@ -70,7 +70,8 @@
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
                         <arg>-Xlint</arg>
-                        <arg>-parameters</arg>
+                        <!--this doesn't work on Java 7-->
+                        <!--<arg>-parameters</arg>-->
                     </compilerArgs>
                 </configuration>
             </plugin>
