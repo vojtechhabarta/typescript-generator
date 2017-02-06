@@ -56,8 +56,8 @@ public class GenerateTask extends DefaultTask {
 
     @TaskAction
     public void generate() throws Exception {
-        if (outputFile == null) {
-            throw new RuntimeException("Please specify 'outputFile' property.");
+        if (outputKind == null) {
+            throw new RuntimeException("Please specify 'outputKind' property.");
         }
         if (jsonLibrary == null) {
             throw new RuntimeException("Please specify 'jsonLibrary' property.");
@@ -117,12 +117,15 @@ public class GenerateTask extends DefaultTask {
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
         settings.classLoader = classLoader;
-        settings.validateFileName(new File(outputFile));
+        final File output = outputFile != null
+                ? getProject().file(outputFile)
+                : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
+        settings.validateFileName(output);
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
                 Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
-                Output.to(getProject().file(outputFile))
+                Output.to(output)
         );
     }
 

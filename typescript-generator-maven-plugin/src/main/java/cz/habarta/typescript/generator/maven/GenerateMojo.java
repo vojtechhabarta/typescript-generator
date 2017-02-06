@@ -19,9 +19,8 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Path and name of generated TypeScript file.
-     * Required parameter.
      */
-    @Parameter(required = true)
+    @Parameter
     private File outputFile;
 
     /**
@@ -334,6 +333,9 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
+    @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
+    private String projectBuildDirectory;
+
     @Override
     public void execute() {
         try {
@@ -386,12 +388,15 @@ public class GenerateMojo extends AbstractMojo {
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
             settings.classLoader = classLoader;
-            settings.validateFileName(outputFile);
+            final File output = outputFile != null
+                    ? outputFile
+                    : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());
+            settings.validateFileName(output);
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
                     Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
-                    Output.to(outputFile)
+                    Output.to(output)
             );
 
         } catch (DependencyResolutionRequiredException | IOException e) {
