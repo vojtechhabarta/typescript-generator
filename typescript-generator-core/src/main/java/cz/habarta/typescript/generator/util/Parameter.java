@@ -22,7 +22,7 @@ public class Parameter {
 
     public static List<Parameter> ofMethod(Method method) {
         final List<Parameter> parameters = new ArrayList<>();
-        for (int i = 0; i < method.getParameterCount(); i++) {
+        for (int i = 0; i < method.getParameterTypes().length; i++) {
             parameters.add(new Parameter(method, i));
         }
         return parameters;
