@@ -136,6 +136,10 @@ public class Settings {
         }
     }
 
+    public String getExtension() {
+        return outputFileType == TypeScriptFileType.implementationFile ? ".ts" : ".d.ts";
+    }
+
     public void validateFileName(File outputFile) {
         if (outputFileType == TypeScriptFileType.declarationFile && !outputFile.getName().endsWith(".d.ts")) {
             throw new RuntimeException("Declaration file must have 'd.ts' extension: " + outputFile);
