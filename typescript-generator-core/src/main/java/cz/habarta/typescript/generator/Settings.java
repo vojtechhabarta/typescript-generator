@@ -142,12 +142,12 @@ public class Settings {
         }
         if (generateNpmPackageJson) {
             if (npmName == null || npmVersion == null) {
-                throw new RuntimeException("'npmName' and 'npmVersion' must be specified when generating NPM package.json.");
+                throw new RuntimeException("'npmName' and 'npmVersion' must be specified when generating NPM 'package.json'.");
             }
         }
         if (!generateNpmPackageJson) {
             if (npmName != null || npmVersion != null) {
-                throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM package.json.");
+                throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM 'package.json'.");
             }
         }
     }
