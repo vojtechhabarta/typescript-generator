@@ -409,8 +409,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.generateNpmPackageJson = generateNpmPackageJson;
-            settings.npmName = npmName != null ? npmName : project.getArtifactId();
-            settings.npmVersion = npmVersion != null ? npmVersion : settings.getDefaultNpmVersion();
+            settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;
+            settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
             settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
