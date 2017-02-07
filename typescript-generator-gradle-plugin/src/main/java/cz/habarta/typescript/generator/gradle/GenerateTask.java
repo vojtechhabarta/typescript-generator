@@ -50,6 +50,9 @@ public class GenerateTask extends DefaultTask {
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
     public List<String> optionalAnnotations;
+    public boolean generateNpmPackageJson;
+    public String npmName;
+    public String npmVersion;
     public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery;
@@ -113,6 +116,9 @@ public class GenerateTask extends DefaultTask {
         settings.loadExtensions(classLoader, extensionClasses);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.generateNpmPackageJson = generateNpmPackageJson;
+        settings.npmName = npmName != null ? npmName : getProject().getName();
+        settings.npmVersion = npmVersion != null ? npmVersion : settings.getDefaultNpmVersion();
         settings.setStringQuotes(stringQuotes);
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;

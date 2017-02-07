@@ -311,6 +311,30 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
+     * If true NPM package.json will be generated.
+     * Only applicable when 'outputKind' is set to 'module'.
+     * NPM package name and version can be specified using 'npmName' and 'npmVersion' parameters.
+     */
+    @Parameter
+    private boolean generateNpmPackageJson;
+
+    /**
+     * Specifies NPM package name.
+     * Only applicable when 'generateNpmPackageJson' parameter is 'true'.
+     * Default value is <code>${project.artifactId}</code>.
+     */
+    @Parameter
+    private String npmName;
+
+    /**
+     * Specifies NPM package version.
+     * Only applicable when 'generateNpmPackageJson' parameter is 'true'.
+     * Default value is <code>1.0.0</code>.
+     */
+    @Parameter
+    private String npmVersion;
+
+    /**
      * Specifies how strings will be quoted.
      * Supported values are 'doubleQuotes', 'singleQuotes'.
      * Default value is 'doubleQuotes'.
@@ -384,6 +408,9 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadExtensions(classLoader, extensions);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.generateNpmPackageJson = generateNpmPackageJson;
+            settings.npmName = npmName != null ? npmName : project.getArtifactId();
+            settings.npmVersion = npmVersion != null ? npmVersion : settings.getDefaultNpmVersion();
             settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;

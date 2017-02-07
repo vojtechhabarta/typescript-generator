@@ -51,6 +51,9 @@ public class Settings {
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+    public boolean generateNpmPackageJson = false;
+    public String npmName = null;
+    public String npmVersion = null;
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery = false;
     public ClassLoader classLoader = null;
@@ -134,6 +137,19 @@ public class Settings {
                 throw new RuntimeException("'mapClasses' parameter is set to `asClasses` which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
             }
         }
+        if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
+            throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
+        }
+        if (generateNpmPackageJson) {
+            if (npmName == null || npmVersion == null) {
+                throw new RuntimeException("'npmName' and 'npmVersion' must be specified when generating NPM package.json.");
+            }
+        }
+        if (!generateNpmPackageJson) {
+            if (npmName != null || npmVersion != null) {
+                throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM package.json.");
+            }
+        }
     }
 
     public String getExtension() {
@@ -147,6 +163,10 @@ public class Settings {
         if (outputFileType == TypeScriptFileType.implementationFile && (!outputFile.getName().endsWith(".ts") || outputFile.getName().endsWith(".d.ts"))) {
             throw new RuntimeException("Implementation file must have 'ts' extension: " + outputFile);
         }
+    }
+
+    public String getDefaultNpmVersion() {
+        return "1.0.0";
     }
 
     public Predicate<String> getExcludeFilter() {
