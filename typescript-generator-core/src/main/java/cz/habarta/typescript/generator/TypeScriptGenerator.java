@@ -17,6 +17,7 @@ public class TypeScriptGenerator {
     private ModelParser modelParser = null;
     private ModelCompiler modelCompiler = null;
     private Emitter emitter = null;
+    private NpmPackageJsonEmitter npmPackageJsonEmitter = null;
 
     public TypeScriptGenerator() {
         this (new Settings());
@@ -49,6 +50,21 @@ public class TypeScriptGenerator {
         final Model model = getModelParser().parseModel(input.getSourceTypes());
         final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
         getEmitter().emit(tsModel, output.getWriter(), output.getName(), output.shouldCloseWriter(), forceExportKeyword, initialIndentationLevel);
+        generateNpmPackageJson(output);
+    }
+
+    private void generateNpmPackageJson(Output output) {
+        if (settings.generateNpmPackageJson) {
+            if (output.getName() == null) {
+                throw new RuntimeException("Generating NPM package.json can only be used when output is specified using file name");
+            }
+            final Output npmOutput = Output.to(new File(new File(output.getName()).getParent(), "package.json"));
+            final NpmPackageJson npmPackageJson = new NpmPackageJson();
+            npmPackageJson.name = settings.npmName;
+            npmPackageJson.version = settings.npmVersion;
+            npmPackageJson.types = new File(output.getName()).getName();
+            getNpmPackageJsonEmitter().emit(npmPackageJson, npmOutput.getWriter(), npmOutput.getName(), npmOutput.shouldCloseWriter());
+        }
     }
 
     public TypeProcessor getTypeProcessor() {
@@ -97,6 +113,13 @@ public class TypeScriptGenerator {
             emitter = new Emitter(settings);
         }
         return emitter;
+    }
+
+    public NpmPackageJsonEmitter getNpmPackageJsonEmitter() {
+        if (npmPackageJsonEmitter == null) {
+            npmPackageJsonEmitter = new NpmPackageJsonEmitter();
+        }
+        return npmPackageJsonEmitter;
     }
 
     private static String getVersion() {
