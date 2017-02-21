@@ -41,6 +41,7 @@ public class Settings {
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public boolean disableTaggedUnions = false;
     public boolean generateJaxrsApplicationInterface = false;
+    public boolean generateJaxrsApplicationClient = false;
     public String restResponseType = null;
     public String restOptionsType = null;
     public TypeProcessor customTypeProcessor = null;
@@ -134,8 +135,11 @@ public class Settings {
                 }
             }
             if (mapClasses == ClassMapping.asClasses) {
-                throw new RuntimeException("'mapClasses' parameter is set to `asClasses` which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
+                throw new RuntimeException("'mapClasses' parameter is set to 'asClasses' which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
             }
+        }
+        if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
         if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");

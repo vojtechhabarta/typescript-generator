@@ -309,6 +309,19 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }, options?: AxiosRequestConfig): RestResponse<Organization[]>;"));
     }
 
+    @Test
+    public void basicClientTest() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
+        Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: `api/people/${personId}` });"));
+        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
+    }
+
     @ApplicationPath("api")
     private static class OrganizationApplication extends Application {
         @Override

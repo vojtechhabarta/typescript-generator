@@ -131,8 +131,11 @@ public class Emitter {
             for (TsPropertyModel property : bean.getProperties()) {
                 emitProperty(property);
             }
+            if (bean.getConstructor() != null) {
+                emitCallable(bean.getConstructor());
+            }
             for (TsMethodModel method : bean.getMethods()) {
-                emitMethod(method);
+                emitCallable(method);
             }
             indent--;
             writeIndentedLine("}");
@@ -143,11 +146,15 @@ public class Emitter {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
-        writeIndentedLine(toValidName(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
+        writeIndentedLine(quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
     }
 
-    public static String toValidName(String name, Settings settings) {
+    public static String quoteIfNeeded(String name, Settings settings) {
         return isValidIdentifierName(name) ? name : quote(name, settings);
+    }
+
+    public static String quote(String value, Settings settings) {
+        return settings.quotes + value + settings.quotes;
     }
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
@@ -168,14 +175,40 @@ public class Emitter {
         return true;
     }
 
-    private void emitMethod(TsMethodModel method) {
+    private void emitCallable(TsCallableModel method) {
+        writeNewLine();
         emitComments(method.getComments());
         final List<String> parameters = new ArrayList<>();
         for (TsParameterModel parameter : method.getParameters()) {
+            final String access = parameter.getAccessibilityModifier() != null ? parameter.getAccessibilityModifier().format() + " " : "";
             final String questionMark = (parameter.getTsType() instanceof TsType.OptionalType) ? "?" : "";
-            parameters.add(parameter.getName() + questionMark + ": " + parameter.getTsType());
+            final String type = parameter.getTsType() != null ? ": " + parameter.getTsType() : "";
+            parameters.add(access + parameter.getName() + questionMark + type);
         }
-        writeIndentedLine(method.getName() + "(" + Utils.join(parameters, ", ") + "): " + method.getReturnType() + ";");
+        final String type = method.getReturnType() != null ? ": " + method.getReturnType() : "";
+        final String signature = method.getName() + "(" + Utils.join(parameters, ", ") + ")" + type;
+        if (method.getBody() != null) {
+            writeIndentedLine(signature + " {");
+            indent++;
+            emitStatements(method.getBody());
+            indent--;
+            writeIndentedLine("}");
+        } else {
+            writeIndentedLine(signature + ";");
+        }
+    }
+
+    private void emitStatements(List<TsStatement> statements) {
+        for (TsStatement statement : statements) {
+            if (statement instanceof TsReturnStatement) {
+                final TsReturnStatement returnStatement = (TsReturnStatement) statement;
+                if (returnStatement.getExpression() != null) {
+                    writeIndentedLine("return " + returnStatement.getExpression().format(settings) + ";");
+                } else {
+                    writeIndentedLine("return;");
+                }
+            }
+        }
     }
 
     private void emitTypeAliases(TsModel model, boolean exportKeyword) {
@@ -252,10 +285,6 @@ public class Emitter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static String quote(String value, Settings settings) {
-        return settings.quotes + value + settings.quotes;
     }
 
     private void close() {

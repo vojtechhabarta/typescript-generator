@@ -236,7 +236,13 @@ public class GenerateMojo extends AbstractMojo {
      * If true interface for JAX-RS REST application will be generated.
      */
     @Parameter
-    private boolean experimentalJaxrsApplicationInterface;
+    private boolean generateJaxrsApplicationInterface;
+
+    /**
+     * If true client for JAX-RS REST application will be generated.
+     */
+    @Parameter
+    private boolean generateJaxrsApplicationClient;
 
     /**
      * Specifies HTTP response type in JAXRS application.
@@ -397,7 +403,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapEnum = mapEnum;
             settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
-            settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
+            settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
+            settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
             settings.restResponseType = restResponseType;
             settings.restOptionsType = restOptionsType;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);

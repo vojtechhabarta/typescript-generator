@@ -40,7 +40,8 @@ public class GenerateTask extends DefaultTask {
     public EnumMapping mapEnum;
     public ClassMapping mapClasses;
     public boolean disableTaggedUnions;
-    public boolean experimentalJaxrsApplicationInterface;
+    public boolean generateJaxrsApplicationInterface;
+    public boolean generateJaxrsApplicationClient;
     public String restResponseType;
     public String restOptionsType;
     public String customTypeProcessor;
@@ -105,7 +106,8 @@ public class GenerateTask extends DefaultTask {
         settings.mapEnum = mapEnum;
         settings.mapClasses = mapClasses;
         settings.disableTaggedUnions = disableTaggedUnions;
-        settings.generateJaxrsApplicationInterface = experimentalJaxrsApplicationInterface;
+        settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
+        settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
         settings.restResponseType = restResponseType;
         settings.restOptionsType = restOptionsType;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);

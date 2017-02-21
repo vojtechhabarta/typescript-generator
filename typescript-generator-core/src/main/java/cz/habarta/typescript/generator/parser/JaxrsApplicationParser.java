@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -35,10 +33,6 @@ public class JaxrsApplicationParser {
     private final Predicate<String> isClassNameExcluded;
     private final Set<String> defaultExcludes;
     private final JaxrsApplicationModel model;
-
-    public static final String PathParamNameGroupName = "ParamName";
-    public static final String PathParamRegexpGroupName = "ParamRegex";
-    public static final Pattern PathParamPattern = Pattern.compile("\\{\\s*(?<ParamName>\\w[\\w\\.-]*)\\s*(:\\s*(?<ParamRegex>[^{}]+)\\s*)?\\}");
 
     public JaxrsApplicationParser(Predicate<String> isClassNameExcluded) {
         this.isClassNameExcluded = isClassNameExcluded;
@@ -130,11 +124,13 @@ public class JaxrsApplicationParser {
         if (httpMethod != null) {
             // path parameters
             final List<MethodParameterModel> pathParams = new ArrayList<>();
-            final Matcher matcher = pathParamMatcher(context.path);
-            while (matcher.find()) {
-                final String name = matcher.group(1);
-                final Type type = context.pathParamTypes.get(name);
-                pathParams.add(new MethodParameterModel(name, type != null ? type : String.class));
+            final PathTemplate pathTemplate = PathTemplate.parse(context.path);
+            for (PathTemplate.Part part : pathTemplate.getParts()) {
+                if (part instanceof PathTemplate.Parameter) {
+                    final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
+                    final Type type = context.pathParamTypes.get(parameter.getName());
+                    pathParams.add(new MethodParameterModel(parameter.getName(), type != null ? type : String.class));
+                }
             }
             // query parameters
             final List<MethodParameterModel> queryParams = new ArrayList<>();
@@ -261,10 +257,6 @@ public class JaxrsApplicationParser {
         return Arrays.asList(
                 "org.glassfish.jersey.media.multipart.FormDataBodyPart"
         );
-    }
-
-    public static Matcher pathParamMatcher(String path) {
-        return PathParamPattern.matcher(path);
     }
 
     private static class ResourceContext {

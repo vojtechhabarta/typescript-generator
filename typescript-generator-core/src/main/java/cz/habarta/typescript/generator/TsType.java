@@ -98,6 +98,10 @@ public abstract class TsType {
 
         public final List<TsType> typeArguments;
 
+        public GenericReferenceType(Symbol symbol, TsType... typeArguments) {
+            this(symbol, Arrays.asList(typeArguments));
+        }
+
         public GenericReferenceType(Symbol symbol, List<TsType> typeArguments) {
             super(symbol);
             this.typeArguments = typeArguments;
@@ -209,6 +213,10 @@ public abstract class TsType {
     public static class ObjectType extends TsType {
 
         public final List<TsProperty> properties;
+
+        public ObjectType(TsProperty... properties) {
+            this(Arrays.asList(properties));
+        }
 
         public ObjectType(List<TsProperty> properties) {
             this.properties = properties;

@@ -24,7 +24,7 @@ public class TsProperty {
 
     public String format(Settings settings) {
         final String questionMark = (tsType instanceof TsType.OptionalType) ? "?" : "";
-        return Emitter.toValidName(name, settings) + questionMark + ": " + tsType.format(settings) + ";";
+        return Emitter.quoteIfNeeded(name, settings) + questionMark + ": " + tsType.format(settings) + ";";
     }
 
 }
