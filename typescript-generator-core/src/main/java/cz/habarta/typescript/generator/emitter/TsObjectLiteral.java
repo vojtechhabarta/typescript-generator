@@ -11,13 +11,7 @@ public class TsObjectLiteral extends TsExpression {
     private final List<TsPropertyDefinition> propertyDefinitions;
 
     public TsObjectLiteral(TsPropertyDefinition... propertyDefinitions) {
-        this(removeNulls(Arrays.asList(propertyDefinitions)));
-    }
-
-    private static List<TsPropertyDefinition> removeNulls(List<TsPropertyDefinition> propertyDefinitions) {
-        final ArrayList<TsPropertyDefinition> props = new ArrayList<>(propertyDefinitions);
-        props.removeAll(Collections.singleton(null));
-        return props;
+        this(Utils.removeNulls(Arrays.asList(propertyDefinitions)));
     }
 
     public TsObjectLiteral(List<TsPropertyDefinition> propertyDefinitions) {

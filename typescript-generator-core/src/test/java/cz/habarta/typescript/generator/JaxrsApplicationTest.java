@@ -298,7 +298,7 @@ public class JaxrsApplicationTest {
     }
 
     @Test
-    public void customizationsTest() {
+    public void customizationTest() {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         settings.restResponseType = "AxiosPromise";
@@ -316,10 +316,32 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
+        // HttpClient
+        Assert.assertTrue(errorMessage, output.contains("interface HttpClient"));
+        Assert.assertTrue(errorMessage, output.contains("request(requestConfig: { method: string; url: string; queryParams?: any; data?: any; }): RestResponse<any>;"));
+        // application client
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
         Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: `api/people/${personId}` });"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
+    }
+
+    @Test
+    public void clientCustomizationTest() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationClient = true;
+        settings.restResponseType = "AxiosPromise";
+        settings.restOptionsType = "AxiosRequestConfig";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+        // HttpClient
+        Assert.assertTrue(errorMessage, output.contains("request(requestConfig: { method: string; url: string; queryParams?: any; data?: any; options?: AxiosRequestConfig; }): RestResponse<any>;"));
+        // application client
+        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
+        Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number, options?: AxiosRequestConfig): RestResponse<Person>"));
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: `api/people/${personId}`, options: options });"));
+        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
     }
 
     @ApplicationPath("api")

@@ -215,7 +215,7 @@ public abstract class TsType {
         public final List<TsProperty> properties;
 
         public ObjectType(TsProperty... properties) {
-            this(Arrays.asList(properties));
+            this(Utils.removeNulls(Arrays.asList(properties)));
         }
 
         public ObjectType(List<TsProperty> properties) {

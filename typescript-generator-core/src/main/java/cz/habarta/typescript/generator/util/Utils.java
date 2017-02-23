@@ -69,6 +69,12 @@ public class Utils {
         return list != null ? list : Collections.<T>emptyList();
     }
 
+    public static <T> List<T> removeNulls(List<T> list) {
+        final ArrayList<T> result = new ArrayList<>(list);
+        result.removeAll(Collections.singleton(null));
+        return result;
+    }
+
     public static String readString(InputStream stream) {
         final Scanner s = new Scanner(stream, "UTF-8").useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
