@@ -22,3 +22,6 @@ nbactions.xml
 # JetBrains IntelliJ
 .idea/
 **.iml
+
+# VS Code
+.vscode
