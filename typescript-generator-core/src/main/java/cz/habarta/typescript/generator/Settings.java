@@ -141,6 +141,13 @@ public class Settings {
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
+        final boolean generateJaxrs = generateJaxrsApplicationClient || generateJaxrsApplicationInterface;
+        if (restResponseType != null && !generateJaxrs) {
+            throw new RuntimeException("'restResponseType' parameter can only be used when generating JAX-RS client or interface.");
+        }
+        if (restOptionsType != null && !generateJaxrs) {
+            throw new RuntimeException("'restOptionsType' parameter can only be used when generating JAX-RS client or interface.");
+        }
         if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
         }
