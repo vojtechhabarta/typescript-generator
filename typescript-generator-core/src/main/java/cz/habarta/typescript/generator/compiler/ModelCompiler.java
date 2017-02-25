@@ -150,7 +150,7 @@ public class ModelCompiler {
             final TsType discriminantType = literals.isEmpty()
                     ? TsType.String
                     : new TsType.UnionType(literals);
-            properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, null));
+            properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, null));
         }
 
         return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
@@ -180,7 +180,7 @@ public class ModelCompiler {
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property) {
         final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
-        return new TsPropertyModel(property.getName(), tsType, property.getComments());
+        return new TsPropertyModel(property.getName(), tsType, settings.declarePropertiesAsReadOnly, property.getComments());
     }
 
     private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {

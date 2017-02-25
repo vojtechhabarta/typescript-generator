@@ -27,6 +27,7 @@ public class Settings {
     public JsonLibrary jsonLibrary = null;
     private Predicate<String> excludeFilter = null;
     public boolean declarePropertiesAsOptional = false;
+    public boolean declarePropertiesAsReadOnly = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;
     public String addTypeNamePrefix = null;

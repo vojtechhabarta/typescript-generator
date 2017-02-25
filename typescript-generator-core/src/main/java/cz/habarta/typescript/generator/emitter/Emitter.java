@@ -145,8 +145,9 @@ public class Emitter {
     private void emitProperty(TsPropertyModel property) {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
+        final String readonly = property.readonly ? "readonly " : "";
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
-        writeIndentedLine(quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
+        writeIndentedLine(readonly + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
     }
 
     public static String quoteIfNeeded(String name, Settings settings) {

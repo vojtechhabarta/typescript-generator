@@ -8,10 +8,12 @@ import java.util.List;
 
 public class TsPropertyModel extends TsProperty implements Comparable<TsProperty> {
 
+    public final boolean readonly;
     public final List<String> comments;
 
-    public TsPropertyModel(String name, TsType tsType, List<String> comments) {
+    public TsPropertyModel(String name, TsType tsType, boolean readonly, List<String> comments) {
         super(name, tsType);
+        this.readonly = readonly;
         this.comments = comments;
     }
 
@@ -20,7 +22,7 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
     }
 
     public TsPropertyModel setTsType(TsType type) {
-        return new TsPropertyModel(getName(), type, getComments());
+        return new TsPropertyModel(getName(), type, readonly, getComments());
     }
 
     @Override
