@@ -321,7 +321,7 @@ public class ModelCompiler {
 
         // application client class
         final TsConstructorModel constructor = new TsConstructorModel(
-                Arrays.asList(new TsParameterModel(TsAccessibilityModifier.Private, "httpClient", new TsType.ReferenceType(httpClientSymbol))),
+                Arrays.asList(new TsParameterModel(TsAccessibilityModifier.Protected, "httpClient", new TsType.ReferenceType(httpClientSymbol))),
                 Collections.<TsStatement>emptyList(),
                 null
         );
