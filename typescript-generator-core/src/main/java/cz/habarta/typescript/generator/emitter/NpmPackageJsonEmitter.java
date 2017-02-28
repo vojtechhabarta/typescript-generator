@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.util.StandardJsonPrettyPrinter;
@@ -26,6 +27,7 @@ public class NpmPackageJsonEmitter {
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
             objectMapper.writeValue(writer, npmPackageJson);
         } catch (IOException e) {

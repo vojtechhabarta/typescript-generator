@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.compiler.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.util.*;
 
@@ -58,11 +59,15 @@ public class TypeScriptGenerator {
             if (output.getName() == null) {
                 throw new RuntimeException("Generating NPM package.json can only be used when output is specified using file name");
             }
-            final Output npmOutput = Output.to(new File(new File(output.getName()).getParent(), "package.json"));
+            final File outputFile = new File(output.getName());
+            final Output npmOutput = Output.to(new File(outputFile.getParent(), "package.json"));
             final NpmPackageJson npmPackageJson = new NpmPackageJson();
             npmPackageJson.name = settings.npmName;
             npmPackageJson.version = settings.npmVersion;
-            npmPackageJson.types = new File(output.getName()).getName();
+            npmPackageJson.types = outputFile.getName();
+            npmPackageJson.main = settings.outputFileType == TypeScriptFileType.implementationFile
+                    ? Utils.replaceExtension(outputFile, ".js").getName()
+                    : null;
             getNpmPackageJsonEmitter().emit(npmPackageJson, npmOutput.getWriter(), npmOutput.getName(), npmOutput.shouldCloseWriter());
         }
     }

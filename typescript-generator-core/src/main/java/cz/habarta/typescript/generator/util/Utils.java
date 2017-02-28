@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.util;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -86,6 +87,13 @@ public class Utils {
 
     private static String normalizeLineEndings(String text, String lineEndings) {
         return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
+    }
+
+    public static File replaceExtension(File file, String newExtension) {
+        final String name = file.getName();
+        final int dotIndex = name.lastIndexOf(".");
+        final int index = dotIndex != -1 ? dotIndex : name.length();
+        return new File(file.getParent(), name.substring(0, index) + newExtension);
     }
 
 }
