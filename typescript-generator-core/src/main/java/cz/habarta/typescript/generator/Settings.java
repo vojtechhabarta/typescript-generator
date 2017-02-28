@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.util.Predicate;
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -60,6 +61,8 @@ public class Settings {
     public boolean disableJackson2ModuleDiscovery = false;
     public ClassLoader classLoader = null;
 
+    private boolean defaultStringEnumsOverriddenByExtension = false;
+
 
     public void setStringQuotes(StringQuotes quotes) {
         this.quotes = quotes == StringQuotes.singleQuotes ? "'" : "\"";
@@ -107,14 +110,14 @@ public class Settings {
         if (outputKind == null) {
             throw new RuntimeException("Required 'outputKind' parameter is not configured. " + seeLink());
         }
+        if (outputKind == TypeScriptOutputKind.ambientModule && outputFileType == TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("Ambient modules are not supported in implementation files. " + seeLink());
+        }
         if (outputKind == TypeScriptOutputKind.ambientModule && module == null) {
             throw new RuntimeException("'module' parameter must be specified for ambient module. " + seeLink());
         }
         if (outputKind != TypeScriptOutputKind.ambientModule && module != null) {
             throw new RuntimeException("'module' parameter is only applicable to ambient modules. " + seeLink());
-        }
-        if (outputKind == TypeScriptOutputKind.ambientModule && outputFileType == TypeScriptFileType.implementationFile) {
-            throw new RuntimeException("Ambient modules are not supported in implementation files. " + seeLink());
         }
         if (outputKind != TypeScriptOutputKind.module && umdNamespace != null) {
             throw new RuntimeException("'umdNamespace' parameter is only applicable to modules. " + seeLink());
@@ -128,16 +131,33 @@ public class Settings {
         if (jsonLibrary == null) {
             throw new RuntimeException("Required 'jsonLibrary' parameter is not configured.");
         }
-        if (outputFileType != TypeScriptFileType.implementationFile) {
-            for (EmitterExtension emitterExtension : extensions) {
-                if (emitterExtension.getFeatures().generatesRuntimeCode) {
-                    throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.",
-                            emitterExtension.getClass().getSimpleName()));
-                }
+        for (EmitterExtension extension : extensions) {
+            final String extensionName = extension.getClass().getSimpleName();
+            final EmitterExtensionFeatures features = extension.getFeatures();
+            if (features.generatesRuntimeCode && outputFileType != TypeScriptFileType.implementationFile) {
+                throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.", extensionName));
             }
-            if (mapClasses == ClassMapping.asClasses) {
-                throw new RuntimeException("'mapClasses' parameter is set to 'asClasses' which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
+            if (features.generatesModuleCode && outputKind != TypeScriptOutputKind.module) {
+                throw new RuntimeException(String.format("Extension '%s' generates code as module but 'outputKind' parameter is not set to 'module'.", extensionName));
             }
+            if (features.generatesJaxrsApplicationClient) {
+                reportConfigurationChange(extensionName, "generateJaxrsApplicationClient", "true");
+                generateJaxrsApplicationClient = true;
+            }
+            if (features.restResponseType != null) {
+                reportConfigurationChange(extensionName, "restResponseType", features.restResponseType);
+                restResponseType = features.restResponseType;
+            }
+            if (features.restOptionsType != null) {
+                reportConfigurationChange(extensionName, "restOptionsType", features.restOptionsType);
+                restOptionsType = features.restOptionsType;
+            }
+            if (features.overridesStringEnums) {
+                defaultStringEnumsOverriddenByExtension = true;
+            }
+        }
+        if (mapClasses == ClassMapping.asClasses && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("'mapClasses' parameter is set to 'asClasses' which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
         }
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
@@ -162,6 +182,10 @@ public class Settings {
                 throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM 'package.json'.");
             }
         }
+    }
+
+    private static void reportConfigurationChange(String extensionName, String parameterName, String parameterValue) {
+        System.out.println(String.format("Configuration: '%s' extension set '%s' parameter to '%s'", extensionName, parameterName, parameterValue));
     }
 
     public String getExtension() {
@@ -204,12 +228,7 @@ public class Settings {
     }
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {
-        for (EmitterExtension extension : extensions) {
-            if (extension.getFeatures().overridesStringEnums) {
-                return true;
-            }
-        }
-        return false;
+        return defaultStringEnumsOverriddenByExtension;
     }
 
     private String seeLink() {

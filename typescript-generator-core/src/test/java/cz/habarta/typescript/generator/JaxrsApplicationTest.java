@@ -384,7 +384,7 @@ public class JaxrsApplicationTest {
     }
 
     @Path("people/{personId}")
-    private static class PersonResource {
+    public static class PersonResource {
         @PathParam("personId")
         protected long personId;
         @GET
