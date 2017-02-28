@@ -36,7 +36,7 @@ public abstract class AbstractClientExtension extends EmitterExtension {
     }
 
     protected abstract void emitClient(Writer writer, Settings settings, boolean exportKeyword, String appName);
-    
+
     protected void emitTemplate(Writer writer, Settings settings, String templateName, Map<String, String> replacements) {
         final List<String> template = readAllLines(getClass().getResource(templateName));
         for (String line : template) {

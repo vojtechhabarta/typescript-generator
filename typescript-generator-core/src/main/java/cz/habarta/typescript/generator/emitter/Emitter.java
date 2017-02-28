@@ -107,6 +107,9 @@ public class Emitter {
         emitTypeAliases(model, exportKeyword);
         emitNumberEnums(model, exportKeyword, declareKeyword);
         for (EmitterExtension emitterExtension : settings.extensions) {
+            writeNewLine();
+            writeNewLine();
+            writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
             emitterExtension.emitElements(new EmitterExtension.Writer() {
                 @Override
                 public void writeIndentedLine(String line) {
