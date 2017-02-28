@@ -11,6 +11,9 @@ release.properties
 /sample-gradle/.nb-gradle/
 /sample-gradle/build/
 
+# npm
+node_modules
+
 # NetBeans
 nbactions.xml
 

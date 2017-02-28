@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.util.*;
+import javax.ws.rs.core.Application;
 
 
 /**
@@ -298,7 +299,7 @@ public class ModelCompiler {
     private TsModel createJaxrsInterface(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication, Symbol responseSymbol, TsType optionsType) {
         final List<TsMethodModel> methods = processJaxrsMethods(jaxrsApplication, symbolTable, responseSymbol, optionsType, false);
         final String applicationName = getApplicationName(jaxrsApplication);
-        final TsBeanModel interfaceModel = new TsBeanModel(null, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, null, methods, null);
+        final TsBeanModel interfaceModel = new TsBeanModel(Application.class, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, null, methods, null);
         tsModel.getBeans().add(interfaceModel);
         return tsModel;
     }
@@ -329,7 +330,7 @@ public class ModelCompiler {
         final String applicationName = getApplicationName(jaxrsApplication);
         final String applicationClientName = applicationName + "Client";
         final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(symbolTable.getSyntheticSymbol(applicationName)) : null;
-        final TsBeanModel clientModel = new TsBeanModel(null, true, symbolTable.getSyntheticSymbol(applicationClientName), null, null, null, Utils.listFromNullable(interfaceType), null, constructor, methods, null);
+        final TsBeanModel clientModel = new TsBeanModel(Application.class, true, symbolTable.getSyntheticSymbol(applicationClientName), null, null, null, Utils.listFromNullable(interfaceType), null, constructor, methods, null);
         tsModel.getBeans().add(clientModel);
         return tsModel;
     }
