@@ -84,7 +84,8 @@ public class ModelCompiler {
     }
 
     public TsType javaToTypeScript(Type type) {
-        final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(), Collections.singletonList(new PropertyModel("property", type, false, null, null)), null);
+        final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
+                Collections.singletonList(new PropertyModel("property", type, false, null, null, null)), null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel<?>>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -94,7 +95,7 @@ public class ModelCompiler {
         final Map<Type, List<BeanModel>> children = createChildrenMap(model);
         final List<TsBeanModel> beans = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
-            beans.add(processBean(symbolTable, children, bean));
+            beans.add(processBean(symbolTable, model, children, bean));
         }
         final List<TsEnumModel<?>> enums = new ArrayList<>();
         for (EnumModel<?> enumModel : model.getEnums()) {
@@ -117,7 +118,7 @@ public class ModelCompiler {
         return children;
     }
 
-    private <T> TsBeanModel processBean(SymbolTable symbolTable, Map<Type, List<BeanModel>> children, BeanModel bean) {
+    private <T> TsBeanModel processBean(SymbolTable symbolTable, Model model, Map<Type, List<BeanModel>> children, BeanModel bean) {
         final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
         final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
         final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
@@ -135,10 +136,7 @@ public class ModelCompiler {
                 interfaces.add(interfaceType);
             }
         }
-        final List<TsPropertyModel> properties = new ArrayList<>();
-        for (PropertyModel property : bean.getProperties()) {
-            properties.add(processProperty(symbolTable, bean, property));
-        }
+        final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean, "", "");
 
         if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
             final List<BeanModel> selfAndDescendants = getSelfAndDescendants(bean, children);
@@ -155,6 +153,27 @@ public class ModelCompiler {
         }
 
         return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
+    }
+
+    private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
+        final List<TsPropertyModel> properties = new ArrayList<>();
+        for (PropertyModel property : bean.getProperties()) {
+            boolean pulled = false;
+            final PropertyModel.PullProperties pullProperties = property.getPullProperties();
+            if (pullProperties != null) {
+                if (property.getType() instanceof Class<?>) {
+                    final BeanModel pullBean = model.getBean((Class<?>) property.getType());
+                    if (pullBean != null) {
+                        properties.addAll(processProperties(symbolTable, model, pullBean, prefix + pullProperties.prefix, pullProperties.suffix + suffix));
+                        pulled = true;
+                    }
+                }
+            }
+            if (!pulled) {
+                properties.add(processProperty(symbolTable, bean, property, prefix, suffix));
+            }
+        }
+        return properties;
     }
 
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
@@ -178,10 +197,10 @@ public class ModelCompiler {
         return false;
     }
 
-    private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property) {
+    private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
         final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
-        return new TsPropertyModel(property.getName(), tsType, settings.declarePropertiesAsReadOnly, property.getComments());
+        return new TsPropertyModel(prefix + property.getName() + suffix, tsType, settings.declarePropertiesAsReadOnly, property.getComments());
     }
 
     private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {

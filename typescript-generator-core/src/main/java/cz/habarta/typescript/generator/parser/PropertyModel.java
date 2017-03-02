@@ -12,13 +12,25 @@ public class PropertyModel {
     private final Type type;
     private final boolean optional;
     private final Member originalMember;
+    private final PullProperties pullProperties;
     private final List<String> comments;
 
-    public PropertyModel(String name, Type type, boolean optional, Member originalMember, List<String> comments) {
+    public static class PullProperties {
+        public final String prefix;
+        public final String suffix;
+
+        public PullProperties(String prefix, String suffix) {
+            this.prefix = prefix;
+            this.suffix = suffix;
+        }
+    }
+
+    public PropertyModel(String name, Type type, boolean optional, Member originalMember, PullProperties pullProperties, List<String> comments) {
         this.name = name;
         this.type = type;
         this.optional = optional;
         this.originalMember = originalMember;
+        this.pullProperties = pullProperties;
         this.comments = comments;
     }
 
@@ -39,7 +51,11 @@ public class PropertyModel {
     }
 
     public PropertyModel originalMember(Member originalMember) {
-        return new PropertyModel(name, type, optional, originalMember, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+    }
+
+    public PullProperties getPullProperties() {
+        return pullProperties;
     }
 
     public List<String> getComments() {
@@ -47,7 +63,7 @@ public class PropertyModel {
     }
 
     public PropertyModel withComments(List<String> comments) {
-        return new PropertyModel(name, type, optional, originalMember, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
     }
 
     @Override

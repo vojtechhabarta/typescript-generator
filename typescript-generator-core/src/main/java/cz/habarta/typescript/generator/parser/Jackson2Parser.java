@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.*;
@@ -18,6 +19,7 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -77,8 +79,17 @@ public class Jackson2Parser extends ModelParser {
                         break;
                     }
                 }
+                // @JsonUnwrapped
+                PropertyModel.PullProperties pullProperties = null;
                 final Member originalMember = beanPropertyWriter.getMember().getMember();
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember));
+                if (originalMember instanceof AccessibleObject) {
+                    final AccessibleObject accessibleObject = (AccessibleObject) originalMember;
+                    final JsonUnwrapped annotation = accessibleObject.getAnnotation(JsonUnwrapped.class);
+                    if (annotation != null && annotation.enabled()) {
+                        pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
+                    }
+                }
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember, pullProperties));
             }
         }
 
