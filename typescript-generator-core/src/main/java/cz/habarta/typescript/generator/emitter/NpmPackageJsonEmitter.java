@@ -26,8 +26,8 @@ public class NpmPackageJsonEmitter {
     private void emitPackageJson(NpmPackageJson npmPackageJson) {
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
             objectMapper.writeValue(writer, npmPackageJson);
         } catch (IOException e) {
