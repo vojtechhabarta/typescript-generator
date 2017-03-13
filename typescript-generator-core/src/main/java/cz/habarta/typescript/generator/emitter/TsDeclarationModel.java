@@ -8,15 +8,13 @@ import java.util.*;
 public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
 
     protected final Class<?> origin;
+    protected final TsBeanCategory category;
     protected final Symbol name;
     protected final List<String> comments;
 
-    public TsDeclarationModel(Symbol name, List<String> comments) {
-        this(null, name, comments);
-    }
-
-    public TsDeclarationModel(Class<?> origin, Symbol name, List<String> comments) {
+    public TsDeclarationModel(Class<?> origin, TsBeanCategory category, Symbol name, List<String> comments) {
         this.origin = origin;
+        this.category = category;
         this.name = name;
         this.comments = comments;
     }
@@ -35,7 +33,27 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
 
     @Override
     public int compareTo(TsDeclarationModel o) {
-        return name.toString().compareTo(o.name.toString());
+        final int categoryResult = compare(this.category, o.category);
+        if (categoryResult != 0) {
+            return categoryResult;
+        }
+        final int nameResult = compare(this.name.toString(), o.name.toString());
+        if (nameResult != 0) {
+            return nameResult;
+        }
+        return 0;
+    }
+
+    /**
+     * Natural order with null last.
+     * Remove on Java 8.
+     */
+    private static <T extends Comparable<T>> int compare(T o1, T o2) {
+        if (o1 != null) {
+            return o2 != null ? o1.compareTo(o2) : -1;
+        } else {
+            return o2 != null ? 1 : 0;
+        }
     }
 
     @Override

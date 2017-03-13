@@ -152,7 +152,7 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, null));
         }
 
-        return new TsBeanModel(bean.getOrigin(), isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
+        return new TsBeanModel(bean.getOrigin(), TsBeanCategory.Data, isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
     }
 
     private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
@@ -318,7 +318,7 @@ public class ModelCompiler {
     private TsModel createJaxrsInterface(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication, Symbol responseSymbol, TsType optionsType) {
         final List<TsMethodModel> methods = processJaxrsMethods(jaxrsApplication, symbolTable, responseSymbol, optionsType, false);
         final String applicationName = getApplicationName(jaxrsApplication);
-        final TsBeanModel interfaceModel = new TsBeanModel(Application.class, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, null, methods, null);
+        final TsBeanModel interfaceModel = new TsBeanModel(Application.class, TsBeanCategory.Service, false, symbolTable.getSyntheticSymbol(applicationName), null, null, null, null, null, null, methods, null);
         tsModel.getBeans().add(interfaceModel);
         return tsModel;
     }
@@ -327,7 +327,7 @@ public class ModelCompiler {
         final Symbol httpClientSymbol = symbolTable.getSyntheticSymbol("HttpClient");
 
         // HttpClient interface
-        tsModel.getBeans().add(new TsBeanModel(null, false, httpClientSymbol, null, null, null, null, null, null, Arrays.asList(
+        tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.Service, false, httpClientSymbol, null, null, null, null, null, null, Arrays.asList(
                 new TsMethodModel("request", new TsType.GenericReferenceType(responseSymbol, TsType.Any), Arrays.asList(
                         new TsParameterModel("requestConfig", new TsType.ObjectType(
                                 new TsProperty("method", TsType.String),
@@ -349,7 +349,7 @@ public class ModelCompiler {
         final String applicationName = getApplicationName(jaxrsApplication);
         final String applicationClientName = applicationName + "Client";
         final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(symbolTable.getSyntheticSymbol(applicationName)) : null;
-        final TsBeanModel clientModel = new TsBeanModel(Application.class, true, symbolTable.getSyntheticSymbol(applicationClientName), null, null, null, Utils.listFromNullable(interfaceType), null, constructor, methods, null);
+        final TsBeanModel clientModel = new TsBeanModel(Application.class, TsBeanCategory.Service, true, symbolTable.getSyntheticSymbol(applicationClientName), null, null, null, Utils.listFromNullable(interfaceType), null, constructor, methods, null);
         tsModel.getBeans().add(clientModel);
         return tsModel;
     }

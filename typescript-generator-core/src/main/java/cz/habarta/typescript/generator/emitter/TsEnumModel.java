@@ -15,7 +15,7 @@ public class TsEnumModel<T> extends TsDeclarationModel {
     private final List<EnumMemberModel<T>> members;
 
     public TsEnumModel(Class<?> origin, Symbol name, EnumKind<T> kind, List<EnumMemberModel<T>> members, List<String> comments) {
-        super(origin, name, comments);
+        super(origin, null, name, comments);
         this.kind = kind;
         this.members = members;
     }

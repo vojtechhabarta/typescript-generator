@@ -18,8 +18,8 @@ public class TsBeanModel extends TsDeclarationModel {
     private final TsConstructorModel constructor;
     private final List<TsMethodModel> methods;
 
-    public TsBeanModel(Class<?> origin, boolean isClass, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, TsConstructorModel constructor, List<TsMethodModel> methods, List<String> comments) {
-        super(origin, name, comments);
+    public TsBeanModel(Class<?> origin, TsBeanCategory category, boolean isClass, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType parent, List<Class<?>> taggedUnionClasses, List<TsType> interfaces, List<TsPropertyModel> properties, TsConstructorModel constructor, List<TsMethodModel> methods, List<String> comments) {
+        super(origin, category, name, comments);
         this.isClass = isClass;
         this.typeParameters = Utils.listFromNullable(typeParameters);
         this.parent = parent;
@@ -76,7 +76,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withProperties(List<TsPropertyModel> properties) {
-        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, constructor, methods, comments);
     }
 
     public TsConstructorModel getConstructor() {
@@ -88,7 +88,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withMethods(List<TsMethodModel> methods) {
-        return new TsBeanModel(origin, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, constructor, methods, comments);
     }
 
 }
