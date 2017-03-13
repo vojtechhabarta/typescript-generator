@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.JaxrsApplicationScanner;
+import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.util.Parameter;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
@@ -30,12 +31,14 @@ import javax.ws.rs.core.StreamingOutput;
 
 public class JaxrsApplicationParser {
 
+    private final Settings settings;
     private final Predicate<String> isClassNameExcluded;
     private final Set<String> defaultExcludes;
     private final JaxrsApplicationModel model;
 
-    public JaxrsApplicationParser(Predicate<String> isClassNameExcluded) {
-        this.isClassNameExcluded = isClassNameExcluded;
+    public JaxrsApplicationParser(Settings settings) {
+        this.settings = settings;
+        this.isClassNameExcluded = settings.getExcludeFilter();
         this.defaultExcludes = new LinkedHashSet<>(getDefaultExcludedClassNames());
         this.model = new JaxrsApplicationModel();
     }
@@ -122,6 +125,18 @@ public class JaxrsApplicationParser {
         // JAX-RS specification - 3.3 Resource Methods
         final HttpMethod httpMethod = getHttpMethod(method);
         if (httpMethod != null) {
+            // swagger
+            final SwaggerOperation swaggerOperation = settings.ignoreSwaggerAnnotations
+                    ? new SwaggerOperation()
+                    : Swagger.parseSwaggerAnnotations(method);
+            if (swaggerOperation.possibleResponses != null) {
+                for (Type response : swaggerOperation.possibleResponses) {
+                    foundType(result, response, resourceClass, method.getName());
+                }
+            }
+            if (swaggerOperation.hidden) {
+                return;
+            }
             // path parameters
             final List<MethodParameterModel> pathParams = new ArrayList<>();
             final PathTemplate pathTemplate = PathTemplate.parse(context.path);
@@ -153,7 +168,12 @@ public class JaxrsApplicationParser {
             if (returnType == void.class) {
                 modelReturnType = returnType;
             } else if (returnType == Response.class) {
-                modelReturnType = Object.class;
+                if (swaggerOperation.response != null) {
+                    modelReturnType = swaggerOperation.response;
+                    foundType(result, modelReturnType, resourceClass, method.getName());
+                } else {
+                    modelReturnType = Object.class;
+                }
             } else if (genericReturnType instanceof ParameterizedType && returnType == GenericEntity.class) {
                 final ParameterizedType parameterizedReturnType = (ParameterizedType) genericReturnType;
                 modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];

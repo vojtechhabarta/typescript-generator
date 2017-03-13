@@ -3,6 +3,9 @@ package cz.habarta.typescript.generator.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -12,7 +15,7 @@ public class Utils {
 
     private Utils() {
     }
-    
+
     public static String join(Iterable<? extends Object> values, String delimiter) {
         final StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -60,6 +63,80 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
+        final Object annotation = getAnnotation(annotatedElement, annotationClassName);
+        return getAnnotationElementValue(annotation, annotationElementName, annotationElementType);
+    }
+
+    public static Object getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
+        for (Annotation annotation : annotatedElement.getAnnotations()) {
+            if (annotation.annotationType().getName().equals(annotationClassName)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getAnnotationElementValue(Object annotation, String annotationElementName, Class<T> annotationElementType) {
+        try {
+            if (annotation != null) {
+                for (Method method : annotation.getClass().getMethods()) {
+                    if (method.getName().equals(annotationElementName)) {
+                        final Object value = method.invoke(annotation);
+                        if (annotationElementType.isInstance(value)) {
+                            return (T) value;
+                        }
+                    }
+                }
+            }
+            return null;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ParameterizedType createParameterizedType(final Type rawType, final Type... actualTypeArguments) {
+        final Type ownerType = null;
+        return new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return actualTypeArguments;
+            }
+
+            @Override
+            public Type getRawType() {
+                return rawType;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return ownerType;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj) {
+                    return true;
+                }
+                if (obj instanceof ParameterizedType) {
+                    final ParameterizedType that = (ParameterizedType) obj;
+                    return
+                        Objects.equals(ownerType, that.getOwnerType()) &&
+                        Objects.equals(rawType, that.getRawType()) &&
+                        Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(ownerType, rawType, actualTypeArguments);
+            }
+        };
     }
 
     public static <T> List<T> listFromNullable(T item) {

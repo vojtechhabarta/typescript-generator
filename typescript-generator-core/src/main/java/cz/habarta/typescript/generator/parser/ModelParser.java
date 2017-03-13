@@ -35,8 +35,8 @@ public abstract class ModelParser {
     }
 
     private Model parseQueue() {
-        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings.getExcludeFilter());
-        final Set<Type> parsedTypes = new LinkedHashSet<>();
+        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings);
+        final Collection<Type> parsedTypes = new ArrayList<>();  // do not use hashcodes, we can only count on `equals` since we use custom `ParameterizedType`s
         final List<BeanModel> beans = new ArrayList<>();
         final List<EnumModel<?>> enums = new ArrayList<>();
         SourceType<? extends Type> sourceType;
