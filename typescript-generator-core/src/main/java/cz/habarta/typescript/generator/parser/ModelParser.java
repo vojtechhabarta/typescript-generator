@@ -30,7 +30,8 @@ public abstract class ModelParser {
     public Model parseModel(List<SourceType<Type>> types) {
         typeQueue.addAll(types);
         final Model model = parseQueue();
-        final Model modelWithJavadoc = javadoc.enrichModel(model);
+        final Model modelWithSwaggerDoc = Swagger.enrichModel(model);
+        final Model modelWithJavadoc = javadoc.enrichModel(modelWithSwaggerDoc);
         return modelWithJavadoc;
     }
 

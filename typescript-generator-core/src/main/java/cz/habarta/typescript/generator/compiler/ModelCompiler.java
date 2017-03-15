@@ -385,9 +385,10 @@ public class ModelCompiler {
     private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
         final String path = Utils.joinPath(pathPrefix, method.getPath());
         final PathTemplate pathTemplate = PathTemplate.parse(path);
-        final List<String> comments = new ArrayList<>();
-        comments.add("HTTP " + method.getHttpMethod() + " /" + path);
-        comments.add("Java method: " + method.getOriginClass().getName() + "." + method.getName());
+        final List<String> comments = Utils.concat(method.getComments(), Arrays.asList(
+            "HTTP " + method.getHttpMethod() + " /" + path,
+            "Java method: " + method.getOriginClass().getName() + "." + method.getName()
+        ));
         final List<TsParameterModel> parameters = new ArrayList<>();
         // path params
         for (MethodParameterModel parameter : method.getPathParams()) {

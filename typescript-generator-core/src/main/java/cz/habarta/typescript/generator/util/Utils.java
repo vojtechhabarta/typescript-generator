@@ -71,9 +71,11 @@ public class Utils {
     }
 
     public static Object getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
-        for (Annotation annotation : annotatedElement.getAnnotations()) {
-            if (annotation.annotationType().getName().equals(annotationClassName)) {
-                return annotation;
+        if (annotatedElement != null) {
+            for (Annotation annotation : annotatedElement.getAnnotations()) {
+                if (annotation.annotationType().getName().equals(annotationClassName)) {
+                    return annotation;
+                }
             }
         }
         return null;
@@ -137,6 +139,16 @@ public class Utils {
                 return Objects.hash(ownerType, rawType, actualTypeArguments);
             }
         };
+    }
+
+    public static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
+        if (list1 == null && list2 == null) {
+            return null;
+        }
+        final List<T> result = new ArrayList<>();
+        if (list1 != null) result.addAll(list1);
+        if (list2 != null) result.addAll(list2);
+        return result;
     }
 
     public static <T> List<T> listFromNullable(T item) {

@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.util.Utils;
 import cz.habarta.typescript.generator.xmldoclet.Class;
 import cz.habarta.typescript.generator.xmldoclet.Enum;
 import cz.habarta.typescript.generator.xmldoclet.EnumConstant;
@@ -73,7 +74,7 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return bean.withProperties(enrichedProperties).withComments(concat(getComments(beanComment, tags), bean.getComments()));
+        return bean.withProperties(enrichedProperties).withComments(Utils.concat(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
@@ -104,7 +105,7 @@ public class Javadoc {
         }
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
-        return enumModel.withMembers(enrichedMembers).withComments(concat(getComments(enumComment, tags), enumModel.getComments()));
+        return enumModel.withMembers(enrichedMembers).withComments(Utils.concat(getComments(enumComment, tags), enumModel.getComments()));
     }
 
     private <T> EnumMemberModel<T> enrichEnumMember(EnumMemberModel<T> enumMember, Enum dEnum) {
@@ -216,13 +217,4 @@ public class Javadoc {
         return result;
     }
 
-    private static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
-        if (list1 == null && list2 == null) {
-            return null;
-        }
-        final List<T> result = new ArrayList<>();
-        if (list1 != null) result.addAll(list1);
-        if (list2 != null) result.addAll(list2);
-        return result;
-    }
 }

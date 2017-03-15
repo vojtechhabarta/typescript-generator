@@ -6,7 +6,8 @@ import java.util.List;
 
 
 public class SwaggerOperation {
-    public Type response;
-    public List<Type> possibleResponses;
+    public Type responseType;
+    public List<SwaggerResponse> possibleResponses;
     public boolean hidden;
+    public String comment;
 }

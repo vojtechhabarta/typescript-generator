@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -30,6 +32,18 @@ public class SwaggerTest {
         Assert.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
         Assert.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
         Assert.assertTrue(!output.contains("testHiddenOperation"));
+    }
+
+    @Test
+    public void testDocumentation() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
+        Assert.assertTrue(output.contains("Documentation for operation 1."));
+        Assert.assertTrue(output.contains("Bad Request"));
+        Assert.assertTrue(output.contains("Not Found"));
+        Assert.assertTrue(output.contains("Documentation for the bean."));
+        Assert.assertTrue(output.contains("Documentation for property 1."));
     }
 
     private static class TestApplication extends Application {
@@ -84,6 +98,36 @@ public class SwaggerTest {
     }
 
     private static class TestError {
+    }
+
+
+    private static class DocumentedApplication extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            return new LinkedHashSet<>(Arrays.<Class<?>>asList(DocumentedResource.class));
+        }
+    }
+
+    @Path("test")
+    private static class DocumentedResource {
+
+        @ApiOperation("Documentation for operation 1.")
+        @ApiResponses({
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Not Found"),
+        })
+        @GET
+        public DocumentedBean documentedOperation1() {
+            return null;
+        }
+
+    }
+
+    @ApiModel(description = "Documentation for the bean.")
+    private static class DocumentedBean {
+
+        @ApiModelProperty("Documentation for property 1.")
+        public String property1;
     }
 
 }

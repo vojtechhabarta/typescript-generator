@@ -130,8 +130,10 @@ public class JaxrsApplicationParser {
                     ? new SwaggerOperation()
                     : Swagger.parseSwaggerAnnotations(method);
             if (swaggerOperation.possibleResponses != null) {
-                for (Type response : swaggerOperation.possibleResponses) {
-                    foundType(result, response, resourceClass, method.getName());
+                for (SwaggerResponse response : swaggerOperation.possibleResponses) {
+                    if (response.responseType != null) {
+                        foundType(result, response.responseType, resourceClass, method.getName());
+                    }
                 }
             }
             if (swaggerOperation.hidden) {
@@ -168,8 +170,8 @@ public class JaxrsApplicationParser {
             if (returnType == void.class) {
                 modelReturnType = returnType;
             } else if (returnType == Response.class) {
-                if (swaggerOperation.response != null) {
-                    modelReturnType = swaggerOperation.response;
+                if (swaggerOperation.responseType != null) {
+                    modelReturnType = swaggerOperation.responseType;
                     foundType(result, modelReturnType, resourceClass, method.getName());
                 } else {
                     modelReturnType = Object.class;
@@ -182,8 +184,10 @@ public class JaxrsApplicationParser {
                 modelReturnType = genericReturnType;
                 foundType(result, modelReturnType, resourceClass, method.getName());
             }
+            // comments
+            final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
-            model.getMethods().add(new JaxrsMethodModel(resourceClass, method.getName(), modelReturnType, httpMethod.value(), context.path, pathParams, queryParams, entityParameter));
+            model.getMethods().add(new JaxrsMethodModel(resourceClass, method.getName(), modelReturnType, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
         if (pathAnnotation != null && httpMethod == null) {
