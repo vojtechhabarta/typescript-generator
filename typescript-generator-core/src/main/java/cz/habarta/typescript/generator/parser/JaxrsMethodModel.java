@@ -14,8 +14,9 @@ public class JaxrsMethodModel extends MethodModel {
     private final MethodParameterModel entityParam;
 
     public JaxrsMethodModel(Class<?> originClass, String name, Type returnType,
-            String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam) {
-        super(originClass, name, null, returnType);
+            String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam,
+            List<String> comments) {
+        super(originClass, name, null, returnType, comments);
         this.httpMethod = httpMethod;
         this.path = path;
         this.pathParams = pathParams;

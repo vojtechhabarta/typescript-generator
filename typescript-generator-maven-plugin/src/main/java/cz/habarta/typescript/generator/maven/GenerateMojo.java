@@ -239,6 +239,12 @@ public class GenerateMojo extends AbstractMojo {
     private boolean disableTaggedUnions;
 
     /**
+     * If true Swagger annotations will not be used.
+     */
+    @Parameter
+    private boolean ignoreSwaggerAnnotations;
+
+    /**
      * If true interface for JAX-RS REST application will be generated.
      */
     @Parameter
@@ -410,6 +416,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapEnum = mapEnum;
             settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
+            settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
             settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
             settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
             settings.restResponseType = restResponseType;

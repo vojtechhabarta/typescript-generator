@@ -35,7 +35,7 @@ public class JaxrsApplicationTest {
 
     @Test
     public void testReturnedTypesFromResource() {
-        final JaxrsApplicationParser.Result result = new JaxrsApplicationParser(null).tryParse(new SourceType<>(TestResource1.class));
+        final JaxrsApplicationParser.Result result = new JaxrsApplicationParser(TestUtils.settings()).tryParse(new SourceType<>(TestResource1.class));
         Assert.assertNotNull(result);
         List<Type> types = getTypes(result.discoveredTypes);
         final List<Type> expectedTypes = Arrays.asList(
@@ -109,7 +109,7 @@ public class JaxrsApplicationTest {
                 A.class.getName(),
                 J.class.getName()
         ), null);
-        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings.getExcludeFilter());
+        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings);
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
         Assert.assertNotNull(result);
         Assert.assertTrue(!getTypes(result.discoveredTypes).contains(A.class));

@@ -30,13 +30,14 @@ public abstract class ModelParser {
     public Model parseModel(List<SourceType<Type>> types) {
         typeQueue.addAll(types);
         final Model model = parseQueue();
-        final Model modelWithJavadoc = javadoc.enrichModel(model);
+        final Model modelWithSwaggerDoc = Swagger.enrichModel(model);
+        final Model modelWithJavadoc = javadoc.enrichModel(modelWithSwaggerDoc);
         return modelWithJavadoc;
     }
 
     private Model parseQueue() {
-        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings.getExcludeFilter());
-        final Set<Type> parsedTypes = new LinkedHashSet<>();
+        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings);
+        final Collection<Type> parsedTypes = new ArrayList<>();  // do not use hashcodes, we can only count on `equals` since we use custom `ParameterizedType`s
         final List<BeanModel> beans = new ArrayList<>();
         final List<EnumModel<?>> enums = new ArrayList<>();
         SourceType<? extends Type> sourceType;

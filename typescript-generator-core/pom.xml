@@ -68,6 +68,12 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>        
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.5.10</version>
+            <scope>test</scope>
+        </dependency>        
     </dependencies>
 
     <build>
