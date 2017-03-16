@@ -178,6 +178,15 @@ public class Utils {
         return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
     }
 
+    public static List<String> splitMultiline(String text, boolean trimLines) {
+        final List<String> result = new ArrayList<>();
+        final String[] lines = text.split("\\r\\n|\\n|\\r");
+        for (String line : lines) {
+            result.add(trimLines ? line.trim() : line);
+        }
+        return result;
+    }
+
     public static File replaceExtension(File file, String newExtension) {
         final String name = file.getName();
         final int dotIndex = name.lastIndexOf(".");

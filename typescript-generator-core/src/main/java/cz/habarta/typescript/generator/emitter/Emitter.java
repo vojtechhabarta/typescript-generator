@@ -106,6 +106,7 @@ public class Emitter {
         emitBeans(model, exportKeyword);
         emitTypeAliases(model, exportKeyword);
         emitNumberEnums(model, exportKeyword, declareKeyword);
+        emitHelpers(model);
         for (EmitterExtension emitterExtension : settings.extensions) {
             writeNewLine();
             writeNewLine();
@@ -244,6 +245,18 @@ public class Emitter {
             }
             indent--;
             writeIndentedLine("}");
+        }
+    }
+
+    private void emitHelpers(TsModel model) {
+        for (TsHelper helper : model.getHelpers()) {
+            writeNewLine();
+            for (String line : helper.getLines()) {
+                writeIndentedLine(line
+                        .replace("\t", settings.indentString)
+                        .replace("\"", settings.quotes)
+                );
+            }
         }
     }
 

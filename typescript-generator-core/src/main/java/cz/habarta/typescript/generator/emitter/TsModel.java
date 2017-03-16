@@ -10,18 +10,20 @@ public class TsModel {
     private final List<TsBeanModel> beans;
     private final List<TsEnumModel<?>> enums;
     private final List<TsAliasModel> typeAliases;
+    private final List<TsHelper> helpers;
 
     public TsModel() {
-        this (new ArrayList<TsBeanModel>(), new ArrayList<TsEnumModel<?>>(), new ArrayList<TsAliasModel>());
+        this (new ArrayList<TsBeanModel>(), new ArrayList<TsEnumModel<?>>(), new ArrayList<TsAliasModel>(), new ArrayList<TsHelper>());
     }
 
-    public TsModel(List<TsBeanModel> beans, List<TsEnumModel<?>> enums, List<TsAliasModel> typeAliases) {
+    public TsModel(List<TsBeanModel> beans, List<TsEnumModel<?>> enums, List<TsAliasModel> typeAliases, List<TsHelper> helpers) {
         if (beans == null) throw new NullPointerException();
         if (enums == null) throw new NullPointerException();
         if (typeAliases == null) throw new NullPointerException();
         this.beans = beans;
         this.enums = enums;
         this.typeAliases = typeAliases;
+        this.helpers = helpers;
     }
 
     public List<TsBeanModel> getBeans() {
@@ -40,7 +42,7 @@ public class TsModel {
     }
 
     public TsModel setBeans(List<TsBeanModel> beans) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, helpers);
     }
 
     public List<TsEnumModel<?>> getEnums() {
@@ -59,7 +61,7 @@ public class TsModel {
     }
 
     public TsModel setEnums(List<TsEnumModel<?>> enums) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, helpers);
     }
 
     public List<TsAliasModel> getTypeAliases() {
@@ -78,7 +80,11 @@ public class TsModel {
     }
 
     public TsModel setTypeAliases(List<TsAliasModel> typeAliases) {
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel(beans, enums, typeAliases, helpers);
+    }
+
+    public List<TsHelper> getHelpers() {
+        return helpers;
     }
 
 }

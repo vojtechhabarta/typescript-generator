@@ -101,8 +101,7 @@ public class ModelCompiler {
         for (EnumModel<?> enumModel : model.getEnums()) {
             enums.add(processEnum(symbolTable, enumModel));
         }
-        final List<TsAliasModel> typeAliases = new ArrayList<>();
-        return new TsModel(beans, enums, typeAliases);
+        return new TsModel().setBeans(beans).setEnums(enums);
     }
 
     private Map<Type, List<BeanModel>> createChildrenMap(Model model) {
@@ -351,6 +350,8 @@ public class ModelCompiler {
         final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(symbolTable.getSyntheticSymbol(applicationName)) : null;
         final TsBeanModel clientModel = new TsBeanModel(Application.class, TsBeanCategory.Service, true, symbolTable.getSyntheticSymbol(applicationClientName), null, null, null, Utils.listFromNullable(interfaceType), null, constructor, methods, null);
         tsModel.getBeans().add(clientModel);
+        // helper
+        tsModel.getHelpers().add(TsHelper.loadFromResource("/helpers/uriEncoding.ts"));
         return tsModel;
     }
 
@@ -380,7 +381,6 @@ public class ModelCompiler {
         }
         return methodNamesCount;
     }
-        
 
     private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
         final String path = Utils.joinPath(pathPrefix, method.getPath());
@@ -469,7 +469,7 @@ public class ModelCompiler {
                 spans.add(new TsIdentifierReference(parameter.getName()));
             }
         }
-        return new TsTemplateLiteral(spans);
+        return new TsTaggedTemplateLiteral(new TsIdentifierReference("uriEncoding"), spans);
     }
 
     private TsModel transformDates(SymbolTable symbolTable, TsModel tsModel) {

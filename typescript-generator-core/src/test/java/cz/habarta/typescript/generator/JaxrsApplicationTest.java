@@ -263,6 +263,7 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("interface RestApplication"));
         Assert.assertTrue(errorMessage, output.contains("getA(): RestResponse<A>;"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
+        Assert.assertTrue(errorMessage, !output.contains("function uriEncoding"));
     }
 
     @Test
@@ -322,8 +323,10 @@ public class JaxrsApplicationTest {
         // application client
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
-        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: `api/people/${personId}` });"));
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}` });"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
+        // helper
+        Assert.assertTrue(errorMessage, output.contains("function uriEncoding"));
     }
 
     @Test
@@ -340,7 +343,7 @@ public class JaxrsApplicationTest {
         // application client
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number, options?: AxiosRequestConfig): RestResponse<Person>"));
-        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: `api/people/${personId}`, options: options });"));
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}`, options: options });"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
     }
 

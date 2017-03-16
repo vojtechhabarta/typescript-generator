@@ -198,21 +198,12 @@ public class Javadoc {
         }
         final List<String> result = new ArrayList<>();
         if (dComments != null) {
-            result.addAll(splitMultiline(dComments));
+            result.addAll(Utils.splitMultiline(dComments, true));
         }
         if (tags != null) {
             for (TagInfo tag : tags) {
-                result.addAll(splitMultiline(tag.getName() + " " + tag.getText()));
+                result.addAll(Utils.splitMultiline(tag.getName() + " " + tag.getText(), true));
             }
-        }
-        return result;
-    }
-
-    private static List<String> splitMultiline(String comments) {
-        final List<String> result = new ArrayList<>();
-        final String[] lines = comments.split("\\r\\n|\\n|\\r");
-        for (String line : lines) {
-            result.add(line.trim());
         }
         return result;
     }
