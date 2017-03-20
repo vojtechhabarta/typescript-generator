@@ -241,11 +241,13 @@ public class Settings {
     }
 
     public void setJaxrsNamespacingAnnotation(ClassLoader classLoader, String jaxrsNamespacingAnnotation) {
-        final String[] split = jaxrsNamespacingAnnotation.split("#");
-        final String className = split[0];
-        final String elementName = split.length > 1 ? split[1] : "value";
-        this.jaxrsNamespacingAnnotation = loadClass(classLoader, className, Annotation.class);
-        this.jaxrsNamespacingAnnotationElement = elementName;
+        if (jaxrsNamespacingAnnotation != null) {
+            final String[] split = jaxrsNamespacingAnnotation.split("#");
+            final String className = split[0];
+            final String elementName = split.length > 1 ? split[1] : "value";
+            this.jaxrsNamespacingAnnotation = loadClass(classLoader, className, Annotation.class);
+            this.jaxrsNamespacingAnnotationElement = elementName;
+        }
     }
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {
