@@ -23,6 +23,10 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
         return origin;
     }
 
+    public TsBeanCategory getCategory() {
+        return category;
+    }
+
     public Symbol getName() {
         return name;
     }

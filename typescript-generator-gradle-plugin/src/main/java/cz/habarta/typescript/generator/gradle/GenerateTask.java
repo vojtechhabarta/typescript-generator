@@ -44,6 +44,8 @@ public class GenerateTask extends DefaultTask {
     public boolean ignoreSwaggerAnnotations;
     public boolean generateJaxrsApplicationInterface;
     public boolean generateJaxrsApplicationClient;
+    public JaxrsNamespacing jaxrsNamespacing;
+    public String jaxrsNamespacingAnnotation;
     public String restResponseType;
     public String restOptionsType;
     public String customTypeProcessor;
@@ -112,6 +114,8 @@ public class GenerateTask extends DefaultTask {
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
         settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
+        settings.jaxrsNamespacing = jaxrsNamespacing;
+        settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
         settings.restResponseType = restResponseType;
         settings.restOptionsType = restOptionsType;
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);

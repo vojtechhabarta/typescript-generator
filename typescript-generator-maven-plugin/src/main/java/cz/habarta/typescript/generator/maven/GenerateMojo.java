@@ -118,7 +118,7 @@ public class GenerateMojo extends AbstractMojo {
      * Supported values are
      * 'jackson1' (annotations from 'org.codehaus.jackson.annotate' package),
      * 'jackson2' (annotations from 'com.fasterxml.jackson.annotation' package),
-     * `jaxb` (annotations from 'javax.xml.bind.annotation' package).
+     * 'jaxb' (annotations from 'javax.xml.bind.annotation' package).
      * Required parameter, recommended value is 'jackson2'.
      */
     @Parameter(required = true)
@@ -255,6 +255,28 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private boolean generateJaxrsApplicationClient;
+
+    /**
+     * Specifies how JAX-RS REST operations will be grouped into objects.
+     * Supported values are 'singleObject', 'perResource', 'byAnnotation'.
+     * Default value is 'singleObject'.
+     * Value 'singleObject' means that one object with all operations will be generated.
+     * Value 'perResource' means that for each root resource one object will be generated.
+     * Value 'byAnnotation' means that operations will be grouped by annotation specified using <code>jaxrsNamespacingAnnotation</code>.
+     */
+    @Parameter
+    private JaxrsNamespacing jaxrsNamespacing;
+
+    /**
+     * Specifies annotation used for grouping JAX-RS REST operations.
+     * Format is <code>annotationClass#annotationElement</code> where
+     * annotationClass is fully-qualified class name and annotationElement is element name and defaults to 'value'.
+     * Examples:
+     * <code>io.swagger.annotations.Api</code>,
+     * <code>io.swagger.annotations.Api#value</code>
+     */
+    @Parameter
+    private String jaxrsNamespacingAnnotation;
 
     /**
      * Specifies HTTP response type in JAXRS application.
@@ -419,6 +441,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
             settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
             settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
+            settings.jaxrsNamespacing = jaxrsNamespacing;
+            settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
             settings.restResponseType = restResponseType;
             settings.restOptionsType = restOptionsType;
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);

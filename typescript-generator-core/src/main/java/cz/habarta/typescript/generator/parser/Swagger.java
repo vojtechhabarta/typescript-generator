@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.util.Utils;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -13,7 +14,7 @@ public class Swagger {
         final SwaggerOperation swaggerOperation = new SwaggerOperation();
         // @ApiOperation
         {
-            final Object apiOperation = Utils.getAnnotation(method, "io.swagger.annotations.ApiOperation");
+            final Annotation apiOperation = Utils.getAnnotation(method, "io.swagger.annotations.ApiOperation");
             if (apiOperation != null) {
                 final Class<?> response = Utils.getAnnotationElementValue(apiOperation, "response", Class.class);
                 final String responseContainer = Utils.getAnnotationElementValue(apiOperation, "responseContainer", String.class);
@@ -39,10 +40,10 @@ public class Swagger {
         }
         // @ApiResponses
         {
-            final Object[] apiResponses = Utils.getAnnotationElementValue(method, "io.swagger.annotations.ApiResponses", "value", Object[].class);
+            final Annotation[] apiResponses = Utils.getAnnotationElementValue(method, "io.swagger.annotations.ApiResponses", "value", Annotation[].class);
             if (apiResponses != null) {
                 swaggerOperation.possibleResponses = new ArrayList<>();
-                for (Object apiResponse : apiResponses) {
+                for (Annotation apiResponse : apiResponses) {
                     final SwaggerResponse response = new SwaggerResponse();
                     response.code = Utils.getAnnotationElementValue(apiResponse, "code", Integer.class);
                     response.comment = Utils.getAnnotationElementValue(apiResponse, "message", String.class);

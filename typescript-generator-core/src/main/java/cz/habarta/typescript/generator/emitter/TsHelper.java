@@ -14,8 +14,7 @@ public class TsHelper {
     }
 
     public static TsHelper loadFromResource(String resourceName) {
-        final String text = Utils.readString(TsHelper.class.getResourceAsStream(resourceName));
-        return new TsHelper(Utils.splitMultiline(text, false));
+        return new TsHelper(Utils.readLines(TsHelper.class.getResourceAsStream(resourceName)));
     }
 
     public List<String> getLines() {

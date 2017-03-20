@@ -45,6 +45,9 @@ public class Settings {
     public boolean ignoreSwaggerAnnotations = false;
     public boolean generateJaxrsApplicationInterface = false;
     public boolean generateJaxrsApplicationClient = false;
+    public JaxrsNamespacing jaxrsNamespacing;
+    public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
+    public String jaxrsNamespacingAnnotationElement;  // default is "value"
     public String restResponseType = null;
     public String restOptionsType = null;
     public TypeProcessor customTypeProcessor = null;
@@ -164,6 +167,15 @@ public class Settings {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
         final boolean generateJaxrs = generateJaxrsApplicationClient || generateJaxrsApplicationInterface;
+        if (jaxrsNamespacing != null && !generateJaxrs) {
+            throw new RuntimeException("'jaxrsNamespacing' parameter can only be used when generating JAX-RS client or interface.");
+        }
+        if (jaxrsNamespacingAnnotation != null && jaxrsNamespacing != JaxrsNamespacing.byAnnotation) {
+            throw new RuntimeException("'jaxrsNamespacingAnnotation' parameter can only be used when 'jaxrsNamespacing' parameter is set to 'byAnnotation'.");
+        }
+        if (jaxrsNamespacingAnnotation == null && jaxrsNamespacing == JaxrsNamespacing.byAnnotation) {
+            throw new RuntimeException("'jaxrsNamespacingAnnotation' must be specified when 'jaxrsNamespacing' parameter is set to 'byAnnotation'.");
+        }
         if (restResponseType != null && !generateJaxrs) {
             throw new RuntimeException("'restResponseType' parameter can only be used when generating JAX-RS client or interface.");
         }
@@ -228,6 +240,14 @@ public class Settings {
         };
     }
 
+    public void setJaxrsNamespacingAnnotation(ClassLoader classLoader, String jaxrsNamespacingAnnotation) {
+        final String[] split = jaxrsNamespacingAnnotation.split("#");
+        final String className = split[0];
+        final String elementName = split.length > 1 ? split[1] : "value";
+        this.jaxrsNamespacingAnnotation = loadClass(classLoader, className, Annotation.class);
+        this.jaxrsNamespacingAnnotationElement = elementName;
+    }
+
     public boolean areDefaultStringEnumsOverriddenByExtension() {
         return defaultStringEnumsOverriddenByExtension;
     }
@@ -240,20 +260,24 @@ public class Settings {
         if (classNames == null) {
             return null;
         }
+        final List<Class<? extends T>> classes = new ArrayList<>();
+        for (String className : classNames) {
+            classes.add(loadClass(classLoader, className, requiredClassType));
+        }
+        return classes;
+    }
+
+    private static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
         try {
-            final List<Class<? extends T>> classes = new ArrayList<>();
-            for (String className : classNames) {
-                System.out.println("Loading class " + className);
-                final Class<?> loadedClass = classLoader.loadClass(className);
-                if (requiredClassType.isAssignableFrom(loadedClass)) {
-                    @SuppressWarnings("unchecked")
-                    final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
-                    classes.add(castedClass);
-                } else {
-                    throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
-                }
+            System.out.println("Loading class " + className);
+            final Class<?> loadedClass = classLoader.loadClass(className);
+            if (requiredClassType.isAssignableFrom(loadedClass)) {
+                @SuppressWarnings("unchecked")
+                final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
+                return castedClass;
+            } else {
+                throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
             }
-            return classes;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
