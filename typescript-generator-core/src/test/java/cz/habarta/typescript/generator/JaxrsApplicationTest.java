@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.*;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.swagger.annotations.Api;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.URI;
@@ -347,8 +348,40 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
     }
 
+    @Test
+    public void testNamespacingPerResource() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationInterface = true;
+        settings.generateJaxrsApplicationClient = true;
+        settings.jaxrsNamespacing = JaxrsNamespacing.perResource;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+        Assert.assertTrue(errorMessage, !output.contains("class OrganizationApplicationClient"));
+        Assert.assertTrue(errorMessage, output.contains("class OrganizationsResourceClient implements OrganizationsResource "));
+        Assert.assertTrue(errorMessage, !output.contains("class OrganizationResourceClient"));
+        Assert.assertTrue(errorMessage, output.contains("class PersonResourceClient implements PersonResource "));
+    }
+
+    @Test
+    public void testNamespacingByAnnotation() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationInterface = true;
+        settings.generateJaxrsApplicationClient = true;
+        settings.jaxrsNamespacing = JaxrsNamespacing.byAnnotation;
+        settings.jaxrsNamespacingAnnotation = Api.class;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+        Assert.assertTrue(errorMessage, output.contains("class OrgApiClient implements OrgApi "));
+        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient implements OrganizationApplication "));
+        Assert.assertTrue(errorMessage, !output.contains("class OrganizationsResourceClient"));
+        Assert.assertTrue(errorMessage, !output.contains("class OrganizationResourceClient"));
+        Assert.assertTrue(errorMessage, !output.contains("class PersonResourceClient"));
+    }
+
     @ApplicationPath("api")
-    private static class OrganizationApplication extends Application {
+    public static class OrganizationApplication extends Application {
         @Override
         public Set<Class<?>> getClasses() {
             return new LinkedHashSet<>(Arrays.asList(
@@ -358,8 +391,9 @@ public class JaxrsApplicationTest {
         }
     }
 
+    @Api("OrgApi")
     @Path("organizations")
-    private static class OrganizationsResource {
+    public static class OrganizationsResource {
         @PathParam("organizationId")
         protected long organizationId;
         @GET
@@ -372,7 +406,7 @@ public class JaxrsApplicationTest {
         }
     }
 
-    private static class OrganizationResource {
+    public static class OrganizationResource {
         @GET
         public Organization getOrganization() {
             return null;
@@ -382,7 +416,7 @@ public class JaxrsApplicationTest {
         }
     }
 
-    private static class Organization {
+    public static class Organization {
         public String name;
     }
 
@@ -409,7 +443,7 @@ public class JaxrsApplicationTest {
         }
     }
 
-    private static class Address {
+    public static class Address {
         public String name;
     }
 

@@ -66,11 +66,11 @@ public class Utils {
     }
 
     public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
-        final Object annotation = getAnnotation(annotatedElement, annotationClassName);
+        final Annotation annotation = getAnnotation(annotatedElement, annotationClassName);
         return getAnnotationElementValue(annotation, annotationElementName, annotationElementType);
     }
 
-    public static Object getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
+    public static Annotation getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
         if (annotatedElement != null) {
             for (Annotation annotation : annotatedElement.getAnnotations()) {
                 if (annotation.annotationType().getName().equals(annotationClassName)) {
@@ -82,7 +82,7 @@ public class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getAnnotationElementValue(Object annotation, String annotationElementName, Class<T> annotationElementType) {
+    public static <T> T getAnnotationElementValue(Annotation annotation, String annotationElementName, Class<T> annotationElementType) {
         try {
             if (annotation != null) {
                 for (Method method : annotation.getClass().getMethods()) {
@@ -163,6 +163,10 @@ public class Utils {
         final ArrayList<T> result = new ArrayList<>(list);
         result.removeAll(Collections.singleton(null));
         return result;
+    }
+
+    public static List<String> readLines(InputStream stream) {
+        return splitMultiline(readString(stream), false);        
     }
 
     public static String readString(InputStream stream) {

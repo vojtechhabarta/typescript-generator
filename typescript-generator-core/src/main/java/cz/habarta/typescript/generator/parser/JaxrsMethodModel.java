@@ -7,6 +7,7 @@ import java.util.*;
 
 public class JaxrsMethodModel extends MethodModel {
 
+    private final Class<?> rootResource;
     private final String httpMethod;
     private final String path;
     private final List<MethodParameterModel> pathParams;
@@ -14,14 +15,19 @@ public class JaxrsMethodModel extends MethodModel {
     private final MethodParameterModel entityParam;
 
     public JaxrsMethodModel(Class<?> originClass, String name, Type returnType,
-            String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam,
+            Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam,
             List<String> comments) {
         super(originClass, name, null, returnType, comments);
+        this.rootResource = rootResource;
         this.httpMethod = httpMethod;
         this.path = path;
         this.pathParams = pathParams;
         this.queryParams = queryParams;
         this.entityParam = entityParam;
+    }
+
+    public Class<?> getRootResource() {
+        return rootResource;
     }
 
     public String getHttpMethod() {

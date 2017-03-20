@@ -10,7 +10,7 @@ import java.text.*;
 import java.util.*;
 
 
-public class Emitter {
+public class Emitter implements EmitterExtension.Writer {
 
     private final Settings settings;
     private Writer writer;
@@ -111,12 +111,7 @@ public class Emitter {
             writeNewLine();
             writeNewLine();
             writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
-            emitterExtension.emitElements(new EmitterExtension.Writer() {
-                @Override
-                public void writeIndentedLine(String line) {
-                    Emitter.this.writeIndentedLine(line);
-                }
-            }, settings, exportKeyword, model);
+            emitterExtension.emitElements(this, settings, exportKeyword, model);
         }
     }
 
@@ -251,12 +246,7 @@ public class Emitter {
     private void emitHelpers(TsModel model) {
         for (TsHelper helper : model.getHelpers()) {
             writeNewLine();
-            for (String line : helper.getLines()) {
-                writeIndentedLine(line
-                        .replace("\t", settings.indentString)
-                        .replace("\"", settings.quotes)
-                );
-            }
+            writeTemplate(this, settings, helper.getLines(), null);
         }
     }
 
@@ -277,11 +267,26 @@ public class Emitter {
         }
     }
 
+    public static void writeTemplate(EmitterExtension.Writer writer, Settings settings, List<String> template, Map<String, String> replacements) {
+        for (String line : template) {
+            if (replacements != null) {
+                for (Map.Entry<String, String> entry : replacements.entrySet()) {
+                    line = line.replace(entry.getKey(), entry.getValue());
+                }
+            }
+            writer.writeIndentedLine(line
+                    .replace("\t", settings.indentString)
+                    .replace("\"", settings.quotes)
+            );
+        }
+    }
+
     private void writeIndentedLine(boolean exportKeyword, String line) {
         writeIndentedLine((exportKeyword ? "export " : "") + line);
     }
 
-    private void writeIndentedLine(String line) {
+    @Override
+    public void writeIndentedLine(String line) {
         try {
             if (!line.isEmpty()) {
                 for (int i = 0; i < indent; i++) {

@@ -91,4 +91,8 @@ public class TsBeanModel extends TsDeclarationModel {
         return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, taggedUnionClasses, interfaces, properties, constructor, methods, comments);
     }
 
+    public boolean isJaxrsApplicationClientBean() {
+        return category== TsBeanCategory.Service && isClass;
+    }
+    
 }

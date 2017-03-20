@@ -79,7 +79,7 @@ public class JaxrsApplicationParser {
         if (path != null) {
             System.out.println("Parsing JAX-RS resource: " + cls.getName());
             final Result result = new Result();
-            parseResource(result, new ResourceContext(path.value()), cls);
+            parseResource(result, new ResourceContext(cls, path.value()), cls);
             return result;
         }
 
@@ -187,7 +187,8 @@ public class JaxrsApplicationParser {
             // comments
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
-            model.getMethods().add(new JaxrsMethodModel(resourceClass, method.getName(), modelReturnType, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
+            model.getMethods().add(new JaxrsMethodModel(resourceClass, method.getName(), modelReturnType,
+                    context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
         if (pathAnnotation != null && httpMethod == null) {
@@ -284,21 +285,23 @@ public class JaxrsApplicationParser {
     }
 
     private static class ResourceContext {
+        public final Class<?> rootResource;
         public final String path;
         public final Map<String, Type> pathParamTypes;
 
-        public ResourceContext(String path) {
-            this(path, new LinkedHashMap<String, Type>());
+        public ResourceContext(Class<?> rootResource, String path) {
+            this(rootResource, path, new LinkedHashMap<String, Type>());
         }
 
-        private ResourceContext(String path, Map<String, Type> pathParamTypes) {
+        private ResourceContext(Class<?> rootResource, String path, Map<String, Type> pathParamTypes) {
+            this.rootResource = rootResource;
             this.path = path;
             this.pathParamTypes = pathParamTypes;
         }
 
         ResourceContext subPath(Path pathAnnotation) {
             final String subPath = pathAnnotation != null ? pathAnnotation.value() : null;
-            return new ResourceContext(Utils.joinPath(path, subPath), pathParamTypes);
+            return new ResourceContext(rootResource, Utils.joinPath(path, subPath), pathParamTypes);
         }
 
         ResourceContext subPathParamTypes(Map<String, Type> subPathParamTypes) {
@@ -307,7 +310,7 @@ public class JaxrsApplicationParser {
             if (subPathParamTypes != null) {
                 newPathParamTypes.putAll(subPathParamTypes);
             }
-            return new ResourceContext(path, newPathParamTypes);
+            return new ResourceContext(rootResource, path, newPathParamTypes);
         }
     }
 

@@ -29,9 +29,9 @@ public class SymbolTable {
     }
 
     public Symbol getSymbol(Class<?> cls, String suffix) {
-        final Pair<Class<?>, String> key = Pair.<Class<?>, String>of(cls, suffix);
+        final String suffixString = suffix != null ? suffix : "";
+        final Pair<Class<?>, String> key = Pair.<Class<?>, String>of(cls, suffixString);
         if (!symbols.containsKey(key)) {
-            final String suffixString = suffix != null ? suffix : "";
             symbols.put(key, new Symbol("$" + cls.getName().replace('.', '$') + suffixString + "$"));
         }
         return symbols.get(key);
@@ -55,6 +55,21 @@ public class SymbolTable {
             syntheticSymbols.put(name, new Symbol(name));
         }
         return syntheticSymbols.get(name);
+    }
+
+    public Symbol getSyntheticSymbol(String name, String suffix) {
+        return getSyntheticSymbol(name + (suffix != null ? suffix : ""));
+    }
+
+    public Symbol addSuffixToSymbol(Symbol symbol, String suffix) {
+        // try symbols
+        for (Map.Entry<Pair<Class<?>, String>, Symbol> entry : symbols.entrySet()) {
+            if (entry.getValue() == symbol) {
+                return getSymbol(entry.getKey().getValue1(), entry.getKey().getValue2() + suffix);
+            }
+        }
+        // syntheticSymbols
+        return getSyntheticSymbol(symbol.name + suffix);
     }
 
     public void resolveSymbolNames() {
