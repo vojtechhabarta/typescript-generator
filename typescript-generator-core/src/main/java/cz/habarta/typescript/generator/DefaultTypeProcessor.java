@@ -120,6 +120,14 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(BigInteger.class, TsType.Number);
         knownTypes.put(Date.class, TsType.Date);
         knownTypes.put(UUID.class, TsType.String);
+
+        // joda time (if present)
+        try {
+            final Class<?> jodaTimeClass = Class.forName("org.joda.time.DateTime");
+            knownTypes.put(jodaTimeClass, TsType.Date);
+        } catch (ClassNotFoundException e) {
+            // ignore if joda time is not present
+        }
         return knownTypes;
     }
 
