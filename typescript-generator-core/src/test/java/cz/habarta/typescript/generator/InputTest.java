@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,8 +12,8 @@ public class InputTest {
 
     @Test
     public void testScanner() {
-        final FastClasspathScanner scanner = new FastClasspathScanner().scan();
-        final List<String> allClassNames = scanner.getNamesOfAllClasses();
+        final ScanResult scanResult = new FastClasspathScanner().scan();
+        final List<String> allClassNames = scanResult.getNamesOfAllClasses();
         final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
         Assert.assertTrue("Typescript-generator must have at least 20 tests :-)", testClassNames.size() > 20);
     }

@@ -3,7 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import java.lang.reflect.*;
 import java.util.*;
 import javax.ws.rs.*;
@@ -30,9 +30,9 @@ public class JaxrsApplicationScanner {
         }
     }
 
-    public static List<SourceType<Type>> scanAutomaticJaxrsApplication(FastClasspathScanner scanner, Predicate<String> isClassNameExcluded) {
+    public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
         try {
-            final List<String> namesOfResourceClasses = scanner.getNamesOfClassesWithAnnotation(Path.class);
+            final List<String> namesOfResourceClasses = scanResult.getNamesOfClassesWithAnnotation(Path.class);
             final List<Class<?>> resourceClasses = new ArrayList<>();
             for (String className : namesOfResourceClasses) {
                 resourceClasses.add(Thread.currentThread().getContextClassLoader().loadClass(className));

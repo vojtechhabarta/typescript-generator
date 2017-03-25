@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -61,28 +62,28 @@ public class Input {
 
     private static class ClasspathScanner {
 
-        private FastClasspathScanner fastClasspathScanner = null;
+        private ScanResult scanResult = null;
 
-        public FastClasspathScanner scanClasspath() {
-            if (fastClasspathScanner == null) {
+        public ScanResult scanClasspath() {
+            if (scanResult == null) {
                 System.out.println("Scanning classpath");
                 final Date scanStart = new Date();
-                final FastClasspathScanner scanner = new FastClasspathScanner().scan();
-                final int count = scanner.getNamesOfAllClasses().size();
+                final ScanResult result = new FastClasspathScanner().scan();
+                final int count = result.getNamesOfAllClasses().size();
                 final Date scanEnd = new Date();
                 final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
                 System.out.println(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
-                fastClasspathScanner = scanner;
+                scanResult = result;
             }
-            return fastClasspathScanner;
+            return scanResult;
         }
 
     }
 
-    private static Input fromClassNamePatterns(FastClasspathScanner scanner, List<String> classNamePatterns) {
+    private static Input fromClassNamePatterns(ScanResult scanResult, List<String> classNamePatterns) {
         final List<String> allClassNames = new ArrayList<>();
-        allClassNames.addAll(scanner.getNamesOfAllStandardClasses());
-        allClassNames.addAll(scanner.getNamesOfAllInterfaceClasses());
+        allClassNames.addAll(scanResult.getNamesOfAllStandardClasses());
+        allClassNames.addAll(scanResult.getNamesOfAllInterfaceClasses());
         Collections.sort(allClassNames);
         final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
         System.out.println(String.format("Found %d classes matching pattern.", classNames.size()));
