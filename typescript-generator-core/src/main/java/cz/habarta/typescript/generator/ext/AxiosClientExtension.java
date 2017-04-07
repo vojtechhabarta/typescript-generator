@@ -19,8 +19,9 @@ public class AxiosClientExtension extends EmitterExtension {
         features.generatesRuntimeCode = true;
         features.generatesModuleCode = true;
         features.generatesJaxrsApplicationClient = true;
-        features.restResponseType = "Axios.Promise<Axios.GenericAxiosResponse<R>>";
+        features.restResponseType = "Promise<Axios.GenericAxiosResponse<R>>";
         features.restOptionsType = "<O>";
+        features.npmPackageDependencies = Collections.singletonMap("axios", "0.16.0");
         return features;
     }
 

@@ -62,6 +62,8 @@ public class Settings {
     public boolean generateNpmPackageJson = false;
     public String npmName = null;
     public String npmVersion = null;
+    public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
+    public String typescriptVersion = "2.2.2";
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery = false;
     public ClassLoader classLoader = null;
@@ -156,6 +158,9 @@ public class Settings {
             if (features.restOptionsType != null) {
                 reportConfigurationChange(extensionName, "restOptionsType", features.restOptionsType);
                 setRestOptionsType(features.restOptionsType);
+            }
+            if (features.npmPackageDependencies != null) {
+                npmPackageDependencies.putAll(features.npmPackageDependencies);
             }
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;
