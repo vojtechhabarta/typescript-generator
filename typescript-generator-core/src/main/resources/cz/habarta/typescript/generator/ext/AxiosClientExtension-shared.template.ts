@@ -8,7 +8,7 @@ declare module "axios" {
     }
 }
 
-class AxiosHttpClient implements HttpClient {
+class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig> {
 
     constructor(private axios: Axios.AxiosInstance) {
     }

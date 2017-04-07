@@ -8,7 +8,6 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
-import javax.ws.rs.core.Application;
 
 
 /**
@@ -54,12 +53,15 @@ public class ModelCompiler {
             final TsType optionsType = settings.restOptionsType != null
                     ? new TsType.VerbatimType(settings.restOptionsType)
                     : null;
+            final TsType.GenericVariableType optionsGenericVariable = settings.restOptionsTypeIsGeneric
+                    ? new TsType.GenericVariableType(settings.restOptionsType)
+                    : null;
 
             if (settings.generateJaxrsApplicationInterface) {
-                tsModel = createJaxrsInterfaces(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsType);
+                tsModel = createJaxrsInterfaces(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsGenericVariable, optionsType);
             }
             if (settings.generateJaxrsApplicationClient) {
-                tsModel = createJaxrsClients(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsType);
+                tsModel = createJaxrsClients(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsGenericVariable, optionsType);
             }
         }
 
@@ -315,20 +317,24 @@ public class ModelCompiler {
         return responseSymbol;
     }
 
-    private TsModel createJaxrsInterfaces(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication, Symbol responseSymbol, TsType optionsType) {
+    private TsModel createJaxrsInterfaces(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication,
+            Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
+        final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
         final Map<Symbol, List<TsMethodModel>> groupedMethods = processJaxrsMethods(jaxrsApplication, symbolTable, null, responseSymbol, optionsType, false);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
-            final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), null, null, null, null, null, null, entry.getValue(), null);
+            final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, null, entry.getValue(), null);
             tsModel.getBeans().add(interfaceModel);
         }
         return tsModel;
     }
 
-    private TsModel createJaxrsClients(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication, Symbol responseSymbol, TsType optionsType) {
+    private TsModel createJaxrsClients(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication,
+            Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
         final Symbol httpClientSymbol = symbolTable.getSyntheticSymbol("HttpClient");
+        final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
 
         // HttpClient interface
-        tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.ServicePrerequisite, false, httpClientSymbol, null, null, null, null, null, null, Arrays.asList(
+        tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.ServicePrerequisite, false, httpClientSymbol, typeParameters, null, null, null, null, null, Arrays.asList(
                 new TsMethodModel("request", new TsType.GenericReferenceType(responseSymbol, TsType.Any), Arrays.asList(
                         new TsParameterModel("requestConfig", new TsType.ObjectType(
                                 new TsProperty("method", TsType.String),
@@ -341,8 +347,11 @@ public class ModelCompiler {
         ), null));
 
         // application client classes
+        final TsType.ReferenceType httpClientType = optionsGenericVariable != null
+                ? new TsType.GenericReferenceType(httpClientSymbol, optionsGenericVariable)
+                : new TsType.ReferenceType(httpClientSymbol);
         final TsConstructorModel constructor = new TsConstructorModel(
-                Arrays.asList(new TsParameterModel(TsAccessibilityModifier.Protected, "httpClient", new TsType.ReferenceType(httpClientSymbol))),
+                Arrays.asList(new TsParameterModel(TsAccessibilityModifier.Protected, "httpClient", httpClientType)),
                 Collections.<TsStatement>emptyList(),
                 null
         );
@@ -351,7 +360,7 @@ public class ModelCompiler {
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final Symbol symbol = settings.generateJaxrsApplicationInterface ? symbolTable.addSuffixToSymbol(entry.getKey(), "Client") : entry.getKey();
             final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(entry.getKey()) : null;
-            final TsBeanModel clientModel = new TsBeanModel(null, TsBeanCategory.Service, true, symbol, null, null, null,
+            final TsBeanModel clientModel = new TsBeanModel(null, TsBeanCategory.Service, true, symbol, typeParameters, null, null,
                     Utils.listFromNullable(interfaceType), null, constructor, entry.getValue(), null);
             tsModel.getBeans().add(clientModel);
         }

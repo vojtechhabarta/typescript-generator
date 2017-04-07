@@ -117,7 +117,7 @@ public class GenerateTask extends DefaultTask {
         settings.jaxrsNamespacing = jaxrsNamespacing;
         settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
         settings.restResponseType = restResponseType;
-        settings.restOptionsType = restOptionsType;
+        settings.setRestOptionsType(restOptionsType);
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;

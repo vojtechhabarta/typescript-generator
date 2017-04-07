@@ -50,6 +50,7 @@ public class Settings {
     public String jaxrsNamespacingAnnotationElement;  // default is "value"
     public String restResponseType = null;
     public String restOptionsType = null;
+    public boolean restOptionsTypeIsGeneric;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
@@ -154,7 +155,7 @@ public class Settings {
             }
             if (features.restOptionsType != null) {
                 reportConfigurationChange(extensionName, "restOptionsType", features.restOptionsType);
-                restOptionsType = features.restOptionsType;
+                setRestOptionsType(features.restOptionsType);
             }
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;
@@ -247,6 +248,18 @@ public class Settings {
             final String elementName = split.length > 1 ? split[1] : "value";
             this.jaxrsNamespacingAnnotation = loadClass(classLoader, className, Annotation.class);
             this.jaxrsNamespacingAnnotationElement = elementName;
+        }
+    }
+
+    public void setRestOptionsType(String restOptionsType) {
+        if (restOptionsType != null) {
+            if (restOptionsType.startsWith("<") && restOptionsType.endsWith(">")) {
+                this.restOptionsType = restOptionsType.substring(1, restOptionsType.length() - 1);
+                this.restOptionsTypeIsGeneric = true;
+            } else {
+                this.restOptionsType = restOptionsType;
+                this.restOptionsTypeIsGeneric = false;
+            }
         }
     }
 

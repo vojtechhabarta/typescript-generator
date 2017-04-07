@@ -20,7 +20,7 @@ public class AxiosClientExtension extends EmitterExtension {
         features.generatesModuleCode = true;
         features.generatesJaxrsApplicationClient = true;
         features.restResponseType = "Axios.Promise<Axios.GenericAxiosResponse<R>>";
-        features.restOptionsType = "Axios.AxiosRequestConfig";
+        features.restOptionsType = "<O>";
         return features;
     }
 

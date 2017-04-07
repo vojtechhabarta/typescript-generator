@@ -280,8 +280,8 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies HTTP response type in JAXRS application.
-     * Default value is <code>Promise&amp;R></code> which means data object returned asynchronously.
-     * Useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>)
+     * Default value is <code>Promise&lt;R></code> which means data object returned asynchronously.
+     * This parameter is useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>)
      * is returned instead of actual response data.
      */
     @Parameter
@@ -291,6 +291,7 @@ public class GenerateMojo extends AbstractMojo {
      * Specifies HTTP request options type in JAXRS application.
      * By default no <code>options</code> parameter is generated.
      * Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>).
+     * Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&ltO></code>).
      */
     @Parameter
     private String restOptionsType;
@@ -444,7 +445,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jaxrsNamespacing = jaxrsNamespacing;
             settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
             settings.restResponseType = restResponseType;
-            settings.restOptionsType = restOptionsType;
+            settings.setRestOptionsType(restOptionsType);
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
             settings.sortTypeDeclarations = sortTypeDeclarations;
