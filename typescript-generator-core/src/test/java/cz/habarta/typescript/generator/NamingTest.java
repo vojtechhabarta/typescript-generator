@@ -26,6 +26,15 @@ public class NamingTest {
         Assert.assertTrue(output.contains("B$ConflictingClass"));
     }
 
+    @Test
+    public void testConflictPrevented() {
+        final Settings settings = TestUtils.settings();
+        settings.mapPackagesToNamespaces = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.ConflictingClass.class, B.ConflictingClass.class));
+        Assert.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.A {"));
+        Assert.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.B {"));
+    }
+
     private static class A {
         private static class ConflictingClass {
             public String conflictingProperty;
@@ -43,7 +52,7 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeNamingFunction = "function(name, simpleName) { if (name.indexOf('cz.') === 0) return 'Test' + simpleName; }";
         final SymbolTable symbolTable = new SymbolTable(settings);
-        final String name = symbolTable.getMappedName(A.class);
+        final String name = symbolTable.getMappedFullName(A.class);
         Assert.assertEquals("TestA", name);
     }
 
@@ -52,7 +61,7 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeNamingFunction = "function() {}";
         final SymbolTable symbolTable = new SymbolTable(settings);
-        final String name = symbolTable.getMappedName(A.class);
+        final String name = symbolTable.getMappedFullName(A.class);
         Assert.assertEquals("A", name);
     }
 

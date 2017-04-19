@@ -41,7 +41,7 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
         if (categoryResult != 0) {
             return categoryResult;
         }
-        final int nameResult = compare(this.name.toString(), o.name.toString());
+        final int nameResult = compare(this.name.getFullName(), o.name.getFullName());
         if (nameResult != 0) {
             return nameResult;
         }

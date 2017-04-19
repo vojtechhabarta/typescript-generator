@@ -37,7 +37,7 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
                             }
                         }
                         if (propertyValue != null) {
-                            final String baseTypeName = tsBean.getName().toString();
+                            final String baseTypeName = tsBean.getName().getSimpleName();
                             final String subTypeName = findTypeName(subType.value(), model);
                             if (baseTypeName != null && subTypeName != null) {
                                 writer.writeIndentedLine("");
@@ -53,7 +53,7 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
     static String findTypeName(Class<?> beanClass, TsModel model) {
         for (TsBeanModel bean : model.getBeans()) {
             if (bean.getOrigin().equals(beanClass)) {
-                return bean.getName().toString();
+                return bean.getName().getSimpleName();
             }
         }
         return null;

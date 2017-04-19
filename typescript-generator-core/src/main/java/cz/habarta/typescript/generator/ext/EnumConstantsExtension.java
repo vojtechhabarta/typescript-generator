@@ -28,9 +28,9 @@ public class EnumConstantsExtension extends EmitterExtension {
         Collections.sort(enums);
         for (TsEnumModel<String> tsEnum : enums) {
             writer.writeIndentedLine("");
-            writer.writeIndentedLine(exportString + "const " + tsEnum.getName() + " = {");
+            writer.writeIndentedLine(exportString + "const " + tsEnum.getName().getSimpleName() + " = {");
             for (EnumMemberModel<String> member : tsEnum.getMembers()) {
-                writer.writeIndentedLine(settings.indentString + member.getPropertyName() + ": " + "<" + tsEnum.getName() + ">\"" + member.getEnumValue() + "\",");
+                writer.writeIndentedLine(settings.indentString + member.getPropertyName() + ": " + "<" + tsEnum.getName().getSimpleName() + ">\"" + member.getEnumValue() + "\",");
             }
             writer.writeIndentedLine("}");
         }

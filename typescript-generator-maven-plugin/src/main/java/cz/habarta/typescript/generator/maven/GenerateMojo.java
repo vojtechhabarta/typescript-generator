@@ -56,6 +56,12 @@ public class GenerateMojo extends AbstractMojo {
     private String namespace;
 
     /**
+     * Generates TypeScript namespaces from Java packages. Default is false.
+     */
+    @Parameter
+    private boolean mapPackagesToNamespaces;
+
+    /**
      * Turns proper module into UMD (Universal Module Definition) with specified namespace.
      * Only applicable to declaration files.
      */
@@ -421,6 +427,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.outputKind = outputKind;
             settings.module = module;
             settings.namespace = namespace;
+            settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
             settings.umdNamespace = umdNamespace;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;

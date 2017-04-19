@@ -89,7 +89,7 @@ public abstract class TsType {
 
         @Override
         public String format(Settings settings) {
-            return symbol.toString();
+            return symbol.getFullName();
         }
 
     }
@@ -109,7 +109,7 @@ public abstract class TsType {
 
         @Override
         public String format(Settings settings) {
-            return symbol + "<" + Utils.join(format(typeArguments, settings), ", ") + ">";
+            return symbol.getFullName() + "<" + Utils.join(format(typeArguments, settings), ", ") + ">";
         }
     }
     

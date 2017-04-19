@@ -69,7 +69,7 @@ public class SymbolTable {
             }
         }
         // syntheticSymbols
-        return getSyntheticSymbol(symbol.name + suffix);
+        return getSyntheticSymbol(symbol.getFullName() + suffix);
     }
 
     public void resolveSymbolNames() {
@@ -79,12 +79,12 @@ public class SymbolTable {
             final String suffix = entry.getKey().getValue2();
             final Symbol symbol = entry.getValue();
             final String suffixString = suffix != null ? suffix : "";
-            final String name = getMappedName(cls) + suffixString;
-            symbol.name = name;
-            if (!names.containsKey(name)) {
-                names.put(name, new ArrayList<Class<?>>());
+            final String fullName = getMappedFullName(cls) + suffixString;
+            symbol.setFullName(fullName);
+            if (!names.containsKey(fullName)) {
+                names.put(fullName, new ArrayList<Class<?>>());
             }
-            names.get(name).add(cls);
+            names.get(fullName).add(cls);
         }
         reportConflicts(names);
     }
@@ -104,7 +104,7 @@ public class SymbolTable {
         }
     }
 
-    public String getMappedName(Class<?> cls) {
+    public String getMappedFullName(Class<?> cls) {
         if (cls == null) {
             return null;
         }
@@ -123,20 +123,31 @@ public class SymbolTable {
                 throw new RuntimeException("Evaluating 'customTypeNamingFunction' failed.", e);
             }
         }
-        String name = cls.getSimpleName();
-        if (settings.removeTypeNamePrefix != null && name.startsWith(settings.removeTypeNamePrefix)) {
-            name = name.substring(settings.removeTypeNamePrefix.length(), name.length());
+        String simpleName = cls.getSimpleName();
+        if (settings.removeTypeNamePrefix != null && simpleName.startsWith(settings.removeTypeNamePrefix)) {
+            simpleName = simpleName.substring(settings.removeTypeNamePrefix.length(), simpleName.length());
         }
-        if (settings.removeTypeNameSuffix != null && name.endsWith(settings.removeTypeNameSuffix)) {
-            name = name.substring(0, name.length() - settings.removeTypeNameSuffix.length());
+        if (settings.removeTypeNameSuffix != null && simpleName.endsWith(settings.removeTypeNameSuffix)) {
+            simpleName = simpleName.substring(0, simpleName.length() - settings.removeTypeNameSuffix.length());
         }
         if (settings.addTypeNamePrefix != null) {
-            name = settings.addTypeNamePrefix + name;
+            simpleName = settings.addTypeNamePrefix + simpleName;
         }
         if (settings.addTypeNameSuffix != null) {
-            name = name + settings.addTypeNameSuffix;
+            simpleName = simpleName + settings.addTypeNameSuffix;
         }
-        return name;
+
+        if (settings.mapPackagesToNamespaces) {
+            final String classNameDotted = cls.getName().replace('$', '.');
+            final int index = classNameDotted.lastIndexOf('.');
+            if (index == -1) {
+                return simpleName;
+            } else {
+                return classNameDotted.substring(0, index) + "." + simpleName;
+            }
+        } else {
+            return simpleName;
+        }
     }
 
     private static boolean isUndefined(Object variable) {

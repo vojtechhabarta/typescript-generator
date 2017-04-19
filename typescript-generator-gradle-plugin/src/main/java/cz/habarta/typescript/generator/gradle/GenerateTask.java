@@ -17,6 +17,7 @@ public class GenerateTask extends DefaultTask {
     public TypeScriptOutputKind outputKind;
     public String module;
     public String namespace;
+    public boolean mapPackagesToNamespaces;
     public String umdNamespace;
     public List<String> classes;
     public List<String> classPatterns;
@@ -93,6 +94,7 @@ public class GenerateTask extends DefaultTask {
         settings.outputKind = outputKind;
         settings.module = module;
         settings.namespace = namespace;
+        settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
         settings.umdNamespace = umdNamespace;
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;

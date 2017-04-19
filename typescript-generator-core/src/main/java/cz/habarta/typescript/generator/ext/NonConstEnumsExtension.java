@@ -29,7 +29,7 @@ public class NonConstEnumsExtension extends EmitterExtension {
         Collections.sort(enums);
         for (TsEnumModel<String> tsEnum : enums) {
             writer.writeIndentedLine("");
-            writer.writeIndentedLine(exportString + "enum " + tsEnum.getName() + " {");
+            writer.writeIndentedLine(exportString + "enum " + tsEnum.getName().getSimpleName() + " {");
             for (EnumMemberModel<String> member : tsEnum.getMembers()) {
                 writer.writeIndentedLine(settings.indentString + member.getPropertyName() + ",");
             }

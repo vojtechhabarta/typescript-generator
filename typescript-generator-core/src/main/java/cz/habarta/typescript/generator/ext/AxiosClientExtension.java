@@ -18,6 +18,7 @@ public class AxiosClientExtension extends EmitterExtension {
         final EmitterExtensionFeatures features = new EmitterExtensionFeatures();
         features.generatesRuntimeCode = true;
         features.generatesModuleCode = true;
+        features.worksWithPackagesMappedToNamespaces = true;
         features.generatesJaxrsApplicationClient = true;
         features.restResponseType = "Promise<Axios.GenericAxiosResponse<R>>";
         features.restOptionsType = "<O>";
@@ -30,7 +31,7 @@ public class AxiosClientExtension extends EmitterExtension {
         emitSharedPart(writer, settings);
         for (TsBeanModel bean : model.getBeans()) {
             if (bean.isJaxrsApplicationClientBean()) {
-                final String clientName = bean.getName().toString();
+                final String clientName = bean.getName().getSimpleName();
                 emitClient(writer, settings, exportKeyword, clientName);
             }
         }
