@@ -155,7 +155,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
     }
 
     private static String getBeanModelClassName(TsBeanModel bean) {
-        return bean.getName().toString();
+        return bean.getName().getSimpleName();
     }
 
     private static void writeBeanProperty(
@@ -164,7 +164,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         TsBeanModel fieldBeanModel = getBeanModelByType(model, property.getTsType());
         String fieldClassName = fieldBeanModel != null ? getBeanModelClassName(fieldBeanModel) : "";
         // if a class has a field of its own type, we get stackoverflow exception
-        if (fieldClassName.equals(bean.getName().toString())) {
+        if (fieldClassName.equals(bean.getName().getSimpleName())) {
             fieldClassName = "";
         }
         writer.writeIndentedLine(

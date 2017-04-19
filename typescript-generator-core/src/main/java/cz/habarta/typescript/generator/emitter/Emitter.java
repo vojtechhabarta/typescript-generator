@@ -117,28 +117,73 @@ public class Emitter implements EmitterExtension.Writer {
 
     private void emitBeans(TsModel model, boolean exportKeyword) {
         for (TsBeanModel bean : model.getBeans()) {
-            writeNewLine();
-            emitComments(bean.getComments());
-            final String declarationType = bean.isClass() ? "class" : "interface";
-            final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
-            final List<TsType> extendsList = bean.getExtendsList();
-            final List<TsType> implementsList = bean.getImplementsList();
-            final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
-            final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
-            writeIndentedLine(exportKeyword, declarationType + " " + bean.getName() + typeParameters + extendsClause + implementsClause + " {");
-            indent++;
-            for (TsPropertyModel property : bean.getProperties()) {
-                emitProperty(property);
-            }
-            if (bean.getConstructor() != null) {
-                emitCallable(bean.getConstructor());
-            }
-            for (TsMethodModel method : bean.getMethods()) {
-                emitCallable(method);
-            }
-            indent--;
-            writeIndentedLine("}");
+            emitFullyQualifiedDeclaration(bean, exportKeyword, false);
         }
+    }
+
+    private void emitTypeAliases(TsModel model, boolean exportKeyword) {
+        for (TsAliasModel alias : model.getTypeAliases()) {
+            emitFullyQualifiedDeclaration(alias, exportKeyword, false);
+        }
+    }
+
+    private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
+        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum && !settings.areDefaultStringEnumsOverriddenByExtension()
+                ? new ArrayList<>(model.getEnums())
+                : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
+        for (TsEnumModel<?> enumModel : enums) {
+            emitFullyQualifiedDeclaration(enumModel, exportKeyword, declareKeyword);
+        }
+    }
+
+    private void emitFullyQualifiedDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
+        if (declaration.getName().getNamespace() != null) {
+            writeNewLine();
+            writeIndentedLine(exportKeyword, "namespace " + declaration.getName().getNamespace() + " {");
+            indent++;
+            emitDeclaration(declaration, true, declareKeyword);
+            indent--;
+            writeNewLine();
+            writeIndentedLine("}");
+        } else {
+            emitDeclaration(declaration, exportKeyword, declareKeyword);
+        }
+    }
+
+    private void emitDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
+        if (declaration instanceof TsBeanModel) {
+            emitBean((TsBeanModel) declaration, exportKeyword);
+        } else if (declaration instanceof TsAliasModel) {
+            emitTypeAlias((TsAliasModel) declaration, exportKeyword);
+        } else if (declaration instanceof TsEnumModel) {
+            emitNumberEnum((TsEnumModel) declaration, exportKeyword, declareKeyword);
+        } else {
+            throw new RuntimeException("Unknown declaration type: " + declaration.getClass().getName());
+        }
+    }
+
+    private void emitBean(TsBeanModel bean, boolean exportKeyword) {
+        writeNewLine();
+        emitComments(bean.getComments());
+        final String declarationType = bean.isClass() ? "class" : "interface";
+        final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
+        final List<TsType> extendsList = bean.getExtendsList();
+        final List<TsType> implementsList = bean.getImplementsList();
+        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
+        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
+        writeIndentedLine(exportKeyword, declarationType + " " + bean.getName().getSimpleName() + typeParameters + extendsClause + implementsClause + " {");
+        indent++;
+        for (TsPropertyModel property : bean.getProperties()) {
+            emitProperty(property);
+        }
+        if (bean.getConstructor() != null) {
+            emitCallable(bean.getConstructor());
+        }
+        for (TsMethodModel method : bean.getMethods()) {
+            emitCallable(method);
+        }
+        indent--;
+        writeIndentedLine("}");
     }
 
     private void emitProperty(TsPropertyModel property) {
@@ -211,36 +256,29 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitTypeAliases(TsModel model, boolean exportKeyword) {
-        for (TsAliasModel alias : model.getTypeAliases()) {
-            writeNewLine();
-            emitComments(alias.getComments());
-            final String genericParameters = alias.getTypeParameters().isEmpty()
-                    ? ""
-                    : "<" + Utils.join(alias.getTypeParameters(), ", ") + ">";
-            writeIndentedLine(exportKeyword, "type " + alias.getName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
-        }
+    private void emitTypeAlias(TsAliasModel alias, boolean exportKeyword) {
+        writeNewLine();
+        emitComments(alias.getComments());
+        final String genericParameters = alias.getTypeParameters().isEmpty()
+                ? ""
+                : "<" + Utils.join(alias.getTypeParameters(), ", ") + ">";
+        writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 
-    private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum && !settings.areDefaultStringEnumsOverriddenByExtension()
-                ? new ArrayList<>(model.getEnums())
-                : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
-        for (TsEnumModel<?> enumModel : enums) {
-            writeNewLine();
-            emitComments(enumModel.getComments());
-            writeIndentedLine(exportKeyword, (declareKeyword ? "declare " : "") + "const enum " + enumModel.getName() + " {");
-            indent++;
-            for (EnumMemberModel<?> member : enumModel.getMembers()) {
-                emitComments(member.getComments());
-                final String initializer = enumModel.getKind() == EnumKind.NumberBased
-                        ? " = " + member.getEnumValue()
-                        : "";
-                writeIndentedLine(member.getPropertyName() + initializer + ",");
-            }
-            indent--;
-            writeIndentedLine("}");
+    private void emitNumberEnum(TsEnumModel<?> enumModel, boolean exportKeyword, boolean declareKeyword) {
+        writeNewLine();
+        emitComments(enumModel.getComments());
+        writeIndentedLine(exportKeyword, (declareKeyword ? "declare " : "") + "const enum " + enumModel.getName().getSimpleName() + " {");
+        indent++;
+        for (EnumMemberModel<?> member : enumModel.getMembers()) {
+            emitComments(member.getComments());
+            final String initializer = enumModel.getKind() == EnumKind.NumberBased
+                    ? " = " + member.getEnumValue()
+                    : "";
+            writeIndentedLine(member.getPropertyName() + initializer + ",");
         }
+        indent--;
+        writeIndentedLine("}");
     }
 
     private void emitHelpers(TsModel model) {

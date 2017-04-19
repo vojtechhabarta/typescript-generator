@@ -24,6 +24,7 @@ public class Settings {
     public TypeScriptOutputKind outputKind = null;
     public String module = null;
     public String namespace = null;
+    public boolean mapPackagesToNamespaces = false;
     public String umdNamespace = null;
     public JsonLibrary jsonLibrary = null;
     private Predicate<String> excludeFilter = null;
@@ -146,6 +147,9 @@ public class Settings {
             }
             if (features.generatesModuleCode && outputKind != TypeScriptOutputKind.module) {
                 throw new RuntimeException(String.format("Extension '%s' generates code as module but 'outputKind' parameter is not set to 'module'.", extensionName));
+            }
+            if (!features.worksWithPackagesMappedToNamespaces && mapPackagesToNamespaces) {
+                throw new RuntimeException(String.format("Extension '%s' doesn't work with 'mapPackagesToNamespaces' parameter.", extensionName));
             }
             if (features.generatesJaxrsApplicationClient) {
                 reportConfigurationChange(extensionName, "generateJaxrsApplicationClient", "true");
