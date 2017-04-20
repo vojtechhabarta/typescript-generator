@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.util.Pair;
 import java.util.*;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
@@ -162,8 +163,16 @@ public class SymbolTable {
 
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
         if (customTypeNamingFunction == null) {
+            final String engineMimeType = "application/javascript";
             final ScriptEngineManager manager = new ScriptEngineManager();
-            final ScriptEngine engine = manager.getEngineByName("javascript");
+            final ScriptEngine engine = manager.getEngineByMimeType(engineMimeType);
+            if (engine == null) {
+                System.out.println(String.format("Error: Script engine for '%s' MIME type not found. Available engines: %s", engineMimeType, manager.getEngineFactories().size()));
+                for (ScriptEngineFactory factory : manager.getEngineFactories()) {
+                    System.out.println(String.format("  %s %s - MIME types: %s", factory.getEngineName(), factory.getEngineVersion(), factory.getMimeTypes()));
+                }
+                throw new RuntimeException("Cannot evaluate function specified using 'customTypeNamingFunction' parameter. See log for details.");
+            }
             engine.eval("var getName = " + settings.customTypeNamingFunction);
             final Invocable invocable = (Invocable) engine;
             customTypeNamingFunction = invocable.getInterface(CustomTypeNamingFunction.class);
