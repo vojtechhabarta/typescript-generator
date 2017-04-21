@@ -239,6 +239,14 @@ public abstract class TsType {
 
     public static TsType transformTsType(TsType tsType, Transformer transformer) {
         final TsType type = transformer.transform(tsType);
+        if (type instanceof TsType.GenericReferenceType) {
+            final GenericReferenceType genericReferenceType = (TsType.GenericReferenceType) type;
+            final List<TsType> typeArguments = new ArrayList<>();
+            for (TsType typeArgument : genericReferenceType.typeArguments) {
+                typeArguments.add(transformTsType(typeArgument, transformer));
+            }
+            return new TsType.GenericReferenceType(genericReferenceType.symbol, typeArguments);
+        }
         if (type instanceof TsType.OptionalType) {
             final TsType.OptionalType optionalType = (TsType.OptionalType) type;
             return new TsType.OptionalType(transformTsType(optionalType.type, transformer));
