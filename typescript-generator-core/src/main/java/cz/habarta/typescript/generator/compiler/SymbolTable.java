@@ -3,7 +3,9 @@ package cz.habarta.typescript.generator.compiler;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.util.Pair;
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
+import java.util.regex.Pattern;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
@@ -140,15 +142,37 @@ public class SymbolTable {
 
         if (settings.mapPackagesToNamespaces) {
             final String classNameDotted = cls.getName().replace('$', '.');
-            final int index = classNameDotted.lastIndexOf('.');
-            if (index == -1) {
-                return simpleName;
-            } else {
-                return classNameDotted.substring(0, index) + "." + simpleName;
+            final String[] parts = classNameDotted.split(Pattern.quote("."));
+            final List<String> safeParts = new ArrayList<>();
+            for (String part : Arrays.asList(parts).subList(0, parts.length - 1)) {
+                safeParts.add(isReservedWord(part) ? "_" + part : part);
             }
+            safeParts.add(simpleName);
+            return Utils.join(safeParts, ".");
         } else {
             return simpleName;
         }
+    }
+
+    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
+    private static final Set<String> Keywords = new LinkedHashSet<>(Arrays.asList(
+        "break",             "case",              "catch",             "class",
+        "const",             "continue",          "debugger",          "default",
+        "delete",            "do",                "else",              "enum",
+        "export",            "extends",           "false",             "finally",
+        "for",               "function",          "if",                "import",
+        "in",                "instanceof",        "new",               "null",
+        "return",            "super",             "switch",            "this",
+        "throw",             "true",              "try",               "typeof",
+        "var",               "void",              "while",             "with",
+
+        "implements",        "interface",         "let",               "package",
+        "private",           "protected",         "public",            "static",
+        "yield"
+    ));
+
+    private static boolean isReservedWord(String word) {
+        return Keywords.contains(word);
     }
 
     private static boolean isUndefined(Object variable) {

@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.yield.KeywordInPackage;
 import java.util.LinkedHashMap;
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,6 +64,26 @@ public class NamingTest {
         final SymbolTable symbolTable = new SymbolTable(settings);
         final String name = symbolTable.getMappedFullName(A.class);
         Assert.assertEquals("A", name);
+    }
+
+    @Test
+    public void testCombinations() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeNamingFunction = "function(name, simpleName) { if (name.indexOf('cz.') === 0) return 'Func' + simpleName; }";
+        settings.addTypeNamePrefix = "Conf";
+        settings.mapPackagesToNamespaces = true;
+        final SymbolTable symbolTable = new SymbolTable(settings);
+        Assert.assertEquals("FuncA", symbolTable.getMappedFullName(A.class));
+        Assert.assertEquals("java.lang.ConfObject", symbolTable.getMappedFullName(Object.class));
+    }
+
+    @Test
+    public void testTypeScriptKeywords() {
+        final Settings settings = TestUtils.settings();
+        settings.mapPackagesToNamespaces = true;
+        final SymbolTable symbolTable = new SymbolTable(settings);
+        final String name = symbolTable.getMappedFullName(KeywordInPackage.class);
+        Assert.assertEquals("cz.habarta.typescript.generator._yield.KeywordInPackage", name);
     }
 
 }
