@@ -102,7 +102,7 @@ public class NashornJavaParser extends ModelParser {
         String methodName = method.getName();
         
         // setters start with 'set'
-        if (!methodName.startsWith("set"))
+        if (!methodName.startsWith("set") || methodName.length() < 4)
             return null;
         
         // setters return 'void'
@@ -124,8 +124,15 @@ public class NashornJavaParser extends ModelParser {
     private PropertyModel parseGetterMethod(Class<?> clazz, Method method) {
         String methodName = method.getName();
         
-        // getters start with 'set'
-        if (methodName.equalsIgnoreCase("getClass") || (!methodName.startsWith("get") && !methodName.startsWith("is")))
+        // getters start with 'get'
+        if (methodName.equalsIgnoreCase("getClass"))
+            return null;
+        
+        if (!methodName.startsWith("get") && !methodName.startsWith("is"))
+            return null;
+        if (methodName.startsWith("get") && methodName.length() < 4)
+            return null;        
+        if (methodName.startsWith("is") && methodName.length() < 3)
             return null;
         
         // getters dont return 'void'
