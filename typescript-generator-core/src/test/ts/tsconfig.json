@@ -8,15 +8,26 @@
     },
     "files": [
         "module-usage.ts",
-        "../../../target/test-ts-modules/test-mn1.d.ts",
-        "../../../target/test-ts-modules/test-mn2.d.ts",
-        "../../../target/test-ts-modules/test-mn3a.d.ts",
-        "../../../target/test-ts-modules/test-mn3b.d.ts",
-        "../../../target/test-ts-modules/test-mn4a.d.ts",
-        "../../../target/test-ts-modules/test-mn4b.d.ts",
-        "../../../target/test-ts-modules/test-mn5.ts",
-        "../../../target/test-ts-modules/test-mn6.ts",
-        "../../../target/test-ts-modules/test-mn7.ts",
-        "../../../target/test-ts-modules/test-mn8.ts"
+        // "../../../target/test-ts-modules/test-mn1.d.ts",
+        // "../../../target/test-ts-modules/test-mn2.d.ts",
+        // "../../../target/test-ts-modules/test-mn3a.d.ts",
+        // "../../../target/test-ts-modules/test-mn3b.d.ts",
+        // "../../../target/test-ts-modules/test-mn4a.d.ts",
+        // "../../../target/test-ts-modules/test-mn4b.d.ts",
+        // "../../../target/test-ts-modules/test-mn5.ts",
+        // "../../../target/test-ts-modules/test-mn6.ts",
+        // "../../../target/test-ts-modules/test-mn7.ts",
+        // "../../../target/test-ts-modules/test-mn8.ts",
+        "module-usage-pkg.ts"
+        // "../../../target/test-ts-modules-pkg/test-mn1.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn2.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn3a.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn3b.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn4a.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn4b.d.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn5.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn6.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn7.ts",
+        // "../../../target/test-ts-modules-pkg/test-mn8.ts"
     ]
 }

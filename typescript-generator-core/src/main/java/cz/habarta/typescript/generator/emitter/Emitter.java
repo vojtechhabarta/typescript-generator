@@ -96,15 +96,15 @@ public class Emitter implements EmitterExtension.Writer {
             writeIndentedLine("}");
         } else {
             final boolean exportElements = settings.outputKind == TypeScriptOutputKind.module;
-            final boolean declareElements = settings.outputKind == TypeScriptOutputKind.global;
+            final boolean declareElements = settings.outputFileType == TypeScriptFileType.declarationFile && settings.outputKind == TypeScriptOutputKind.global;
             emitElements(model, exportElements, declareElements);
         }
     }
 
     private void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         exportKeyword = exportKeyword || forceExportKeyword;
-        emitBeans(model, exportKeyword);
-        emitTypeAliases(model, exportKeyword);
+        emitBeans(model, exportKeyword, declareKeyword);
+        emitTypeAliases(model, exportKeyword, declareKeyword);
         emitNumberEnums(model, exportKeyword, declareKeyword);
         emitHelpers(model);
         for (EmitterExtension emitterExtension : settings.extensions) {
@@ -115,15 +115,15 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitBeans(TsModel model, boolean exportKeyword) {
+    private void emitBeans(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         for (TsBeanModel bean : model.getBeans()) {
-            emitFullyQualifiedDeclaration(bean, exportKeyword, false);
+            emitFullyQualifiedDeclaration(bean, exportKeyword, declareKeyword);
         }
     }
 
-    private void emitTypeAliases(TsModel model, boolean exportKeyword) {
+    private void emitTypeAliases(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         for (TsAliasModel alias : model.getTypeAliases()) {
-            emitFullyQualifiedDeclaration(alias, exportKeyword, false);
+            emitFullyQualifiedDeclaration(alias, exportKeyword, declareKeyword);
         }
     }
 
@@ -139,9 +139,10 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitFullyQualifiedDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
         if (declaration.getName().getNamespace() != null) {
             writeNewLine();
-            writeIndentedLine(exportKeyword, "namespace " + declaration.getName().getNamespace() + " {");
+            final String prefix = declareKeyword ? "declare " : "";
+            writeIndentedLine(exportKeyword, prefix + "namespace " + declaration.getName().getNamespace() + " {");
             indent++;
-            emitDeclaration(declaration, true, declareKeyword);
+            emitDeclaration(declaration, true, false);
             indent--;
             writeNewLine();
             writeIndentedLine("}");
