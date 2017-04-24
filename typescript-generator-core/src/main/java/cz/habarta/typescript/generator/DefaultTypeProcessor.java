@@ -78,6 +78,11 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments), discoveredClasses);
             }
         }
+        if (javaType instanceof GenericArrayType) {
+            final GenericArrayType genericArrayType = (GenericArrayType) javaType;
+            final Result result = context.processType(genericArrayType.getGenericComponentType());
+            return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
+        }
         if (javaType instanceof TypeVariable) {
             final TypeVariable<?> typeVariable = (TypeVariable<?>) javaType;
             return new Result(new TsType.GenericVariableType(typeVariable.getName()));
