@@ -114,7 +114,8 @@ public class NashornJavaParser extends ModelParser {
             return null;
         
         // we have a winner
-        String propertyName = methodName.substring(2).toLowerCase();
+        String propertyName = methodName.substring(2);
+        propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
         Type propertyType = method.getParameterTypes()[0];
         
         return new PropertyModel(propertyName, propertyType, false, method, null, null);
@@ -143,14 +144,16 @@ public class NashornJavaParser extends ModelParser {
                 return null;
             
             Type propertyType = method.getReturnType();
-            String propertyName = methodName.substring(2).toLowerCase();
+            String propertyName = methodName.substring(2);
+            propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
             
             return new PropertyModel(propertyName, propertyType, false, method, null, null);
         }
         else if (methodName.startsWith("get")) {
             
             Type propertyType = method.getReturnType();
-            String propertyName = methodName.substring(3).toLowerCase();
+            String propertyName = methodName.substring(3);
+            propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);            
             
             return new PropertyModel(propertyName, propertyType, false, method, null, null);            
         }
