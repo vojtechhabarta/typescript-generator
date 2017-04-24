@@ -42,6 +42,14 @@ public class NashornJavaParser extends ModelParser {
             for (Class<?> cls : classes) {
                 addBeanToQueue(new SourceType<>(cls, sourceClass.type, field.getName()));
             }
+            if (type instanceof ParameterizedType) {
+                ParameterizedType aType = (ParameterizedType) type;
+                Type[] parameterArgTypes = aType.getActualTypeArguments();
+                for(Type parameterArgType : parameterArgTypes){
+                    addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, field.getName()));
+                }
+            }
+            
             properties.add(new PropertyModel(field.getName(), type, false, field, null, null));
         }
         
@@ -58,6 +66,14 @@ public class NashornJavaParser extends ModelParser {
                 for (Class<?> cls : classes) {
                     addBeanToQueue(new SourceType<>(cls, sourceClass.type, propertyGetter.getName()));
                 }
+                if (propertyGetter.getType() instanceof ParameterizedType) {
+                    ParameterizedType aType = (ParameterizedType) propertyGetter.getType();
+                    Type[] parameterArgTypes = aType.getActualTypeArguments();
+                    for(Type parameterArgType : parameterArgTypes){
+                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, propertyGetter.getName()));
+                    }
+                }                
+                
                 properties.add(propertyGetter);   
                 continue;
             }            
@@ -69,6 +85,14 @@ public class NashornJavaParser extends ModelParser {
                 for (Class<?> cls : classes) {
                     addBeanToQueue(new SourceType<>(cls, sourceClass.type, propertySetter.getName()));
                 }
+                if (propertySetter.getType() instanceof ParameterizedType) {
+                    ParameterizedType aType = (ParameterizedType) propertySetter.getType();
+                    Type[] parameterArgTypes = aType.getActualTypeArguments();
+                    for(Type parameterArgType : parameterArgTypes){
+                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, propertySetter.getName()));
+                    }
+                }                
+                
                 properties.add(propertySetter);    
                 continue;
             }  
@@ -78,7 +102,7 @@ public class NashornJavaParser extends ModelParser {
             List<Class<?>> classes = discoverClassesUsedInType(returnType);
             for (Class<?> cls : classes) {
                 addBeanToQueue(new SourceType<>(cls, sourceClass.type, method.getName()));
-            }
+            }            
             
             /* parameters and generic parameters */
             List<MethodParameterModel> parameters = new ArrayList<>();      
@@ -145,6 +169,10 @@ public class NashornJavaParser extends ModelParser {
             return null;        
         if (methodName.startsWith("is") && methodName.length() < 3)
             return null;
+        
+        // java.util.stream.BaseStream<T, S> has isParallel() and parallel() methods
+        if (methodName.equalsIgnoreCase("isParallel"))
+            return null;        
         
         // getters dont return 'void'
         if (method.getReturnType().equals(Void.TYPE))
