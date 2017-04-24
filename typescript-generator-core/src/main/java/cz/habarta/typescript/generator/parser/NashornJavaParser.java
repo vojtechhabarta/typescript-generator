@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,10 +80,20 @@ public class NashornJavaParser extends ModelParser {
                 addBeanToQueue(new SourceType<>(cls, sourceClass.type, method.getName()));
             }
             
-            List<MethodParameterModel> parameters = new ArrayList<>();        
+            /* parameters and generic parameters */
+            List<MethodParameterModel> parameters = new ArrayList<>();      
             for (Parameter parameter : method.getParameters()) {
-                parameters.add(new MethodParameterModel(parameter.getName(), parameter.getParameterizedType()));
+                Type parameterizedType = parameter.getParameterizedType();
+                parameters.add(new MethodParameterModel(parameter.getName(), parameterizedType));
                 addBeanToQueue(new SourceType<>(parameter.getType(), sourceClass.type, method.getName()));
+                
+                if (parameterizedType instanceof ParameterizedType) {
+                    ParameterizedType aType = (ParameterizedType) parameterizedType;
+                    Type[] parameterArgTypes = aType.getActualTypeArguments();
+                    for(Type parameterArgType : parameterArgTypes){
+                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, method.getName()));
+                    }
+                }
             }
             methods.add(new MethodModel(sourceClass.type, method.getName(), parameters, returnType, null));            
         }
