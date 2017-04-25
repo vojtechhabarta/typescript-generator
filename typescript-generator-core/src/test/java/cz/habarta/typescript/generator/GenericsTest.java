@@ -113,6 +113,17 @@ public class GenericsTest {
         assertEquals(expected, output.trim());
     }
 
+    @Test
+    public void testGenericArray() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TableGA.class));
+        final String expected =
+                "interface TableGA<T> {\n" +
+                "    rows: T[];\n" +
+                "}";
+        assertEquals(expected, output.trim());
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -155,6 +166,10 @@ public class GenericsTest {
     class Page2 {
         @SuppressWarnings("rawtypes")
         public Table someTable;
+    }
+
+    class TableGA<T> {
+        public T[] rows;
     }
 
 }
