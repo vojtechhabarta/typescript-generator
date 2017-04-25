@@ -1,5 +1,9 @@
 package cz.habarta.typescript.generator.parser;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -31,6 +35,7 @@ public class NashornJavaParser extends ModelParser {
         final List<PropertyModel> properties = new ArrayList<>();
         final List<MethodModel> methods = new ArrayList<>();
         
+        /* Public fields */
         for (Field field : sourceClass.type.getDeclaredFields()) {
             
             /* only include public fields */
@@ -52,56 +57,56 @@ public class NashornJavaParser extends ModelParser {
             
             properties.add(new PropertyModel(field.getName(), type, false, field, null, null));
         }
+
+        /* Private fields that have a getter or setter method become properties */
+        try {
+            BeanInfo info = Introspector.getBeanInfo(sourceClass.type);
+            for (PropertyDescriptor pd : info.getPropertyDescriptors()) {            
+                if (pd.getReadMethod() != null) {
+                    String propertyName = pd.getName();
+                    if (propertyName.equals("class")) {
+                        continue;
+                    }                    
+                    Type type = pd.getReadMethod().getGenericReturnType();
+                    List<Class<?>> classes = discoverClassesUsedInType(type);
+                    for (Class<?> cls : classes) {
+                        addBeanToQueue(new SourceType<>(cls, sourceClass.type, propertyName));
+                    }
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType aType = (ParameterizedType) type;
+                        Type[] parameterArgTypes = aType.getActualTypeArguments();
+                        for(Type parameterArgType : parameterArgTypes){
+                            addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, propertyName));
+                        }
+                    }
+                    properties.add(new PropertyModel(propertyName, type, false, pd.getReadMethod(), null, null));
+                }
+            }
+        }
+        catch (IntrospectionException e1) {
+            /* ignore */
+        }
         
+        /* Public methods */
         for (Method method : sourceClass.type.getDeclaredMethods()) {
             
             /* only include public methods */            
             if (!Modifier.isPublic(method.getModifiers())) 
                 continue;
             
-            /* method is a property getter */
-            PropertyModel propertyGetter = parseGetterMethod(sourceClass.type, method);
-            if (propertyGetter != null) {
-                List<Class<?>> classes = discoverClassesUsedInType(propertyGetter.getType());
-                for (Class<?> cls : classes) {
-                    addBeanToQueue(new SourceType<>(cls, sourceClass.type, propertyGetter.getName()));
-                }
-                if (propertyGetter.getType() instanceof ParameterizedType) {
-                    ParameterizedType aType = (ParameterizedType) propertyGetter.getType();
-                    Type[] parameterArgTypes = aType.getActualTypeArguments();
-                    for(Type parameterArgType : parameterArgTypes){
-                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, propertyGetter.getName()));
-                    }
-                }                
-                
-                properties.add(propertyGetter);   
-                continue;
-            }            
-            
-            /* method is a property setter */
-            PropertyModel propertySetter = parseSetterMethod(sourceClass.type, method);
-            if (propertySetter != null) {
-                List<Class<?>> classes = discoverClassesUsedInType(propertySetter.getType());
-                for (Class<?> cls : classes) {
-                    addBeanToQueue(new SourceType<>(cls, sourceClass.type, propertySetter.getName()));
-                }
-                if (propertySetter.getType() instanceof ParameterizedType) {
-                    ParameterizedType aType = (ParameterizedType) propertySetter.getType();
-                    Type[] parameterArgTypes = aType.getActualTypeArguments();
-                    for(Type parameterArgType : parameterArgTypes){
-                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, propertySetter.getName()));
-                    }
-                }                
-                
-                properties.add(propertySetter);    
-                continue;
-            }  
-            
-            /* plain method */
+            /* return type analyzed */
             Type returnType = method.getGenericReturnType();
             List<Class<?>> classes = discoverClassesUsedInType(returnType);
             for (Class<?> cls : classes) {
                 addBeanToQueue(new SourceType<>(cls, sourceClass.type, method.getName()));
+                
+                if (returnType instanceof ParameterizedType) {
+                    ParameterizedType aType = (ParameterizedType) returnType;
+                    Type[] parameterArgTypes = aType.getActualTypeArguments();
+                    for(Type parameterArgType : parameterArgTypes){
+                        addBeanToQueue(new SourceType<>(parameterArgType, sourceClass.type, method.getName()));
+                    }
+                }
             }            
             
             /* parameters and generic parameters */
@@ -132,77 +137,4 @@ public class NashornJavaParser extends ModelParser {
         }
         return new BeanModel(sourceClass.type, superclass, null, null, null, interfaces, properties, methods, null);
     }
-    
-    private PropertyModel parseSetterMethod(Class<?> clazz, Method method) {
-        String methodName = method.getName();
-        
-        // setters start with 'set'
-        if (!methodName.startsWith("set") || methodName.length() < 4)
-            return null;
-        
-        // setters return 'void'
-        if (!method.getReturnType().equals(Void.TYPE))
-            return null;
-        
-        // setters have a single argument
-        if (method.getParameterCount() != 1)
-            return null;
-        
-        // we have a winner
-        String propertyName = methodName.substring(2);
-        propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
-        Type propertyType = method.getParameterTypes()[0];
-        
-        return new PropertyModel(propertyName, propertyType, false, method, null, null);
-    }
-    
-    private PropertyModel parseGetterMethod(Class<?> clazz, Method method) {
-        String methodName = method.getName();
-        
-        // getters start with 'get'
-        if (methodName.equalsIgnoreCase("getClass"))
-            return null;
-        
-        if (!methodName.startsWith("get") && !methodName.startsWith("is"))
-            return null;
-        if (methodName.startsWith("get") && methodName.length() < 4)
-            return null;        
-        if (methodName.startsWith("is") && methodName.length() < 3)
-            return null;
-        
-        // java.util.stream.BaseStream<T, S> has isParallel() and parallel() methods
-        if (methodName.equalsIgnoreCase("isParallel"))
-            return null;        
-        
-        // getters dont return 'void'
-        if (method.getReturnType().equals(Void.TYPE))
-            return null;
-        
-        // getters have no arguments
-        if (method.getParameterCount() != 0)
-            return null;
-        
-        // we might have a winner
-        if (methodName.startsWith("is")) {
-            
-            // 'is' type getters always return a boolean
-            if (!method.getReturnType().equals(boolean.class))
-                return null;
-            
-            Type propertyType = method.getReturnType();
-            String propertyName = methodName.substring(2);
-            propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
-            
-            return new PropertyModel(propertyName, propertyType, false, method, null, null);
-        }
-        else if (methodName.startsWith("get")) {
-            
-            Type propertyType = method.getReturnType();
-            String propertyName = methodName.substring(3);
-            propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);            
-            
-            return new PropertyModel(propertyName, propertyType, false, method, null, null);            
-        }
-        return null;
-    }    
 }
