@@ -4,6 +4,8 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -112,6 +114,19 @@ public class EnumTest {
         settings.setExcludeFilter(Arrays.asList(StatusType.class.getName()), Arrays.<String>asList());
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithObjectEnum.class, StatusType.class));
         assertTrue(!output.contains("StatusType"));
+    }
+
+    @Test
+    public void testObjectEnum() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(StatusType.class));
+        System.out.println(output);
+        final String expected = "" +
+                "interface StatusType {\n" +
+                "    code: number;\n" +
+                "    label: string;\n" +
+                "}";
+        assertEquals(expected.trim(), output.trim());
     }
 
     private static class AClass {

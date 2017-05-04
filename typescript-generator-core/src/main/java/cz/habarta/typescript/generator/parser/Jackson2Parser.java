@@ -48,7 +48,15 @@ public class Jackson2Parser extends ModelParser {
     }
 
     @Override
-    protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
+    protected DeclarationModel parseClass(SourceType<Class<?>> sourceClass) {
+        if (sourceClass.type.isEnum()) {
+            return parseEnumOrObjectEnum(sourceClass);
+        } else {
+            return parseBean(sourceClass);
+        }
+    }
+
+    private BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
 
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
@@ -91,6 +99,9 @@ public class Jackson2Parser extends ModelParser {
                 }
                 properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember, pullProperties));
             }
+        }
+        if (sourceClass.type.isEnum()) {
+            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, null);
         }
 
         final String discriminantProperty;
@@ -252,9 +263,11 @@ public class Jackson2Parser extends ModelParser {
 
     }
 
-    @Override
-    protected EnumModel<?> parseEnum(SourceType<Class<?>> sourceClass) {
+    private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass) {
         final JsonFormat jsonFormat = sourceClass.type.getAnnotation(JsonFormat.class);
+        if (jsonFormat != null && jsonFormat.shape() == JsonFormat.Shape.OBJECT) {
+            return parseBean(sourceClass);
+        }
         final boolean isNumberBased = jsonFormat != null && (
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_FLOAT ||

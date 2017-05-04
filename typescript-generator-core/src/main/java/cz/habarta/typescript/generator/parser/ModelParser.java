@@ -60,12 +60,13 @@ public abstract class ModelParser {
                     final Class<?> cls = (Class<?>) sourceType.type;
                     System.out.println("Parsing '" + cls.getName() + "'" +
                             (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
-                    if (cls.isEnum()) {
-                        final EnumModel<?> enumModel = parseEnum(sourceType.asSourceClass());
-                        enums.add(enumModel);
+                    final DeclarationModel model = parseClass(sourceType.asSourceClass());
+                    if (model instanceof EnumModel) {
+                        enums.add((EnumModel) model);
+                    } else if (model instanceof BeanModel) {
+                        beans.add((BeanModel) model);
                     } else {
-                        final BeanModel bean = parseBean(sourceType.asSourceClass());
-                        beans.add(bean);
+                        throw new RuntimeException();
                     }
                 }
                 for (Class<?> cls : result.getDiscoveredClasses()) {
@@ -76,9 +77,9 @@ public abstract class ModelParser {
         return new Model(beans, enums, jaxrsApplicationParser.getModel());
     }
 
-    protected abstract BeanModel parseBean(SourceType<Class<?>> sourceClass);
+    protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected EnumModel<?> parseEnum(SourceType<Class<?>> sourceClass) {
+    protected static DeclarationModel parseEnum(SourceType<Class<?>> sourceClass) {
         final List<EnumMemberModel<String>> values = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")

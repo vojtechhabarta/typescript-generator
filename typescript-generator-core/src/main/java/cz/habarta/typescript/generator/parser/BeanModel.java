@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class BeanModel extends DeclarationModel {
         this.taggedUnionClasses = taggedUnionClasses;
         this.discriminantProperty = discriminantProperty;
         this.discriminantLiteral = discriminantLiteral;
-        this.interfaces = interfaces;
+        this.interfaces = Utils.listFromNullable(interfaces);
         this.properties = properties;
     }
 

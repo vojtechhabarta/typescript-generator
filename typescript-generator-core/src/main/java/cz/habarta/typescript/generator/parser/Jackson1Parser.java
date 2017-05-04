@@ -34,7 +34,15 @@ public class Jackson1Parser extends ModelParser {
     }
 
     @Override
-    protected BeanModel parseBean(SourceType<Class<?>> sourceClass) {
+    protected DeclarationModel parseClass(SourceType<Class<?>> sourceClass) {
+        if (sourceClass.type.isEnum()) {
+            return ModelParser.parseEnum(sourceClass);
+        } else {
+            return parseBean(sourceClass);
+        }
+    }
+
+    private BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
 
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
