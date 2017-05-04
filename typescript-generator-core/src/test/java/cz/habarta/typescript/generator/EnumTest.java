@@ -1,8 +1,10 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -104,6 +106,14 @@ public class EnumTest {
         assertEquals(expected, output);
     }
 
+    @Test
+    public void testExcludeObjectEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.setExcludeFilter(Arrays.asList(StatusType.class.getName()), Arrays.<String>asList());
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithObjectEnum.class, StatusType.class));
+        assertTrue(!output.contains("StatusType"));
+    }
+
     private static class AClass {
         public Direction direction;
     }
@@ -141,6 +151,33 @@ public class EnumTest {
     }
 
     enum EmptyEnum {
+    }
+
+    static class ClassWithObjectEnum {
+        public StatusType status;
+        public List<Map<String, StatusType>> statuses;
+    }
+
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+    public enum StatusType {
+        GOOD(0, "Good"),
+        FULL(1, "Full");
+
+        private final int code;
+        private final String label;
+
+        private StatusType(int code, String label) {
+            this.label = label;
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
 }
