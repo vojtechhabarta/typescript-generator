@@ -31,7 +31,7 @@
             <plugin>
                 <groupId>cz.habarta.typescript-generator</groupId>
                 <artifactId>typescript-generator-maven-plugin</artifactId>
-                <version>1.15-SNAPSHOT</version>
+                <version>1.25.322</version>
                 <executions>
                     <execution>
                         <id>generate</id>
@@ -39,17 +39,15 @@
                             <goal>generate</goal>
                         </goals>
                         <phase>process-classes</phase>
-                        <configuration>
-                            <jsonLibrary>jackson2</jsonLibrary>
-                            <disableJackson2ModuleDiscovery>false</disableJackson2ModuleDiscovery>
-                            <classes>
-                                <class>cz.habarta.typescript.generator.sample.Person</class>
-                            </classes>
-                            <outputFile>target/sample.d.ts</outputFile>
-                            <outputKind>module</outputKind>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <jsonLibrary>jackson2</jsonLibrary>
+                    <classes>
+                        <class>cz.habarta.typescript.generator.sample.Person</class>
+                    </classes>
+                    <outputKind>module</outputKind>
+                </configuration>
             </plugin>
         </plugins>
     </build>
