@@ -36,6 +36,7 @@ public class ModulesAndNamespacesTest {
     private static void file(String prefix, String module, String namespace, boolean mapPackagesToNamespaces, TypeScriptOutputKind outputKind, TypeScriptFileType outputFileType, File output) {
         final Settings settings = new Settings();
         settings.jsonLibrary = JsonLibrary.jackson2;
+        settings.mapEnum = EnumMapping.asEnum;
         settings.addTypeNamePrefix = prefix;
         settings.module = module;
         settings.namespace = namespace;
@@ -43,6 +44,7 @@ public class ModulesAndNamespacesTest {
         settings.outputKind = outputKind;
         settings.outputFileType = outputFileType;
         if (outputFileType == TypeScriptFileType.implementationFile) {
+            settings.nonConstEnums = true;
             settings.mapClasses = ClassMapping.asClasses;
         }
         if (outputFileType == TypeScriptFileType.implementationFile && !mapPackagesToNamespaces) {

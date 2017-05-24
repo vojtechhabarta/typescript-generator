@@ -41,6 +41,7 @@ public class Settings {
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public boolean nonConstEnums = false;
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public boolean disableTaggedUnions = false;
     public boolean ignoreSwaggerAnnotations = false;
@@ -64,7 +65,7 @@ public class Settings {
     public String npmName = null;
     public String npmVersion = null;
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
-    public String typescriptVersion = "2.2.2";
+    public String typescriptVersion = "^2.4";
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery = false;
     public ClassLoader classLoader = null;
@@ -141,6 +142,10 @@ public class Settings {
         }
         for (EmitterExtension extension : extensions) {
             final String extensionName = extension.getClass().getSimpleName();
+            final DeprecationText deprecation = extension.getClass().getAnnotation(DeprecationText.class);
+            if (deprecation != null) {
+                System.out.println(String.format("Warning: Extension '%s' is deprecated: %s", extensionName, deprecation.value()));
+            }
             final EmitterExtensionFeatures features = extension.getFeatures();
             if (features.generatesRuntimeCode && outputFileType != TypeScriptFileType.implementationFile) {
                 throw new RuntimeException(String.format("Extension '%s' generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.", extensionName));
@@ -169,6 +174,9 @@ public class Settings {
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;
             }
+        }
+        if (nonConstEnums && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("Non-const enums can only be used in implementation files but 'outputFileType' parameter is not set to 'implementationFile'.");
         }
         if (mapClasses == ClassMapping.asClasses && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'mapClasses' parameter is set to 'asClasses' which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");

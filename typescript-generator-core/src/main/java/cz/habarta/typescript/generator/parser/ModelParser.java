@@ -39,7 +39,7 @@ public abstract class ModelParser {
         final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings);
         final Collection<Type> parsedTypes = new ArrayList<>();  // do not use hashcodes, we can only count on `equals` since we use custom `ParameterizedType`s
         final List<BeanModel> beans = new ArrayList<>();
-        final List<EnumModel<?>> enums = new ArrayList<>();
+        final List<EnumModel> enums = new ArrayList<>();
         SourceType<? extends Type> sourceType;
         while ((sourceType = typeQueue.poll()) != null) {
             if (parsedTypes.contains(sourceType.type)) {
@@ -80,15 +80,15 @@ public abstract class ModelParser {
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
     protected static DeclarationModel parseEnum(SourceType<Class<?>> sourceClass) {
-        final List<EnumMemberModel<String>> values = new ArrayList<>();
+        final List<EnumMemberModel> values = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")
             final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) sourceClass.type;
             for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                values.add(new EnumMemberModel<>(enumConstant.name(), enumConstant.name(), null));
+                values.add(new EnumMemberModel(enumConstant.name(), enumConstant.name(), null));
             }
         }
-        return new EnumModel<>(sourceClass.type, EnumKind.StringBased, values, null);
+        return new EnumModel(sourceClass.type, EnumKind.StringBased, values, null);
     }
 
     protected void addBeanToQueue(SourceType<? extends Type> sourceType) {

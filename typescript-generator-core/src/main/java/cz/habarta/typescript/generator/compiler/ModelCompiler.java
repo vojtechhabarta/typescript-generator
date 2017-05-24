@@ -76,6 +76,9 @@ public class ModelCompiler {
             if (settings.mapEnum == EnumMapping.asInlineUnion) {
                 tsModel = inlineEnums(tsModel, symbolTable);
             }
+            if (settings.mapEnum == EnumMapping.asNumberBasedEnum) {
+                tsModel = transformEnumsToNumberBasedEnum(tsModel);
+            }
         }
 
         // tagged unions
@@ -89,7 +92,7 @@ public class ModelCompiler {
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
                 Collections.singletonList(new PropertyModel("property", type, false, null, null, null)), null);
-        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel<?>>emptyList(), null);
+        final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
     }
@@ -100,11 +103,16 @@ public class ModelCompiler {
         for (BeanModel bean : model.getBeans()) {
             beans.add(processBean(symbolTable, model, children, bean));
         }
-        final List<TsEnumModel<?>> enums = new ArrayList<>();
-        for (EnumModel<?> enumModel : model.getEnums()) {
-            enums.add(processEnum(symbolTable, enumModel));
+        final List<TsEnumModel> enums = new ArrayList<>();
+        final List<TsEnumModel> stringEnums = new ArrayList<>();
+        for (EnumModel enumModel : model.getEnums()) {
+            final TsEnumModel tsEnumModel = processEnum(symbolTable, enumModel);
+            enums.add(tsEnumModel);
+            if (tsEnumModel.getKind() == EnumKind.StringBased) {
+                stringEnums.add(tsEnumModel);
+            }
         }
-        return new TsModel().setBeans(beans).setEnums(enums);
+        return new TsModel().withBeans(beans).withEnums(enums).withOriginalStringEnums(stringEnums);
     }
 
     private Map<Type, List<BeanModel>> createChildrenMap(Model model) {
@@ -205,7 +213,7 @@ public class ModelCompiler {
         return new TsPropertyModel(prefix + property.getName() + suffix, tsType, settings.declarePropertiesAsReadOnly, property.getComments());
     }
 
-    private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {
+    private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
         final Symbol beanIdentifier = symbolTable.getSymbol(enumModel.getOrigin());
         return TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
     }
@@ -244,7 +252,7 @@ public class ModelCompiler {
             }
             beans.add(bean.withProperties(properties));
         }
-        return tsModel.setBeans(beans);
+        return tsModel.withBeans(beans);
     }
 
     private TsModel addImplementedProperties(SymbolTable symbolTable, TsModel tsModel) {
@@ -273,7 +281,7 @@ public class ModelCompiler {
                 beans.add(bean);
             }
         }
-        return tsModel.setBeans(beans);
+        return tsModel.withBeans(beans);
     }
 
     private static Map<String, TsType> getInheritedProperties(SymbolTable symbolTable, TsModel tsModel, List<TsType> parents) {
@@ -544,20 +552,21 @@ public class ModelCompiler {
                 
             }
         });
-        return model.setTypeAliases(new ArrayList<>(typeAliases));
+        return model.withTypeAliases(new ArrayList<>(typeAliases));
     }
 
     private TsModel transformEnumsToUnions(TsModel tsModel) {
+        final List<TsEnumModel> stringEnums = tsModel.getEnums(EnumKind.StringBased);
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
-        for (TsEnumModel<String> enumModel : tsModel.getEnums(EnumKind.StringBased)) {
+        for (TsEnumModel enumModel : stringEnums) {
             final List<TsType> values = new ArrayList<>();
-            for (EnumMemberModel<String> member : enumModel.getMembers()) {
-                values.add(new TsType.StringLiteralType(member.getEnumValue()));
+            for (EnumMemberModel member : enumModel.getMembers()) {
+                values.add(new TsType.StringLiteralType((String) member.getEnumValue()));
             }
             final TsType union = new TsType.UnionType(values);
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), null, union, enumModel.getComments()));
         }
-        return tsModel.setTypeAliases(new ArrayList<>(typeAliases));
+        return tsModel.withoutEnums(stringEnums).withTypeAliases(new ArrayList<>(typeAliases));
     }
 
     private TsModel inlineEnums(final TsModel tsModel, final SymbolTable symbolTable) {
@@ -575,9 +584,20 @@ public class ModelCompiler {
                 return tsType;
             }
         });
-        final ArrayList<TsAliasModel> aliases = new ArrayList<>(tsModel.getTypeAliases());
-        aliases.removeAll(inlinedAliases);
-        return newTsModel.setTypeAliases(aliases);
+        return newTsModel.withoutTypeAliases(new ArrayList<>(inlinedAliases));
+    }
+
+    private TsModel transformEnumsToNumberBasedEnum(TsModel tsModel) {
+        final List<TsEnumModel> stringEnums = tsModel.getEnums(EnumKind.StringBased);
+        final LinkedHashSet<TsEnumModel> enums = new LinkedHashSet<>();
+        for (TsEnumModel enumModel : stringEnums) {
+            final List<EnumMemberModel> members = new ArrayList<>();
+            for (EnumMemberModel member : enumModel.getMembers()) {
+                members.add(new EnumMemberModel(member.getPropertyName(), (Number) null, member.getComments()));
+            }
+            enums.add(enumModel.withMembers(members));
+        }
+        return tsModel.withoutEnums(stringEnums).withEnums(new ArrayList<>(enums));
     }
 
     private TsModel createAndUseTaggedUnions(final SymbolTable symbolTable, TsModel tsModel) {
@@ -612,13 +632,13 @@ public class ModelCompiler {
                 return tsType;
             }
         });
-        return model.setTypeAliases(new ArrayList<>(typeAliases));
+        return model.withTypeAliases(new ArrayList<>(typeAliases));
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {
         final List<TsBeanModel> beans = tsModel.getBeans();
         final List<TsAliasModel> aliases = tsModel.getTypeAliases();
-        final List<TsEnumModel<?>> enums = tsModel.getEnums();
+        final List<TsEnumModel> enums = tsModel.getEnums();
         if (settings.sortDeclarations) {
             for (TsBeanModel bean : beans) {
                 Collections.sort(bean.getProperties());
@@ -634,9 +654,9 @@ public class ModelCompiler {
             addOrderedClass(symbolTable, tsModel, bean, orderedBeans);
         }
         return tsModel
-                    .setBeans(new ArrayList<>(orderedBeans))
-                    .setTypeAliases(aliases)
-                    .setEnums(enums);
+                    .withBeans(new ArrayList<>(orderedBeans))
+                    .withTypeAliases(aliases)
+                    .withEnums(enums);
     }
 
     private static void addOrderedClass(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean, LinkedHashSet<TsBeanModel> orderedBeans) {
@@ -671,7 +691,7 @@ public class ModelCompiler {
             }
             newBeans.add(bean.withProperties(newProperties).withMethods(newMethods));
         }
-        return tsModel.setBeans(newBeans);
+        return tsModel.withBeans(newBeans);
     }
 
     private static Class<?> getOriginClass(SymbolTable symbolTable, TsType type) {

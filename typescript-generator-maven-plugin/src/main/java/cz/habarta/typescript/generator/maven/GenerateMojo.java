@@ -220,14 +220,22 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies how enums will be mapped.
-     * Supported values are 'asUnion', 'asInlineUnion', 'asNumberBasedEnum'.
+     * Supported values are 'asUnion', 'asInlineUnion', 'asEnum', 'asNumberBasedEnum'.
      * Default value is 'asUnion'.
      * Value 'asUnion' creates type alias to union of string enum values.
      * Value 'asInlineUnion' creates union of enum values on places where the enum is used.
+     * Value 'asEnum' creates string enum. Requires TypeScript 2.4.
      * Value 'asNumberBasedEnum' creates enum of named number values.
      */
     @Parameter
     private EnumMapping mapEnum;
+
+    /**
+     * If true generated enums will not have <code>const</code> keyword.
+     * This can be used only in implementation files.
+     */
+    @Parameter
+    private boolean nonConstEnums;
 
     /**
      * Specifies whether classes will be mapped to classes or interfaces.
@@ -444,6 +452,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
+            settings.nonConstEnums = nonConstEnums;
             settings.mapClasses = mapClasses;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;

@@ -76,6 +76,26 @@ public class EnumTest {
     }
 
     @Test
+    public void testEnumAsEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asEnum;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
+        final String expected = (
+                "interface AClass {\n" +
+                "    direction: Direction;\n" +
+                "}\n" +
+                "\n" +
+                "declare const enum Direction {\n" +
+                "    North = 'North',\n" +
+                "    East = 'East',\n" +
+                "    South = 'South',\n" +
+                "    West = 'West',\n" +
+                "}"
+                ).replace("'", "\"");
+        assertEquals(expected.trim(), output.trim());
+    }
+
+    @Test
     public void testEnumWithJsonPropertyAnnotations() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonPropertyAnnotations.class));
@@ -120,7 +140,6 @@ public class EnumTest {
     public void testObjectEnum() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(StatusType.class));
-        System.out.println(output);
         final String expected = "" +
                 "interface StatusType {\n" +
                 "    code: number;\n" +

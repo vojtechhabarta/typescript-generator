@@ -8,28 +8,31 @@ import cz.habarta.typescript.generator.parser.EnumModel;
 import java.util.List;
 
 
-// T extends String | Number
-public class TsEnumModel<T> extends TsDeclarationModel {
-    
-    private final EnumKind<T> kind;
-    private final List<EnumMemberModel<T>> members;
+public class TsEnumModel extends TsDeclarationModel {
 
-    public TsEnumModel(Class<?> origin, Symbol name, EnumKind<T> kind, List<EnumMemberModel<T>> members, List<String> comments) {
+    private final EnumKind kind;
+    private final List<EnumMemberModel> members;
+
+    public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
         super(origin, null, name, comments);
         this.kind = kind;
         this.members = members;
     }
 
-    public static <T> TsEnumModel<T> fromEnumModel(Symbol name, EnumModel<T> enumModel) {
-        return new TsEnumModel<>(enumModel.getOrigin(), name, enumModel.getKind(), enumModel.getMembers(), enumModel.getComments());
+    public static TsEnumModel fromEnumModel(Symbol name, EnumModel enumModel) {
+        return new TsEnumModel(enumModel.getOrigin(), name, enumModel.getKind(), enumModel.getMembers(), enumModel.getComments());
     }
 
-    public EnumKind<T> getKind() {
+    public EnumKind getKind() {
         return kind;
     }
 
-    public List<EnumMemberModel<T>> getMembers() {
+    public List<EnumMemberModel> getMembers() {
         return members;
+    }
+
+    public TsEnumModel withMembers(List<EnumMemberModel> members) {
+        return new TsEnumModel(origin, name, kind, members, comments);
     }
 
 }

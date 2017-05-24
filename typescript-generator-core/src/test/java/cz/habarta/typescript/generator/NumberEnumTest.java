@@ -21,11 +21,11 @@ public class NumberEnumTest {
         final ModelParser parser = new TypeScriptGenerator(settings).getModelParser();
         final Model model = parser.parseModel(SomeCode.class);
         Assert.assertEquals(1, model.getEnums().size());
-        final EnumModel<?> enumModel = model.getEnums().get(0);
+        final EnumModel enumModel = model.getEnums().get(0);
         Assert.assertEquals(EnumKind.NumberBased, enumModel.getKind());
         Assert.assertEquals(2, enumModel.getMembers().size());
-        Assert.assertEquals(10, enumModel.getMembers().get(0).getEnumValue());
-        Assert.assertEquals(11, enumModel.getMembers().get(1).getEnumValue());
+        Assert.assertEquals(10, ((Number)enumModel.getMembers().get(0).getEnumValue()).intValue());
+        Assert.assertEquals(11, ((Number)enumModel.getMembers().get(1).getEnumValue()).intValue());
     }
 
     @Test
@@ -34,6 +34,20 @@ public class NumberEnumTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeCode.class));
         Assert.assertEquals(
                 "declare const enum SomeCode {\n" +
+                "    VALUE0 = 10,\n" +
+                "    VALUE1 = 11,\n" +
+                "}",
+                output.trim());
+    }
+
+    @Test
+    public void testNonConstEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.nonConstEnums = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeCode.class));
+        Assert.assertEquals(
+                "enum SomeCode {\n" +
                 "    VALUE0 = 10,\n" +
                 "    VALUE1 = 11,\n" +
                 "}",

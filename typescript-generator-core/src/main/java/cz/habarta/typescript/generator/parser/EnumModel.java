@@ -6,33 +6,32 @@ import cz.habarta.typescript.generator.compiler.EnumKind;
 import java.util.*;
 
 
-// T extends String | Number
-public class EnumModel<T> extends DeclarationModel {
+public class EnumModel extends DeclarationModel {
 
-    private final EnumKind<T> kind;
-    private final List<EnumMemberModel<T>> members;
+    private final EnumKind kind;
+    private final List<EnumMemberModel> members;
 
-    public EnumModel(Class<?> origin, EnumKind<T> kind, List<EnumMemberModel<T>> members, List<String> comments) {
+    public EnumModel(Class<?> origin, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
         super (origin, comments);
         this.kind = kind;
         this.members = members;
     }
 
-    public EnumKind<T> getKind() {
+    public EnumKind getKind() {
         return kind;
     }
 
-    public List<EnumMemberModel<T>> getMembers() {
+    public List<EnumMemberModel> getMembers() {
         return members;
     }
 
-    public EnumModel<T> withMembers(List<EnumMemberModel<T>> members) {
-        return new EnumModel<>(origin, kind, members, comments);
+    public EnumModel withMembers(List<EnumMemberModel> members) {
+        return new EnumModel(origin, kind, members, comments);
     }
 
     @Override
-    public EnumModel<T> withComments(List<String> comments) {
-        return new EnumModel<>(origin, kind, members, comments);
+    public EnumModel withComments(List<String> comments) {
+        return new EnumModel(origin, kind, members, comments);
     }
 
 }
