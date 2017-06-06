@@ -55,17 +55,16 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
             <goals>
                 <goal>generate</goal>
             </goals>
-            <configuration>
-                <jsonLibrary>jackson2</jsonLibrary>
-                <classes>
-                    <class>cz.habarta.typescript.generator.Person</class>
-                </classes>
-                <outputFile>target/rest.d.ts</outputFile>
-                <outputKind>global</outputKind>
-                <namespace>Rest</namespace>
-            </configuration>
+            <phase>process-classes</phase>
         </execution>
     </executions>
+    <configuration>
+        <jsonLibrary>jackson2</jsonLibrary>
+        <classes>
+            <class>cz.habarta.typescript.generator.Person</class>
+        </classes>
+        <outputKind>module</outputKind>
+    </configuration>
 </plugin>
 ```
 
@@ -123,10 +122,12 @@ For more details see [Class Names Glob Patterns](../../wiki/Class-Names-Glob-Pat
 
 Output parameters
 -----------------
-Output is configured using several parameters, two of them are mandatory:
-- `outputFile` - specifies path and name of output file 
-- `outputKind` - determines if and how module will be generated
+Output is configured using several parameters:
+- `outputKind` (required parameter) - determines if and how module will be generated
     - values are: `global`, `module`, `ambientModule`
+- `outputFileType` - specifies TypeScript file type
+    - values are: `declarationFile` (.d.ts) or `implementationFile` (.ts)
+- `outputFile` - specifies path and name of output file
 
 For more details see [Modules and Namespaces](http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html) page.
 
