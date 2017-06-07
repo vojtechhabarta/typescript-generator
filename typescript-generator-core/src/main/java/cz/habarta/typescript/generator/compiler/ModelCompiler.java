@@ -153,10 +153,37 @@ public class ModelCompiler {
                     : new TsType.UnionType(literals);
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, null));
         }
+        
+        List<TsMethodModel> methods = null;
+        if (settings.jsonLibrary == JsonLibrary.nashorn) {
+            methods = processMethods(symbolTable, model, bean, "", "");
+        }
 
-        return new TsBeanModel(bean.getOrigin(), TsBeanCategory.Data, isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
+        return new TsBeanModel(bean.getOrigin(), TsBeanCategory.Data, isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, methods, bean.getComments());
     }
 
+    private List<TsMethodModel> processMethods(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
+        final List<TsMethodModel> methods = new ArrayList<>();
+        if (bean.getMethods() != null) {
+            for (MethodModel method : bean.getMethods()) {
+                methods.add(processMethod(symbolTable, bean, method, prefix, suffix));
+            }
+        }
+        return methods;
+    }   
+    
+    private TsMethodModel processMethod(SymbolTable symbolTable, BeanModel bean,
+            MethodModel method, String prefix, String suffix) {
+        final TsType returnType = typeFromJava(symbolTable, method.getReturnType(), method.getName(), bean.getOrigin());
+        List<TsParameterModel> parameters = new ArrayList<>();
+        for (MethodParameterModel param : method.getParameters()) {
+            TsType paramType = typeFromJava(symbolTable, param.getType(), method.getName(), bean.getOrigin());
+            TsParameterModel parameterModel = new TsParameterModel(param.getName(), paramType);
+            parameters.add(parameterModel);
+        }
+        return new TsMethodModel(method.getName(), returnType, parameters, null, null);
+    }    
+    
     private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
         final List<TsPropertyModel> properties = new ArrayList<>();
         for (PropertyModel property : bean.getProperties()) {
