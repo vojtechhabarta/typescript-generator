@@ -166,6 +166,14 @@ ModelParser  ==>  ModelCompiler  ==>  Emitter
 - `Emitter` takes `TsModel` and produces TypeScript declaration file.
 
 
+Links
+-----
+
+- http://www.rainerhahnekamp.com/type-safe-endpoints-with-typescript-and-java - blog post about using typescript-generator not only with Spring MVC
+- http://www.jsweet.org/10-reasons-to-use-jsweet - blog post about JSweet transpiler mentions typescript-generator
+- https://github.com/raphaeljolivet/java2typescript - tool similar to typescript-generator
+
+
 Contributing
 ------------
 
