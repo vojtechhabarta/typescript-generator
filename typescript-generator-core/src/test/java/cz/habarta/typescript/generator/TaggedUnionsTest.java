@@ -132,6 +132,7 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface IQuadrilateral2 extends IShape2 {\n" +
+                "    kind: 'square' | 'rectangle';\n" +
                 "}\n" +
                 "\n" +
                 "type IShape2Union = CSquare2 | CRectangle2 | CCircle2;\n" +

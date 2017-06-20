@@ -113,7 +113,7 @@ public class Jackson2Parser extends ModelParser {
             // this is parent
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             discriminantLiteral = null;
-        } else if (!sourceClass.type.isInterface() && !Modifier.isAbstract(sourceClass.type.getModifiers()) && isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
+        } else if (isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             discriminantLiteral = getTypeName(sourceClass.type);
@@ -186,8 +186,11 @@ public class Jackson2Parser extends ModelParser {
                 return jsonSubType.name();
             }
         }
-        // use simplified class name
-        return cls.getName().substring(cls.getName().lastIndexOf(".") + 1);
+        // use simplified class name if it's not an interface or abstract
+        if(!cls.isInterface() && !Modifier.isAbstract(cls.getModifiers())) {
+            return cls.getName().substring(cls.getName().lastIndexOf(".") + 1);
+        }
+        return null;
     }
 
     private static JsonSubTypes.Type getJsonSubTypeForClass(JsonSubTypes types, Class<?> cls) {
