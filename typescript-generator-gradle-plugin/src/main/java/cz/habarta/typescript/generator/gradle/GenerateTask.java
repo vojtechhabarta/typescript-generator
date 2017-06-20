@@ -62,6 +62,7 @@ public class GenerateTask extends DefaultTask {
     public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery;
+    public boolean debug;
 
     @TaskAction
     public void generate() throws Exception {
@@ -84,7 +85,7 @@ public class GenerateTask extends DefaultTask {
         for (File file : getProject().getConfigurations().getAt("compile").getFiles()) {
             urls.add(file.toURI().toURL());
         }
-        final URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+        final URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
         // Settings
         final Settings settings = new Settings();
@@ -142,7 +143,7 @@ public class GenerateTask extends DefaultTask {
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
+                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader, debug),
                 Output.to(output)
         );
     }

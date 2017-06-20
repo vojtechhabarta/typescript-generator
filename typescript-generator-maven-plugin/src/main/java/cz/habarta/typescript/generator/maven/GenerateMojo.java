@@ -401,6 +401,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private boolean disableJackson2ModuleDiscovery;
 
+    /**
+     * Turns on verbose output for debugging purposes.
+     */
+    @Parameter
+    private boolean debug;
+
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -417,7 +424,7 @@ public class GenerateMojo extends AbstractMojo {
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
-            final URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+            final URLClassLoader classLoader = Settings.createClassLoader(project.getArtifactId(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
             // Settings
             final Settings settings = new Settings();
@@ -475,7 +482,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader, debug),
                     Output.to(output)
             );
 

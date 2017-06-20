@@ -31,17 +31,10 @@ public class JaxrsApplicationScanner {
     }
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
-        try {
-            final List<String> namesOfResourceClasses = scanResult.getNamesOfClassesWithAnnotation(Path.class);
-            final List<Class<?>> resourceClasses = new ArrayList<>();
-            for (String className : namesOfResourceClasses) {
-                resourceClasses.add(Thread.currentThread().getContextClassLoader().loadClass(className));
-            }
-            System.out.println(String.format("Found %d root resources.", resourceClasses.size()));
-            return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
-        } catch (ReflectiveOperationException e) {
-            throw reportError(e);
-        }
+        final List<String> namesOfResourceClasses = scanResult.getNamesOfClassesWithAnnotation(Path.class);
+        final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
+        System.out.println(String.format("Found %d root resources.", resourceClasses.size()));
+        return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
     }
 
     private static RuntimeException reportError(ReflectiveOperationException e) {

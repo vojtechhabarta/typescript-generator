@@ -7,6 +7,8 @@ import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.util.Predicate;
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -71,6 +73,26 @@ public class Settings {
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
+
+    private static class TypeScriptGeneratorURLClassLoader extends URLClassLoader {
+
+        private final String name;
+
+        public TypeScriptGeneratorURLClassLoader(String name, URL[] urls, ClassLoader parent) {
+            super(urls, parent);
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "TsGenURLClassLoader{" + name + ", parent: " + getParent() + "}";
+        }
+        
+    }
+
+    public static URLClassLoader createClassLoader(String name, URL[] urls, ClassLoader parent) {
+        return new TypeScriptGeneratorURLClassLoader(name, urls, parent);
+    }
 
     public void setStringQuotes(StringQuotes quotes) {
         this.quotes = quotes == StringQuotes.singleQuotes ? "'" : "\"";
