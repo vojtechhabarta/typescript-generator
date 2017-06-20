@@ -69,6 +69,31 @@ public class TaggedUnionsTest {
         public double radius;
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(DiamondB1.class),
+        @JsonSubTypes.Type(DiamondB2.class),
+        @JsonSubTypes.Type(DiamondC.class),
+    })
+    private static interface DiamondA {
+        public String getA();
+    }
+
+    @JsonTypeName("b1")
+    private static interface DiamondB1 extends DiamondA {
+        public String getB1();
+    }
+
+    @JsonTypeName("b2")
+    private static interface DiamondB2 extends DiamondA {
+        public String getB2();
+    }
+
+    @JsonTypeName("c")
+    private static interface DiamondC extends DiamondB1, DiamondB2 {
+        public String getC();
+    }
+
     @Test
     public void testTaggedUnions() {
         final Settings settings = TestUtils.settings();
@@ -171,6 +196,39 @@ public class TaggedUnionsTest {
                 "    kind: 'circle';\n" +
                 "    radius: number;\n" +
                 "}\n" +
+                ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testTaggedUnionsWithDiamond() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DiamondA.class));
+        System.out.println(output);
+        final String expected = (
+                "\n" +
+                "interface DiamondA {\n" +
+                "    kind: 'b1' | 'c' | 'b2';\n" +
+                "    a: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface DiamondB1 extends DiamondA {\n" +
+                "    kind: 'b1' | 'c';\n" +
+                "    b1: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface DiamondB2 extends DiamondA {\n" +
+                "    kind: 'b2' | 'c';\n" +
+                "    b2: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface DiamondC extends DiamondB1, DiamondB2 {\n" +
+                "    kind: 'c';\n" +
+                "    c: string;\n" +
+                "}\n" +
+                "\n" +
+                "type DiamondAUnion = DiamondB1 | DiamondB2 | DiamondC;\n" +
                 ""
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
