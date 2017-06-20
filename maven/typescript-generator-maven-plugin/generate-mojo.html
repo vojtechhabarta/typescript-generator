@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2017-06-20
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.25.330
+                  <li id="projectVersion">Version: 1.25.331
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.25.330:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.25.331:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -350,6 +350,17 @@ For example it is possible to implement TypeProcessor for
           
 <tr class="b">
             
+<td><b><a href="#debug">debug</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>Turns on verbose output for debugging purposes.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td><b><a href="#declarePropertiesAsOptional">declarePropertiesAsOptional</a></b></td>
             
 <td><tt>boolean</tt></td>
@@ -359,7 +370,7 @@ For example it is possible to implement TypeProcessor for
 <td>If true declared properties will be optional.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#declarePropertiesAsReadOnly">declarePropertiesAsReadOnly</a></b></td>
             
@@ -370,7 +381,7 @@ For example it is possible to implement TypeProcessor for
 <td>If true declared properties will be <tt>readonly</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#disableJackson2ModuleDiscovery">disableJackson2ModuleDiscovery</a></b></td>
             
@@ -381,7 +392,7 @@ For example it is possible to implement TypeProcessor for
 <td>Turns off Jackson2 automatic module discovery.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#disableTaggedUnions">disableTaggedUnions</a></b></td>
             
@@ -393,7 +404,7 @@ For example it is possible to implement TypeProcessor for
 polymorphic types.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#displaySerializerWarning">displaySerializerWarning</a></b></td>
             
@@ -404,7 +415,7 @@ polymorphic types.<br /></td>
 <td>Display warnings when bean serializer is not found.<br /><b>Default value is</b>: <tt>true</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#excludeClassPatterns">excludeClassPatterns</a></b></td>
             
@@ -415,7 +426,7 @@ polymorphic types.<br /></td>
 <td>Excluded classes specified using glob patterns.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#excludeClasses">excludeClasses</a></b></td>
             
@@ -426,7 +437,7 @@ polymorphic types.<br /></td>
 <td>List of classes excluded from processing.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#extensions">extensions</a></b></td>
             
@@ -439,7 +450,7 @@ extensions:
 cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#generateJaxrsApplicationClient">generateJaxrsApplicationClient</a></b></td>
             
@@ -450,7 +461,7 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
 <td>If true client for JAX-RS REST application will be generated.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#generateJaxrsApplicationInterface">generateJaxrsApplicationInterface</a></b></td>
             
@@ -461,7 +472,7 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
 <td>If true interface for JAX-RS REST application will be generated.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#generateNpmPackageJson">generateNpmPackageJson</a></b></td>
             
@@ -474,7 +485,7 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
 be specified using 'npmName' and 'npmVersion' parameters.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#ignoreSwaggerAnnotations">ignoreSwaggerAnnotations</a></b></td>
             
@@ -485,7 +496,7 @@ be specified using 'npmName' and 'npmVersion' parameters.<br /></td>
 <td>If true Swagger annotations will not be used.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#importDeclarations">importDeclarations</a></b></td>
             
@@ -498,7 +509,7 @@ output. This can be used with &quot;customTypeMappings&quot; to provide
 needed TypeScript types.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#includePropertyAnnotations">includePropertyAnnotations</a></b></td>
             
@@ -510,7 +521,7 @@ needed TypeScript types.<br /></td>
 for methods with one of the annotations defined in this list<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#javadocXmlFiles">javadocXmlFiles</a></b></td>
             
@@ -527,7 +538,7 @@ Wiki page
 'https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#jaxrsNamespacing">jaxrsNamespacing</a></b></td>
             
@@ -545,7 +556,7 @@ grouped by annotation specified using
 <tt>jaxrsNamespacingAnnotation</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#jaxrsNamespacingAnnotation">jaxrsNamespacingAnnotation</a></b></td>
             
@@ -561,7 +572,7 @@ is element name and defaults to 'value'. Examples:
 <tt>io.swagger.annotations.Api#value</tt><br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#mapClasses">mapClasses</a></b></td>
             
@@ -575,7 +586,7 @@ Supported values are 'asInterfaces', 'asClasses'. Default value is
 implementation files (.ts).<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#mapDate">mapDate</a></b></td>
             
@@ -587,7 +598,7 @@ implementation files (.ts).<br /></td>
 are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#mapEnum">mapEnum</a></b></td>
             
@@ -603,7 +614,7 @@ the enum is used. Value 'asNumberBasedEnum' creates enum of named
 number values.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#mapPackagesToNamespaces">mapPackagesToNamespaces</a></b></td>
             
@@ -615,7 +626,7 @@ number values.<br /></td>
 false.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#module">module</a></b></td>
             
@@ -627,7 +638,7 @@ false.<br /></td>
 'ambientModule'.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#namespace">namespace</a></b></td>
             
@@ -639,7 +650,7 @@ false.<br /></td>
 modules. Default is no namespace.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#noFileComment">noFileComment</a></b></td>
             
@@ -653,7 +664,7 @@ version. So it might be useful to suppress this comment if the file
 is in source control and is regenerated in build.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#npmName">npmName</a></b></td>
             
@@ -666,7 +677,7 @@ is in source control and is regenerated in build.<br /></td>
 <tt>${project.artifactId}</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#npmVersion">npmVersion</a></b></td>
             
@@ -679,7 +690,7 @@ is in source control and is regenerated in build.<br /></td>
 <tt>1.0.0</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#optionalAnnotations">optionalAnnotations</a></b></td>
             
@@ -693,7 +704,7 @@ when generating the corresponding TypeScript interface. Example
 optional annotation: @javax.annotation.Nullable<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#outputFile">outputFile</a></b></td>
             
@@ -704,7 +715,7 @@ optional annotation: @javax.annotation.Nullable<br /></td>
 <td>Path and name of generated TypeScript file.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
@@ -718,7 +729,7 @@ optional annotation: @javax.annotation.Nullable<br /></td>
 Default value is 'declarationFile'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#referencedFiles">referencedFiles</a></b></td>
             
@@ -731,7 +742,7 @@ directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
 with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -744,7 +755,7 @@ enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -757,7 +768,7 @@ enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#restOptionsType">restOptionsType</a></b></td>
             
@@ -773,7 +784,7 @@ be specific (for example <tt>AxiosRequestConfig</tt>) or
 generic (for example <tt>&amp;ltO&gt;</tt>).<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#restResponseType">restResponseType</a></b></td>
             
@@ -789,7 +800,7 @@ or <tt>AxiosPromise</tt>) is returned instead of actual
 response data.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -801,7 +812,7 @@ response data.<br /></td>
 sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -813,7 +824,7 @@ sorted alphabetically.<br /></td>
 alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#stringQuotes">stringQuotes</a></b></td>
             
@@ -825,7 +836,7 @@ alphabetically.<br /></td>
 'doubleQuotes', 'singleQuotes'. Default value is 'doubleQuotes'.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#umdNamespace">umdNamespace</a></b></td>
             
@@ -967,6 +978,16 @@ For example it is possible to implement TypeProcessor for
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="debug">debug</a>:</b></p>
+        
+<div>Turns on verbose output for debugging purposes.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
