@@ -168,7 +168,7 @@ public abstract class TsType {
         public final List<TsType> types;
 
         public UnionType(List<? extends TsType> types) {
-            this.types = new ArrayList<TsType>(types);
+            this.types = new ArrayList<TsType>(new LinkedHashSet<TsType>(types));
         }
 
         @Override
