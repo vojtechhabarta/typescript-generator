@@ -77,7 +77,7 @@ public class Input {
                 System.out.println("Scanning classpath");
                 final Date scanStart = new Date();
                 final ScanResult result = new FastClasspathScanner()
-                        .overrideClasspath(classLoader.getURLs())
+                        .overrideClasspath((Object[])classLoader.getURLs())
                         .verbose(verbose)
                         .scan();
                 final int count = result.getNamesOfAllClasses().size();
