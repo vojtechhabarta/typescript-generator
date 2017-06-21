@@ -101,7 +101,15 @@ public class JaxrsApplicationParser {
         Collections.sort(methods, new Comparator<Method>() {
             @Override
             public int compare(Method o1, Method o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
+                final int nameDiff = o1.getName().compareToIgnoreCase(o2.getName());
+                if (nameDiff != 0) {
+                    return nameDiff;
+                }
+                final int parameterTypesDiff = Arrays.asList(o1.getParameterTypes()).toString().compareTo(Arrays.asList(o2.getParameterTypes()).toString());
+                if (parameterTypesDiff != 0) {
+                    return parameterTypesDiff;
+                }
+                return 0;
             }
         });
         for (Method method : methods) {
