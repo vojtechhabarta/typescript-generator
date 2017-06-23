@@ -71,6 +71,32 @@ public class TaggedUnionsTest {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
     @JsonSubTypes({
+        @JsonSubTypes.Type(IRectangle3.class),
+        @JsonSubTypes.Type(ICircle3.class),
+    })
+    interface IShape3 {
+    }
+    
+    interface IQuadrilateral3 extends IShape3 {
+    }
+    
+    interface INamedShape3 extends IShape3 {
+        String getName();
+    }
+    
+    interface INamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {
+    }
+    
+    @JsonTypeName("rectangle")
+    interface IRectangle3 extends INamedQuadrilateral3 {
+    }
+    
+    @JsonTypeName("circle")
+    interface ICircle3 extends INamedShape3 {
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
         @JsonSubTypes.Type(DiamondB1.class),
         @JsonSubTypes.Type(DiamondB2.class),
         @JsonSubTypes.Type(DiamondC.class),
@@ -162,6 +188,41 @@ public class TaggedUnionsTest {
                 "\n" +
                 "type IShape2Union = CSquare2 | CRectangle2 | CCircle2;\n" +
                 ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testTaggedUnionsWithOverlappingInterfaces() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(IShape3.class));
+        System.out.println(output);
+        final String expected = (
+                "\n" +
+                "interface IShape3 {\n" +
+                "    kind: 'circle' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface IRectangle3 extends INamedQuadrilateral3 {\n" +
+                "}\n" +
+                "\n" +
+                "interface ICircle3 extends INamedShape3 {\n" +
+                "    kind: 'circle';\n" +
+                "}\n" +
+                "\n" +
+                "interface INamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {\n" +
+                "    kind: 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface INamedShape3 extends IShape3 {\n" +
+                "    name: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface IQuadrilateral3 extends IShape3 {\n" +
+                "    kind: 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "type IShape3Union = IRectangle3 | ICircle3;\n"
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
     }
