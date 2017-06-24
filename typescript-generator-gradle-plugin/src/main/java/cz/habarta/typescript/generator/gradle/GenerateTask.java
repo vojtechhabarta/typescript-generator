@@ -51,6 +51,7 @@ public class GenerateTask extends DefaultTask {
     public String restOptionsType;
     public String customTypeProcessor;
     public boolean sortDeclarations;
+    public boolean sortDiscriminantTypes;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
     public List<File> javadocXmlFiles;
@@ -123,6 +124,7 @@ public class GenerateTask extends DefaultTask {
         settings.setRestOptionsType(restOptionsType);
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
+        settings.sortDiscriminantTypes = sortDiscriminantTypes;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
