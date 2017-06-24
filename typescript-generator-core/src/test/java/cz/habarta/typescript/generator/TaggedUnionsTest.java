@@ -94,6 +94,30 @@ public class TaggedUnionsTest {
         public String getC();
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(Type2.class),
+        @JsonSubTypes.Type(Type1.class),
+        @JsonSubTypes.Type(Type3.class),
+    })
+    private interface Root {
+    }
+
+    private interface ParentA extends Root {
+    }
+
+    @JsonTypeName("type1")
+    private interface Type1 extends ParentA {
+    }
+
+    @JsonTypeName("type2")
+    private interface Type2 extends ParentA {
+    }
+
+    @JsonTypeName("type3")
+    private interface Type3 extends Root {
+    }
+
     @Test
     public void testTaggedUnions() {
         final Settings settings = TestUtils.settings();
@@ -137,7 +161,7 @@ public class TaggedUnionsTest {
         final String expected = (
                 "\n" +
                 "interface IShape2 {\n" +
-                "    kind: 'circle' | 'square' | 'rectangle';\n" +
+                "    kind: 'square' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
                 "interface CSquare2 extends IQuadrilateral2 {\n" +
@@ -205,11 +229,10 @@ public class TaggedUnionsTest {
     public void testTaggedUnionsWithDiamond() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DiamondA.class));
-        System.out.println(output);
         final String expected = (
                 "\n" +
                 "interface DiamondA {\n" +
-                "    kind: 'b1' | 'c' | 'b2';\n" +
+                "    kind: 'b1' | 'b2' | 'c';\n" +
                 "    a: string;\n" +
                 "}\n" +
                 "\n" +
@@ -231,6 +254,38 @@ public class TaggedUnionsTest {
                 "type DiamondAUnion = DiamondB1 | DiamondB2 | DiamondC;\n" +
                 ""
                 ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testTaggedUnionsDiscriminantsSorted() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Root.class));
+        final String expected = (
+                "\n" +
+                "interface Root {\n" +
+                "    kind: 'type2' | 'type1' | 'type3';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type2 extends ParentA {\n" +
+                "    kind: 'type2';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type1 extends ParentA {\n" +
+                "    kind: 'type1';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type3 extends Root {\n" +
+                "    kind: 'type3';\n" +
+                "}\n" +
+                "\n" +
+                "interface ParentA extends Root {\n" +
+                "    kind: 'type2' | 'type1';\n" +
+                "}\n" +
+                "\n" +
+                "type RootUnion = Type2 | Type1 | Type3;\n" +
+                ""
+            ).replace('\'', '"');
         Assert.assertEquals(expected, output);
     }
 
