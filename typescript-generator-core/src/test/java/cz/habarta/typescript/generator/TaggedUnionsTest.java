@@ -18,19 +18,24 @@ public class TaggedUnionsTest {
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
     @JsonSubTypes({
         @JsonSubTypes.Type(Square.class),
+        @JsonSubTypes.Type(Quadrilateral.class),
         @JsonSubTypes.Type(Rectangle.class),
         @JsonSubTypes.Type(Circle.class),
     })
     private static class Shape {
     }
 
+    @JsonTypeName("quadrilateral")
+    private static class Quadrilateral extends Shape {
+    }
+
     @JsonTypeName("square")
-    private static class Square extends Shape {
+    private static class Square extends Quadrilateral {
         public double size;
     }
 
     @JsonTypeName("rectangle")
-    private static class Rectangle extends Shape {
+    private static class Rectangle extends Quadrilateral {
         public double width;
         public double height;
     }
@@ -129,15 +134,19 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface Shape {\n" +
-                "    kind: 'square' | 'rectangle' | 'circle';\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
-                "interface Square extends Shape {\n" +
+                "interface Square extends Quadrilateral {\n" +
                 "    kind: 'square';\n" +
                 "    size: number;\n" +
                 "}\n" +
                 "\n" +
-                "interface Rectangle extends Shape {\n" +
+                "interface Quadrilateral extends Shape {\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle extends Quadrilateral {\n" +
                 "    kind: 'rectangle';\n" +
                 "    width: number;\n" +
                 "    height: number;\n" +
@@ -148,7 +157,7 @@ public class TaggedUnionsTest {
                 "    radius: number;\n" +
                 "}\n" +
                 "\n" +
-                "type ShapeUnion = Square | Rectangle | Circle;\n" +
+                "type ShapeUnion = Square | Quadrilateral | Rectangle | Circle;\n" +
                 ""
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
@@ -202,15 +211,19 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface Shape {\n" +
-                "    kind: 'square' | 'rectangle' | 'circle';\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
-                "interface Square extends Shape {\n" +
+                "interface Square extends Quadrilateral {\n" +
                 "    kind: 'square';\n" +
                 "    size: number;\n" +
                 "}\n" +
                 "\n" +
-                "interface Rectangle extends Shape {\n" +
+                "interface Quadrilateral extends Shape {\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle extends Quadrilateral {\n" +
                 "    kind: 'rectangle';\n" +
                 "    width: number;\n" +
                 "    height: number;\n" +

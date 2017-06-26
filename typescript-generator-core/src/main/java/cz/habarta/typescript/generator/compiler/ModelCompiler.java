@@ -188,14 +188,14 @@ public class ModelCompiler {
     }
 
     private static List<Class<?>> getParentTaggedUnionClasses(BeanModel bean, Model model) {
-        if (bean == null) {
+        if (bean == null || bean.getOrigin() == Object.class) {
             return null;
         }
         final List<Class<?>> taggedUnionClasses = bean.getTaggedUnionClasses();
         if (taggedUnionClasses == null) {
             final List<Type> parentTypes = bean.getParentAndInterfaces();
             for (Type parentType : parentTypes) {
-                final BeanModel parent = model.getBean(parentType.getClass());
+                final BeanModel parent = model.getBean(parentType);
                 final List<Class<?>> results = getParentTaggedUnionClasses(parent, model);
                 if (results != null) {
                     return results;

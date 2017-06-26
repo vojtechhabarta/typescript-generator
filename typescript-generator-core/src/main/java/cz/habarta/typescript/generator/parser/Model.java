@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 
@@ -22,7 +23,7 @@ public class Model {
         return beans;
     }
 
-    public BeanModel getBean(Class<?> beanClass) {
+    public BeanModel getBean(Type beanClass) {
         for (BeanModel bean : beans) {
             if (bean.getOrigin().equals(beanClass)) {
                 return bean;
