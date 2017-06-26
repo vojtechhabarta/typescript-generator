@@ -190,6 +190,9 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitProperty(TsPropertyModel property) {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
+        if (tsType instanceof TsType.CollisionType) {
+            throw new RuntimeException("Error! Unresolvable collision type: " + tsType.format(settings));
+        }
         final String readonly = property.readonly ? "readonly " : "";
         final String questionMark = settings.declarePropertiesAsOptional || (tsType instanceof TsType.OptionalType) ? "?" : "";
         writeIndentedLine(readonly + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");

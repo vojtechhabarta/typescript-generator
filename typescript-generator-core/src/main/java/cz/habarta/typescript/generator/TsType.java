@@ -237,6 +237,26 @@ public abstract class TsType {
 
     }
 
+    public static class CollisionType extends TsType {
+        public final List<TsType> types;
+
+        public CollisionType(TsType... types) {
+            this(Utils.removeNulls(Arrays.asList(types)));
+        }
+        public CollisionType(List<TsType> types) {
+            this.types = types;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            final List<String> props = new ArrayList<>();
+            for (TsType type : types) {
+                props.add(type.format(settings));
+            }
+            return Utils.join(props, ", ");
+        }
+    }
+
     public static TsType transformTsType(TsType tsType, Transformer transformer) {
         final TsType type = transformer.transform(tsType);
         if (type instanceof TsType.GenericReferenceType) {
