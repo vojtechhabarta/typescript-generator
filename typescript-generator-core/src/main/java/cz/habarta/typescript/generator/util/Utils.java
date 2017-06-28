@@ -165,6 +165,12 @@ public class Utils {
         return result;
     }
 
+    public static <T> List<T> removeAll(List<T> list, List<T> toBeRemoved) {
+        final ArrayList<T> result = new ArrayList<>(list);
+        result.removeAll(toBeRemoved);
+        return result;
+    }
+
     public static List<String> readLines(InputStream stream) {
         return splitMultiline(readString(stream), false);        
     }

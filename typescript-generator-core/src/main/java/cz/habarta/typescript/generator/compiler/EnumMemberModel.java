@@ -4,13 +4,21 @@ package cz.habarta.typescript.generator.compiler;
 import java.util.List;
 
 
-public class EnumMemberModel<T> {
+public class EnumMemberModel {
     
     private final String propertyName;
-    private final T enumValue;
+    private final Object/*String|Number*/ enumValue;
     private final List<String> comments;
 
-    public EnumMemberModel(String propertyName, T enumValue, List<String> comments) {
+    public EnumMemberModel(String propertyName, String enumValue, List<String> comments) {
+        this(propertyName, (Object)enumValue, comments);
+    }
+
+    public EnumMemberModel(String propertyName, Number enumValue, List<String> comments) {
+        this(propertyName, (Object)enumValue, comments);
+    }
+
+    private EnumMemberModel(String propertyName, Object enumValue, List<String> comments) {
         this.propertyName = propertyName;
         this.enumValue = enumValue;
         this.comments = comments;
@@ -20,7 +28,7 @@ public class EnumMemberModel<T> {
         return propertyName;
     }
 
-    public T getEnumValue() {
+    public Object getEnumValue() {
         return enumValue;
     }
 
@@ -28,8 +36,8 @@ public class EnumMemberModel<T> {
         return comments;
     }
 
-    public EnumMemberModel<T> withComments(List<String> comments) {
-        return new EnumMemberModel<>(propertyName, enumValue, comments);
+    public EnumMemberModel withComments(List<String> comments) {
+        return new EnumMemberModel(propertyName, enumValue, comments);
     }
 
 }

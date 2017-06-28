@@ -276,8 +276,7 @@ public class Jackson2Parser extends ModelParser {
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_FLOAT ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_INT);
 
-        final List<EnumMemberModel<String>> stringMembers = new ArrayList<>();
-        final List<EnumMemberModel<Number>> numberMembers = new ArrayList<>();
+        final List<EnumMemberModel> enumMembers = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             final Class<?> enumClass = (Class<?>) sourceClass.type;
 
@@ -296,10 +295,10 @@ public class Jackson2Parser extends ModelParser {
                     if (field.isEnumConstant()) {
                         if (isNumberBased) {
                             final Number value = getNumberEnumValue(field, valueMethod, index++);
-                            numberMembers.add(new EnumMemberModel<>(field.getName(), value, null));
+                            enumMembers.add(new EnumMemberModel(field.getName(), value, null));
                         } else {
                             final String value = getStringEnumValue(field, valueMethod);
-                            stringMembers.add(new EnumMemberModel<>(field.getName(), value, null));
+                            enumMembers.add(new EnumMemberModel(field.getName(), value, null));
                         }
                     }
                 }
@@ -309,11 +308,7 @@ public class Jackson2Parser extends ModelParser {
             }
         }
 
-        if (isNumberBased) {
-            return new EnumModel<>(sourceClass.type, EnumKind.NumberBased, numberMembers, null);
-        } else {
-            return new EnumModel<>(sourceClass.type, EnumKind.StringBased, stringMembers, null);
-        }
+        return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, null);
     }
 
     private Number getNumberEnumValue(Field field, Method valueMethod, int index) throws Exception {

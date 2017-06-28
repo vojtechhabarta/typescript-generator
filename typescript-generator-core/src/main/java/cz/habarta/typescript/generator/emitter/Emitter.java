@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
-import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
@@ -105,7 +104,7 @@ public class Emitter implements EmitterExtension.Writer {
         exportKeyword = exportKeyword || forceExportKeyword;
         emitBeans(model, exportKeyword, declareKeyword);
         emitTypeAliases(model, exportKeyword, declareKeyword);
-        emitNumberEnums(model, exportKeyword, declareKeyword);
+        emitLiteralEnums(model, exportKeyword, declareKeyword);
         emitHelpers(model);
         for (EmitterExtension emitterExtension : settings.extensions) {
             writeNewLine();
@@ -127,11 +126,8 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitNumberEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        final ArrayList<TsEnumModel<?>> enums = settings.mapEnum == EnumMapping.asNumberBasedEnum && !settings.areDefaultStringEnumsOverriddenByExtension()
-                ? new ArrayList<>(model.getEnums())
-                : new ArrayList<TsEnumModel<?>>(model.getEnums(EnumKind.NumberBased));
-        for (TsEnumModel<?> enumModel : enums) {
+    private void emitLiteralEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
+        for (TsEnumModel enumModel : model.getEnums()) {
             emitFullyQualifiedDeclaration(enumModel, exportKeyword, declareKeyword);
         }
     }
@@ -157,7 +153,7 @@ public class Emitter implements EmitterExtension.Writer {
         } else if (declaration instanceof TsAliasModel) {
             emitTypeAlias((TsAliasModel) declaration, exportKeyword);
         } else if (declaration instanceof TsEnumModel) {
-            emitNumberEnum((TsEnumModel) declaration, exportKeyword, declareKeyword);
+            emitLiteralEnum((TsEnumModel) declaration, exportKeyword, declareKeyword);
         } else {
             throw new RuntimeException("Unknown declaration type: " + declaration.getClass().getName());
         }
@@ -266,15 +262,18 @@ public class Emitter implements EmitterExtension.Writer {
         writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 
-    private void emitNumberEnum(TsEnumModel<?> enumModel, boolean exportKeyword, boolean declareKeyword) {
+    private void emitLiteralEnum(TsEnumModel enumModel, boolean exportKeyword, boolean declareKeyword) {
         writeNewLine();
         emitComments(enumModel.getComments());
-        writeIndentedLine(exportKeyword, (declareKeyword ? "declare " : "") + "const enum " + enumModel.getName().getSimpleName() + " {");
+        final String declareText = declareKeyword ? "declare " : "";
+        final String constText = settings.nonConstEnums ? "" : "const ";
+        writeIndentedLine(exportKeyword, declareText + constText + "enum " + enumModel.getName().getSimpleName() + " {");
         indent++;
-        for (EnumMemberModel<?> member : enumModel.getMembers()) {
+        for (EnumMemberModel member : enumModel.getMembers()) {
             emitComments(member.getComments());
-            final String initializer = enumModel.getKind() == EnumKind.NumberBased
-                    ? " = " + member.getEnumValue()
+            final Object value = member.getEnumValue();
+            final String initializer = value != null
+                    ? " = " + (value instanceof String ? quote((String) value, settings) : String.valueOf(value))
                     : "";
             writeIndentedLine(member.getPropertyName() + initializer + ",");
         }

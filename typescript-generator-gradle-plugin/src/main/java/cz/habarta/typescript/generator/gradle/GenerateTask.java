@@ -40,6 +40,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> customTypeMappings;
     public DateMapping mapDate;
     public EnumMapping mapEnum;
+    public boolean nonConstEnums;
     public ClassMapping mapClasses;
     public boolean disableTaggedUnions;
     public boolean ignoreSwaggerAnnotations;
@@ -112,6 +113,7 @@ public class GenerateTask extends DefaultTask {
         settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
+        settings.nonConstEnums = nonConstEnums;
         settings.mapClasses = mapClasses;
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;

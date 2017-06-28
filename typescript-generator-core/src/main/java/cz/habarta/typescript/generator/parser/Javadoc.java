@@ -41,13 +41,13 @@ public class Javadoc {
 
     public Model enrichModel(Model model) {
         final List<BeanModel> dBeans = new ArrayList<>();
-        final List<EnumModel<?>> dEnums = new ArrayList<>();
+        final List<EnumModel> dEnums = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
             final BeanModel dBean = enrichBean(bean);
             dBeans.add(dBean);
         }
-        for (EnumModel<?> enumModel : model.getEnums()) {
-            final EnumModel<?> dEnumModel = enrichEnum(enumModel);
+        for (EnumModel enumModel : model.getEnums()) {
+            final EnumModel dEnumModel = enrichEnum(enumModel);
             dEnums.add(dEnumModel);
         }
         return new Model(dBeans, dEnums, model.getJaxrsApplication());
@@ -96,11 +96,11 @@ public class Javadoc {
         return property.withComments(getComments(propertyComment, tags));
     }
 
-    private <T> EnumModel<T> enrichEnum(EnumModel<T> enumModel) {
+    private EnumModel enrichEnum(EnumModel enumModel) {
         final Enum dEnum = findJavadocEnum(enumModel.getOrigin(), dRoots);
-        final List<EnumMemberModel<T>> enrichedMembers = new ArrayList<>();
-        for (EnumMemberModel<T> member : enumModel.getMembers()) {
-            final EnumMemberModel<T> enrichedMember = enrichEnumMember(member, dEnum);
+        final List<EnumMemberModel> enrichedMembers = new ArrayList<>();
+        for (EnumMemberModel member : enumModel.getMembers()) {
+            final EnumMemberModel enrichedMember = enrichEnumMember(member, dEnum);
             enrichedMembers.add(enrichedMember);
         }
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
@@ -108,7 +108,7 @@ public class Javadoc {
         return enumModel.withMembers(enrichedMembers).withComments(Utils.concat(getComments(enumComment, tags), enumModel.getComments()));
     }
 
-    private <T> EnumMemberModel<T> enrichEnumMember(EnumMemberModel<T> enumMember, Enum dEnum) {
+    private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember, Enum dEnum) {
         final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
         final List<TagInfo> tags = dConstant != null ? dConstant.getTag(): null;
         final String memberComment = dConstant != null ? dConstant.getComment() : null;
