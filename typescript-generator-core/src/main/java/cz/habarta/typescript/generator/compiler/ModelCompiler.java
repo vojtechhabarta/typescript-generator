@@ -284,16 +284,32 @@ public class ModelCompiler {
         return tsModel.withBeans(beans);
     }
 
-    private static Map<String, TsType> getInheritedProperties(SymbolTable symbolTable, TsModel tsModel, List<TsType> parents) {
+    // Get inherited properties for a list of types and combine them
+    private static Map<String, TsType> getInheritedProperties(SymbolTable symbolTable, TsModel tsModel, List<TsType> types) {
         final Map<String, TsType> properties = new LinkedHashMap<>();
-        for (TsType parentType : parents) {
-            final TsBeanModel parent = tsModel.getBean(getOriginClass(symbolTable, parentType));
-            if (parent != null) {
-                properties.putAll(getInheritedProperties(symbolTable, tsModel, parent.getParentAndInterfaces()));
-                for (TsPropertyModel property : parent.getProperties()) {
-                    properties.put(property.getName(), property.getTsType());
+        for (TsType type : types) {
+            final Map<String, TsType> inheritedProperties = getInheritedProperties(symbolTable, tsModel, type);
+            for (String inheritedPropertyName : inheritedProperties.keySet()) {
+                final TsType existingProperty = properties.get(inheritedPropertyName);
+                final TsType newProperty = inheritedProperties.get(inheritedPropertyName);
+                // If two of the inherited types collide, store a CollisionType
+                if (existingProperty != null && !existingProperty.equals(newProperty)) {
+                    properties.put(inheritedPropertyName, new TsType.CollisionType(existingProperty, newProperty));
+                } else {
+                    properties.put(inheritedPropertyName, newProperty);
                 }
             }
+        }
+        return properties;
+    }
+
+    // Get inherited properties for a type, while overriding parent types if they differ
+    private static Map<String, TsType> getInheritedProperties(SymbolTable symbolTable, TsModel tsModel, TsType type) {
+        final Map<String, TsType> properties = new LinkedHashMap<>();
+        final TsBeanModel bean = tsModel.getBean(getOriginClass(symbolTable, type));
+        properties.putAll(getInheritedProperties(symbolTable, tsModel, bean.getParentAndInterfaces()));
+        for (TsPropertyModel property : bean.getProperties()) {
+            properties.put(property.getName(), property.getTsType());
         }
         return properties;
     }
