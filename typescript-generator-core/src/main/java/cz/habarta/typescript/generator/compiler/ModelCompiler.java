@@ -151,7 +151,7 @@ public class ModelCompiler {
             final TsType discriminantType = literals.isEmpty()
                     ? TsType.String
                     : new TsType.UnionType(literals);
-            properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, null));
+            properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, /*ownProperty*/ true, null));
         }
 
         return new TsBeanModel(bean.getOrigin(), TsBeanCategory.Data, isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, null, bean.getComments());
@@ -202,7 +202,7 @@ public class ModelCompiler {
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
         final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
-        return new TsPropertyModel(prefix + property.getName() + suffix, tsType, settings.declarePropertiesAsReadOnly, property.getComments());
+        return new TsPropertyModel(prefix + property.getName() + suffix, tsType, settings.declarePropertiesAsReadOnly, false, property.getComments());
     }
 
     private TsEnumModel<?> processEnum(SymbolTable symbolTable, EnumModel<?> enumModel) {
@@ -238,7 +238,7 @@ public class ModelCompiler {
             final Map<String, TsType> inheritedPropertyTypes = getInheritedProperties(symbolTable, tsModel, bean.getParentAndInterfaces());
             final List<TsPropertyModel> properties = new ArrayList<>();
             for (TsPropertyModel property : bean.getProperties()) {
-                if (!Objects.equals(property.getTsType(), inheritedPropertyTypes.get(property.getName()))) {
+                if (property.isOwnProperty() || !Objects.equals(property.getTsType(), inheritedPropertyTypes.get(property.getName()))) {
                     properties.add(property);
                 }
             }

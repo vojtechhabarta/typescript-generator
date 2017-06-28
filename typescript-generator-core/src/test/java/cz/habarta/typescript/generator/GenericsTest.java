@@ -84,6 +84,7 @@ public class GenericsTest {
         final String nl = settings.newline;
         final String expected =
                 "export interface IA extends IB<string> {" + nl +
+                "    type: string;" + nl +
                 "}" + nl +
                 "" + nl +
                 "export interface IB<T> {" + nl +

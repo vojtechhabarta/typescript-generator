@@ -9,12 +9,18 @@ import java.util.List;
 public class TsPropertyModel extends TsProperty implements Comparable<TsProperty> {
 
     public final boolean readonly;
+    public final boolean ownProperty; // property exists directly on the bean, should not be inherited
     public final List<String> comments;
 
-    public TsPropertyModel(String name, TsType tsType, boolean readonly, List<String> comments) {
+    public TsPropertyModel(String name, TsType tsType, boolean readonly, boolean ownProperty, List<String> comments) {
         super(name, tsType);
         this.readonly = readonly;
         this.comments = comments;
+        this.ownProperty = ownProperty;
+    }
+
+    public boolean isOwnProperty() {
+        return ownProperty;
     }
 
     public List<String> getComments() {
@@ -22,7 +28,7 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
     }
 
     public TsPropertyModel setTsType(TsType type) {
-        return new TsPropertyModel(getName(), type, readonly, getComments());
+        return new TsPropertyModel(getName(), type, readonly, ownProperty, getComments());
     }
 
     @Override

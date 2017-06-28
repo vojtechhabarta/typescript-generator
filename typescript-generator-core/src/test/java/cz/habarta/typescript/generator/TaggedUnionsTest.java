@@ -196,7 +196,6 @@ public class TaggedUnionsTest {
     public void testTaggedUnionsWithOverlappingInterfaces() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(IShape3.class));
-        System.out.println(output);
         final String expected = (
                 "\n" +
                 "interface IShape3 {\n" +
@@ -204,6 +203,7 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface IRectangle3 extends INamedQuadrilateral3 {\n" +
+                "    kind: 'rectangle';\n" +
                 "}\n" +
                 "\n" +
                 "interface ICircle3 extends INamedShape3 {\n" +
@@ -215,6 +215,7 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface INamedShape3 extends IShape3 {\n" +
+                "    kind: 'circle' | 'rectangle';\n" +
                 "    name: string;\n" +
                 "}\n" +
                 "\n" +
@@ -266,7 +267,6 @@ public class TaggedUnionsTest {
     public void testTaggedUnionsWithDiamond() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DiamondA.class));
-        System.out.println(output);
         final String expected = (
                 "\n" +
                 "interface DiamondA {\n" +
