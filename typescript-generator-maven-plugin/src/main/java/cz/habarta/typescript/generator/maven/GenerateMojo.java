@@ -318,12 +318,6 @@ public class GenerateMojo extends AbstractMojo {
     private boolean sortDeclarations;
 
     /**
-     * If true discriminant types will be sorted alphabetically.
-     */
-    @Parameter
-    private boolean sortDiscriminantTypes;
-
-    /**
      * If true TypeScript type declarations (interfaces) will be sorted alphabetically.
      */
     @Parameter
@@ -468,7 +462,6 @@ public class GenerateMojo extends AbstractMojo {
             settings.setRestOptionsType(restOptionsType);
             settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
             settings.sortDeclarations = sortDeclarations;
-            settings.sortDiscriminantTypes = sortDiscriminantTypes;
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
             settings.javadocXmlFiles = javadocXmlFiles;
