@@ -166,26 +166,16 @@ public abstract class TsType {
     public static class UnionType extends TsType {
 
         public final List<TsType> types;
-        public final boolean sort;
 
         public UnionType(List<? extends TsType> types) {
-            this(types, false);
-        }
-
-        public UnionType(List<? extends TsType> types, boolean sort) {
             this.types = new ArrayList<TsType>(new LinkedHashSet<TsType>(types));
-            this.sort = sort;
         }
 
         @Override
         public String format(Settings settings) {
-            List<String> formattedTypes = format(this.types, settings);
-            if (this.sort) {
-                Collections.sort(formattedTypes);
-            }
-            return formattedTypes.isEmpty()
+            return types.isEmpty()
                     ? "never"
-                    : Utils.join(formattedTypes, " | ");
+                    : Utils.join(format(types, settings), " | ");
         }
 
     }
