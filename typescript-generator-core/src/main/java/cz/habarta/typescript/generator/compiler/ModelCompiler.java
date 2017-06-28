@@ -158,7 +158,7 @@ public class ModelCompiler {
             }
             final TsType discriminantType = literals.isEmpty()
                     ? TsType.String
-                    : new TsType.UnionType(literals);
+                    : new TsType.UnionType(literals, settings.sortDiscriminantTypes);
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, settings.declarePropertiesAsReadOnly, /*ownProperty*/ true, null));
         }
 

@@ -57,6 +57,7 @@ public class Settings {
     public boolean restOptionsTypeIsGeneric;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
+    public boolean sortDiscriminantTypes = false;
     public boolean sortTypeDeclarations = false;
     public boolean noFileComment = false;
     public List<File> javadocXmlFiles = null;
