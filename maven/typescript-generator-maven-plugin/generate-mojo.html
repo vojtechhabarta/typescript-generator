@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2017-06-28
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.26.337
+                  <li id="projectVersion">Version: 1.26.338
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.26.337:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.26.338:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -607,11 +607,12 @@ are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.<br /></td>
 <td><tt>-</tt></td>
             
 <td>Specifies how enums will be mapped. Supported values are 'asUnion',
-'asInlineUnion', 'asNumberBasedEnum'. Default value is 'asUnion'.
-Value 'asUnion' creates type alias to union of string enum values.
-Value 'asInlineUnion' creates union of enum values on places where
-the enum is used. Value 'asNumberBasedEnum' creates enum of named
-number values.<br /></td>
+'asInlineUnion', 'asEnum', 'asNumberBasedEnum'. Default value is
+'asUnion'. Value 'asUnion' creates type alias to union of string
+enum values. Value 'asInlineUnion' creates union of enum values on
+places where the enum is used. Value 'asEnum' creates string enum.
+Requires TypeScript 2.4. Value 'asNumberBasedEnum' creates enum of
+named number values.<br /></td>
           </tr>
           
 <tr class="a">
@@ -666,6 +667,18 @@ is in source control and is regenerated in build.<br /></td>
           
 <tr class="a">
             
+<td><b><a href="#nonConstEnums">nonConstEnums</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>If true generated enums will not have <tt>const</tt> keyword.
+This can be used only in implementation files.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
 <td><b><a href="#npmName">npmName</a></b></td>
             
 <td><tt>String</tt></td>
@@ -677,7 +690,7 @@ is in source control and is regenerated in build.<br /></td>
 <tt>${project.artifactId}</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#npmVersion">npmVersion</a></b></td>
             
@@ -690,7 +703,7 @@ is in source control and is regenerated in build.<br /></td>
 <tt>1.0.0</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#optionalAnnotations">optionalAnnotations</a></b></td>
             
@@ -704,7 +717,7 @@ when generating the corresponding TypeScript interface. Example
 optional annotation: @javax.annotation.Nullable<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#outputFile">outputFile</a></b></td>
             
@@ -715,7 +728,7 @@ optional annotation: @javax.annotation.Nullable<br /></td>
 <td>Path and name of generated TypeScript file.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
@@ -729,7 +742,7 @@ optional annotation: @javax.annotation.Nullable<br /></td>
 Default value is 'declarationFile'.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#referencedFiles">referencedFiles</a></b></td>
             
@@ -742,7 +755,7 @@ directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
 with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -755,7 +768,7 @@ enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -768,7 +781,7 @@ enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&qu
 will be &quot;Data&quot;.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#restOptionsType">restOptionsType</a></b></td>
             
@@ -784,7 +797,7 @@ be specific (for example <tt>AxiosRequestConfig</tt>) or
 generic (for example <tt>&amp;ltO&gt;</tt>).<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#restResponseType">restResponseType</a></b></td>
             
@@ -800,7 +813,7 @@ or <tt>AxiosPromise</tt>) is returned instead of actual
 response data.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -812,7 +825,7 @@ response data.<br /></td>
 sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -824,7 +837,7 @@ sorted alphabetically.<br /></td>
 alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#stringQuotes">stringQuotes</a></b></td>
             
@@ -836,7 +849,7 @@ alphabetically.<br /></td>
 'doubleQuotes', 'singleQuotes'. Default value is 'doubleQuotes'.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#umdNamespace">umdNamespace</a></b></td>
             
@@ -1230,11 +1243,12 @@ are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.</div>
 <p><b><a name="mapEnum">mapEnum</a>:</b></p>
         
 <div>Specifies how enums will be mapped. Supported values are 'asUnion',
-'asInlineUnion', 'asNumberBasedEnum'. Default value is 'asUnion'.
-Value 'asUnion' creates type alias to union of string enum values.
-Value 'asInlineUnion' creates union of enum values on places where
-the enum is used. Value 'asNumberBasedEnum' creates enum of named
-number values.</div>
+'asInlineUnion', 'asEnum', 'asNumberBasedEnum'. Default value is
+'asUnion'. Value 'asUnion' creates type alias to union of string
+enum values. Value 'asInlineUnion' creates union of enum values on
+places where the enum is used. Value 'asEnum' creates string enum.
+Requires TypeScript 2.4. Value 'asNumberBasedEnum' creates enum of
+named number values.</div>
         
 <ul>
           
@@ -1281,6 +1295,17 @@ modules. Default is no namespace.</div>
 default there is a comment with timestamp and typescript-generator
 version. So it might be useful to suppress this comment if the file
 is in source control and is regenerated in build.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="nonConstEnums">nonConstEnums</a>:</b></p>
+        
+<div>If true generated enums will not have <tt>const</tt> keyword.
+This can be used only in implementation files.</div>
         
 <ul>
           
