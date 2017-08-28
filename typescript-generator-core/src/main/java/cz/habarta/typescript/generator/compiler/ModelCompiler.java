@@ -417,8 +417,12 @@ public class ModelCompiler {
             final Annotation annotation = method.getRootResource().getAnnotation(settings.jaxrsNamespacingAnnotation);
             final String element = settings.jaxrsNamespacingAnnotationElement != null ? settings.jaxrsNamespacingAnnotationElement : "value";
             final String annotationValue = Utils.getAnnotationElementValue(annotation, element, String.class);
-            if (annotationValue != null && Emitter.isValidIdentifierName(annotationValue)) {
-                return symbolTable.getSyntheticSymbol(annotationValue, nameSuffix);
+            if (annotationValue != null) {
+                if (Emitter.isValidIdentifierName(annotationValue)) {
+                    return symbolTable.getSyntheticSymbol(annotationValue, nameSuffix);
+                } else {
+                    System.out.println(String.format("Warning: Ignoring annotation value '%s' since it is not a valid identifier, '%s' will be in default namespace", annotationValue, method.getOriginClass().getName() + "." + method.getName()));
+                }
             }
         }
         final String applicationName = getApplicationName(jaxrsApplication);
