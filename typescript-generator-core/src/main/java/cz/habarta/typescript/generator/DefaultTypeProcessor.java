@@ -38,7 +38,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (javaClass.getName().equals("java.util.OptionalInt") ||
                     javaClass.getName().equals("java.util.OptionalLong") ||
                     javaClass.getName().equals("java.util.OptionalDouble")) {
-                return new Result(TsType.Number);
+                return new Result(TsType.Number.optional());
             }
             // generic structural type used without type arguments
             if (javaClass.getTypeParameters().length > 0) {
@@ -64,7 +64,8 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
                 }
                 if (javaClass.getName().equals("java.util.Optional")) {
-                    return context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
                 }
                 // generic structural type
                 final List<Class<?>> discoveredClasses = new ArrayList<>();

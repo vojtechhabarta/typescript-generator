@@ -6,6 +6,7 @@ package cz.habarta.typescript.generator;
 //import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 //import java.util.Objects;
 //import java.util.Optional;
+//import java.util.OptionalInt;
 //import org.junit.Assert;
 //import org.junit.Test;
 
@@ -21,7 +22,8 @@ public class OptionalTest {
 //        Assert.assertEquals(
 //                "interface Person {\n" +
 //                "    name: string;\n" +
-//                "    email: string;\n" +
+//                "    email?: string;\n" +
+//                "    age?: number;\n" +
 //                "}",
 //                output.trim());
 //    }
@@ -52,6 +54,7 @@ public class OptionalTest {
 //    private static class Person {
 //        public String name;
 //        public Optional<String> email;
+//        public OptionalInt age;
 //
 //        public Person() {
 //        }
