@@ -13,6 +13,12 @@ public class DefaultTypeProcessor implements TypeProcessor {
     @Override
     public Result processType(Type javaType, Context context) {
         if (KnownTypes.containsKey(javaType)) return new Result(KnownTypes.get(javaType));
+        if (javaType instanceof Class) {
+            final Class<?> javaClass = (Class<?>) javaType;
+            if (JavaTimeTemporal != null && JavaTimeTemporal.isAssignableFrom(javaClass)) {
+                return new Result(TsType.Date);
+            }
+        }
         // map JAX-RS standard types to `any`
         for (Class<?> cls : JaxrsApplicationParser.getStandardEntityClasses()) {
             final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
@@ -126,17 +132,19 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(BigInteger.class, TsType.Number);
         knownTypes.put(Date.class, TsType.Date);
         knownTypes.put(UUID.class, TsType.String);
-
-        // joda time (if present)
-        try {
-            final Class<?> jodaTimeClass = Class.forName("org.joda.time.DateTime");
-            knownTypes.put(jodaTimeClass, TsType.Date);
-        } catch (ClassNotFoundException e) {
-            // ignore if joda time is not present
-        }
         return knownTypes;
     }
 
     private static final Map<Type, TsType> KnownTypes = getKnownTypes();
+
+    private static Class<?> getTemporalIfAvailable() {
+        try {
+            return Class.forName("java.time.temporal.Temporal");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    private static final Class<?> JavaTimeTemporal = getTemporalIfAvailable();
 
 }
