@@ -86,6 +86,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classPatterns;
 
     /**
+     * Java classes with these annotations will be generated as typescript classes,
+     * even if the general configuration is to generate typescript interfaces
+     */
+    @Parameter
+    private List<String> classAnnotations;
+
+    /**
      * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for JSON classes to process.
      * Parameter contains fully-qualified class name.
      * It is possible to exclude particular REST resource classes using {@link #excludeClasses} parameter.
@@ -484,6 +491,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
             settings.classLoader = classLoader;
+            settings.classAnnotations = classAnnotations;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());

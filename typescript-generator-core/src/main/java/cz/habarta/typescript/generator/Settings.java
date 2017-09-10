@@ -71,6 +71,11 @@ public class Settings {
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery = false;
     public ClassLoader classLoader = null;
+    /**
+     * Java classes with these annotations will be generated as typescript classes,
+     * even if the general configuration is to generate typescript interfaces
+     */
+    public List<String> classAnnotations = new ArrayList<>();
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 

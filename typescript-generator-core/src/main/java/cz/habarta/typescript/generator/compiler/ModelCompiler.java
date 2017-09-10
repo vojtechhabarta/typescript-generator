@@ -42,7 +42,7 @@ public class ModelCompiler {
 
     public TsModel javaToTypeScript(Model model) {
         final SymbolTable symbolTable = new SymbolTable(settings);
-        TsModel tsModel = processModel(symbolTable, model);
+        TsModel tsModel = processModel(symbolTable, model, settings.classAnnotations);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
 
@@ -97,11 +97,11 @@ public class ModelCompiler {
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
     }
 
-    private TsModel processModel(SymbolTable symbolTable, Model model) {
+    private TsModel processModel(SymbolTable symbolTable, Model model, List<String> classAnnotations) {
         final Map<Type, List<BeanModel>> children = createChildrenMap(model);
         final List<TsBeanModel> beans = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
-            beans.add(processBean(symbolTable, model, children, bean));
+            beans.add(processBean(symbolTable, model, children, bean, classAnnotations));
         }
         final List<TsEnumModel> enums = new ArrayList<>();
         final List<TsEnumModel> stringEnums = new ArrayList<>();
@@ -128,8 +128,19 @@ public class ModelCompiler {
         return children;
     }
 
-    private <T> TsBeanModel processBean(SymbolTable symbolTable, Model model, Map<Type, List<BeanModel>> children, BeanModel bean) {
-        final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
+    private static boolean classHasAnnotations(Class<?> clazz, List<String> annotations) {
+        final Annotation[] classAnnotations = clazz.getAnnotations();
+        final Set<String> classAnnotationNames = new HashSet<>();
+        for (int i=0;i<classAnnotations.length;i++) {
+            classAnnotationNames.add(classAnnotations[i].annotationType().getName());
+        }
+        classAnnotationNames.retainAll(annotations);
+        return !classAnnotationNames.isEmpty();
+    }
+
+    private TsBeanModel processBean(SymbolTable symbolTable, Model model, Map<Type, List<BeanModel>> children, BeanModel bean, List<String> classAnnotations) {
+        final boolean hasClassAnnotations = classHasAnnotations(bean.getOrigin(), classAnnotations);
+        final boolean isClass = hasClassAnnotations || (!bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses);
         final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
         final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
         for (TypeVariable<?> typeParameter : bean.getOrigin().getTypeParameters()) {
