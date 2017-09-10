@@ -11,6 +11,9 @@ public abstract class EmitterExtension {
     public void emitElements(Writer writer, Settings settings, boolean exportKeyword, TsModel model) {
     }
 
+    public void beanGenerationAddCode(Writer writer, Settings settings, TsBeanModel bean) {
+    }
+
     public static interface Writer {
         public void writeIndentedLine(String line);
     }
