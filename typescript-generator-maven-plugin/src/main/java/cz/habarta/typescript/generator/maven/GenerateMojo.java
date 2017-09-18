@@ -410,6 +410,13 @@ public class GenerateMojo extends AbstractMojo {
     private boolean disableJackson2ModuleDiscovery;
 
     /**
+     * Use Jackson's concept of required parameters to specify optionality in the generated definition. If a property
+     * is not marked as required, the TypeScript property will be emitted as optional.
+     */
+    @Parameter
+    private boolean useJackson2RequiredForOptional;
+
+    /**
      * Turns on verbose output for debugging purposes.
      */
     @Parameter
@@ -483,6 +490,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+            settings.useJackson2RequiredForOptional = useJackson2RequiredForOptional;
             settings.classLoader = classLoader;
             final File output = outputFile != null
                     ? outputFile

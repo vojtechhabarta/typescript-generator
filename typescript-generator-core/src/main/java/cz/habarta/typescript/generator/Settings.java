@@ -70,6 +70,7 @@ public class Settings {
     public String typescriptVersion = "^2.4";
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery = false;
+    public boolean useJackson2RequiredForOptional = false;
     public ClassLoader classLoader = null;
 
     private boolean defaultStringEnumsOverriddenByExtension = false;

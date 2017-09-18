@@ -1,13 +1,27 @@
 
 package cz.habarta.typescript.generator.gradle;
 
-import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.ClassMapping;
+import cz.habarta.typescript.generator.DateMapping;
+import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.Input;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.gradle.api.*;
-import org.gradle.api.tasks.*;
+import cz.habarta.typescript.generator.JaxrsNamespacing;
+import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.Output;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.StringQuotes;
+import cz.habarta.typescript.generator.TypeScriptFileType;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.TypeScriptOutputKind;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskAction;
+
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class GenerateTask extends DefaultTask {
@@ -63,6 +77,7 @@ public class GenerateTask extends DefaultTask {
     public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
     public boolean disableJackson2ModuleDiscovery;
+    public boolean useJackson2RequiredForOptional;
     public boolean debug;
 
     @TaskAction
@@ -137,6 +152,7 @@ public class GenerateTask extends DefaultTask {
         settings.setStringQuotes(stringQuotes);
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+        settings.useJackson2RequiredForOptional = useJackson2RequiredForOptional;
         settings.classLoader = classLoader;
         final File output = outputFile != null
                 ? getProject().file(outputFile)
