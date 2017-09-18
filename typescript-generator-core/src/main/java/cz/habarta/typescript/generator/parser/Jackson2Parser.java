@@ -80,7 +80,13 @@ public class Jackson2Parser extends ModelParser {
                         continue;
                     }
                 }
+
                 boolean optional = false;
+
+                if (settings.useJackson2RequiredForOptional) {
+                    optional = ! beanPropertyWriter.isRequired();
+                }
+
                 for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
                     if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
                         optional = true;
@@ -170,7 +176,7 @@ public class Jackson2Parser extends ModelParser {
     private String getTypeName(final Class<?> cls) {
         // find @JsonTypeName recursively
         final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class);
-        if (jsonTypeName != null) {
+        if (jsonTypeName != null && ! jsonTypeName.value().isEmpty()) {
             return jsonTypeName.value();
         }
         // find @JsonSubTypes.Type recursively
