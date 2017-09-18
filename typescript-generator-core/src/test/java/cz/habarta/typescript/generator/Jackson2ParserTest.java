@@ -89,6 +89,7 @@ public class Jackson2ParserTest {
     @JsonTypeName("explicit-name1")
     private static class SubTypeDiscriminatedByName1 implements ParentWithNameDiscriminant {
     }
+    @JsonTypeName(/* Default should be the simplename of the class */)
     private static class SubTypeDiscriminatedByName2 implements ParentWithNameDiscriminant {
     }
     private static class SubTypeDiscriminatedByName3 implements ParentWithNameDiscriminant {
