@@ -170,7 +170,7 @@ public class Jackson2Parser extends ModelParser {
     private String getTypeName(final Class<?> cls) {
         // find @JsonTypeName recursively
         final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class);
-        if (jsonTypeName != null && ! jsonTypeName.value().isEmpty()) {
+        if (jsonTypeName != null && !jsonTypeName.value().isEmpty()) {
             return jsonTypeName.value();
         }
         // find @JsonSubTypes.Type recursively
