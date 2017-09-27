@@ -119,10 +119,12 @@ public class ModelCompiler {
         final Map<Type, List<BeanModel>> children = new LinkedHashMap<>();
         for (BeanModel bean : model.getBeans()) {
             for (Type ancestor : bean.getParentAndInterfaces()) {
-                if (!children.containsKey(ancestor)) {
-                    children.put(ancestor, new ArrayList<BeanModel>());
+                Type processedAncestor = processTypeForDescendantLookup(ancestor);
+
+                if (!children.containsKey(processedAncestor)) {
+                    children.put(processedAncestor, new ArrayList<BeanModel>());
                 }
-                children.get(ancestor).add(bean);
+                children.get(processedAncestor).add(bean);
             }
         }
         return children;
@@ -186,10 +188,21 @@ public class ModelCompiler {
         return properties;
     }
 
+    /**
+     * Given a type, returns the type that should be used for the purpose of looking up implementations of that type.
+     */
+    private static Type processTypeForDescendantLookup(Type type) {
+        if (type instanceof ParameterizedType) {
+            return ((ParameterizedType) type).getRawType();
+        } else {
+            return type;
+        }
+    }
+
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
         final List<BeanModel> descendants = new ArrayList<>();
         descendants.add(bean);
-        final List<BeanModel> directDescendants = children.get(bean.getOrigin());
+        final List<BeanModel> directDescendants = children.get(processTypeForDescendantLookup(bean.getOrigin()));
         if (directDescendants != null) {
             for (BeanModel descendant : directDescendants) {
                 descendants.addAll(getSelfAndDescendants(descendant, children));
