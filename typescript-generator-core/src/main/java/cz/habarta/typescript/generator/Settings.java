@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.databind.Module;
 import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
@@ -30,7 +31,8 @@ public class Settings {
     public String umdNamespace = null;
     public JsonLibrary jsonLibrary = null;
     private Predicate<String> excludeFilter = null;
-    public boolean declarePropertiesAsOptional = false;
+    @Deprecated public boolean declarePropertiesAsOptional = false;
+    public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
     public boolean declarePropertiesAsReadOnly = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;
@@ -69,7 +71,9 @@ public class Settings {
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
     public String typescriptVersion = "^2.4";
     public boolean displaySerializerWarning = true;
-    public boolean disableJackson2ModuleDiscovery = false;
+    @Deprecated public boolean disableJackson2ModuleDiscovery = false;
+    public boolean jackson2ModuleDiscovery = false;
+    public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
@@ -120,6 +124,12 @@ public class Settings {
     public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {
         if (optionalAnnotations != null) {
             this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
+        }
+    }
+
+    public void loadJackson2Modules(ClassLoader classLoader, List<String> jackson2Modules) {
+        if (jackson2Modules != null) {
+            this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
         }
     }
 
@@ -234,6 +244,16 @@ public class Settings {
             if (npmName != null || npmVersion != null) {
                 throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM 'package.json'.");
             }
+        }
+
+        if (declarePropertiesAsOptional) {
+            System.out.println("Warning: Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
+            if (optionalProperties == null) {
+                optionalProperties = OptionalProperties.all;
+            }
+        }
+        if (disableJackson2ModuleDiscovery) {
+            System.out.println("Warning: Parameter 'disableJackson2ModuleDiscovery' was removed. See 'jackson2ModuleDiscovery' and 'jackson2Modules' parameters.");
         }
     }
 

@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.parser.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.xml.bind.annotation.XmlElement;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -107,6 +108,70 @@ public class Jackson2ParserTest {
         System.out.println(new ObjectMapper().writeValueAsString(new SubTypeDiscriminatedByName2()));
         System.out.println(new ObjectMapper().writeValueAsString(new SubTypeDiscriminatedByName3()));
         System.out.println(new ObjectMapper().writeValueAsString(new SubTypeDiscriminatedByName4()));
+    }
+
+    @Test
+    public void testOptionalJsonProperty() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalProperties = OptionalProperties.useLibraryDefinition;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
+        Assert.assertTrue(output.contains("oname1?: string"));
+//        Assert.assertTrue(output.contains("oname2?: string"));  // uncomment on Java 8
+        Assert.assertTrue(output.contains("jname1?: string"));
+        Assert.assertTrue(output.contains("jname2?: string"));
+        Assert.assertTrue(output.contains("jname3: string"));
+        Assert.assertTrue(output.contains("jname4: string"));
+        Assert.assertTrue(output.contains("xname1?: string"));
+        Assert.assertTrue(output.contains("xname2?: string"));
+        Assert.assertTrue(output.contains("xname3?: string"));
+        Assert.assertTrue(output.contains("xname4?: string"));
+    }
+
+    @Test
+    public void testOptionalXmlElement() {
+        final Settings settings = TestUtils.settings();
+        settings.jsonLibrary = JsonLibrary.jaxb;
+        settings.optionalProperties = OptionalProperties.useLibraryDefinition;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
+        Assert.assertTrue(output.contains("oname1?: string"));
+//        Assert.assertTrue(output.contains("oname2?: string"));  // uncomment on Java 8
+        Assert.assertTrue(output.contains("jname1?: string"));
+        Assert.assertTrue(output.contains("jname2?: string"));
+        Assert.assertTrue(output.contains("jname3?: string"));
+        Assert.assertTrue(output.contains("jname4?: string"));
+        Assert.assertTrue(output.contains("xname1?: string"));
+        Assert.assertTrue(output.contains("xname2?: string"));
+        Assert.assertTrue(output.contains("xname3: string"));
+        Assert.assertTrue(output.contains("xname4: string"));
+    }
+
+    public static class ClassWithOptionals {
+        public String oname1;
+//        public Optional<String> oname2;  // uncomment on Java 8
+
+        @JsonProperty
+        public String jname1;
+        @JsonProperty(required = false)
+        public String jname2;
+        @JsonProperty(required = true)
+        public String jname3;
+        private String jname4;
+        @JsonProperty(required = true)
+        public String getJname4() {
+            return jname4;
+        }
+
+        @XmlElement
+        public String xname1;
+        @XmlElement(required = false)
+        public String xname2;
+        @XmlElement(required = true)
+        public String xname3;
+        private String xname4;
+        @XmlElement(required = true)
+        public String getXname4() {
+            return xname4;
+        }
     }
 
 }

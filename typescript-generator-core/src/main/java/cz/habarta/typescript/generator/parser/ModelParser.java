@@ -5,7 +5,11 @@ import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -78,6 +82,30 @@ public abstract class ModelParser {
     }
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
+
+    protected static void checkMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
+        if (!(propertyMember instanceof Field) && !(propertyMember instanceof Method)) {
+            throw new RuntimeException(String.format(
+                    "Unexpected member type '%s' in property '%s' in class '%s'",
+                    propertyMember != null ? propertyMember.getClass().getName() : null,
+                    propertyName,
+                    sourceClass.getName()));
+        }
+    }
+
+    protected boolean isAnnotatedPropertyOptional(AnnotatedElement annotatedProperty) {
+        if (settings.optionalProperties == OptionalProperties.all) {
+            return true;
+        }
+        if (settings.optionalProperties == null || settings.optionalProperties == OptionalProperties.useSpecifiedAnnotations) {
+            for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
+                if (annotatedProperty.getAnnotation(optionalAnnotation) != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     protected static DeclarationModel parseEnum(SourceType<Class<?>> sourceClass) {
         final List<EnumMemberModel> values = new ArrayList<>();

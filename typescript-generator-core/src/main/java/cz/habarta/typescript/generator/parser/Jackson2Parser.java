@@ -20,6 +20,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -38,8 +39,15 @@ public class Jackson2Parser extends ModelParser {
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
         super(settings, typeProcessor);
-        if (!settings.disableJackson2ModuleDiscovery) {
+        if (settings.jackson2ModuleDiscovery) {
             objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
+        }
+        for (Class<? extends Module> moduleClass : settings.jackson2Modules) {
+            try {
+                objectMapper.registerModule(moduleClass.newInstance());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(String.format("Cannot instantiate Jackson2 module '%s'", moduleClass.getName()), e);
+            }
         }
         if (useJaxbAnnotations) {
             AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
@@ -63,6 +71,7 @@ public class Jackson2Parser extends ModelParser {
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
+                checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
                 if (propertyType == JsonNode.class) {
                     propertyType = Object.class;
@@ -80,13 +89,9 @@ public class Jackson2Parser extends ModelParser {
                         continue;
                     }
                 }
-                boolean optional = false;
-                for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
-                    if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                        optional = true;
-                        break;
-                    }
-                }
+                final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
+                        ? !beanPropertyWriter.isRequired()
+                        : isAnnotatedPropertyOptional((AnnotatedElement) propertyMember);
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
                 final Member originalMember = beanPropertyWriter.getMember().getMember();
