@@ -131,10 +131,25 @@ public class GenerateMojo extends AbstractMojo {
     private JsonLibrary jsonLibrary;
 
     /**
-     * If true declared properties will be optional.
+     * Deprecated, use <code>optionalProperties</code> parameter.
      */
+    @Deprecated
     @Parameter
     private boolean declarePropertiesAsOptional;
+
+    /**
+     * Specifies how properties are defined to be optional.
+     * Supported values are:
+     * <ul>
+     * <li><code>useSpecifiedAnnotations</code> - annotations specified using <code>optionalAnnotations</code> parameter</li>
+     * <li><code>useLibraryDefinition</code> - examples: <code>@JsonProperty(required = false)</code> when using <code>jackson2</code> library
+     *   or <code>@XmlElement(required = false)</code> when using <code>jaxb</code> library</li>
+     * <li><code>all</code> - all properties are optional</li>
+     * </ul>
+     * Default value is <code>useSpecifiedAnnotations</code>.
+     */
+    @Parameter
+    private OptionalProperties optionalProperties;
 
     /**
      * If true declared properties will be <code>readonly</code>.
@@ -404,10 +419,23 @@ public class GenerateMojo extends AbstractMojo {
     private boolean displaySerializerWarning;
 
     /**
-     * Turns off Jackson2 automatic module discovery.
+     * Deprecated, see <code>jackson2ModuleDiscovery</code> and <code>jackson2Modules</code> parameters.
      */
+    @Deprecated
     @Parameter
     private boolean disableJackson2ModuleDiscovery;
+
+    /**
+     * Turns on Jackson2 automatic module discovery.
+     */
+    @Parameter
+    private boolean jackson2ModuleDiscovery;
+
+    /**
+     * Specifies Jackson2 modules to use.
+     */
+    @Parameter
+    private List<String> jackson2Modules;
 
     /**
      * Turns on verbose output for debugging purposes.
@@ -447,6 +475,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+            settings.optionalProperties = optionalProperties;
             settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
@@ -483,6 +512,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.setStringQuotes(stringQuotes);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+            settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
+            settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
             final File output = outputFile != null
                     ? outputFile

@@ -27,7 +27,8 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
     public JsonLibrary jsonLibrary;
-    public boolean declarePropertiesAsOptional;
+    @Deprecated public boolean declarePropertiesAsOptional;
+    public OptionalProperties optionalProperties;
     public boolean declarePropertiesAsReadOnly;
     public String removeTypeNamePrefix;
     public String removeTypeNameSuffix;
@@ -62,7 +63,9 @@ public class GenerateTask extends DefaultTask {
     public String npmVersion;
     public StringQuotes stringQuotes;
     public boolean displaySerializerWarning = true;
-    public boolean disableJackson2ModuleDiscovery;
+    @Deprecated public boolean disableJackson2ModuleDiscovery;
+    public boolean jackson2ModuleDiscovery;
+    public List<String> jackson2Modules;
     public boolean debug;
 
     @TaskAction
@@ -101,6 +104,7 @@ public class GenerateTask extends DefaultTask {
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+        settings.optionalProperties = optionalProperties;
         settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
         settings.removeTypeNamePrefix = removeTypeNamePrefix;
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
@@ -137,6 +141,8 @@ public class GenerateTask extends DefaultTask {
         settings.setStringQuotes(stringQuotes);
         settings.displaySerializerWarning = displaySerializerWarning;
         settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+        settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
+        settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
         final File output = outputFile != null
                 ? getProject().file(outputFile)

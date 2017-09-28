@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -48,6 +49,8 @@ public class Jackson1Parser extends ModelParser {
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
+                final Member propertyMember = beanPropertyWriter.getMember().getMember();
+                checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = beanPropertyWriter.getGenericPropertyType();
                 if (propertyType == JsonNode.class) {
                     propertyType = Object.class;
@@ -65,13 +68,7 @@ public class Jackson1Parser extends ModelParser {
                         continue;
                     }
                 }
-                boolean optional = false;
-                for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
-                    if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                        optional = true;
-                        break;
-                    }
-                }
+                final boolean optional = isAnnotatedPropertyOptional((AnnotatedElement) propertyMember);
                 final Member originalMember = beanPropertyWriter.getMember().getMember();
                 properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember, null));
             }
