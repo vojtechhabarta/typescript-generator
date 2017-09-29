@@ -2,6 +2,13 @@
 [![Appveyor](https://img.shields.io/appveyor/ci/vojtechhabarta/typescript-generator/master.svg)](https://ci.appveyor.com/project/vojtechhabarta/typescript-generator)
 [![Stars](https://img.shields.io/github/stars/vojtechhabarta/typescript-generator.svg?style=social)](https://github.com/vojtechhabarta/typescript-generator)
 
+Quick links:
+[Configuration parameters](http://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
+|
+[Breaking changes](https://github.com/vojtechhabarta/typescript-generator/wiki/Breaking-Changes)
+|
+[Release notes](https://github.com/vojtechhabarta/typescript-generator/releases)
+
 typescript-generator
 ====================
 typescript-generator is a tool for generating TypeScript definition files (.d.ts) from Java JSON classes.
