@@ -18,19 +18,24 @@ public class TaggedUnionsTest {
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
     @JsonSubTypes({
         @JsonSubTypes.Type(Square.class),
+        @JsonSubTypes.Type(Quadrilateral.class),
         @JsonSubTypes.Type(Rectangle.class),
         @JsonSubTypes.Type(Circle.class),
     })
     private static class Shape {
     }
 
+    @JsonTypeName("quadrilateral")
+    private static class Quadrilateral extends Shape {
+    }
+
     @JsonTypeName("square")
-    private static class Square extends Shape {
+    private static class Square extends Quadrilateral {
         public double size;
     }
 
     @JsonTypeName("rectangle")
-    private static class Rectangle extends Shape {
+    private static class Rectangle extends Quadrilateral {
         public double width;
         public double height;
     }
@@ -120,6 +125,30 @@ public class TaggedUnionsTest {
         public String getC();
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(Type2.class),
+        @JsonSubTypes.Type(Type1.class),
+        @JsonSubTypes.Type(Type3.class),
+    })
+    private interface Root {
+    }
+
+    private interface ParentA extends Root {
+    }
+
+    @JsonTypeName("type1")
+    private interface Type1 extends ParentA {
+    }
+
+    @JsonTypeName("type2")
+    private interface Type2 extends ParentA {
+    }
+
+    @JsonTypeName("type3")
+    private interface Type3 extends Root {
+    }
+
     @Test
     public void testTaggedUnions() {
         final Settings settings = TestUtils.settings();
@@ -131,15 +160,19 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface Shape {\n" +
-                "    kind: 'square' | 'rectangle' | 'circle';\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
-                "interface Square extends Shape {\n" +
+                "interface Square extends Quadrilateral {\n" +
                 "    kind: 'square';\n" +
                 "    size: number;\n" +
                 "}\n" +
                 "\n" +
-                "interface Rectangle extends Shape {\n" +
+                "interface Quadrilateral extends Shape {\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle extends Quadrilateral {\n" +
                 "    kind: 'rectangle';\n" +
                 "    width: number;\n" +
                 "    height: number;\n" +
@@ -150,7 +183,7 @@ public class TaggedUnionsTest {
                 "    radius: number;\n" +
                 "}\n" +
                 "\n" +
-                "type ShapeUnion = Square | Rectangle | Circle;\n" +
+                "type ShapeUnion = Square | Quadrilateral | Rectangle | Circle;\n" +
                 ""
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
@@ -163,7 +196,7 @@ public class TaggedUnionsTest {
         final String expected = (
                 "\n" +
                 "interface IShape2 {\n" +
-                "    kind: 'circle' | 'square' | 'rectangle';\n" +
+                "    kind: 'square' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
                 "interface CSquare2 extends IQuadrilateral2 {\n" +
@@ -240,15 +273,19 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface Shape {\n" +
-                "    kind: 'square' | 'rectangle' | 'circle';\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle' | 'circle';\n" +
                 "}\n" +
                 "\n" +
-                "interface Square extends Shape {\n" +
+                "interface Square extends Quadrilateral {\n" +
                 "    kind: 'square';\n" +
                 "    size: number;\n" +
                 "}\n" +
                 "\n" +
-                "interface Rectangle extends Shape {\n" +
+                "interface Quadrilateral extends Shape {\n" +
+                "    kind: 'square' | 'quadrilateral' | 'rectangle';\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle extends Quadrilateral {\n" +
                 "    kind: 'rectangle';\n" +
                 "    width: number;\n" +
                 "    height: number;\n" +
@@ -270,7 +307,7 @@ public class TaggedUnionsTest {
         final String expected = (
                 "\n" +
                 "interface DiamondA {\n" +
-                "    kind: 'b1' | 'c' | 'b2';\n" +
+                "    kind: 'b1' | 'b2' | 'c';\n" +
                 "    a: string;\n" +
                 "}\n" +
                 "\n" +
@@ -292,6 +329,38 @@ public class TaggedUnionsTest {
                 "type DiamondAUnion = DiamondB1 | DiamondB2 | DiamondC;\n" +
                 ""
                 ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testTaggedUnionsDiscriminantsSorted() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Root.class));
+        final String expected = (
+                "\n" +
+                "interface Root {\n" +
+                "    kind: 'type2' | 'type1' | 'type3';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type2 extends ParentA {\n" +
+                "    kind: 'type2';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type1 extends ParentA {\n" +
+                "    kind: 'type1';\n" +
+                "}\n" +
+                "\n" +
+                "interface Type3 extends Root {\n" +
+                "    kind: 'type3';\n" +
+                "}\n" +
+                "\n" +
+                "interface ParentA extends Root {\n" +
+                "    kind: 'type2' | 'type1';\n" +
+                "}\n" +
+                "\n" +
+                "type RootUnion = Type2 | Type1 | Type3;\n" +
+                ""
+            ).replace('\'', '"');
         Assert.assertEquals(expected, output);
     }
 

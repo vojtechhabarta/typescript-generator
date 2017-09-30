@@ -147,10 +147,19 @@ public class ModelCompiler {
             }
         }
         final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean, "", "");
+        final List<Class<?>> parentTaggedUnionClasses = getParentTaggedUnionClasses(bean, model);
 
         if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
             final List<BeanModel> selfAndDescendants = getSelfAndDescendants(bean, children);
             final List<TsType.StringLiteralType> literals = new ArrayList<>();
+            if (parentTaggedUnionClasses != null) {
+                Collections.sort(selfAndDescendants, new Comparator<BeanModel>() {
+                    @Override
+                    public int compare(BeanModel o1, BeanModel o2) {
+                        return parentTaggedUnionClasses.indexOf(o1.getOrigin()) - parentTaggedUnionClasses.indexOf(o2.getOrigin());
+                    }
+                });
+            }
             for (BeanModel descendant : selfAndDescendants) {
                 if (descendant.getDiscriminantLiteral() != null) {
                     literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
@@ -184,6 +193,25 @@ public class ModelCompiler {
             }
         }
         return properties;
+    }
+
+    private static List<Class<?>> getParentTaggedUnionClasses(BeanModel bean, Model model) {
+        if (bean == null || bean.getOrigin() == Object.class) {
+            return null;
+        }
+        final List<Class<?>> taggedUnionClasses = bean.getTaggedUnionClasses();
+        if (taggedUnionClasses == null) {
+            final List<Type> parentTypes = bean.getParentAndInterfaces();
+            for (Type parentType : parentTypes) {
+                final BeanModel parent = model.getBean(parentType);
+                final List<Class<?>> results = getParentTaggedUnionClasses(parent, model);
+                if (results != null) {
+                    return results;
+                }
+            }
+            return null;
+        }
+        return taggedUnionClasses;
     }
 
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
