@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.math.*;
 import java.util.*;
+import javax.xml.bind.JAXBElement;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
@@ -17,6 +18,16 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final Class<?> javaClass = (Class<?>) javaType;
             if (JavaTimeTemporal != null && JavaTimeTemporal.isAssignableFrom(javaClass)) {
                 return new Result(TsType.Date);
+            }
+        }
+        if (javaType instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType) javaType;
+            if (parameterizedType.getRawType() instanceof Class) {
+                final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
+                if (JAXBElement.class.isAssignableFrom(javaClass)) {
+                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    return new Result(result.getTsType(), result.getDiscoveredClasses());
+                }
             }
         }
         // map JAX-RS standard types to `any`
