@@ -67,6 +67,7 @@ public class GenerateTask extends DefaultTask {
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
     public boolean debug;
+    public String indentString;
 
     @TaskAction
     public void generate() throws Exception {
@@ -144,6 +145,7 @@ public class GenerateTask extends DefaultTask {
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
+        settings.indentString = indentString;
         final File output = outputFile != null
                 ? getProject().file(outputFile)
                 : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
