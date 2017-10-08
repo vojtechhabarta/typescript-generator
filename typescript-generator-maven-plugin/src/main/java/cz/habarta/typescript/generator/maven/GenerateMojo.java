@@ -451,6 +451,12 @@ public class GenerateMojo extends AbstractMojo {
     private StringQuotes stringQuotes;
 
     /**
+     * Specifies indentation string.
+     */
+    @Parameter
+    private String indentString;
+
+    /**
      * Display warnings when bean serializer is not found.
      */
     @Parameter(defaultValue = "true")
@@ -480,12 +486,6 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private boolean debug;
-
-    /**
-     * Override default indentation string
-     */
-    @Parameter
-    private String indentString;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -553,12 +553,12 @@ public class GenerateMojo extends AbstractMojo {
             settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;
             settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
             settings.setStringQuotes(stringQuotes);
+            settings.setIndentString(indentString);
             settings.displaySerializerWarning = displaySerializerWarning;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
-            settings.indentString = indentString;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());

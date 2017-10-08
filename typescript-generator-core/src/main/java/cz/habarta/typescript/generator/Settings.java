@@ -103,6 +103,10 @@ public class Settings {
         this.quotes = quotes == StringQuotes.singleQuotes ? "'" : "\"";
     }
 
+    public void setIndentString(String indentString) {
+        this.indentString = indentString != null ? indentString : "    ";
+    }
+
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
         if (customTypeProcessor != null) {
             this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);
