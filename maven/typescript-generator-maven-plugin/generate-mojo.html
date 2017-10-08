@@ -53,7 +53,7 @@
                   <li id="publishDate">Last Published: 2017-10-08
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.29.356
+                  <li id="projectVersion">Version: 1.29.357
                       </li>
                       
                 
@@ -125,7 +125,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.29.356:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:1.29.357:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -167,11 +167,20 @@ For more information see README and Wiki on GitHub.</div>
             
 <td><tt>-</tt></td>
             
-<td>Library used in JSON classes. Supported values are 'jackson1'
-(annotations from 'org.codehaus.jackson.annotate' package),
-'jackson2' (annotations from 'com.fasterxml.jackson.annotation'
-package), 'jaxb' (annotations from 'javax.xml.bind.annotation'
-package). Required parameter, recommended value is 'jackson2'.<br /></td>
+<td>Library used in JSON classes. Supported values are: 
+
+<ul>
+
+<li><tt>jackson1</tt> - annotations from
+`org.codehaus.jackson.annotate` package</li>
+
+<li><tt>jackson2</tt> - annotations from
+`com.fasterxml.jackson.annotation` package</li>
+
+<li><tt>jaxb</tt> - annotations from
+`javax.xml.bind.annotation` package</li>
+</ul>
+Required parameter, recommended value is <tt>jackson2</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -182,14 +191,22 @@ package). Required parameter, recommended value is 'jackson2'.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Kind of generated TypeScript output, allowed values are 'global',
-'module' or 'ambientModule'. Value 'global' means that declarations
-will be in global scope or namespace (no module). Value 'module'
-means that generated file will contain top-level 'export'
-declarations. Value 'ambientModule' means that generated
-declarations will be wrapped in 'declare module &quot;mod&quot; { }'
-declaration. Required parameter. For more information see Wiki page
-'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.<br /></td>
+<td>Kind of generated TypeScript output. Allowed values are: 
+
+<ul>
+
+<li><tt>global</tt> - means that declarations will be in global
+scope or namespace (no module)</li>
+
+<li><tt>module</tt> - means that generated file will contain
+top-level <tt>export</tt> declarations</li>
+
+<li><tt>ambientModule</tt> - means that generated declarations
+will be wrapped in <tt>declare module &quot;mod&quot; { }</tt>
+declaration</li>
+</ul>
+Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules
+and Namespaces</a> Wiki page.<br /></td>
           </tr>
         </table>
       </div>
@@ -219,7 +236,8 @@ declaration. Required parameter. For more information see Wiki page
 <td><tt>-</tt></td>
             
 <td>Prefix which will be added to names of classes, interfaces, enums.
-For example if set to &quot;I&quot; then mapping for &quot;Data&quot; will be &quot;IData&quot;.<br /></td>
+For example if set to <tt>I</tt> then mapping for
+<tt>Data</tt> will be <tt>IData</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -231,8 +249,8 @@ For example if set to &quot;I&quot; then mapping for &quot;Data&quot; will be &q
 <td><tt>-</tt></td>
             
 <td>Suffix which will be added to names of classes, interfaces, enums.
-For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will be
-&quot;PersonData&quot;.<br /></td>
+For example if set to <tt>Data</tt> then mapping for
+<tt>Person</tt> will be <tt>PersonData</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -245,10 +263,17 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
             
 <td>JSON classes to process specified using glob patterns so it is
 possible to specify package or class name suffix. Glob patterns
-support two wildcards: Single &quot;*&quot; wildcard matches any character
-except for &quot;.&quot; and &quot;$&quot;. Double &quot;**&quot; wildcard matches any character.
-For more information and examples see Wiki page
-'https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns'.<br /></td>
+support two wildcards: 
+
+<ul>
+
+<li>Single <tt>*</tt> wildcard matches any character except for
+<tt>.</tt> and <tt>$</tt>.</li>
+
+<li>Double <tt>**</tt> wildcard matches any character.</li>
+</ul>
+For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
+Names Glob Patterns</a> Wiki page.<br /></td>
           </tr>
           
 <tr class="a">
@@ -299,8 +324,9 @@ possible to exclude particular REST resource classes using
             
 <td>List of custom mappings. Each item specifies TypeScript type which
 will be used for particular Java class. Item format is:
-&quot;javaClass:typescriptType&quot;. For example mapping &quot;ZonedDateTime&quot; to
-&quot;string&quot; would be added as &quot;java.time.ZonedDateTime:string&quot;.<br /></td>
+<tt>javaClassName:typescriptType</tt>. For example mapping
+Joda-Time <tt>LocalDateTime</tt> to <tt>string</tt> would
+be added as <tt>org.joda.time.LocalDateTime:string</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -313,8 +339,8 @@ will be used for particular Java class. Item format is:
             
 <td>Specifies custom TypeScript names for Java classes. Multiple
 mappings can be specified, each using this format:
-&quot;javaClassName:typescriptName&quot;. This takes precedence over other
-naming settings.<br /></td>
+<tt>javaClassName:typescriptName</tt>. This takes precedence
+over other naming settings.<br /></td>
           </tr>
           
 <tr class="b">
@@ -327,11 +353,11 @@ naming settings.<br /></td>
             
 <td>Specifies JavaScript function for getting custom TypeScript names
 for Java classes. Function can return undefined if default name
-should be used. Function signature: <tt>function
-getName(className: string, classSimpleName: string): string | null
-| undefined;</tt> Example function: <tt>function(name,
-simpleName) { if (name.startsWith('cz.')) return 'Test' +
-simpleName; }</tt><br /></td>
+should be used.<br />
+Function signature: <tt>function getName(className: string,
+classSimpleName: string): string | null | undefined;</tt><br />
+Example function: <tt>function(name, simpleName) { if
+(name.startsWith('cz.')) return 'Test' + simpleName; }</tt><br /></td>
           </tr>
           
 <tr class="a">
@@ -345,7 +371,7 @@ simpleName; }</tt><br /></td>
 <td>Specifies custom class implementing <tt>TypeProcessor</tt>.
 This allows to customize how Java types are mapped to TypeScript.
 For example it is possible to implement TypeProcessor for
-<tt>Optional</tt> from guava or for Java 8 date/time classes.<br /></td>
+<tt>Optional</tt> from guava.<br /></td>
           </tr>
           
 <tr class="b">
@@ -367,7 +393,7 @@ For example it is possible to implement TypeProcessor for
             
 <td><tt>-</tt></td>
             
-<td>Deprecated, use <tt>optionalProperties</tt> parameter.<br /></td>
+<td><b>Deprecated</b>, use <tt>optionalProperties</tt> parameter.<br /></td>
           </tr>
           
 <tr class="b">
@@ -378,7 +404,8 @@ For example it is possible to implement TypeProcessor for
             
 <td><tt>-</tt></td>
             
-<td>If true declared properties will be <tt>readonly</tt>.<br /></td>
+<td>If <tt>true</tt> declared properties will be
+<tt>readonly</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -389,7 +416,7 @@ For example it is possible to implement TypeProcessor for
             
 <td><tt>-</tt></td>
             
-<td>Deprecated, see <tt>jackson2ModuleDiscovery</tt> and
+<td><b>Deprecated</b>, see <tt>jackson2ModuleDiscovery</tt> and
 <tt>jackson2Modules</tt> parameters.<br /></td>
           </tr>
           
@@ -401,8 +428,8 @@ For example it is possible to implement TypeProcessor for
             
 <td><tt>-</tt></td>
             
-<td>If true tagged unions will not be generated for Jackson 2
-polymorphic types.<br /></td>
+<td>If <tt>true</tt> tagged unions will not be generated for
+Jackson 2 polymorphic types.<br /></td>
           </tr>
           
 <tr class="a">
@@ -424,7 +451,9 @@ polymorphic types.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Excluded classes specified using glob patterns.<br /></td>
+<td>Excluded classes specified using glob patterns. For more
+information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
+Names Glob Patterns</a> Wiki page.<br /></td>
           </tr>
           
 <tr class="a">
@@ -447,8 +476,22 @@ polymorphic types.<br /></td>
 <td><tt>-</tt></td>
             
 <td>List of extensions specified as fully qualified class name. Known
-extensions:
-cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<br /></td>
+extensions: 
+
+<ul>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.AxiosClientExtension}</tt>
+- generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX
+RS Application</a>Wiki page</li>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</tt>
+- generates type-safe property path getters</li>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</tt></li>
+</ul><br /></td>
           </tr>
           
 <tr class="a">
@@ -459,7 +502,8 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
             
 <td><tt>-</tt></td>
             
-<td>If true client for JAX-RS REST application will be generated.<br /></td>
+<td>If <tt>true</tt> client for JAX-RS REST application will be
+generated.<br /></td>
           </tr>
           
 <tr class="b">
@@ -470,7 +514,8 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
             
 <td><tt>-</tt></td>
             
-<td>If true interface for JAX-RS REST application will be generated.<br /></td>
+<td>If <tt>true</tt> interface for JAX-RS REST application will be
+generated.<br /></td>
           </tr>
           
 <tr class="a">
@@ -481,9 +526,10 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension<b
             
 <td><tt>-</tt></td>
             
-<td>If true NPM package.json will be generated. Only applicable when
-'outputKind' is set to 'module'. NPM package name and version can
-be specified using 'npmName' and 'npmVersion' parameters.<br /></td>
+<td>If <tt>true</tt> NPM <tt>package.json</tt> will be
+generated. Only applicable when <tt>outputKind</tt> is set to
+<tt>module</tt>. NPM package name and version can be specified
+using <tt>npmName</tt> and <tt>npmVersion</tt> parameters.<br /></td>
           </tr>
           
 <tr class="b">
@@ -494,7 +540,7 @@ be specified using 'npmName' and 'npmVersion' parameters.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>If true Swagger annotations will not be used.<br /></td>
+<td>If <tt>true</tt> Swagger annotations will not be used.<br /></td>
           </tr>
           
 <tr class="a">
@@ -506,8 +552,8 @@ be specified using 'npmName' and 'npmVersion' parameters.<br /></td>
 <td><tt>-</tt></td>
             
 <td>List of import declarations which will be added to generated
-output. This can be used with &quot;customTypeMappings&quot; to provide
-needed TypeScript types.<br /></td>
+output. This can be used with <tt>customTypeMappings</tt> to
+provide needed TypeScript types.<br /></td>
           </tr>
           
 <tr class="b">
@@ -519,7 +565,7 @@ needed TypeScript types.<br /></td>
 <td><tt>-</tt></td>
             
 <td>If this list is not empty then TypeScript will only be generated
-for methods with one of the annotations defined in this list<br /></td>
+for methods with one of the annotations defined in this list.<br /></td>
           </tr>
           
 <tr class="a">
@@ -565,11 +611,11 @@ for methods with one of the annotations defined in this list<br /></td>
             
 <td>List of Javadoc XML files to search for documentation comments.
 These files should be created using
-&quot;com.github.markusbernhardt.xmldoclet.XmlDoclet&quot;
-(com.github.markusbernhardt:xml-doclet). Javadoc comments are added
-to output declarations as JSDoc comments. For more information see
-Wiki page
-'https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc'.<br /></td>
+<tt>com.github.markusbernhardt.xmldoclet.XmlDoclet</tt> from
+<tt>com.github.markusbernhardt:xml-doclet</tt> artifact.
+Javadoc comments are added to output declarations as JSDoc
+comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a>
+Wiki page.<br /></td>
           </tr>
           
 <tr class="a">
@@ -581,13 +627,21 @@ Wiki page
 <td><tt>-</tt></td>
             
 <td>Specifies how JAX-RS REST operations will be grouped into objects.
-Supported values are 'singleObject', 'perResource', 'byAnnotation'.
-Default value is 'singleObject'. Value 'singleObject' means that
-one object with all operations will be generated. Value
-'perResource' means that for each root resource one object will be
-generated. Value 'byAnnotation' means that operations will be
+Supported values are: 
+
+<ul>
+
+<li><tt>singleObject</tt> - means that one object with all
+operations will be generated</li>
+
+<li><tt>perResource</tt> - means that for each root resource
+one object will be generated</li>
+
+<li><tt>byAnnotation</tt> - means that operations will be
 grouped by annotation specified using
-<tt>jaxrsNamespacingAnnotation</tt>.<br /></td>
+<tt>jaxrsNamespacingAnnotation</tt></li>
+</ul>
+Default value is <tt>singleObject</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -600,10 +654,16 @@ grouped by annotation specified using
             
 <td>Specifies annotation used for grouping JAX-RS REST operations.
 Format is <tt>annotationClass#annotationElement</tt> where
-annotationClass is fully-qualified class name and annotationElement
-is element name and defaults to 'value'. Examples:
-<tt>io.swagger.annotations.Api</tt>,
-<tt>io.swagger.annotations.Api#value</tt><br /></td>
+<tt>annotationClass</tt> is fully-qualified class name and
+<tt>annotationElement</tt> is element name and defaults to
+<tt>value</tt>. Examples: 
+
+<ul>
+
+<li><tt>io.swagger.annotations.Api</tt></li>
+
+<li><tt>io.swagger.annotations.Api#value</tt></li>
+</ul><br /></td>
           </tr>
           
 <tr class="a">
@@ -615,9 +675,17 @@ is element name and defaults to 'value'. Examples:
 <td><tt>-</tt></td>
             
 <td>Specifies whether classes will be mapped to classes or interfaces.
-Supported values are 'asInterfaces', 'asClasses'. Default value is
-'asInterfaces'. Value 'asClasses' can only be used in
-implementation files (.ts).<br /></td>
+Supported values are: 
+
+<ul>
+
+<li><tt>asInterfaces</tt></li>
+
+<li><tt>asClasses</tt></li>
+</ul>
+Default value is <tt>asInterfaces</tt>.<br />
+Value <tt>asClasses</tt> can only be used in implementation
+files (.ts).<br /></td>
           </tr>
           
 <tr class="b">
@@ -629,7 +697,17 @@ implementation files (.ts).<br /></td>
 <td><tt>-</tt></td>
             
 <td>Specifies how <tt>Date</tt> will be mapped. Supported values
-are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.<br /></td>
+are: 
+
+<ul>
+
+<li><tt>asDate</tt> - type <tt>Date</tt></li>
+
+<li><tt>asNumber</tt> - type <tt>number</tt></li>
+
+<li><tt>asString</tt> - type <tt>string</tt></li>
+</ul>
+Default value is <tt>asDate</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -640,13 +718,23 @@ are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Specifies how enums will be mapped. Supported values are 'asUnion',
-'asInlineUnion', 'asEnum', 'asNumberBasedEnum'. Default value is
-'asUnion'. Value 'asUnion' creates type alias to union of string
-enum values. Value 'asInlineUnion' creates union of enum values on
-places where the enum is used. Value 'asEnum' creates string enum.
-Requires TypeScript 2.4. Value 'asNumberBasedEnum' creates enum of
-named number values.<br /></td>
+<td>Specifies how enums will be mapped. Supported values are: 
+
+<ul>
+
+<li><tt>asUnion</tt> - creates type alias to union of string
+enum values</li>
+
+<li><tt>asInlineUnion</tt> - creates union of enum values on
+places where the enum is used</li>
+
+<li><tt>asEnum</tt> - creates string enum. Requires TypeScript
+2.4</li>
+
+<li><tt>asNumberBasedEnum</tt> - creates enum of named number
+values</li>
+</ul>
+Default value is <tt>asUnion</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -658,7 +746,7 @@ named number values.<br /></td>
 <td><tt>-</tt></td>
             
 <td>Generates TypeScript namespaces from Java packages. Default is
-false.<br /></td>
+<tt>false</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -669,8 +757,9 @@ false.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Name of generated ambient module. Used when 'outputKind' is set to
-'ambientModule'.<br /></td>
+<td>Name of generated ambient module.<br />
+Used when <tt>outputKind</tt> is set to
+<tt>ambientModule</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -681,8 +770,9 @@ false.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Generates specified namespace. Not recommended to combine with
-modules. Default is no namespace.<br /></td>
+<td>Generates specified namespace.<br />
+Not recommended to combine with modules.<br />
+Default is no namespace.<br /></td>
           </tr>
           
 <tr class="a">
@@ -693,10 +783,11 @@ modules. Default is no namespace.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>If true generated file will not contain comment at the top. By
-default there is a comment with timestamp and typescript-generator
-version. So it might be useful to suppress this comment if the file
-is in source control and is regenerated in build.<br /></td>
+<td>If <tt>true</tt> generated file will not contain comment at the
+top. By default there is a comment with timestamp and
+typescript-generator version. So it might be useful to suppress
+this comment if the file is in source control and is regenerated in
+build.<br /></td>
           </tr>
           
 <tr class="b">
@@ -707,7 +798,8 @@ is in source control and is regenerated in build.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>If true generated enums will not have <tt>const</tt> keyword.
+<td>If <tt>true</tt> generated enums will not have
+<tt>const</tt> keyword.<br />
 This can be used only in implementation files.<br /></td>
           </tr>
           
@@ -719,9 +811,10 @@ This can be used only in implementation files.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Specifies NPM package name. Only applicable when
-'generateNpmPackageJson' parameter is 'true'. Default value is
-<tt>${project.artifactId}</tt>.<br /></td>
+<td>Specifies NPM package name.<br />
+Only applicable when <tt>generateNpmPackageJson</tt> parameter
+is <tt>true</tt>.<br />
+Default value is <tt>${project.artifactId}</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -732,9 +825,10 @@ This can be used only in implementation files.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Specifies NPM package version. Only applicable when
-'generateNpmPackageJson' parameter is 'true'. Default value is
-<tt>1.0.0</tt>.<br /></td>
+<td>Specifies NPM package version.<br />
+Only applicable when <tt>generateNpmPackageJson</tt> parameter
+is <tt>true</tt>.<br />
+Default value is <tt>1.0.0</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -748,7 +842,7 @@ This can be used only in implementation files.<br /></td>
 <td>The presence of any annotation in this list on a JSON property will
 cause the typescript-generator to treat that property as optional
 when generating the corresponding TypeScript interface. Example
-optional annotation: @javax.annotation.Nullable<br /></td>
+optional annotation: <tt>javax.annotation.Nullable</tt><br /></td>
           </tr>
           
 <tr class="b">
@@ -796,10 +890,17 @@ Default value is <tt>useSpecifiedAnnotations</tt>.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Output file format, can be 'declarationFile' (.d.ts) or
-'implementationFile' (.ts). Setting this parameter to
-'implementationFile' allows to generate runnable TypeScript code.
-Default value is 'declarationFile'.<br /></td>
+<td>Output file format, can be: 
+
+<ul>
+
+<li><tt>declarationFile</tt> (.d.ts)</li>
+
+<li><tt>implementationFile</tt> (.ts)</li>
+</ul>
+Setting this parameter to <tt>implementationFile</tt> allows to
+generate runnable TypeScript code.<br />
+Default value is <tt>declarationFile</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -811,8 +912,9 @@ Default value is 'declarationFile'.<br /></td>
 <td><tt>-</tt></td>
             
 <td>List of files which will be referenced using triple-slash
-directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
-with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></td>
+directive: <tt>/// &lt;reference path=&quot;file&quot; /&gt;</tt>. This
+can be used with <tt>customTypeMappings</tt> to provide needed
+TypeScript types.<br /></td>
           </tr>
           
 <tr class="b">
@@ -824,8 +926,8 @@ with &quot;customTypeMappings&quot; to provide needed TypeScript types.<br /></t
 <td><tt>-</tt></td>
             
 <td>Prefix which will be removed from names of classes, interfaces,
-enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&quot;
-will be &quot;Data&quot;.<br /></td>
+enums. For example if set to <tt>Json</tt> then mapping for
+<tt>JsonData</tt> will be <tt>Data</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -837,8 +939,8 @@ will be &quot;Data&quot;.<br /></td>
 <td><tt>-</tt></td>
             
 <td>Suffix which will be removed from names of classes, interfaces,
-enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&quot;
-will be &quot;Data&quot;.<br /></td>
+enums. For example if set to <tt>JSON</tt> then mapping for
+<tt>DataJSON</tt> will be <tt>Data</tt>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -854,7 +956,7 @@ default no <tt>options</tt> parameter is generated. Useful when
 passing additional parameters to underlying HTTP request method
 (like jQuery ajax settings or <tt>AxiosRequestConfig</tt>). Can
 be specific (for example <tt>AxiosRequestConfig</tt>) or
-generic (for example <tt>&amp;ltO&gt;</tt>).<br /></td>
+generic (for example <tt>&lt;O&gt;</tt>).<br /></td>
           </tr>
           
 <tr class="a">
@@ -881,8 +983,8 @@ response data.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>If true TypeScript declarations (interfaces, properties) will be
-sorted alphabetically.<br /></td>
+<td>If <tt>true</tt> TypeScript declarations (interfaces,
+properties) will be sorted alphabetically.<br /></td>
           </tr>
           
 <tr class="a">
@@ -893,8 +995,8 @@ sorted alphabetically.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>If true TypeScript type declarations (interfaces) will be sorted
-alphabetically.<br /></td>
+<td>If <tt>true</tt> TypeScript type declarations (interfaces) will
+be sorted alphabetically.<br /></td>
           </tr>
           
 <tr class="b">
@@ -905,8 +1007,15 @@ alphabetically.<br /></td>
             
 <td><tt>-</tt></td>
             
-<td>Specifies how strings will be quoted. Supported values are
-'doubleQuotes', 'singleQuotes'. Default value is 'doubleQuotes'.<br /></td>
+<td>Specifies how strings will be quoted. Supported values are: 
+
+<ul>
+
+<li><tt>doubleQuotes</tt></li>
+
+<li><tt>singleQuotes</tt></li>
+</ul>
+Default value is <tt>doubleQuotes</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -929,7 +1038,8 @@ specified namespace. Only applicable to declaration files.<br /></td>
 <p><b><a name="addTypeNamePrefix">addTypeNamePrefix</a>:</b></p>
         
 <div>Prefix which will be added to names of classes, interfaces, enums.
-For example if set to &quot;I&quot; then mapping for &quot;Data&quot; will be &quot;IData&quot;.</div>
+For example if set to <tt>I</tt> then mapping for
+<tt>Data</tt> will be <tt>IData</tt>.</div>
         
 <ul>
           
@@ -940,8 +1050,8 @@ For example if set to &quot;I&quot; then mapping for &quot;Data&quot; will be &q
 <p><b><a name="addTypeNameSuffix">addTypeNameSuffix</a>:</b></p>
         
 <div>Suffix which will be added to names of classes, interfaces, enums.
-For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will be
-&quot;PersonData&quot;.</div>
+For example if set to <tt>Data</tt> then mapping for
+<tt>Person</tt> will be <tt>PersonData</tt>.</div>
         
 <ul>
           
@@ -953,10 +1063,17 @@ For example if set to &quot;Data&quot; then mapping for &quot;Person&quot; will 
         
 <div>JSON classes to process specified using glob patterns so it is
 possible to specify package or class name suffix. Glob patterns
-support two wildcards: Single &quot;*&quot; wildcard matches any character
-except for &quot;.&quot; and &quot;$&quot;. Double &quot;**&quot; wildcard matches any character.
-For more information and examples see Wiki page
-'https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns'.</div>
+support two wildcards: 
+
+<ul>
+
+<li>Single <tt>*</tt> wildcard matches any character except for
+<tt>.</tt> and <tt>$</tt>.</li>
+
+<li>Double <tt>**</tt> wildcard matches any character.</li>
+</ul>
+For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
+Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
@@ -1003,8 +1120,9 @@ possible to exclude particular REST resource classes using
         
 <div>List of custom mappings. Each item specifies TypeScript type which
 will be used for particular Java class. Item format is:
-&quot;javaClass:typescriptType&quot;. For example mapping &quot;ZonedDateTime&quot; to
-&quot;string&quot; would be added as &quot;java.time.ZonedDateTime:string&quot;.</div>
+<tt>javaClassName:typescriptType</tt>. For example mapping
+Joda-Time <tt>LocalDateTime</tt> to <tt>string</tt> would
+be added as <tt>org.joda.time.LocalDateTime:string</tt>.</div>
         
 <ul>
           
@@ -1016,8 +1134,8 @@ will be used for particular Java class. Item format is:
         
 <div>Specifies custom TypeScript names for Java classes. Multiple
 mappings can be specified, each using this format:
-&quot;javaClassName:typescriptName&quot;. This takes precedence over other
-naming settings.</div>
+<tt>javaClassName:typescriptName</tt>. This takes precedence
+over other naming settings.</div>
         
 <ul>
           
@@ -1029,11 +1147,11 @@ naming settings.</div>
         
 <div>Specifies JavaScript function for getting custom TypeScript names
 for Java classes. Function can return undefined if default name
-should be used. Function signature: <tt>function
-getName(className: string, classSimpleName: string): string | null
-| undefined;</tt> Example function: <tt>function(name,
-simpleName) { if (name.startsWith('cz.')) return 'Test' +
-simpleName; }</tt></div>
+should be used.<br />
+Function signature: <tt>function getName(className: string,
+classSimpleName: string): string | null | undefined;</tt><br />
+Example function: <tt>function(name, simpleName) { if
+(name.startsWith('cz.')) return 'Test' + simpleName; }</tt></div>
         
 <ul>
           
@@ -1046,7 +1164,7 @@ simpleName; }</tt></div>
 <div>Specifies custom class implementing <tt>TypeProcessor</tt>.
 This allows to customize how Java types are mapped to TypeScript.
 For example it is possible to implement TypeProcessor for
-<tt>Optional</tt> from guava or for Java 8 date/time classes.</div>
+<tt>Optional</tt> from guava.</div>
         
 <ul>
           
@@ -1066,7 +1184,7 @@ For example it is possible to implement TypeProcessor for
         </ul><hr />
 <p><b><a name="declarePropertiesAsOptional">declarePropertiesAsOptional</a>:</b></p>
         
-<div>Deprecated, use <tt>optionalProperties</tt> parameter.</div>
+<div><b>Deprecated</b>, use <tt>optionalProperties</tt> parameter.</div>
         
 <ul>
           
@@ -1076,7 +1194,8 @@ For example it is possible to implement TypeProcessor for
         </ul><hr />
 <p><b><a name="declarePropertiesAsReadOnly">declarePropertiesAsReadOnly</a>:</b></p>
         
-<div>If true declared properties will be <tt>readonly</tt>.</div>
+<div>If <tt>true</tt> declared properties will be
+<tt>readonly</tt>.</div>
         
 <ul>
           
@@ -1086,7 +1205,7 @@ For example it is possible to implement TypeProcessor for
         </ul><hr />
 <p><b><a name="disableJackson2ModuleDiscovery">disableJackson2ModuleDiscovery</a>:</b></p>
         
-<div>Deprecated, see <tt>jackson2ModuleDiscovery</tt> and
+<div><b>Deprecated</b>, see <tt>jackson2ModuleDiscovery</tt> and
 <tt>jackson2Modules</tt> parameters.</div>
         
 <ul>
@@ -1097,8 +1216,8 @@ For example it is possible to implement TypeProcessor for
         </ul><hr />
 <p><b><a name="disableTaggedUnions">disableTaggedUnions</a>:</b></p>
         
-<div>If true tagged unions will not be generated for Jackson 2
-polymorphic types.</div>
+<div>If <tt>true</tt> tagged unions will not be generated for
+Jackson 2 polymorphic types.</div>
         
 <ul>
           
@@ -1120,7 +1239,9 @@ polymorphic types.</div>
         </ul><hr />
 <p><b><a name="excludeClassPatterns">excludeClassPatterns</a>:</b></p>
         
-<div>Excluded classes specified using glob patterns.</div>
+<div>Excluded classes specified using glob patterns. For more
+information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
+Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
@@ -1141,8 +1262,22 @@ polymorphic types.</div>
 <p><b><a name="extensions">extensions</a>:</b></p>
         
 <div>List of extensions specified as fully qualified class name. Known
-extensions:
-cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension</div>
+extensions: 
+
+<ul>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.AxiosClientExtension}</tt>
+- generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX
+RS Application</a>Wiki page</li>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</tt>
+- generates type-safe property path getters</li>
+
+<li>
+<tt>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</tt></li>
+</ul></div>
         
 <ul>
           
@@ -1152,7 +1287,8 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension</
         </ul><hr />
 <p><b><a name="generateJaxrsApplicationClient">generateJaxrsApplicationClient</a>:</b></p>
         
-<div>If true client for JAX-RS REST application will be generated.</div>
+<div>If <tt>true</tt> client for JAX-RS REST application will be
+generated.</div>
         
 <ul>
           
@@ -1162,7 +1298,8 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension</
         </ul><hr />
 <p><b><a name="generateJaxrsApplicationInterface">generateJaxrsApplicationInterface</a>:</b></p>
         
-<div>If true interface for JAX-RS REST application will be generated.</div>
+<div>If <tt>true</tt> interface for JAX-RS REST application will be
+generated.</div>
         
 <ul>
           
@@ -1172,9 +1309,10 @@ cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension</
         </ul><hr />
 <p><b><a name="generateNpmPackageJson">generateNpmPackageJson</a>:</b></p>
         
-<div>If true NPM package.json will be generated. Only applicable when
-'outputKind' is set to 'module'. NPM package name and version can
-be specified using 'npmName' and 'npmVersion' parameters.</div>
+<div>If <tt>true</tt> NPM <tt>package.json</tt> will be
+generated. Only applicable when <tt>outputKind</tt> is set to
+<tt>module</tt>. NPM package name and version can be specified
+using <tt>npmName</tt> and <tt>npmVersion</tt> parameters.</div>
         
 <ul>
           
@@ -1184,7 +1322,7 @@ be specified using 'npmName' and 'npmVersion' parameters.</div>
         </ul><hr />
 <p><b><a name="ignoreSwaggerAnnotations">ignoreSwaggerAnnotations</a>:</b></p>
         
-<div>If true Swagger annotations will not be used.</div>
+<div>If <tt>true</tt> Swagger annotations will not be used.</div>
         
 <ul>
           
@@ -1195,8 +1333,8 @@ be specified using 'npmName' and 'npmVersion' parameters.</div>
 <p><b><a name="importDeclarations">importDeclarations</a>:</b></p>
         
 <div>List of import declarations which will be added to generated
-output. This can be used with &quot;customTypeMappings&quot; to provide
-needed TypeScript types.</div>
+output. This can be used with <tt>customTypeMappings</tt> to
+provide needed TypeScript types.</div>
         
 <ul>
           
@@ -1207,7 +1345,7 @@ needed TypeScript types.</div>
 <p><b><a name="includePropertyAnnotations">includePropertyAnnotations</a>:</b></p>
         
 <div>If this list is not empty then TypeScript will only be generated
-for methods with one of the annotations defined in this list</div>
+for methods with one of the annotations defined in this list.</div>
         
 <ul>
           
@@ -1249,11 +1387,11 @@ for methods with one of the annotations defined in this list</div>
         
 <div>List of Javadoc XML files to search for documentation comments.
 These files should be created using
-&quot;com.github.markusbernhardt.xmldoclet.XmlDoclet&quot;
-(com.github.markusbernhardt:xml-doclet). Javadoc comments are added
-to output declarations as JSDoc comments. For more information see
-Wiki page
-'https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc'.</div>
+<tt>com.github.markusbernhardt.xmldoclet.XmlDoclet</tt> from
+<tt>com.github.markusbernhardt:xml-doclet</tt> artifact.
+Javadoc comments are added to output declarations as JSDoc
+comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a>
+Wiki page.</div>
         
 <ul>
           
@@ -1264,13 +1402,21 @@ Wiki page
 <p><b><a name="jaxrsNamespacing">jaxrsNamespacing</a>:</b></p>
         
 <div>Specifies how JAX-RS REST operations will be grouped into objects.
-Supported values are 'singleObject', 'perResource', 'byAnnotation'.
-Default value is 'singleObject'. Value 'singleObject' means that
-one object with all operations will be generated. Value
-'perResource' means that for each root resource one object will be
-generated. Value 'byAnnotation' means that operations will be
+Supported values are: 
+
+<ul>
+
+<li><tt>singleObject</tt> - means that one object with all
+operations will be generated</li>
+
+<li><tt>perResource</tt> - means that for each root resource
+one object will be generated</li>
+
+<li><tt>byAnnotation</tt> - means that operations will be
 grouped by annotation specified using
-<tt>jaxrsNamespacingAnnotation</tt>.</div>
+<tt>jaxrsNamespacingAnnotation</tt></li>
+</ul>
+Default value is <tt>singleObject</tt>.</div>
         
 <ul>
           
@@ -1282,10 +1428,16 @@ grouped by annotation specified using
         
 <div>Specifies annotation used for grouping JAX-RS REST operations.
 Format is <tt>annotationClass#annotationElement</tt> where
-annotationClass is fully-qualified class name and annotationElement
-is element name and defaults to 'value'. Examples:
-<tt>io.swagger.annotations.Api</tt>,
-<tt>io.swagger.annotations.Api#value</tt></div>
+<tt>annotationClass</tt> is fully-qualified class name and
+<tt>annotationElement</tt> is element name and defaults to
+<tt>value</tt>. Examples: 
+
+<ul>
+
+<li><tt>io.swagger.annotations.Api</tt></li>
+
+<li><tt>io.swagger.annotations.Api#value</tt></li>
+</ul></div>
         
 <ul>
           
@@ -1295,11 +1447,20 @@ is element name and defaults to 'value'. Examples:
         </ul><hr />
 <p><b><a name="jsonLibrary">jsonLibrary</a>:</b></p>
         
-<div>Library used in JSON classes. Supported values are 'jackson1'
-(annotations from 'org.codehaus.jackson.annotate' package),
-'jackson2' (annotations from 'com.fasterxml.jackson.annotation'
-package), 'jaxb' (annotations from 'javax.xml.bind.annotation'
-package). Required parameter, recommended value is 'jackson2'.</div>
+<div>Library used in JSON classes. Supported values are: 
+
+<ul>
+
+<li><tt>jackson1</tt> - annotations from
+`org.codehaus.jackson.annotate` package</li>
+
+<li><tt>jackson2</tt> - annotations from
+`com.fasterxml.jackson.annotation` package</li>
+
+<li><tt>jaxb</tt> - annotations from
+`javax.xml.bind.annotation` package</li>
+</ul>
+Required parameter, recommended value is <tt>jackson2</tt>.</div>
         
 <ul>
           
@@ -1310,9 +1471,17 @@ package). Required parameter, recommended value is 'jackson2'.</div>
 <p><b><a name="mapClasses">mapClasses</a>:</b></p>
         
 <div>Specifies whether classes will be mapped to classes or interfaces.
-Supported values are 'asInterfaces', 'asClasses'. Default value is
-'asInterfaces'. Value 'asClasses' can only be used in
-implementation files (.ts).</div>
+Supported values are: 
+
+<ul>
+
+<li><tt>asInterfaces</tt></li>
+
+<li><tt>asClasses</tt></li>
+</ul>
+Default value is <tt>asInterfaces</tt>.<br />
+Value <tt>asClasses</tt> can only be used in implementation
+files (.ts).</div>
         
 <ul>
           
@@ -1323,7 +1492,17 @@ implementation files (.ts).</div>
 <p><b><a name="mapDate">mapDate</a>:</b></p>
         
 <div>Specifies how <tt>Date</tt> will be mapped. Supported values
-are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.</div>
+are: 
+
+<ul>
+
+<li><tt>asDate</tt> - type <tt>Date</tt></li>
+
+<li><tt>asNumber</tt> - type <tt>number</tt></li>
+
+<li><tt>asString</tt> - type <tt>string</tt></li>
+</ul>
+Default value is <tt>asDate</tt>.</div>
         
 <ul>
           
@@ -1333,13 +1512,23 @@ are 'asDate', 'asNumber', 'asString'. Default value is 'asDate'.</div>
         </ul><hr />
 <p><b><a name="mapEnum">mapEnum</a>:</b></p>
         
-<div>Specifies how enums will be mapped. Supported values are 'asUnion',
-'asInlineUnion', 'asEnum', 'asNumberBasedEnum'. Default value is
-'asUnion'. Value 'asUnion' creates type alias to union of string
-enum values. Value 'asInlineUnion' creates union of enum values on
-places where the enum is used. Value 'asEnum' creates string enum.
-Requires TypeScript 2.4. Value 'asNumberBasedEnum' creates enum of
-named number values.</div>
+<div>Specifies how enums will be mapped. Supported values are: 
+
+<ul>
+
+<li><tt>asUnion</tt> - creates type alias to union of string
+enum values</li>
+
+<li><tt>asInlineUnion</tt> - creates union of enum values on
+places where the enum is used</li>
+
+<li><tt>asEnum</tt> - creates string enum. Requires TypeScript
+2.4</li>
+
+<li><tt>asNumberBasedEnum</tt> - creates enum of named number
+values</li>
+</ul>
+Default value is <tt>asUnion</tt>.</div>
         
 <ul>
           
@@ -1350,7 +1539,7 @@ named number values.</div>
 <p><b><a name="mapPackagesToNamespaces">mapPackagesToNamespaces</a>:</b></p>
         
 <div>Generates TypeScript namespaces from Java packages. Default is
-false.</div>
+<tt>false</tt>.</div>
         
 <ul>
           
@@ -1360,8 +1549,9 @@ false.</div>
         </ul><hr />
 <p><b><a name="module">module</a>:</b></p>
         
-<div>Name of generated ambient module. Used when 'outputKind' is set to
-'ambientModule'.</div>
+<div>Name of generated ambient module.<br />
+Used when <tt>outputKind</tt> is set to
+<tt>ambientModule</tt>.</div>
         
 <ul>
           
@@ -1371,8 +1561,9 @@ false.</div>
         </ul><hr />
 <p><b><a name="namespace">namespace</a>:</b></p>
         
-<div>Generates specified namespace. Not recommended to combine with
-modules. Default is no namespace.</div>
+<div>Generates specified namespace.<br />
+Not recommended to combine with modules.<br />
+Default is no namespace.</div>
         
 <ul>
           
@@ -1382,10 +1573,11 @@ modules. Default is no namespace.</div>
         </ul><hr />
 <p><b><a name="noFileComment">noFileComment</a>:</b></p>
         
-<div>If true generated file will not contain comment at the top. By
-default there is a comment with timestamp and typescript-generator
-version. So it might be useful to suppress this comment if the file
-is in source control and is regenerated in build.</div>
+<div>If <tt>true</tt> generated file will not contain comment at the
+top. By default there is a comment with timestamp and
+typescript-generator version. So it might be useful to suppress
+this comment if the file is in source control and is regenerated in
+build.</div>
         
 <ul>
           
@@ -1395,7 +1587,8 @@ is in source control and is regenerated in build.</div>
         </ul><hr />
 <p><b><a name="nonConstEnums">nonConstEnums</a>:</b></p>
         
-<div>If true generated enums will not have <tt>const</tt> keyword.
+<div>If <tt>true</tt> generated enums will not have
+<tt>const</tt> keyword.<br />
 This can be used only in implementation files.</div>
         
 <ul>
@@ -1406,9 +1599,10 @@ This can be used only in implementation files.</div>
         </ul><hr />
 <p><b><a name="npmName">npmName</a>:</b></p>
         
-<div>Specifies NPM package name. Only applicable when
-'generateNpmPackageJson' parameter is 'true'. Default value is
-<tt>${project.artifactId}</tt>.</div>
+<div>Specifies NPM package name.<br />
+Only applicable when <tt>generateNpmPackageJson</tt> parameter
+is <tt>true</tt>.<br />
+Default value is <tt>${project.artifactId}</tt>.</div>
         
 <ul>
           
@@ -1418,9 +1612,10 @@ This can be used only in implementation files.</div>
         </ul><hr />
 <p><b><a name="npmVersion">npmVersion</a>:</b></p>
         
-<div>Specifies NPM package version. Only applicable when
-'generateNpmPackageJson' parameter is 'true'. Default value is
-<tt>1.0.0</tt>.</div>
+<div>Specifies NPM package version.<br />
+Only applicable when <tt>generateNpmPackageJson</tt> parameter
+is <tt>true</tt>.<br />
+Default value is <tt>1.0.0</tt>.</div>
         
 <ul>
           
@@ -1433,7 +1628,7 @@ This can be used only in implementation files.</div>
 <div>The presence of any annotation in this list on a JSON property will
 cause the typescript-generator to treat that property as optional
 when generating the corresponding TypeScript interface. Example
-optional annotation: @javax.annotation.Nullable</div>
+optional annotation: <tt>javax.annotation.Nullable</tt></div>
         
 <ul>
           
@@ -1478,10 +1673,17 @@ Default value is <tt>useSpecifiedAnnotations</tt>.</div>
         </ul><hr />
 <p><b><a name="outputFileType">outputFileType</a>:</b></p>
         
-<div>Output file format, can be 'declarationFile' (.d.ts) or
-'implementationFile' (.ts). Setting this parameter to
-'implementationFile' allows to generate runnable TypeScript code.
-Default value is 'declarationFile'.</div>
+<div>Output file format, can be: 
+
+<ul>
+
+<li><tt>declarationFile</tt> (.d.ts)</li>
+
+<li><tt>implementationFile</tt> (.ts)</li>
+</ul>
+Setting this parameter to <tt>implementationFile</tt> allows to
+generate runnable TypeScript code.<br />
+Default value is <tt>declarationFile</tt>.</div>
         
 <ul>
           
@@ -1491,14 +1693,22 @@ Default value is 'declarationFile'.</div>
         </ul><hr />
 <p><b><a name="outputKind">outputKind</a>:</b></p>
         
-<div>Kind of generated TypeScript output, allowed values are 'global',
-'module' or 'ambientModule'. Value 'global' means that declarations
-will be in global scope or namespace (no module). Value 'module'
-means that generated file will contain top-level 'export'
-declarations. Value 'ambientModule' means that generated
-declarations will be wrapped in 'declare module &quot;mod&quot; { }'
-declaration. Required parameter. For more information see Wiki page
-'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.</div>
+<div>Kind of generated TypeScript output. Allowed values are: 
+
+<ul>
+
+<li><tt>global</tt> - means that declarations will be in global
+scope or namespace (no module)</li>
+
+<li><tt>module</tt> - means that generated file will contain
+top-level <tt>export</tt> declarations</li>
+
+<li><tt>ambientModule</tt> - means that generated declarations
+will be wrapped in <tt>declare module &quot;mod&quot; { }</tt>
+declaration</li>
+</ul>
+Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules
+and Namespaces</a> Wiki page.</div>
         
 <ul>
           
@@ -1509,8 +1719,9 @@ declaration. Required parameter. For more information see Wiki page
 <p><b><a name="referencedFiles">referencedFiles</a>:</b></p>
         
 <div>List of files which will be referenced using triple-slash
-directive: /// &lt;reference path=&quot;file&quot; /&gt;. This can be used
-with &quot;customTypeMappings&quot; to provide needed TypeScript types.</div>
+directive: <tt>/// &lt;reference path=&quot;file&quot; /&gt;</tt>. This
+can be used with <tt>customTypeMappings</tt> to provide needed
+TypeScript types.</div>
         
 <ul>
           
@@ -1521,8 +1732,8 @@ with &quot;customTypeMappings&quot; to provide needed TypeScript types.</div>
 <p><b><a name="removeTypeNamePrefix">removeTypeNamePrefix</a>:</b></p>
         
 <div>Prefix which will be removed from names of classes, interfaces,
-enums. For example if set to &quot;Json&quot; then mapping for &quot;JsonData&quot;
-will be &quot;Data&quot;.</div>
+enums. For example if set to <tt>Json</tt> then mapping for
+<tt>JsonData</tt> will be <tt>Data</tt>.</div>
         
 <ul>
           
@@ -1533,8 +1744,8 @@ will be &quot;Data&quot;.</div>
 <p><b><a name="removeTypeNameSuffix">removeTypeNameSuffix</a>:</b></p>
         
 <div>Suffix which will be removed from names of classes, interfaces,
-enums. For example if set to &quot;JSON&quot; then mapping for &quot;DataJSON&quot;
-will be &quot;Data&quot;.</div>
+enums. For example if set to <tt>JSON</tt> then mapping for
+<tt>DataJSON</tt> will be <tt>Data</tt>.</div>
         
 <ul>
           
@@ -1549,7 +1760,7 @@ default no <tt>options</tt> parameter is generated. Useful when
 passing additional parameters to underlying HTTP request method
 (like jQuery ajax settings or <tt>AxiosRequestConfig</tt>). Can
 be specific (for example <tt>AxiosRequestConfig</tt>) or
-generic (for example <tt>&amp;ltO&gt;</tt>).</div>
+generic (for example <tt>&lt;O&gt;</tt>).</div>
         
 <ul>
           
@@ -1574,8 +1785,8 @@ response data.</div>
         </ul><hr />
 <p><b><a name="sortDeclarations">sortDeclarations</a>:</b></p>
         
-<div>If true TypeScript declarations (interfaces, properties) will be
-sorted alphabetically.</div>
+<div>If <tt>true</tt> TypeScript declarations (interfaces,
+properties) will be sorted alphabetically.</div>
         
 <ul>
           
@@ -1585,8 +1796,8 @@ sorted alphabetically.</div>
         </ul><hr />
 <p><b><a name="sortTypeDeclarations">sortTypeDeclarations</a>:</b></p>
         
-<div>If true TypeScript type declarations (interfaces) will be sorted
-alphabetically.</div>
+<div>If <tt>true</tt> TypeScript type declarations (interfaces) will
+be sorted alphabetically.</div>
         
 <ul>
           
@@ -1596,8 +1807,15 @@ alphabetically.</div>
         </ul><hr />
 <p><b><a name="stringQuotes">stringQuotes</a>:</b></p>
         
-<div>Specifies how strings will be quoted. Supported values are
-'doubleQuotes', 'singleQuotes'. Default value is 'doubleQuotes'.</div>
+<div>Specifies how strings will be quoted. Supported values are: 
+
+<ul>
+
+<li><tt>doubleQuotes</tt></li>
+
+<li><tt>singleQuotes</tt></li>
+</ul>
+Default value is <tt>doubleQuotes</tt>.</div>
         
 <ul>
           
