@@ -24,39 +24,47 @@ public class GenerateMojo extends AbstractMojo {
     private File outputFile;
 
     /**
-     * Output file format, can be 'declarationFile' (.d.ts) or 'implementationFile' (.ts).
-     * Setting this parameter to 'implementationFile' allows to generate runnable TypeScript code.
-     * Default value is 'declarationFile'.
+     * Output file format, can be:
+     * <ul>
+     * <li><code>declarationFile</code> (.d.ts)</li>
+     * <li><code>implementationFile</code> (.ts)</li>
+     * </ul>
+     * Setting this parameter to <code>implementationFile</code> allows to generate runnable TypeScript code.<br>
+     * Default value is <code>declarationFile</code>.
      */
     @Parameter
     private TypeScriptFileType outputFileType;
 
     /**
-     * Kind of generated TypeScript output, allowed values are 'global', 'module' or 'ambientModule'.
-     * Value 'global' means that declarations will be in global scope or namespace (no module).
-     * Value 'module' means that generated file will contain top-level 'export' declarations.
-     * Value 'ambientModule' means that generated declarations will be wrapped in 'declare module "mod" { }' declaration.
+     * Kind of generated TypeScript output. Allowed values are:
+     * <ul>
+     * <li><code>global</code> - means that declarations will be in global scope or namespace (no module)</li>
+     * <li><code>module</code> - means that generated file will contain top-level <code>export</code> declarations</li>
+     * <li><code>ambientModule</code> - means that generated declarations will be wrapped in <code>declare module "mod" { }</code> declaration</li>
+     * </ul>
      * Required parameter.
-     * For more information see Wiki page 'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.
+     * For more information see <a href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules and Namespaces</a> Wiki page.
      */
     @Parameter(required = true)
-    private TypeScriptOutputKind outputKind;
+    public TypeScriptOutputKind outputKind;
 
     /**
-     * Name of generated ambient module.
-     * Used when 'outputKind' is set to 'ambientModule'.
+     * Name of generated ambient module.<br>
+     * Used when {@link #outputKind} is set to <code>ambientModule</code>.
      */
     @Parameter
     private String module;
 
     /**
-     * Generates specified namespace. Not recommended to combine with modules. Default is no namespace.
+     * Generates specified namespace.<br>
+     * Not recommended to combine with modules.<br>
+     * Default is no namespace.
      */
     @Parameter
     private String namespace;
 
     /**
-     * Generates TypeScript namespaces from Java packages. Default is false.
+     * Generates TypeScript namespaces from Java packages. Default is <code>false</code>.
      */
     @Parameter
     private boolean mapPackagesToNamespaces;
@@ -78,9 +86,11 @@ public class GenerateMojo extends AbstractMojo {
      * JSON classes to process specified using glob patterns
      * so it is possible to specify package or class name suffix.
      * Glob patterns support two wildcards:
-     * Single "*" wildcard matches any character except for "." and "$".
-     * Double "**" wildcard matches any character.
-     * For more information and examples see Wiki page 'https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns'.
+     * <ul>
+     * <li>Single <code>*</code> wildcard matches any character except for <code>.</code> and <code>$</code>.</li>
+     * <li>Double <code>**</code> wildcard matches any character.</li>
+     * </ul>
+     * For more information and examples see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.
      */
     @Parameter
     private List<String> classPatterns;
@@ -108,30 +118,33 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Excluded classes specified using glob patterns.
+     * For more information and examples see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.
      */
     @Parameter
     private List<String> excludeClassPatterns;
 
     /**
      * If this list is not empty then TypeScript will only be generated for
-     * methods with one of the annotations defined in this list
+     * methods with one of the annotations defined in this list.
      */
     @Parameter
     private List<String> includePropertyAnnotations;
 
     /**
      * Library used in JSON classes.
-     * Supported values are
-     * 'jackson1' (annotations from 'org.codehaus.jackson.annotate' package),
-     * 'jackson2' (annotations from 'com.fasterxml.jackson.annotation' package),
-     * 'jaxb' (annotations from 'javax.xml.bind.annotation' package).
-     * Required parameter, recommended value is 'jackson2'.
+     * Supported values are:
+     * <ul>
+     * <li><code>jackson1</code> - annotations from `org.codehaus.jackson.annotate` package</li>
+     * <li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
+     * <li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package<li>
+     * </ul>
+     * Required parameter, recommended value is <code>jackson2</code>.
      */
     @Parameter(required = true)
     private JsonLibrary jsonLibrary;
 
     /**
-     * Deprecated, use <code>optionalProperties</code> parameter.
+     * <b>Deprecated</b>, use {@link #optionalProperties} parameter.
      */
     @Deprecated
     @Parameter
@@ -141,7 +154,7 @@ public class GenerateMojo extends AbstractMojo {
      * Specifies how properties are defined to be optional.
      * Supported values are:
      * <ul>
-     * <li><code>useSpecifiedAnnotations</code> - annotations specified using <code>optionalAnnotations</code> parameter</li>
+     * <li><code>useSpecifiedAnnotations</code> - annotations specified using {@link #optionalAnnotations} parameter</li>
      * <li><code>useLibraryDefinition</code> - examples: <code>@JsonProperty(required = false)</code> when using <code>jackson2</code> library
      *   or <code>@XmlElement(required = false)</code> when using <code>jaxb</code> library</li>
      * <li><code>all</code> - all properties are optional</li>
@@ -152,42 +165,42 @@ public class GenerateMojo extends AbstractMojo {
     private OptionalProperties optionalProperties;
 
     /**
-     * If true declared properties will be <code>readonly</code>.
+     * If <code>true</code> declared properties will be <code>readonly</code>.
      */
     @Parameter
     private boolean declarePropertiesAsReadOnly;
 
     /**
      * Prefix which will be removed from names of classes, interfaces, enums.
-     * For example if set to "Json" then mapping for "JsonData" will be "Data".
+     * For example if set to <code>Json</code> then mapping for <code>JsonData</code> will be <code>Data</code>.
      */
     @Parameter
     private String removeTypeNamePrefix;
 
     /**
      * Suffix which will be removed from names of classes, interfaces, enums.
-     * For example if set to "JSON" then mapping for "DataJSON" will be "Data".
+     * For example if set to <code>JSON</code> then mapping for <code>DataJSON</code> will be <code>Data</code>.
      */
     @Parameter
     private String removeTypeNameSuffix;
 
     /**
      * Prefix which will be added to names of classes, interfaces, enums.
-     * For example if set to "I" then mapping for "Data" will be "IData".
+     * For example if set to <code>I</code> then mapping for <code>Data</code> will be <code>IData</code>.
      */
     @Parameter
     private String addTypeNamePrefix;
 
     /**
      * Suffix which will be added to names of classes, interfaces, enums.
-     * For example if set to "Data" then mapping for "Person" will be "PersonData".
+     * For example if set to <code>Data</code> then mapping for <code>Person</code> will be <code>PersonData</code>.
      */
     @Parameter
     private String addTypeNameSuffix;
 
     /**
      * Specifies custom TypeScript names for Java classes.
-     * Multiple mappings can be specified, each using this format: "javaClassName:typescriptName".
+     * Multiple mappings can be specified, each using this format: <code>javaClassName:typescriptName</code>.
      * This takes precedence over other naming settings.
      */
     @Parameter
@@ -195,23 +208,23 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies JavaScript function for getting custom TypeScript names for Java classes.
-     * Function can return undefined if default name should be used.
-     * Function signature: <code>function getName(className: string, classSimpleName: string): string | null | undefined;</code>
+     * Function can return undefined if default name should be used.<br>
+     * Function signature: <code>function getName(className: string, classSimpleName: string): string | null | undefined;</code><br>
      * Example function: <code>function(name, simpleName) { if (name.startsWith('cz.')) return 'Test' + simpleName; }</code>
      */
     @Parameter
     private String customTypeNamingFunction;
 
     /**
-     * List of files which will be referenced using triple-slash directive: /// &lt;reference path="file" />.
-     * This can be used with "customTypeMappings" to provide needed TypeScript types.
+     * List of files which will be referenced using triple-slash directive: <code>/// &lt;reference path="file" /></code>.
+     * This can be used with {@link #customTypeMappings} to provide needed TypeScript types.
      */
     @Parameter
     private List<String> referencedFiles;
 
     /**
      * List of import declarations which will be added to generated output.
-     * This can be used with "customTypeMappings" to provide needed TypeScript types.
+     * This can be used with {@link #customTypeMappings} to provide needed TypeScript types.
      */
     @Parameter
     private List<String> importDeclarations;
@@ -219,34 +232,41 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * List of custom mappings.
      * Each item specifies TypeScript type which will be used for particular Java class.
-     * Item format is: "javaClass:typescriptType".
-     * For example mapping "ZonedDateTime" to "string" would be added as "java.time.ZonedDateTime:string".
+     * Item format is: <code>javaClassName:typescriptType</code>.
+     * For example mapping Joda-Time {@link org.joda.time.LocalDateTime} to <code>string</code> would be added as <code>org.joda.time.LocalDateTime:string</code>.
      */
     @Parameter
     private List<String> customTypeMappings;
 
     /**
      * Specifies how {@link java.util.Date} will be mapped.
-     * Supported values are 'asDate', 'asNumber', 'asString'.
-     * Default value is 'asDate'.
+     * Supported values are:
+     * <ul>
+     * <li><code>asDate</code> - type <code>Date</code></li>
+     * <li><code>asNumber</code> - type <code>number</code></li>
+     * <li><code>asString</code> - type <code>string</code></li>
+     * </ul>
+     * Default value is <code>asDate</code>.
      */
     @Parameter
     private DateMapping mapDate;
 
     /**
      * Specifies how enums will be mapped.
-     * Supported values are 'asUnion', 'asInlineUnion', 'asEnum', 'asNumberBasedEnum'.
-     * Default value is 'asUnion'.
-     * Value 'asUnion' creates type alias to union of string enum values.
-     * Value 'asInlineUnion' creates union of enum values on places where the enum is used.
-     * Value 'asEnum' creates string enum. Requires TypeScript 2.4.
-     * Value 'asNumberBasedEnum' creates enum of named number values.
+     * Supported values are:
+     * <ul>
+     * <li><code>asUnion</code> - creates type alias to union of string enum values</li>
+     * <li><code>asInlineUnion</code> - creates union of enum values on places where the enum is used</li>
+     * <li><code>asEnum</code> - creates string enum. Requires TypeScript 2.4</li>
+     * <li><code>asNumberBasedEnum</code> - creates enum of named number values</li>
+     * </ul>
+     * Default value is <code>asUnion</code>.
      */
     @Parameter
     private EnumMapping mapEnum;
 
     /**
-     * If true generated enums will not have <code>const</code> keyword.
+     * If <code>true</code> generated enums will not have <code>const</code> keyword.<br>
      * This can be used only in implementation files.
      */
     @Parameter
@@ -254,44 +274,50 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies whether classes will be mapped to classes or interfaces.
-     * Supported values are 'asInterfaces', 'asClasses'.
-     * Default value is 'asInterfaces'.
-     * Value 'asClasses' can only be used in implementation files (.ts).
+     * Supported values are:
+     * <ul>
+     * <li><code>asInterfaces</code></li>
+     * <li><code>asClasses</code></li>
+     * </ul>
+     * Default value is <code>asInterfaces</code>.<br>
+     * Value <code>asClasses</code> can only be used in implementation files (.ts).
      */
     @Parameter
     private ClassMapping mapClasses;
 
     /**
-     * If true tagged unions will not be generated for Jackson 2 polymorphic types.
+     * If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types.
      */
     @Parameter
     private boolean disableTaggedUnions;
 
     /**
-     * If true Swagger annotations will not be used.
+     * If <code>true</code> Swagger annotations will not be used.
      */
     @Parameter
     private boolean ignoreSwaggerAnnotations;
 
     /**
-     * If true interface for JAX-RS REST application will be generated.
+     * If <code>true</code> interface for JAX-RS REST application will be generated.
      */
     @Parameter
     private boolean generateJaxrsApplicationInterface;
 
     /**
-     * If true client for JAX-RS REST application will be generated.
+     * If <code>true</code> client for JAX-RS REST application will be generated.
      */
     @Parameter
     private boolean generateJaxrsApplicationClient;
 
     /**
      * Specifies how JAX-RS REST operations will be grouped into objects.
-     * Supported values are 'singleObject', 'perResource', 'byAnnotation'.
-     * Default value is 'singleObject'.
-     * Value 'singleObject' means that one object with all operations will be generated.
-     * Value 'perResource' means that for each root resource one object will be generated.
-     * Value 'byAnnotation' means that operations will be grouped by annotation specified using <code>jaxrsNamespacingAnnotation</code>.
+     * Supported values are:
+     * <ul>
+     * <li><code>singleObject</code> - means that one object with all operations will be generated</li>
+     * <li><code>perResource</code> - means that for each root resource one object will be generated</li>
+     * <li><code>byAnnotation</code> - means that operations will be grouped by annotation specified using {@link #jaxrsNamespacingAnnotation}</li>
+     * </ul>
+     * Default value is <code>singleObject</code>.
      */
     @Parameter
     private JaxrsNamespacing jaxrsNamespacing;
@@ -299,10 +325,12 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies annotation used for grouping JAX-RS REST operations.
      * Format is <code>annotationClass#annotationElement</code> where
-     * annotationClass is fully-qualified class name and annotationElement is element name and defaults to 'value'.
+     * <code>annotationClass</code> is fully-qualified class name and <code>annotationElement</code> is element name and defaults to <code>value</code>.
      * Examples:
-     * <code>io.swagger.annotations.Api</code>,
-     * <code>io.swagger.annotations.Api#value</code>
+     * <ul>
+     * <li><code>io.swagger.annotations.Api</code></li>
+     * <li><code>io.swagger.annotations.Api#value</code></li>
+     * </ul>
      */
     @Parameter
     private String jaxrsNamespacingAnnotation;
@@ -320,7 +348,7 @@ public class GenerateMojo extends AbstractMojo {
      * Specifies HTTP request options type in JAXRS application.
      * By default no <code>options</code> parameter is generated.
      * Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>).
-     * Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&ltO></code>).
+     * Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&lt;O></code>).
      */
     @Parameter
     private String restOptionsType;
@@ -329,25 +357,25 @@ public class GenerateMojo extends AbstractMojo {
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
      * This allows to customize how Java types are mapped to TypeScript.
      * For example it is possible to implement TypeProcessor
-     * for {@link com.google.common.base.Optional} from guava or for Java 8 date/time classes.
+     * for {@link com.google.common.base.Optional} from guava.
      */
     @Parameter
     private String customTypeProcessor;
 
     /**
-     * If true TypeScript declarations (interfaces, properties) will be sorted alphabetically.
+     * If <code>true</code> TypeScript declarations (interfaces, properties) will be sorted alphabetically.
      */
     @Parameter
     private boolean sortDeclarations;
 
     /**
-     * If true TypeScript type declarations (interfaces) will be sorted alphabetically.
+     * If <code>true</code> TypeScript type declarations (interfaces) will be sorted alphabetically.
      */
     @Parameter
     private boolean sortTypeDeclarations;
 
     /**
-     * If true generated file will not contain comment at the top.
+     * If <code>true</code> generated file will not contain comment at the top.
      * By default there is a comment with timestamp and typescript-generator version.
      * So it might be useful to suppress this comment if the file is in source control and is regenerated in build.
      */
@@ -356,9 +384,9 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * List of Javadoc XML files to search for documentation comments.
-     * These files should be created using "com.github.markusbernhardt.xmldoclet.XmlDoclet" (com.github.markusbernhardt:xml-doclet).
+     * These files should be created using <code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from <code>com.github.markusbernhardt:xml-doclet</code> artifact.
      * Javadoc comments are added to output declarations as JSDoc comments.
-     * For more information see Wiki page 'https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc'.
+     * For more information see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a> Wiki page.
      */
     @Parameter
     private List<File> javadocXmlFiles;
@@ -366,7 +394,13 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * List of extensions specified as fully qualified class name.
      * Known extensions:
-     * cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension
+     * <ul>
+     * <li><code>cz.habarta.typescript.generator.ext.AxiosClientExtension}</code>
+     *   - generates client for JAX-RS service using Axios library, see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX RS Application</a>Wiki page</li>
+     * <li><code>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</code>
+     *   - generates type-safe property path getters</li>
+     * <li><code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
+     * </ul>
      */
     @Parameter
     private List<String> extensions;
@@ -375,30 +409,30 @@ public class GenerateMojo extends AbstractMojo {
      * The presence of any annotation in this list on a JSON property will cause
      * the typescript-generator to treat that property as optional when generating
      * the corresponding TypeScript interface.
-     * Example optional annotation: @javax.annotation.Nullable
+     * Example optional annotation: <code>javax.annotation.Nullable</code>
      */
     @Parameter
     private List<String> optionalAnnotations;
 
     /**
-     * If true NPM package.json will be generated.
-     * Only applicable when 'outputKind' is set to 'module'.
-     * NPM package name and version can be specified using 'npmName' and 'npmVersion' parameters.
+     * If <code>true</code> NPM <code>package.json</code> will be generated.
+     * Only applicable when {@link #outputKind} is set to <code>module</code>.
+     * NPM package name and version can be specified using {@link #npmName} and {@link #npmVersion} parameters.
      */
     @Parameter
     private boolean generateNpmPackageJson;
 
     /**
-     * Specifies NPM package name.
-     * Only applicable when 'generateNpmPackageJson' parameter is 'true'.
+     * Specifies NPM package name.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code>.<br>
      * Default value is <code>${project.artifactId}</code>.
      */
     @Parameter
     private String npmName;
 
     /**
-     * Specifies NPM package version.
-     * Only applicable when 'generateNpmPackageJson' parameter is 'true'.
+     * Specifies NPM package version.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code>.<br>
      * Default value is <code>1.0.0</code>.
      */
     @Parameter
@@ -406,8 +440,12 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies how strings will be quoted.
-     * Supported values are 'doubleQuotes', 'singleQuotes'.
-     * Default value is 'doubleQuotes'.
+     * Supported values are:
+     * <ul>
+     * <li><code>doubleQuotes</code></li>
+     * <li><code>singleQuotes</code></li>
+     * </ul>
+     * Default value is <code>doubleQuotes</code>.
      */
     @Parameter
     private StringQuotes stringQuotes;
@@ -419,7 +457,7 @@ public class GenerateMojo extends AbstractMojo {
     private boolean displaySerializerWarning;
 
     /**
-     * Deprecated, see <code>jackson2ModuleDiscovery</code> and <code>jackson2Modules</code> parameters.
+     * <b>Deprecated</b>, see {@link #jackson2ModuleDiscovery} and {@link #jackson2Modules} parameters.
      */
     @Deprecated
     @Parameter
