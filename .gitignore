@@ -9,6 +9,7 @@ release.properties
 # Gradle
 /sample-gradle/.gradle/
 /sample-gradle/.nb-gradle/
+/sample-gradle/bin/
 /sample-gradle/build/
 
 # npm

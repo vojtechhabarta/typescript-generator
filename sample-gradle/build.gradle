@@ -20,7 +20,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.7-SNAPSHOT'
+        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.+'
     }
 }
 
