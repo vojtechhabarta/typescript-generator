@@ -14,8 +14,8 @@
 
     <properties>
         <jackson1.version>1.9.13</jackson1.version>
-        <jackson2.version>2.9.1</jackson2.version>
-        <jersey.version>2.26</jersey.version>
+        <jackson2.version>2.8.10</jackson2.version>
+        <jersey.version>2.25</jersey.version>
     </properties>
 
     <dependencies>
