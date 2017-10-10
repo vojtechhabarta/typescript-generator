@@ -131,7 +131,7 @@ public abstract class ModelParser {
         return new PropertyModel(name, type, optional, originalMember, pullProperties, null);
     }
 
-    private List<Class<?>> discoverClassesUsedInType(Type type) {
+    protected List<Class<?>> discoverClassesUsedInType(Type type) {
         final TypeProcessor.Result result = processType(type);
         return result != null ? result.getDiscoveredClasses() : Collections.<Class<?>>emptyList();
     }

@@ -104,6 +104,8 @@ public class TypeScriptGenerator {
                 return new Jackson2Parser(settings, getTypeProcessor());
             case jaxb:
                 return new Jackson2Parser(settings, getTypeProcessor(), /*useJaxbAnnotations*/ true);
+            case nashorn:
+                return new NashornJavaParser(settings, getTypeProcessor());                
             default:
                 throw new RuntimeException();
         }
