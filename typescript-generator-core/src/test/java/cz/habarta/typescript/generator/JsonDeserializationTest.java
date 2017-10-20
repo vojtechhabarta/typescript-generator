@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class JsonDeserializationTest {
         settings.experimentalJsonDeserialization = true;
         final File actualFile = new File("target/JsonDeserializationTest-actual.ts");
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(User.class), Output.to(actualFile));
-        final List<String> actualLines = Files.readAllLines(actualFile.toPath());
+        final List<String> actualLines = Files.readAllLines(actualFile.toPath(), StandardCharsets.UTF_8);
         final List<String> expectedLines = Utils.readLines(getClass().getResourceAsStream("JsonDeserializationTest-expected.ts"));
 
         int contentLines = 0;
