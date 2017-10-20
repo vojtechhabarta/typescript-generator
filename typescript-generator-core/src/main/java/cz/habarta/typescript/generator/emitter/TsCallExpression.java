@@ -2,10 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.util.Utils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 public class TsCallExpression extends TsExpression {
@@ -32,11 +29,7 @@ public class TsCallExpression extends TsExpression {
 
     @Override
     public String format(Settings settings) {
-        final List<String> args = new ArrayList<>();
-        for (TsExpression argument : arguments) {
-            args.add(argument.format(settings));
-        }
-        return expression.format(settings) + "(" + Utils.join(args, ", ") + ")";
+        return expression.format(settings) + "(" + Emitter.formatList(settings, arguments) + ")";
     }
 
 }

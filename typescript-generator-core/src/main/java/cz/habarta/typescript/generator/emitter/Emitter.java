@@ -186,9 +186,10 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitProperty(TsPropertyModel property) {
         emitComments(property.getComments());
         final TsType tsType = property.getTsType();
-        final String readonly = property.readonly ? "readonly " : "";
+        final String staticString = property.modifiers.isStatic ? "static " : "";
+        final String readonlyString = property.modifiers.isReadonly ? "readonly " : "";
         final String questionMark = tsType instanceof TsType.OptionalType ? "?" : "";
-        writeIndentedLine(readonly + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
+        writeIndentedLine(staticString + readonlyString + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
     }
 
     public static String quoteIfNeeded(String name, Settings settings) {
@@ -217,9 +218,23 @@ public class Emitter implements EmitterExtension.Writer {
         return true;
     }
 
+    public static String formatList(Settings settings, List<? extends Emittable> list) {
+        return formatList(settings, list, ", ");
+    }
+
+    public static String formatList(Settings settings, List<? extends Emittable> list, String delimiter) {
+        final List<String> result = new ArrayList<>();
+        for (Emittable item : list) {
+            result.add(item.format(settings));
+        }
+        return Utils.join(result, delimiter);
+    }
+
     private void emitCallable(TsCallableModel method) {
         writeNewLine();
         emitComments(method.getComments());
+        final String staticString = method.getModifiers().isStatic ? "static " : "";
+        final String typeParametersString = method.getTypeParameters().isEmpty() ? "" : "<" + formatList(settings, method.getTypeParameters()) + ">";
         final List<String> parameters = new ArrayList<>();
         for (TsParameterModel parameter : method.getParameters()) {
             final String access = parameter.getAccessibilityModifier() != null ? parameter.getAccessibilityModifier().format() + " " : "";
@@ -227,8 +242,9 @@ public class Emitter implements EmitterExtension.Writer {
             final String type = parameter.getTsType() != null ? ": " + parameter.getTsType() : "";
             parameters.add(access + parameter.getName() + questionMark + type);
         }
+        final String parametersString = "(" + Utils.join(parameters, ", ") + ")";
         final String type = method.getReturnType() != null ? ": " + method.getReturnType() : "";
-        final String signature = method.getName() + "(" + Utils.join(parameters, ", ") + ")" + type;
+        final String signature = staticString + method.getName() + typeParametersString + parametersString + type;
         if (method.getBody() != null) {
             writeIndentedLine(signature + " {");
             indent++;
@@ -243,14 +259,51 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitStatements(List<TsStatement> statements) {
         for (TsStatement statement : statements) {
             if (statement instanceof TsReturnStatement) {
-                final TsReturnStatement returnStatement = (TsReturnStatement) statement;
-                if (returnStatement.getExpression() != null) {
-                    writeIndentedLine("return " + returnStatement.getExpression().format(settings) + ";");
-                } else {
-                    writeIndentedLine("return;");
-                }
+                emitReturnStatement((TsReturnStatement) statement);
+            } else if (statement instanceof TsIfStatement) {
+                emitIfStatement((TsIfStatement) statement);
+            } else if (statement instanceof TsExpressionStatement) {
+                emitExpressionStatement((TsExpressionStatement) statement);
+            } else if (statement instanceof TsVariableDeclarationStatement) {
+                emitVariableDeclarationStatement((TsVariableDeclarationStatement) statement);
             }
         }
+    }
+
+    private void emitReturnStatement(TsReturnStatement returnStatement) {
+        if (returnStatement.getExpression() != null) {
+            writeIndentedLine("return " + returnStatement.getExpression().format(settings) + ";");
+        } else {
+            writeIndentedLine("return;");
+        }
+    }
+
+    private void emitIfStatement(TsIfStatement ifStatement) {
+        writeIndentedLine("if (" + ifStatement.getExpression().format(settings) + ") {");
+        indent++;
+        emitStatements(ifStatement.getThenStatements());
+        indent--;
+        if (ifStatement.getElseStatements() != null) {
+            writeIndentedLine("} else {");
+            indent++;
+            emitStatements(ifStatement.getElseStatements());
+            indent--;
+        }
+        writeIndentedLine("}");
+    }
+
+    private void emitExpressionStatement(TsExpressionStatement expressionStatement) {
+        writeIndentedLine(expressionStatement.getExpression().format(settings) + ";");
+    }
+
+    private void emitVariableDeclarationStatement(TsVariableDeclarationStatement variableDeclarationStatement) {
+        writeIndentedLine(
+                (variableDeclarationStatement.isConst() ? "const " : "let ")
+                + variableDeclarationStatement.getName()
+                + (variableDeclarationStatement.getType() != null ? ": " + variableDeclarationStatement.getType().format(settings) : "")
+                + (variableDeclarationStatement.getInitializer() != null ? " = " + variableDeclarationStatement.getInitializer().format(settings) : "")
+                + ";"
+        );
     }
 
     private void emitTypeAlias(TsAliasModel alias, boolean exportKeyword) {

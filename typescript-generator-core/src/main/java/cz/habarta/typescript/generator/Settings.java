@@ -57,6 +57,7 @@ public class Settings {
     public String restResponseType = null;
     public String restOptionsType = null;
     public boolean restOptionsTypeIsGeneric;
+    public boolean experimentalJsonDeserialization;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
