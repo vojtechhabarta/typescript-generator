@@ -76,6 +76,11 @@ public class Settings {
     public boolean jackson2ModuleDiscovery = false;
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
+    /**
+     * Java classes with these annotations will be generated as typescript classes,
+     * even if the general configuration is to generate typescript interfaces
+     */
+    public List<String> classAnnotations = new ArrayList<>();
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
