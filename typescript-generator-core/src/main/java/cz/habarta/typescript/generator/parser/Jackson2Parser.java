@@ -121,7 +121,7 @@ public class Jackson2Parser extends ModelParser {
         } else if (isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
-            discriminantLiteral = getTypeName(sourceClass.type);
+            discriminantLiteral = getTypeName(parentJsonTypeInfo, sourceClass.type);
         } else {
             // not part of explicit hierarchy
             discriminantProperty = null;
@@ -172,7 +172,11 @@ public class Jackson2Parser extends ModelParser {
                 : jsonTypeInfo.property();
     }
 
-    private String getTypeName(final Class<?> cls) {
+    private String getTypeName(JsonTypeInfo parentJsonTypeInfo, final Class<?> cls) {
+        // Id.CLASS
+        if (parentJsonTypeInfo.use() == JsonTypeInfo.Id.CLASS) {
+            return cls.getName();
+        }
         // find @JsonTypeName recursively
         final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class);
         if (jsonTypeName != null && !jsonTypeName.value().isEmpty()) {

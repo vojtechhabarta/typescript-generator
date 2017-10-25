@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -118,6 +119,23 @@ public class TaggedUnionsTest {
     @JsonTypeName("c")
     private static interface DiamondC extends DiamondB1, DiamondB2 {
         public String getC();
+    }
+
+    @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(DieselCar.class),
+        @JsonSubTypes.Type(ElectricCar.class),
+    })
+    private static class Car {
+        public String name;
+    }
+
+    private static class DieselCar extends Car {
+        public double fuelTankCapacityInLiters;
+    }
+
+    private static class ElectricCar extends Car {
+        public double batteryCapacityInKWh;
     }
 
     @Test
@@ -293,6 +311,41 @@ public class TaggedUnionsTest {
                 ""
                 ).replace('\'', '"');
         Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testIdClass() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Car.class));
+        System.out.println(output);
+        final String expected = (
+                "\n" +
+                "interface Car {\n" +
+                "    '@class': 'cz.habarta.typescript.generator.TaggedUnionsTest$DieselCar' | 'cz.habarta.typescript.generator.TaggedUnionsTest$ElectricCar';\n" +
+                "    name: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface DieselCar extends Car {\n" +
+                "    '@class': 'cz.habarta.typescript.generator.TaggedUnionsTest$DieselCar';\n" +
+                "    fuelTankCapacityInLiters: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface ElectricCar extends Car {\n" +
+                "    '@class': 'cz.habarta.typescript.generator.TaggedUnionsTest$ElectricCar';\n" +
+                "    batteryCapacityInKWh: number;\n" +
+                "}\n" +
+                "\n" +
+                "type CarUnion = DieselCar | ElectricCar;\n" +
+                ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    public static void main(String[] args) throws Exception {
+        final ElectricCar electricCar = new ElectricCar();
+        electricCar.name = "Tesla";
+        electricCar.batteryCapacityInKWh = 75;  // kWh
+        System.out.println(new ObjectMapper().writeValueAsString(electricCar));
     }
 
 }
