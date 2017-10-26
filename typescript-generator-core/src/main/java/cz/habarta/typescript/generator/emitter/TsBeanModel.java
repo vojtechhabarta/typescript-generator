@@ -92,7 +92,11 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public boolean isJaxrsApplicationClientBean() {
-        return category== TsBeanCategory.Service && isClass;
+        return category == TsBeanCategory.Service && isClass;
+    }
+    
+    public boolean isDataClass() {
+        return category == TsBeanCategory.Data && isClass;
     }
     
 }

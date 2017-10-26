@@ -84,6 +84,8 @@ public class ModelCompiler {
         // tagged unions
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
+        tsModel = createDeserializationMethods(symbolTable, tsModel);
+
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
         return tsModel;
@@ -131,12 +133,6 @@ public class ModelCompiler {
     }
 
     private <T> TsBeanModel processBean(SymbolTable symbolTable, Model model, Map<Type, List<BeanModel>> children, BeanModel bean) {
-        final boolean isClass = !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses;
-        final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
-        final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
-        for (TypeVariable<?> typeParameter : bean.getOrigin().getTypeParameters()) {
-            typeParameters.add(new TsType.GenericVariableType(typeParameter.getName()));
-        }
         TsType parentType = typeFromJava(symbolTable, bean.getParent());
         if (parentType != null && parentType.equals(TsType.Any)) {
             parentType = null;
@@ -165,47 +161,27 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, modifiers, /*ownProperty*/ true, null));
         }
 
-        final List<TsMethodModel> methods = isClass && settings.experimentalJsonDeserialization
-                ? Arrays.asList(createDeserializationMethod(beanIdentifier, typeParameters, properties))
-                : null;
-        return new TsBeanModel(bean.getOrigin(), TsBeanCategory.Data, isClass, beanIdentifier, typeParameters, parentType, bean.getTaggedUnionClasses(), interfaces, properties, null, methods, bean.getComments());
+        return new TsBeanModel(
+                bean.getOrigin(),
+                TsBeanCategory.Data,
+                /*isClass*/ !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses,
+                symbolTable.getSymbol(bean.getOrigin()),
+                getTypeParameters(bean.getOrigin()),
+                parentType,
+                bean.getTaggedUnionClasses(),
+                interfaces,
+                properties,
+                /*constructor*/ null,
+                /*methods*/ null,
+                bean.getComments());
     }
 
-    private TsMethodModel createDeserializationMethod(Symbol beanIdentifier, List<TsType.GenericVariableType> typeParameters, List<TsPropertyModel> properties) {
-        final List<TsStatement> body = new ArrayList<>();
-        body.add(new TsIfStatement(new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference("data")),
-                Arrays.<TsStatement>asList(new TsReturnStatement(new TsIdentifierReference("data")))
-        ));
-        body.add(new TsVariableDeclarationStatement(
-                /*const*/ true,
-                "instance",
-                /*type*/ null,
-                new TsBinaryExpression(
-                        new TsIdentifierReference("target"),
-                        TsBinaryOperator.BarBar,
-                        new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, null)
-                )
-        ));
-        for (TsPropertyModel property : properties) {
-            body.add(new TsExpressionStatement(new TsAssignmentExpression(
-                    new TsMemberExpression(new TsIdentifierReference("instance"), property.name),
-                    new TsMemberExpression(new TsIdentifierReference("data"), property.name)
-            )));
+    private static List<TsType.GenericVariableType> getTypeParameters(Class<?> cls) {
+        final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
+        for (TypeVariable<?> typeParameter : cls.getTypeParameters()) {
+            typeParameters.add(new TsType.GenericVariableType(typeParameter.getName()));
         }
-        body.add(new TsReturnStatement(new TsIdentifierReference("instance")));
-
-        final TsType.ReferenceType dataType = typeParameters.isEmpty()
-                ? new TsType.ReferenceType(beanIdentifier)
-                : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
-        return new TsMethodModel(
-                "fromData",
-                TsModifierFlags.None.setStatic(),
-                typeParameters,
-                Arrays.asList(new TsParameterModel("data", dataType), new TsParameterModel("target", dataType.optional())),
-                dataType,
-                body,
-                null
-        );
+        return typeParameters;
     }
 
     private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
@@ -693,6 +669,74 @@ public class ModelCompiler {
             }
         });
         return model.withTypeAliases(new ArrayList<>(typeAliases));
+    }
+
+    private TsModel createDeserializationMethods(final SymbolTable symbolTable, TsModel tsModel) {
+        if (!settings.experimentalJsonDeserialization) {
+            return tsModel;
+        }
+        final List<TsBeanModel> beans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            final List<TsMethodModel> methods = new ArrayList<>(bean.getMethods());
+            if (bean.isDataClass()) {
+                final TsMethodModel deserializationMethod = createDeserializationMethod(symbolTable, tsModel, bean);
+                methods.add(0, deserializationMethod);
+            }
+            beans.add(bean.withMethods(methods));
+        }
+        return tsModel.withBeans(beans);
+    }
+
+    private TsMethodModel createDeserializationMethod(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+        final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
+        List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+
+        final List<TsStatement> body = new ArrayList<>();
+        body.add(new TsIfStatement(new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference("data")),
+                Arrays.<TsStatement>asList(new TsReturnStatement(new TsIdentifierReference("data")))
+        ));
+        body.add(new TsVariableDeclarationStatement(
+                /*const*/ true,
+                "instance",
+                /*type*/ null,
+                new TsBinaryExpression(
+                        new TsIdentifierReference("target"),
+                        TsBinaryOperator.BarBar,
+                        new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, null)
+                )
+        ));
+        if (bean.getParent() != null) {
+            body.add(new TsExpressionStatement(
+                    new TsCallExpression(
+                            new TsMemberExpression(new TsSuperExpression(), "fromData"),
+                            new TsIdentifierReference("data"),
+                            new TsIdentifierReference("instance")
+                    )
+            ));
+        }
+        for (TsPropertyModel property : bean.getProperties()) {
+            final Map<String, TsType> inheritedProperties = getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
+            if (!inheritedProperties.containsKey(property.getName())) {
+                body.add(new TsExpressionStatement(new TsAssignmentExpression(
+                        new TsMemberExpression(new TsIdentifierReference("instance"), property.name),
+                        new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+                )));
+            }
+        }
+        body.add(new TsReturnStatement(new TsIdentifierReference("instance")));
+
+        final TsType.ReferenceType dataType = typeParameters.isEmpty()
+                ? new TsType.ReferenceType(beanIdentifier)
+                : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
+        return new TsMethodModel(
+                "fromData",
+                TsModifierFlags.None.setStatic(),
+                typeParameters,
+                Arrays.asList(new TsParameterModel("data", dataType), new TsParameterModel("target", dataType.optional())),
+                dataType,
+                body,
+                null
+        );
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

@@ -237,6 +237,9 @@ public class Settings {
         if (restOptionsType != null && !generateJaxrs) {
             throw new RuntimeException("'restOptionsType' parameter can only be used when generating JAX-RS client or interface.");
         }
+        if (experimentalJsonDeserialization && disableTaggedUnions) {
+            throw new RuntimeException("'experimentalJsonDeserialization' parameter cannot be used when `disableTaggedUnions` is true.");
+        }
         if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
         }
