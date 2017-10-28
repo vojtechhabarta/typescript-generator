@@ -719,7 +719,7 @@ public class ModelCompiler {
             if (!inheritedProperties.containsKey(property.getName())) {
                 body.add(new TsExpressionStatement(new TsAssignmentExpression(
                         new TsMemberExpression(new TsIdentifierReference("instance"), property.name),
-                        new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+                        getPropertyCopy(symbolTable, tsModel, bean, property)
                 )));
             }
         }
@@ -737,6 +737,21 @@ public class ModelCompiler {
                 body,
                 null
         );
+    }
+
+    private TsExpression getPropertyCopy(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean, TsPropertyModel property) {
+        final TsType tsType = property.getTsType();
+        if (tsType instanceof TsType.ReferenceType) {
+            final TsType.ReferenceType referenceType = (TsType.ReferenceType) tsType;
+            final TsBeanModel referencedBean = tsModel.getBean(symbolTable.getSymbolClass(referenceType.symbol));
+            if (referencedBean != null && referencedBean.isClass()) {
+                return new TsCallExpression(
+                        new TsMemberExpression(new TsTypeReferenceExpression(referenceType), "fromData"),
+                        new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+                );
+            }
+        }
+        return new TsMemberExpression(new TsIdentifierReference("data"), property.name);
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {
