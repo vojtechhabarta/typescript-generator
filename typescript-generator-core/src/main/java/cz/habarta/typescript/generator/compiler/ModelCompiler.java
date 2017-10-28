@@ -675,6 +675,7 @@ public class ModelCompiler {
         if (!settings.experimentalJsonDeserialization) {
             return tsModel;
         }
+        tsModel.getHelpers().add(TsHelper.loadFromResource("/helpers/jsonDeserialization.ts"));
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             final List<TsMethodModel> methods = new ArrayList<>(bean.getMethods());
@@ -740,18 +741,45 @@ public class ModelCompiler {
     }
 
     private TsExpression getPropertyCopy(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean, TsPropertyModel property) {
-        final TsType tsType = property.getTsType();
+        final TsExpression copyFunction = getCopyFunctionForTsType(symbolTable, tsModel, property.getTsType());
+        if (copyFunction instanceof TsIdentifierReference) {
+            final TsIdentifierReference reference = (TsIdentifierReference) copyFunction;
+            if (reference.getIdentifier().equals("__identity")) {
+                // function degenerates to the same value (data.property)
+                return new TsMemberExpression(new TsIdentifierReference("data"), property.name);
+            }
+        }
+        return new TsCallExpression(
+                copyFunction,
+                new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+        );
+    }
+
+    private TsExpression getCopyFunctionForTsType(SymbolTable symbolTable, TsModel tsModel, TsType tsType) {
         if (tsType instanceof TsType.ReferenceType) {
             final TsType.ReferenceType referenceType = (TsType.ReferenceType) tsType;
             final TsBeanModel referencedBean = tsModel.getBean(symbolTable.getSymbolClass(referenceType.symbol));
             if (referencedBean != null && referencedBean.isClass()) {
-                return new TsCallExpression(
-                        new TsMemberExpression(new TsTypeReferenceExpression(referenceType), "fromData"),
-                        new TsMemberExpression(new TsIdentifierReference("data"), property.name)
-                );
+                // Class.fromData
+                return new TsMemberExpression(new TsTypeReferenceExpression(referenceType), "fromData");
             }
         }
-        return new TsMemberExpression(new TsIdentifierReference("data"), property.name);
+        if (tsType instanceof TsType.BasicArrayType) {
+            // __getCopyArrayFn
+            final TsType.BasicArrayType arrayType = (TsType.BasicArrayType) tsType;
+            return new TsCallExpression(
+                    new TsIdentifierReference("__getCopyArrayFn"),
+                    getCopyFunctionForTsType(symbolTable, tsModel, arrayType.elementType));
+        }
+        if (tsType instanceof TsType.IndexedArrayType) {
+            // __getCopyObjectFn
+            final TsType.IndexedArrayType objectType = (TsType.IndexedArrayType) tsType;
+            return new TsCallExpression(
+                    new TsIdentifierReference("__getCopyObjectFn"),
+                    getCopyFunctionForTsType(symbolTable, tsModel, objectType.elementType));
+        }
+        // __identity
+        return new TsIdentifierReference("__identity");
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

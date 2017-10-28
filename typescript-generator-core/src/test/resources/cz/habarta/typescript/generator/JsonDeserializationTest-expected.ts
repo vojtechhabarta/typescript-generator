@@ -24,14 +24,14 @@ export class User {
         instance.childAccount = data.childAccount;
         instance.age = data.age;
         instance.address = Address.fromData(data.address);
-        instance.addresses = __copyArray(data.addresses, Address.fromData);
-        instance.taggedAddresses = __copyObject(data.taggedAddresses, Address.fromData);
-        instance.groupedAddresses = __copyObject(data.groupedAddresses, __copyArrayFn(Address.fromData));
-        instance.listOfTaggedAddresses = __copyArray(data.listOfTaggedAddresses, __copyObjectFn(Address.fromData));
-        instance.orders = PagedList.fromData(data.orders, Order.fromData, __identity);
-        instance.allOrders = __copyArray(data.allOrders, PagedList.fromDataFn(Order.fromData, __identity));
+        instance.addresses = __getCopyArrayFn(Address.fromData)(data.addresses);
+        instance.taggedAddresses = __getCopyObjectFn(Address.fromData)(data.taggedAddresses);
+        instance.groupedAddresses = __getCopyObjectFn(__getCopyArrayFn(Address.fromData))(data.groupedAddresses);
+        instance.listOfTaggedAddresses = __getCopyArrayFn(__getCopyObjectFn(Address.fromData))(data.listOfTaggedAddresses);
+        instance.orders = PagedList.fromDataFn<Order, Authentication>(Order.fromData, __identity)(data.orders);
+        instance.allOrders = __getCopyArrayFn(PagedList.fromDataFn<Order, Authentication>(Order.fromData, __identity))(data.allOrders);
         instance.shape = Shape.fromDataUnion(data.shape);
-        instance.shapes = __copyArray(data.shapes, Shape.fromDataUnion);
+        instance.shapes = __getCopyArrayFn(Shape.fromDataUnion)(data.shapes);
         return instance;
     }
 }
@@ -178,19 +178,19 @@ export type Authentication = "Password" | "Token" | "Fingerprint" | "Voice";
 
 export type ShapeUnion = Square | Rectangle | Circle;
 
-function __copyArrayFn<T>(copyFn: (item: T) => T): (array: T[]) => T[] {
-    return (array: T[]) => __copyArray(array, copyFn);
+function __getCopyArrayFn<T>(itemCopyFn: (item: T) => T): (array: T[]) => T[] {
+    return (array: T[]) => __copyArray(array, itemCopyFn);
 }
 
-function __copyArray<T>(array: T[], copyFn: (item: T) => T): T[] {
-    return array && array.map(item => item && copyFn(item));
+function __copyArray<T>(array: T[], itemCopyFn: (item: T) => T): T[] {
+    return array && array.map(item => item && itemCopyFn(item));
 }
 
-function __copyObjectFn<T>(copyFn: (item: T) => T): (object: { [index: string]: T }) => { [index: string]: T } {
-    return (object: { [index: string]: T }) => __copyObject(object, copyFn);
+function __getCopyObjectFn<T>(itemCopyFn: (item: T) => T): (object: { [index: string]: T }) => { [index: string]: T } {
+    return (object: { [index: string]: T }) => __copyObject(object, itemCopyFn);
 }
 
-function __copyObject<T>(object: { [index: string]: T }, copyFn: (item: T) => T): { [index: string]: T } {
+function __copyObject<T>(object: { [index: string]: T }, itemCopyFn: (item: T) => T): { [index: string]: T } {
     if (!object) {
         return object;
     }
@@ -198,7 +198,7 @@ function __copyObject<T>(object: { [index: string]: T }, copyFn: (item: T) => T)
     for (const key in object) {
         if (object.hasOwnProperty(key)) {
             const value = object[key];
-            result[key] = value && copyFn(value);
+            result[key] = value && itemCopyFn(value);
         }
     }
     return result;
