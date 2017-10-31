@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.emitter.Emittable;
 import cz.habarta.typescript.generator.emitter.Emitter;
-import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
 
@@ -269,12 +268,7 @@ public abstract class TsType implements Emittable {
     }
 
     public static class Context {
-        public TsBeanModel bean;
-
-        public Context(TsBeanModel bean) {
-            this.bean = bean;
-        }
-
+        // currently not needed
     }
 
     public static interface Transformer {

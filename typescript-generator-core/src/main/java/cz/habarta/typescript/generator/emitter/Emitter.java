@@ -266,6 +266,8 @@ public class Emitter implements EmitterExtension.Writer {
                 emitExpressionStatement((TsExpressionStatement) statement);
             } else if (statement instanceof TsVariableDeclarationStatement) {
                 emitVariableDeclarationStatement((TsVariableDeclarationStatement) statement);
+            } else if (statement instanceof TsSwitchStatement) {
+                emitTsSwitchStatement((TsSwitchStatement) statement);
             }
         }
     }
@@ -304,6 +306,25 @@ public class Emitter implements EmitterExtension.Writer {
                 + (variableDeclarationStatement.getInitializer() != null ? " = " + variableDeclarationStatement.getInitializer().format(settings) : "")
                 + ";"
         );
+    }
+
+    private void emitTsSwitchStatement(TsSwitchStatement switchStatement) {
+        writeIndentedLine("switch (" + switchStatement.getExpression().format(settings) + ") {");
+        indent++;
+        for (TsSwitchCaseClause caseClause : switchStatement.getCaseClauses()) {
+            writeIndentedLine("case " + caseClause.getExpression().format(settings) + ":");
+            indent++;
+            emitStatements(caseClause.getStatements());
+            indent--;
+        }
+        if (switchStatement.getDefaultClause() != null) {
+            writeIndentedLine("default:");
+            indent++;
+            emitStatements(switchStatement.getDefaultClause());
+            indent--;
+        }
+        indent--;
+        writeIndentedLine("}");
     }
 
     private void emitTypeAlias(TsAliasModel alias, boolean exportKeyword) {
