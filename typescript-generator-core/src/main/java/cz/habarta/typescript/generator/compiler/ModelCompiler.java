@@ -1,14 +1,17 @@
-
 package cz.habarta.typescript.generator.compiler;
 
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Utils;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Compiles Java model to TypeScript model.
@@ -68,6 +71,11 @@ public class ModelCompiler {
         // dates
         tsModel = transformDates(symbolTable, tsModel);
 
+        // class enums
+        if (settings.classEnumPattern != null && !Objects.equals(settings.classEnumPattern, "")) {
+            tsModel = transformClassToEnum(tsModel);
+        }
+
         // enums
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
@@ -89,6 +97,33 @@ public class ModelCompiler {
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
         return tsModel;
+    }
+
+    private TsModel transformClassToEnum(TsModel tsModel) {
+        final List<TsBeanModel> classEnums = tsModel.getBeans()
+                .stream()
+                .filter(tsBeanModel -> tsBeanModel.getName().getSimpleName().contains(settings.classEnumPattern))
+                .collect(Collectors.toList());
+
+        List<TsEnumModel> stringEnums = new ArrayList<>();
+        for (TsBeanModel tsBeanModel : classEnums) {
+            List<EnumMemberModel> members = new ArrayList<>();
+            for (Field declaredField : tsBeanModel.getOrigin().getDeclaredFields()) {
+                if (declaredField.getType().getName().equals(tsBeanModel.getOrigin().getName())) {
+                    members.add(new EnumMemberModel(declaredField.getName(), declaredField.getName(), null));
+                }
+            }
+            TsEnumModel temp = new TsEnumModel(
+                    tsBeanModel.getOrigin(),
+                    tsBeanModel.getName(),
+                    EnumKind.StringBased,
+                    members,
+                    null
+            );
+            stringEnums.add(temp);
+        }
+
+        return tsModel.withEnums(stringEnums).withoutBeans(classEnums);
     }
 
     public TsType javaToTypeScript(Type type) {

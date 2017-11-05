@@ -48,6 +48,10 @@ public class TsModel {
         return new TsModel(beans, enums, originalStringEnums, typeAliases, helpers);
     }
 
+    public TsModel withoutBeans(List<TsBeanModel> beans) {
+        return new TsModel(Utils.removeAll(this.beans, beans), enums, originalStringEnums, typeAliases, helpers);
+    }
+
     public List<TsEnumModel> getEnums() {
         return enums;
     }

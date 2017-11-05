@@ -1,14 +1,15 @@
-
 package cz.habarta.typescript.generator.gradle;
 
 import cz.habarta.typescript.generator.*;
-import cz.habarta.typescript.generator.Input;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.gradle.api.*;
-import org.gradle.api.tasks.*;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskAction;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GenerateTask extends DefaultTask {
 
@@ -68,6 +69,7 @@ public class GenerateTask extends DefaultTask {
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
     public boolean debug;
+    public String classEnumPattern;
 
     @TaskAction
     public void generate() throws Exception {
@@ -150,6 +152,7 @@ public class GenerateTask extends DefaultTask {
                 ? getProject().file(outputFile)
                 : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
         settings.validateFileName(output);
+        settings.classEnumPattern = classEnumPattern;
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
