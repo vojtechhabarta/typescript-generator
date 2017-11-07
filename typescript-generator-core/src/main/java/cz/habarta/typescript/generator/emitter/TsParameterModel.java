@@ -1,35 +1,25 @@
 
 package cz.habarta.typescript.generator.emitter;
 
+import cz.habarta.typescript.generator.TsParameter;
 import cz.habarta.typescript.generator.TsType;
 
 
-public class TsParameterModel {
+public class TsParameterModel extends TsParameter {
 
     private final TsAccessibilityModifier accessibilityModifier;
-    private final String name;
-    private final TsType tsType;
 
     public TsParameterModel(String name, TsType tsType) {
         this(null, name, tsType);
     }
 
     public TsParameterModel(TsAccessibilityModifier accessibilityModifier, String name, TsType tsType) {
+        super(name, tsType);
         this.accessibilityModifier = accessibilityModifier;
-        this.name = name;
-        this.tsType = tsType;
     }
 
     public TsAccessibilityModifier getAccessibilityModifier() {
         return accessibilityModifier;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TsType getTsType() {
-        return tsType;
     }
 
 }

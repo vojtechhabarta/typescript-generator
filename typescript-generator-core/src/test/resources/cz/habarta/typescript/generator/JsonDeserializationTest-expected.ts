@@ -18,7 +18,7 @@ export class User {
         if (!data) {
             return data;
         }
-        const instance = target || new User(); 
+        const instance = target || new User();
         instance.name = data.name;
         instance.authentication = data.authentication;
         instance.childAccount = data.childAccount;
@@ -56,18 +56,18 @@ export class PagedList<T, A> {
     items: T[];
     additionalInfo: A;
 
-    static fromDataFn<T, A>(constructorFnT: (data: T) => T, constructorFnA: (data: A) => A): (data: PagedList<T, A>) => PagedList<T, A> {
-        return (data: PagedList<T, A>) => PagedList.fromData(data, constructorFnT, constructorFnA);
+    static fromDataFn<T, A>(constructorFnOfT: (data: T) => T, constructorFnOfA: (data: A) => A): (data: PagedList<T, A>) => PagedList<T, A> {
+        return data => PagedList.fromData(data, constructorFnOfT, constructorFnOfA);
     }
 
-    static fromData<T, A>(data: PagedList<T, A>, constructorFnT: (data: T) => T, constructorFnA: (data: A) => A, target?: PagedList<T, A>): PagedList<T, A> {
+    static fromData<T, A>(data: PagedList<T, A>, constructorFnOfT: (data: T) => T, constructorFnOfA: (data: A) => A, target?: PagedList<T, A>): PagedList<T, A> {
         if (!data) {
             return data;
         }
         const instance = target || new PagedList<T, A>();
         instance.page = data.page;
-        instance.items = __copyArray(data.items, constructorFnT);
-        instance.additionalInfo = constructorFnA(data.additionalInfo);
+        instance.items = __getCopyArrayFn(constructorFnOfT)(data.items);
+        instance.additionalInfo = constructorFnOfA(data.additionalInfo);
         return instance;
     }
 }

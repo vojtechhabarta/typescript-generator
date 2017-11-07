@@ -232,6 +232,23 @@ public abstract class TsType implements Emittable {
 
     }
 
+    public static class FunctionType extends TsType {
+
+        public final List<TsParameter> parameters;
+        public final TsType type;
+
+        public FunctionType(List<TsParameter> parameters, TsType type) {
+            this.parameters = parameters;
+            this.type = type;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return Emitter.formatParameterList(parameters, false) + " => " + type.format(settings);
+        }
+
+    }
+
     public static TsType transformTsType(Context context, TsType tsType, Transformer transformer) {
         final TsType type = transformer.transform(context, tsType);
         if (type instanceof TsType.GenericReferenceType) {
@@ -263,6 +280,14 @@ public abstract class TsType implements Emittable {
                 properties.add(new TsProperty(property.name, transformTsType(context, property.tsType, transformer)));
             }
             return new TsType.ObjectType(properties);
+        }
+        if (type instanceof TsType.FunctionType) {
+            final TsType.FunctionType functionType = (TsType.FunctionType) type;
+            final List<TsParameter> parameters = new ArrayList<>();
+            for (TsParameter parameter : functionType.parameters) {
+                parameters.add(new TsParameter(parameter.name, transformTsType(context, parameter.tsType, transformer)));
+            }
+            return new TsType.FunctionType(parameters, transformTsType(context, functionType.type, transformer));
         }
         return type;
     }

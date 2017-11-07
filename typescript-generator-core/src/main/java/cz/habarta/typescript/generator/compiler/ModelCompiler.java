@@ -688,6 +688,10 @@ public class ModelCompiler {
             if (bean.isDataClass()) {
                 final TsMethodModel deserializationMethod = createDeserializationMethod(symbolTable, tsModel, bean);
                 methods.add(0, deserializationMethod);
+                if (!bean.getTypeParameters().isEmpty()) {
+                    final TsMethodModel genericFunctionConstructor = createDeserializationGenericFunctionConstructor(symbolTable, tsModel, bean);
+                    methods.add(0, genericFunctionConstructor);
+                }
                 if (!bean.getTaggedUnionClasses().isEmpty()) {
                     final TsMethodModel unionDeserializationMethod = createDeserializationMethodForTaggedUnion(symbolTable, tsModel, bean);
                     methods.add(1, unionDeserializationMethod);
@@ -701,6 +705,14 @@ public class ModelCompiler {
     private TsMethodModel createDeserializationMethod(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
         final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
         List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+
+        final TsType.ReferenceType dataType = typeParameters.isEmpty()
+                ? new TsType.ReferenceType(beanIdentifier)
+                : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
+        final List<TsParameterModel> parameters = new ArrayList<>();
+        parameters.add(new TsParameterModel("data", dataType));
+        parameters.addAll(getConstructorFnOfParameters(typeParameters));
+        parameters.add(new TsParameterModel("target", dataType.optional()));
 
         final List<TsStatement> body = new ArrayList<>();
         body.add(ifUndefinedThenReturnItStatement("data"));
@@ -734,22 +746,65 @@ public class ModelCompiler {
         }
         body.add(new TsReturnStatement(new TsIdentifierReference("instance")));
 
-        final TsType.ReferenceType dataType = typeParameters.isEmpty()
-                ? new TsType.ReferenceType(beanIdentifier)
-                : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
         return new TsMethodModel(
                 "fromData",
                 TsModifierFlags.None.setStatic(),
                 typeParameters,
-                Arrays.asList(new TsParameterModel("data", dataType), new TsParameterModel("target", dataType.optional())),
+                parameters,
                 dataType,
                 body,
                 null
         );
     }
 
+    private TsMethodModel createDeserializationGenericFunctionConstructor(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+        final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
+        List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+        final TsType.ReferenceType dataType = new TsType.GenericReferenceType(beanIdentifier, typeParameters);
+
+        final List<TsParameterModel> constructorFnOfParameters = getConstructorFnOfParameters(typeParameters);
+        final List<TsExpression> arguments = new ArrayList<>();
+        arguments.add(new TsIdentifierReference("data"));
+        for (TsParameterModel constructorFnOfParameter : constructorFnOfParameters) {
+            arguments.add(new TsIdentifierReference(constructorFnOfParameter.name));
+        }
+        final List<TsStatement> body = new ArrayList<>();
+        body.add(new TsReturnStatement(
+                new TsArrowFunction(
+                        Arrays.asList(new TsParameter("data", null)),
+                        new TsCallExpression(
+                                new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), "fromData"),
+                                null,
+                                arguments
+                        )
+                )
+        ));
+
+        return new TsMethodModel(
+                "fromDataFn",
+                TsModifierFlags.None.setStatic(),
+                typeParameters,
+                constructorFnOfParameters,
+                new TsType.FunctionType(Arrays.asList(new TsParameter("data", dataType)), dataType),
+                body,
+                null
+        );
+    }
+
+    private List<TsParameterModel> getConstructorFnOfParameters(List<TsType.GenericVariableType> typeParameters) {
+        final List<TsParameterModel> parameters = new ArrayList<>();
+        for (TsType.GenericVariableType typeParameter : typeParameters) {
+            parameters.add(new TsParameterModel(
+                    "constructorFnOf" + typeParameter.name,
+                    new TsType.FunctionType(Arrays.asList(new TsParameter("data", typeParameter)), typeParameter)
+            ));
+        }
+        return parameters;
+    }
+
     private static TsIfStatement ifUndefinedThenReturnItStatement(String identifier) {
-        return new TsIfStatement(new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference(identifier)),
+        return new TsIfStatement(
+                new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference(identifier)),
                 Arrays.<TsStatement>asList(new TsReturnStatement(new TsIdentifierReference(identifier)))
         );
     }
@@ -770,6 +825,19 @@ public class ModelCompiler {
     }
 
     private TsExpression getCopyFunctionForTsType(SymbolTable symbolTable, TsModel tsModel, TsType tsType) {
+        if (tsType instanceof TsType.GenericReferenceType) {
+            final TsType.GenericReferenceType genericReferenceType = (TsType.GenericReferenceType) tsType;
+            // Class.fromDataFn<T1...>(constructorFnOfT1...)
+            final List<TsExpression> arguments = new ArrayList<>();
+            for (TsType typeArgument : genericReferenceType.typeArguments) {
+                arguments.add(getCopyFunctionForTsType(symbolTable, tsModel, typeArgument));
+            }
+            return new TsCallExpression(
+                    new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(genericReferenceType.symbol)), "fromDataFn"),
+                    genericReferenceType.typeArguments,
+                    arguments
+            );
+        }
         if (tsType instanceof TsType.ReferenceType) {
             final TsType.ReferenceType referenceType = (TsType.ReferenceType) tsType;
             final TsBeanModel referencedBean = tsModel.getBean(symbolTable.getSymbolClass(referenceType.symbol));
@@ -788,14 +856,21 @@ public class ModelCompiler {
             final TsType.BasicArrayType arrayType = (TsType.BasicArrayType) tsType;
             return new TsCallExpression(
                     new TsIdentifierReference("__getCopyArrayFn"),
-                    getCopyFunctionForTsType(symbolTable, tsModel, arrayType.elementType));
+                    getCopyFunctionForTsType(symbolTable, tsModel, arrayType.elementType)
+            );
         }
         if (tsType instanceof TsType.IndexedArrayType) {
             // __getCopyObjectFn
             final TsType.IndexedArrayType objectType = (TsType.IndexedArrayType) tsType;
             return new TsCallExpression(
                     new TsIdentifierReference("__getCopyObjectFn"),
-                    getCopyFunctionForTsType(symbolTable, tsModel, objectType.elementType));
+                    getCopyFunctionForTsType(symbolTable, tsModel, objectType.elementType)
+            );
+        }
+        if (tsType instanceof TsType.GenericVariableType) {
+            // constructorFnOfT
+            final TsType.GenericVariableType genericVariableType = (TsType.GenericVariableType) tsType;
+            return new TsIdentifierReference("constructorFnOf" + genericVariableType.name);
         }
         // __identity
         return new TsIdentifierReference("__identity");
