@@ -11,7 +11,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Compiles Java model to TypeScript model.
@@ -100,10 +99,13 @@ public class ModelCompiler {
     }
 
     private TsModel transformClassToEnum(TsModel tsModel) {
-        final List<TsBeanModel> classEnums = tsModel.getBeans()
-                .stream()
-                .filter(tsBeanModel -> tsBeanModel.getName().getSimpleName().contains(settings.classEnumPattern))
-                .collect(Collectors.toList());
+        List<TsBeanModel> beans = tsModel.getBeans();
+
+        List<TsBeanModel> classEnums = new ArrayList<TsBeanModel>();
+        for (TsBeanModel bean : beans) {
+            if (bean.getName().getSimpleName().contains(settings.classEnumPattern))
+                classEnums.add(bean);
+        }
 
         List<TsEnumModel> stringEnums = new ArrayList<>();
         for (TsBeanModel tsBeanModel : classEnums) {

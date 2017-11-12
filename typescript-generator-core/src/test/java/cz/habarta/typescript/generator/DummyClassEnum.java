@@ -2,11 +2,9 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.EqualsAndHashCode;
 
 import java.util.Objects;
 
-@EqualsAndHashCode
 public class DummyClassEnum {
 
     public static final DummyClassEnum ATYPE  = new DummyClassEnum("ATYPE");
