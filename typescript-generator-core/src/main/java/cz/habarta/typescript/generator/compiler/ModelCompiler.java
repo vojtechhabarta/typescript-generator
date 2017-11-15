@@ -40,8 +40,13 @@ public class ModelCompiler {
         this.typeProcessor = typeProcessor;
     }
 
+    public enum TransformationPhase {
+        BeforeEnums
+    }
+
     public TsModel javaToTypeScript(Model model) {
         final SymbolTable symbolTable = new SymbolTable(settings);
+        final List<Extension.TransformerDefinition> extensionTransformers = getExtensionTransformers();
         TsModel tsModel = processModel(symbolTable, model);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
@@ -69,6 +74,7 @@ public class ModelCompiler {
         tsModel = transformDates(symbolTable, tsModel);
 
         // enums
+        tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
                 tsModel = transformEnumsToUnions(tsModel);
@@ -89,6 +95,26 @@ public class ModelCompiler {
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
         return tsModel;
+    }
+
+    private List<Extension.TransformerDefinition> getExtensionTransformers() {
+        final List<Extension.TransformerDefinition> transformers = new ArrayList<>();
+        for (EmitterExtension emitterExtension : settings.extensions) {
+            if (emitterExtension instanceof Extension) {
+                final Extension extension = (Extension) emitterExtension;
+                transformers.addAll(extension.getTransformers());
+            }
+        }
+        return transformers;
+    }
+
+    private static TsModel applyExtensionTransformers(SymbolTable symbolTable, TsModel model, TransformationPhase phase, List<Extension.TransformerDefinition> transformerDefinitions) {
+        for (Extension.TransformerDefinition definition : transformerDefinitions) {
+            if (definition.phase == phase) {
+                model = definition.transformer.transformModel(symbolTable, model);
+            }
+        }
+        return model;
     }
 
     public TsType javaToTypeScript(Type type) {

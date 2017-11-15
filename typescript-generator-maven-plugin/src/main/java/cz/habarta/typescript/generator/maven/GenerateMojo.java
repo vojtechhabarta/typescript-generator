@@ -401,9 +401,22 @@ public class GenerateMojo extends AbstractMojo {
      *   - generates type-safe property path getters</li>
      * <li><code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
      * </ul>
+     * Parameter {@link #extensionsWithConfiguration} can be used in case extension needs some configuration.
      */
     @Parameter
     private List<String> extensions;
+
+    /**
+     * List of extensions with their configurations.
+     * This parameter has the same purpose as {@link #extensions} parameter.
+     * Each item of this list has
+     * <ul>
+     * <li><code>className</code> - required fully-qualified class name of the extension</li>
+     * <li><code>configuration</code> - optional <code>Map</code> with <code>String</code> keys and <code>String</code> values</li>
+     * </ul>
+     */
+    @Parameter
+    private List<Settings.ConfiguredExtension> extensionsWithConfiguration;
 
     /**
      * The presence of any annotation in this list on a JSON property will cause
@@ -546,7 +559,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
             settings.javadocXmlFiles = javadocXmlFiles;
-            settings.loadExtensions(classLoader, extensions);
+            settings.loadExtensions(classLoader, extensions, extensionsWithConfiguration);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.generateNpmPackageJson = generateNpmPackageJson;

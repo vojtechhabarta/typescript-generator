@@ -159,6 +159,10 @@ public class Utils {
         return list != null ? list : Collections.<T>emptyList();
     }
 
+    public static <K, V> Map<K, V> mapFromNullable(Map<K, V> map) {
+        return map != null ? map : Collections.<K, V>emptyMap();
+    }
+
     public static <T> List<T> removeNulls(List<T> list) {
         final ArrayList<T> result = new ArrayList<>(list);
         result.removeAll(Collections.singleton(null));

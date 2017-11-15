@@ -107,10 +107,22 @@ public class Emitter implements EmitterExtension.Writer {
         emitLiteralEnums(model, exportKeyword, declareKeyword);
         emitHelpers(model);
         for (EmitterExtension emitterExtension : settings.extensions) {
-            writeNewLine();
-            writeNewLine();
-            writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
-            emitterExtension.emitElements(this, settings, exportKeyword, model);
+            final List<String> extensionLines = new ArrayList<>();
+            final EmitterExtension.Writer extensionWriter = new EmitterExtension.Writer() {
+                @Override
+                public void writeIndentedLine(String line) {
+                    extensionLines.add(line);
+                }
+            };
+            emitterExtension.emitElements(extensionWriter, settings, exportKeyword, model);
+            if (!extensionLines.isEmpty()) {
+                writeNewLine();
+                writeNewLine();
+                writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
+                for (String line : extensionLines) {
+                    this.writeIndentedLine(line);
+                }
+            }
         }
     }
 

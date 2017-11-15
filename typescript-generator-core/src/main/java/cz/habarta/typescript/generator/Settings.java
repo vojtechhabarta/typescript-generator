@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.util.Predicate;
+import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.net.URL;
@@ -79,6 +80,10 @@ public class Settings {
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
+    public static class ConfiguredExtension {
+        public String className;
+        public Map<String, String> configuration;
+    }
 
     private static class TypeScriptGeneratorURLClassLoader extends URLClassLoader {
 
@@ -114,9 +119,17 @@ public class Settings {
         }
     }
 
-    public void loadExtensions(ClassLoader classLoader, List<String> extensions) {
+    public void loadExtensions(ClassLoader classLoader, List<String> extensions, List<Settings.ConfiguredExtension> extensionsWithConfiguration) {
+        this.extensions = new ArrayList<>();
         if (extensions != null) {
-            this.extensions = loadInstances(classLoader, extensions, EmitterExtension.class);
+            this.extensions.addAll(loadInstances(classLoader, extensions, Extension.class));
+        }
+        if (extensionsWithConfiguration != null) {
+            for (ConfiguredExtension configuredExtension : extensionsWithConfiguration) {
+                final Extension extension = loadInstance(classLoader, configuredExtension.className, Extension.class);
+                extension.setConfiguration(Utils.mapFromNullable(configuredExtension.configuration));
+                this.extensions.add(extension);
+            }
         }
     }
 

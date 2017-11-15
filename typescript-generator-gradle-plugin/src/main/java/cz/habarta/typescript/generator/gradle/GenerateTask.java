@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.gradle;
 
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.Input;
+import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -57,6 +58,8 @@ public class GenerateTask extends DefaultTask {
     public boolean noFileComment;
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
+    public List<String> extensions;
+    public List<Settings.ConfiguredExtension> extensionsWithConfiguration;
     public List<String> optionalAnnotations;
     public boolean generateNpmPackageJson;
     public String npmName;
@@ -133,7 +136,7 @@ public class GenerateTask extends DefaultTask {
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
         settings.javadocXmlFiles = javadocXmlFiles;
-        settings.loadExtensions(classLoader, extensionClasses);
+        settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.generateNpmPackageJson = generateNpmPackageJson;
