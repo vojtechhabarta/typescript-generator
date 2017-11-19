@@ -29,3 +29,7 @@ nbactions.xml
 
 # VS Code
 .vscode
+
+# generated files
+typescript-generator-core/src/test/**/*.js
+typescript-generator-core/src/test/**/*.js.map

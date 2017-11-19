@@ -1,0 +1,75 @@
+{
+    "name": "name1",
+    "authentication": "Password",
+    "childAccount": true,
+    "age": 42,
+    "address": {
+        "street": "street1",
+        "city": "city1"
+    },
+    "addresses": [
+        {
+            "street": "street2",
+            "city": "city2"
+        }
+    ],
+    "taggedAddresses": {
+        "address3": {
+            "street": "street3",
+            "city": "city3"
+        }
+    },
+    "groupedAddresses": {
+        "addresses4": [
+            {
+                "street": "street5",
+                "city": "city5"
+            }
+        ]
+    },
+    "listOfTaggedAddresses": [
+        {
+            "address6": {
+                "street": "street6",
+                "city": "city6"
+            }
+        }
+    ],
+    "orders": {
+        "page": 7,
+        "items": [
+            {
+                "id": "id7"
+            }
+        ],
+        "additionalInfo": "Token"
+    },
+    "allOrders": [
+        {
+            "page": 8,
+            "items": [
+                {
+                    "id": "id8"
+                }
+            ],
+            "additionalInfo": "Fingerprint"
+        }
+    ],
+    "shape": {
+        "kind": "square",
+        "metadata": {
+            "group": "group9"
+        },
+        "size": 9
+    },
+    "shapes": [
+        {
+            "kind": "rectangle",
+            "metadata": {
+                "group": "group10"
+            },
+            "width": 10,
+            "height": 10
+        }
+    ]
+}

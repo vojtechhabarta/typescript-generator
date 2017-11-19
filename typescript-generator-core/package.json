@@ -1,0 +1,11 @@
+{
+  "name": "typescript-generator-core",
+  "version": "1.0.0",
+  "description": "Support for tests",
+  "scripts": {
+    "test": "npm run ModulesAndNamespacesTest && npm run JsonDeserializationTest",
+    "ModulesAndNamespacesTest": "tsc -p src/test/ts/tsconfig.json",
+    "JsonDeserializationTest": "tsc -p src/test/ts/JsonDeserializationTest/tsconfig.json && node src/test/ts/JsonDeserializationTest/JsonDeserializationTest-expected-test.js"
+  },
+  "license": "ISC"
+}

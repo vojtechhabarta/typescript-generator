@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -45,6 +46,7 @@ public class JsonDeserializationTest {
         for (String notFoundLine : notFoundLines) {
             System.out.println(notFoundLine);
         }
+        Assert.assertEquals(0, notFoundLines.size());
     }
 
     private static class User {
