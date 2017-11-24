@@ -91,6 +91,7 @@ public class ModelCompiler {
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
         tsModel = createDeserializationMethods(symbolTable, tsModel);
+        tsModel = useDeserializationMethodsInJaxrs(symbolTable, tsModel);
 
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
@@ -399,16 +400,18 @@ public class ModelCompiler {
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
 
         // HttpClient interface
+        final TsType.GenericVariableType returnGenericVariable = new TsType.GenericVariableType("R");
         tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.ServicePrerequisite, false, httpClientSymbol, typeParameters, null, null, null, null, Arrays.asList(
-                new TsMethodModel("request", TsModifierFlags.None, null, Arrays.asList(
+                new TsMethodModel("request", TsModifierFlags.None, Arrays.asList(returnGenericVariable), Arrays.asList(
                         new TsParameterModel("requestConfig", new TsType.ObjectType(
                                 new TsProperty("method", TsType.String),
                                 new TsProperty("url", TsType.String),
                                 new TsProperty("queryParams", new TsType.OptionalType(TsType.Any)),
                                 new TsProperty("data", new TsType.OptionalType(TsType.Any)),
+                                new TsProperty("copyFn", new TsType.OptionalType(new TsType.FunctionType(Arrays.asList(new TsParameter("data", returnGenericVariable)), returnGenericVariable))),
                                 optionsType != null ? new TsProperty("options", new TsType.OptionalType(optionsType)) : null
                         ))
-                ), new TsType.GenericReferenceType(responseSymbol, TsType.Any), null, null)
+                ), new TsType.GenericReferenceType(responseSymbol, returnGenericVariable), null, null)
         ), null));
 
         // application client classes
@@ -710,8 +713,8 @@ public class ModelCompiler {
         tsModel.getHelpers().add(TsHelper.loadFromResource("/helpers/jsonDeserialization.ts"));
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
-            final List<TsMethodModel> methods = new ArrayList<>(bean.getMethods());
             if (bean.isDataClass()) {
+                final List<TsMethodModel> methods = new ArrayList<>(bean.getMethods());
                 final TsMethodModel deserializationMethod = createDeserializationMethod(symbolTable, tsModel, bean);
                 methods.add(0, deserializationMethod);
                 if (!bean.getTypeParameters().isEmpty()) {
@@ -722,8 +725,10 @@ public class ModelCompiler {
                     final TsMethodModel unionDeserializationMethod = createDeserializationMethodForTaggedUnion(symbolTable, tsModel, bean);
                     methods.add(1, unionDeserializationMethod);
                 }
+                beans.add(bean.withMethods(methods));
+            } else {
+                beans.add(bean);
             }
-            beans.add(bean.withMethods(methods));
         }
         return tsModel.withBeans(beans);
     }
@@ -934,6 +939,58 @@ public class ModelCompiler {
                 body,
                 null
         );
+    }
+
+    private TsModel useDeserializationMethodsInJaxrs(SymbolTable symbolTable, TsModel tsModel) {
+        if (!settings.experimentalJsonDeserialization) {
+            return tsModel;
+        }
+        final List<TsBeanModel> beans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            if (bean.isJaxrsApplicationClientBean()) {
+                final List<TsMethodModel> methods = new ArrayList<>();
+                for (TsMethodModel method : bean.getMethods()) {
+                    final TsMethodModel changedMethod = addCopyFnToJaxrsMethod(symbolTable, tsModel, method);
+                    methods.add(changedMethod != null ? changedMethod : method);
+                }
+                beans.add(bean.withMethods(methods));
+            } else {
+                beans.add(bean);
+            }
+        }
+        return tsModel.withBeans(beans);
+    }
+
+    private TsMethodModel addCopyFnToJaxrsMethod(SymbolTable symbolTable, TsModel tsModel, TsMethodModel method) {
+        final TsType returnType = method.getReturnType();
+        if (!(returnType instanceof TsType.GenericReferenceType)) return null;
+        final TsType.GenericReferenceType genericReferenceReturnType = (TsType.GenericReferenceType) returnType;
+        if (genericReferenceReturnType.symbol != symbolTable.getSyntheticSymbol("RestResponse")) return null;
+        final List<TsType> typeArguments = genericReferenceReturnType.typeArguments;
+        if (typeArguments == null || typeArguments.size() != 1) return null;
+        final TsType returnDataType = typeArguments.get(0);
+        final List<TsStatement> body = method.getBody();
+        if (body == null || body.size() != 1) return null;
+        final TsStatement statement = body.get(0);
+        if (!(statement instanceof TsReturnStatement)) return null;
+        final TsReturnStatement returnStatement = (TsReturnStatement) statement;
+        final TsExpression returnExpression = returnStatement.getExpression();
+        if (returnExpression == null) return null;
+        if (!(returnExpression instanceof TsCallExpression)) return null;
+        final TsCallExpression callExpression = (TsCallExpression) returnExpression;
+        final List<TsExpression> arguments = callExpression.getArguments();
+        if (arguments == null || arguments.isEmpty()) return null;
+        final TsExpression firstArgument = arguments.get(0);
+        if (!(firstArgument instanceof TsObjectLiteral)) return null;
+        final TsObjectLiteral objectLiteral = (TsObjectLiteral) firstArgument;
+
+        // todo create changed method instead of modifying existing
+        final int index = Math.max(objectLiteral.getPropertyDefinitions().size() - 1, 0);
+        final TsExpression copyFunction = returnDataType == TsType.Void
+                ? TsIdentifierReference.Undefined
+                : getCopyFunctionForTsType(symbolTable, tsModel, returnDataType);
+        objectLiteral.getPropertyDefinitions().add(index, new TsPropertyDefinition("copyFn", copyFunction));
+        return method;
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

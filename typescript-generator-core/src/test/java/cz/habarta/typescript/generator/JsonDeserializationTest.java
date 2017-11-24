@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import cz.habarta.typescript.generator.ext.AxiosClientExtension;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,23 @@ public class JsonDeserializationTest {
             System.out.println(notFoundLine);
         }
         Assert.assertEquals(0, notFoundLines.size());
+    }
+
+    @Test
+    public void jaxrsApplicationClientTest() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.outputKind = TypeScriptOutputKind.module;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateJaxrsApplicationClient = true;
+        settings.experimentalJsonDeserialization = true;
+        settings.extensions.add(new AxiosClientExtension());
+//        final File actualFile = new File("target/JaxrsWithJsonDeserialization-actual.ts");
+//        new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class), Output.to(actualFile));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
+        Assert.assertTrue(output.contains("copyFn: Organization.fromData"));
+        Assert.assertTrue(output.contains("copyFn: undefined"));
+        Assert.assertTrue(output.contains("copyFn: __getCopyArrayFn(Organization.fromData)"));
     }
 
     private static class User {
@@ -113,4 +131,5 @@ public class JsonDeserializationTest {
     private static class ShapeMetadata {
         public String group;
     }
+
 }

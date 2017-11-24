@@ -36,7 +36,7 @@ public class AxiosClientExtensionTest {
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<Axios.GenericAxiosResponse<R>>"));
 
         Assert.assertTrue(errorMessage, output.contains("class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig>"));
-        Assert.assertTrue(errorMessage, output.contains("request(requestConfig: { method: string; url: string; queryParams?: any; data?: any; options?: Axios.AxiosRequestConfig; }): RestResponse<any>"));
+        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: Axios.AxiosRequestConfig; }): RestResponse<R>"));
         Assert.assertTrue(errorMessage, output.contains("class AxiosOrganizationsResourceClient extends OrganizationsResourceClient<Axios.AxiosRequestConfig>"));
         Assert.assertTrue(errorMessage, output.contains("class AxiosPersonResourceClient extends PersonResourceClient<Axios.AxiosRequestConfig>"));
         Assert.assertTrue(errorMessage, output.contains("constructor(baseURL: string, axiosInstance: Axios.AxiosInstance = axios.create())"));

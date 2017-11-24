@@ -320,7 +320,7 @@ public class JaxrsApplicationTest {
         final String errorMessage = "Unexpected output: " + output;
         // HttpClient
         Assert.assertTrue(errorMessage, output.contains("interface HttpClient"));
-        Assert.assertTrue(errorMessage, output.contains("request(requestConfig: { method: string; url: string; queryParams?: any; data?: any; }): RestResponse<any>;"));
+        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; }): RestResponse<R>;"));
         // application client
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
@@ -340,7 +340,7 @@ public class JaxrsApplicationTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         // HttpClient
-        Assert.assertTrue(errorMessage, output.contains("request(requestConfig: { method: string; url: string; queryParams?: any; data?: any; options?: AxiosRequestConfig; }): RestResponse<any>;"));
+        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: AxiosRequestConfig; }): RestResponse<R>;"));
         // application client
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number, options?: AxiosRequestConfig): RestResponse<Person>"));
