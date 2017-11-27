@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import cz.habarta.typescript.generator.ext.AxiosClientExtension;
+import cz.habarta.typescript.generator.ext.JsonDeserializationExtension;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class JsonDeserializationTest {
         settings.outputKind = TypeScriptOutputKind.module;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.mapClasses = ClassMapping.asClasses;
-        settings.experimentalJsonDeserialization = true;
+        settings.extensions.add(new JsonDeserializationExtension());
         final File actualFile = new File("target/JsonDeserializationTest-actual.ts");
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(User.class), Output.to(actualFile));
         final List<String> actualLines = Files.readAllLines(actualFile.toPath(), StandardCharsets.UTF_8);
@@ -56,8 +57,7 @@ public class JsonDeserializationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
         settings.mapClasses = ClassMapping.asClasses;
-        settings.generateJaxrsApplicationClient = true;
-        settings.experimentalJsonDeserialization = true;
+        settings.extensions.add(new JsonDeserializationExtension(/*useJsonDeserializationInJaxrsApplicationClient*/true));
         settings.extensions.add(new AxiosClientExtension());
 //        final File actualFile = new File("target/JaxrsWithJsonDeserialization-actual.ts");
 //        new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class), Output.to(actualFile));
