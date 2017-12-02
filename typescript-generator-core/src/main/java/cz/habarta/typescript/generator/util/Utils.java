@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Utils {
@@ -206,6 +208,49 @@ public class Utils {
         final int dotIndex = name.lastIndexOf(".");
         final int index = dotIndex != -1 ? dotIndex : name.length();
         return new File(file.getParent(), name.substring(0, index) + newExtension);
+    }
+
+    public static boolean classNameMatches(String className, List<Pattern> regexps) {
+        for (Pattern regexp : regexps) {
+            if (regexp.matcher(className).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Pattern> globsToRegexps(List<String> globs) {
+        if (globs == null) {
+            return null;
+        }
+        final List<Pattern> regexps = new ArrayList<>();
+        for (String glob : globs) {
+            regexps.add(globToRegexp(glob));
+        }
+        return regexps;
+    }
+
+    /**
+     * Creates regexp for glob pattern.
+     * Replaces "*" with "[^.\$]*" and "**" with ".*".
+     */
+    private static Pattern globToRegexp(String glob) {
+        final Pattern globToRegexpPattern = Pattern.compile("(\\*\\*)|(\\*)");
+        final Matcher matcher = globToRegexpPattern.matcher(glob);
+        final StringBuffer sb = new StringBuffer();
+        int lastEnd = 0;
+        while (matcher.find()) {
+            sb.append(Pattern.quote(glob.substring(lastEnd, matcher.start())));
+            if (matcher.group(1) != null) {
+                sb.append(Matcher.quoteReplacement(".*"));
+            }
+            if (matcher.group(2) != null) {
+                sb.append(Matcher.quoteReplacement("[^.$]*"));
+            }
+            lastEnd = matcher.end();
+        }
+        sb.append(Pattern.quote(glob.substring(lastEnd, glob.length())));
+        return Pattern.compile(sb.toString());
     }
 
 }

@@ -3,12 +3,12 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
+import cz.habarta.typescript.generator.util.Utils;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import java.lang.reflect.*;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -128,54 +128,14 @@ public class Input {
     }
 
     static List<String> filterClassNames(List<String> classNames, List<String> globs) {
-        final List<Pattern> regexps = globsToRegexps(globs);
+        final List<Pattern> regexps = Utils.globsToRegexps(globs);
         final List<String> result = new ArrayList<>();
         for (String className : classNames) {
-            if (classNameMatches(className, regexps)) {
+            if (Utils.classNameMatches(className, regexps)) {
                 result.add(className);
             }
         }
         return result;
-    }
-
-    static boolean classNameMatches(String className, List<Pattern> regexps) {
-        for (Pattern regexp : regexps) {
-            if (regexp.matcher(className).matches()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static List<Pattern> globsToRegexps(List<String> globs) {
-        final List<Pattern> regexps = new ArrayList<>();
-        for (String glob : globs) {
-            regexps.add(globToRegexp(glob));
-        }
-        return regexps;
-    }
-
-    /**
-     * Creates regexp for glob pattern.
-     * Replaces "*" with "[^.\$]*" and "**" with ".*".
-     */
-    static Pattern globToRegexp(String glob) {
-        final Pattern globToRegexpPattern = Pattern.compile("(\\*\\*)|(\\*)");
-        final Matcher matcher = globToRegexpPattern.matcher(glob);
-        final StringBuffer sb = new StringBuffer();
-        int lastEnd = 0;
-        while (matcher.find()) {
-            sb.append(Pattern.quote(glob.substring(lastEnd, matcher.start())));
-            if (matcher.group(1) != null) {
-                sb.append(Matcher.quoteReplacement(".*"));
-            }
-            if (matcher.group(2) != null) {
-                sb.append(Matcher.quoteReplacement("[^.$]*"));
-            }
-            lastEnd = matcher.end();
-        }
-        sb.append(Pattern.quote(glob.substring(lastEnd, glob.length())));
-        return Pattern.compile(sb.toString());
     }
 
 }

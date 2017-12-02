@@ -63,10 +63,4 @@ public class InputTest {
         Assert.assertTrue(!result3.contains("cz.habarta.CCC$Json"));
     }
 
-    @Test
-    public void testGlobToRegexp() {
-        Assert.assertEquals("\\Q\\E.*\\QJson\\E", Input.globToRegexp("**Json").toString());
-        Assert.assertEquals("\\Qcz.habarta.test.\\E[^.\\$]*\\Q\\E", Input.globToRegexp("cz.habarta.test.*").toString());
-    }
-
 }

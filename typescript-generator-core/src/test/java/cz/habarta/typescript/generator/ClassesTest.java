@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -132,6 +133,135 @@ public class ClassesTest {
 
     private static abstract class Q5 extends Q3 implements Q2, Q4 {
         public abstract String getQ5();
+    }
+
+
+    @Test
+    public void testClassPatterns1() {
+        testClassPatterns(
+                Arrays.asList(
+                        "**Bc",
+                        "**Bi",
+                        "**Derived1",
+                        "**Derived2"
+                ),
+                ""
+                + "class Bc {\n"
+                + "    x: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "class Derived1 extends Bc implements Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "class Derived2 extends Derived1 {\n"
+                + "}"
+        );
+    }
+
+    @Test
+    public void testClassPatterns2() {
+        testClassPatterns(
+                Arrays.asList(
+                        "**Derived1",
+                        "**Derived2"
+                ),
+                ""
+                + "interface Bc {\n"
+                + "    x: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "class Derived1 implements Bc, Bi {\n"
+                + "    x: string;\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "class Derived2 extends Derived1 {\n"
+                + "}"
+        );
+    }
+
+    @Test
+    public void testClassPatterns3() {
+        testClassPatterns(
+                Arrays.asList(
+                        "**Bc",
+                        "**Derived2"
+                ),
+                ""
+                + "class Bc {\n"
+                + "    x: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Derived1 extends Bc, Bi {\n"
+                + "}\n"
+                + "\n"
+                + "class Derived2 implements Derived1 {\n"
+                + "    x: string;\n"
+                + "    y: string;\n"
+                + "}"
+        );
+    }
+
+    @Test
+    public void testClassPatterns4() {
+        testClassPatterns(
+                Arrays.asList(
+                        "**Bc",
+                        "**Derived1"
+                ),
+                ""
+                + "class Bc {\n"
+                + "    x: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "class Derived1 extends Bc implements Bi {\n"
+                + "    y: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Derived2 extends Derived1 {\n"
+                + "}"
+        );
+    }
+
+    private static void testClassPatterns(List<String> mapClassesAsClassesPatterns, String expected) {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Bc.class, Bi.class, Derived1.class, Derived2.class));
+        System.out.println(output);
+        Assert.assertEquals(expected.replace('\'', '"').trim(), output.trim());
+    }
+
+    private static abstract class Bc {
+        public abstract String getX();
+    }
+
+    private static abstract interface Bi {
+        public abstract String getY();
+    }
+
+    private static abstract class Derived1 extends Bc implements Bi {
+    }
+
+    private static abstract class Derived2 extends Derived1 {
     }
 
 }

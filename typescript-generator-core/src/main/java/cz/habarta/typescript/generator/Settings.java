@@ -48,6 +48,8 @@ public class Settings {
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public boolean nonConstEnums = false;
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
+    public List<String> mapClassesAsClassesPatterns;
+    private Predicate<String> mapClassesAsClassesFilter = null;
     public boolean disableTaggedUnions = false;
     public boolean ignoreSwaggerAnnotations = false;
     public boolean generateJaxrsApplicationInterface = false;
@@ -230,6 +232,9 @@ public class Settings {
         if (mapClasses == ClassMapping.asClasses && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'mapClasses' parameter is set to 'asClasses' which generates runtime code but 'outputFileType' parameter is not set to 'implementationFile'.");
         }
+        if (mapClassesAsClassesPatterns != null && mapClasses != ClassMapping.asClasses) {
+            throw new RuntimeException("'mapClassesAsClassesPatterns' parameter can only be used when 'mapClasses' parameter is set to 'asClasses'.");
+        }
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
@@ -308,13 +313,27 @@ public class Settings {
 
     public static Predicate<String> createExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
         final Set<String> names = new LinkedHashSet<>(excludedClasses != null ? excludedClasses : Collections.<String>emptyList());
-        final List<Pattern> patterns = Input.globsToRegexps(excludedClassPatterns != null ? excludedClassPatterns : Collections.<String>emptyList());
+        final List<Pattern> patterns = Utils.globsToRegexps(excludedClassPatterns != null ? excludedClassPatterns : Collections.<String>emptyList());
         return new Predicate<String>() {
             @Override
             public boolean test(String className) {
-                return names.contains(className) || Input.classNameMatches(className, patterns);
+                return names.contains(className) || Utils.classNameMatches(className, patterns);
             }
         };
+    }
+
+    public Predicate<String> getMapClassesAsClassesFilter() {
+        if (mapClassesAsClassesFilter == null) {
+            final List<Pattern> patterns = Utils.globsToRegexps(mapClassesAsClassesPatterns);
+            mapClassesAsClassesFilter = new Predicate<String>() {
+                @Override
+                public boolean test(String className) {
+                    return mapClasses == ClassMapping.asClasses &&
+                            (patterns == null || Utils.classNameMatches(className, patterns));
+                }
+            };
+        }
+        return mapClassesAsClassesFilter;
     }
 
     public void setJaxrsNamespacingAnnotation(ClassLoader classLoader, String jaxrsNamespacingAnnotation) {

@@ -273,7 +273,8 @@ public class GenerateMojo extends AbstractMojo {
     private boolean nonConstEnums;
 
     /**
-     * Specifies whether classes will be mapped to classes or interfaces.
+     * Specifies whether Java classes will be mapped to TypeScript classes or interfaces.
+     * Java interfaces are always mapped as TypeScript interfaces.
      * Supported values are:
      * <ul>
      * <li><code>asInterfaces</code></li>
@@ -281,9 +282,19 @@ public class GenerateMojo extends AbstractMojo {
      * </ul>
      * Default value is <code>asInterfaces</code>.<br>
      * Value <code>asClasses</code> can only be used in implementation files (.ts).
+     * It is also possible to generate mix of classes and interfaces by setting this parameter to <code>asClasses</code> value
+     * and specifying which classes should be mapped as classes using <code>mapClassesAsClassesPatterns</code> parameter.
      */
     @Parameter
     private ClassMapping mapClasses;
+
+    /**
+     * Specifies which Java classes should be mapped as TypeScript classes.
+     * Classes which are matched by any of these patters are mapped as classes otherwise they are mapped as interfaces.
+     * This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.
+     */
+    @Parameter
+    private List<String> mapClassesAsClassesPatterns;
 
     /**
      * If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types.
@@ -546,6 +557,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapEnum = mapEnum;
             settings.nonConstEnums = nonConstEnums;
             settings.mapClasses = mapClasses;
+            settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
             settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;

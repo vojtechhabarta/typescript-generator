@@ -317,7 +317,6 @@ public class TaggedUnionsTest {
     public void testIdClass() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Car.class));
-        System.out.println(output);
         final String expected = (
                 "\n" +
                 "interface Car {\n" +

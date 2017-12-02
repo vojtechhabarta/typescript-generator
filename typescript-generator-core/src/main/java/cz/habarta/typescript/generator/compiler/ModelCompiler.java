@@ -159,10 +159,20 @@ public class ModelCompiler {
     }
 
     private <T> TsBeanModel processBean(SymbolTable symbolTable, Model model, Map<Type, List<BeanModel>> children, BeanModel bean) {
-        TsType parentType = typeFromJava(symbolTable, bean.getParent());
-        if (parentType != null && parentType.equals(TsType.Any)) {
-            parentType = null;
+        final boolean isClass = mappedToClass(bean.getOrigin());
+        final List<TsType> extendsList = new ArrayList<>();
+        final List<TsType> implementsList = new ArrayList<>();
+
+        final TsType parentType = typeFromJava(symbolTable, bean.getParent());
+        if (parentType != null && !parentType.equals(TsType.Any)) {
+            final boolean isParentMappedToClass = mappedToClass(getOriginClass(symbolTable, parentType));
+            if (isClass && !isParentMappedToClass) {
+                implementsList.add(parentType);
+            } else {
+                extendsList.add(parentType);
         }
+        }
+        
         final List<TsType> interfaces = new ArrayList<>();
         for (Type aInterface : bean.getInterfaces()) {
             final TsType interfaceType = typeFromJava(symbolTable, aInterface);
@@ -170,6 +180,12 @@ public class ModelCompiler {
                 interfaces.add(interfaceType);
             }
         }
+        if (isClass) {
+            implementsList.addAll(interfaces);
+        } else {
+            extendsList.addAll(interfaces);
+        }
+        
         final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean, "", "");
 
         if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
@@ -190,16 +206,21 @@ public class ModelCompiler {
         return new TsBeanModel(
                 bean.getOrigin(),
                 TsBeanCategory.Data,
-                /*isClass*/ !bean.getOrigin().isInterface() && settings.mapClasses == ClassMapping.asClasses,
+                isClass,
                 symbolTable.getSymbol(bean.getOrigin()),
                 getTypeParameters(bean.getOrigin()),
                 parentType,
-                interfaces,
+                extendsList,
+                implementsList,
                 properties,
                 /*constructor*/ null,
                 /*methods*/ null,
                 bean.getComments())
                 .withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral());
+    }
+
+    private boolean mappedToClass(Class<?> cls) {
+        return !cls.isInterface() && settings.getMapClassesAsClassesFilter().test(cls.getName());
     }
 
     private static List<TsType.GenericVariableType> getTypeParameters(Class<?> cls) {
@@ -300,7 +321,7 @@ public class ModelCompiler {
     private TsModel removeInheritedProperties(SymbolTable symbolTable, TsModel tsModel) {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
-            final Map<String, TsType> inheritedPropertyTypes = getInheritedProperties(symbolTable, tsModel, bean.getParentAndInterfaces());
+            final Map<String, TsType> inheritedPropertyTypes = getInheritedProperties(symbolTable, tsModel, bean.getAllParents());
             final List<TsPropertyModel> properties = new ArrayList<>();
             for (TsPropertyModel property : bean.getProperties()) {
                 if (property.isOwnProperty() || !Objects.equals(property.getTsType(), inheritedPropertyTypes.get(property.getName()))) {
@@ -322,9 +343,9 @@ public class ModelCompiler {
                 for (TsPropertyModel property : bean.getProperties()) {
                     classPropertyNames.add(property.getName());
                 }
-                classPropertyNames.addAll(getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent())).keySet());
+                classPropertyNames.addAll(getInheritedProperties(symbolTable, tsModel, bean.getExtendsList()).keySet());
                 
-                final List<TsPropertyModel> implementedProperties = getImplementedProperties(symbolTable, tsModel, bean.getInterfaces());
+                final List<TsPropertyModel> implementedProperties = getImplementedProperties(symbolTable, tsModel, bean.getImplementsList());
                 Collections.reverse(implementedProperties);
                 for (TsPropertyModel implementedProperty : implementedProperties) {
                     if (!classPropertyNames.contains(implementedProperty.getName())) {
@@ -346,7 +367,7 @@ public class ModelCompiler {
         for (TsType parentType : parents) {
             final TsBeanModel parent = tsModel.getBean(getOriginClass(symbolTable, parentType));
             if (parent != null) {
-                properties.putAll(getInheritedProperties(symbolTable, tsModel, parent.getParentAndInterfaces()));
+                properties.putAll(getInheritedProperties(symbolTable, tsModel, parent.getAllParents()));
                 for (TsPropertyModel property : parent.getProperties()) {
                     properties.put(property.getName(), property.getTsType());
                 }
@@ -360,7 +381,7 @@ public class ModelCompiler {
         for (TsType aInterface : interfaces) {
             final TsBeanModel bean = tsModel.getBean(getOriginClass(symbolTable, aInterface));
             if (bean != null) {
-                properties.addAll(getImplementedProperties(symbolTable, tsModel, bean.getInterfaces()));
+                properties.addAll(getImplementedProperties(symbolTable, tsModel, bean.getExtendsList()));
                 properties.addAll(bean.getProperties());
             }
         }
@@ -387,7 +408,7 @@ public class ModelCompiler {
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
         final Map<Symbol, List<TsMethodModel>> groupedMethods = processJaxrsMethods(jaxrsApplication, symbolTable, null, responseSymbol, optionsType, false);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
-            final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, entry.getValue(), null);
+            final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, null, entry.getValue(), null);
             tsModel.getBeans().add(interfaceModel);
         }
         return tsModel;
@@ -400,7 +421,7 @@ public class ModelCompiler {
 
         // HttpClient interface
         final TsType.GenericVariableType returnGenericVariable = new TsType.GenericVariableType("R");
-        tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.ServicePrerequisite, false, httpClientSymbol, typeParameters, null, null, null, null, Arrays.asList(
+        tsModel.getBeans().add(new TsBeanModel(null, TsBeanCategory.ServicePrerequisite, false, httpClientSymbol, typeParameters, null, null, null, null, null, Arrays.asList(
                 new TsMethodModel("request", TsModifierFlags.None, Arrays.asList(returnGenericVariable), Arrays.asList(
                         new TsParameterModel("requestConfig", new TsType.ObjectType(
                                 new TsProperty("method", TsType.String),
@@ -428,7 +449,7 @@ public class ModelCompiler {
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final Symbol symbol = settings.generateJaxrsApplicationInterface ? symbolTable.addSuffixToSymbol(entry.getKey(), "Client") : entry.getKey();
             final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(entry.getKey()) : null;
-            final TsBeanModel clientModel = new TsBeanModel(null, TsBeanCategory.Service, true, symbol, typeParameters, null,
+            final TsBeanModel clientModel = new TsBeanModel(null, TsBeanCategory.Service, true, symbol, typeParameters, null, null,
                     Utils.listFromNullable(interfaceType), null, constructor, entry.getValue(), null);
             tsModel.getBeans().add(clientModel);
         }
