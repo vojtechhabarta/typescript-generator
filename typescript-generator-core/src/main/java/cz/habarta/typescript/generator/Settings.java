@@ -123,13 +123,16 @@ public class Settings {
     public void loadExtensions(ClassLoader classLoader, List<String> extensions, List<Settings.ConfiguredExtension> extensionsWithConfiguration) {
         this.extensions = new ArrayList<>();
         if (extensions != null) {
-            this.extensions.addAll(loadInstances(classLoader, extensions, Extension.class));
+            this.extensions.addAll(loadInstances(classLoader, extensions, EmitterExtension.class));
         }
         if (extensionsWithConfiguration != null) {
             for (ConfiguredExtension configuredExtension : extensionsWithConfiguration) {
-                final Extension extension = loadInstance(classLoader, configuredExtension.className, Extension.class);
-                extension.setConfiguration(Utils.mapFromNullable(configuredExtension.configuration));
-                this.extensions.add(extension);
+                final EmitterExtension emitterExtension = loadInstance(classLoader, configuredExtension.className, EmitterExtension.class);
+                if (emitterExtension instanceof Extension) {
+                    final Extension extension = (Extension) emitterExtension;
+                    extension.setConfiguration(Utils.mapFromNullable(configuredExtension.configuration));
+                }
+                this.extensions.add(emitterExtension);
             }
         }
     }
