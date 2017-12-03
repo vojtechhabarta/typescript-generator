@@ -98,7 +98,7 @@ public class JsonDeserializationExtension extends Extension {
                     final TsMethodModel genericFunctionConstructor = createDeserializationGenericFunctionConstructor(symbolTable, tsModel, bean);
                     methods.add(0, genericFunctionConstructor);
                 }
-                if (!bean.getTaggedUnionClasses().isEmpty()) {
+                if (bean.getTaggedUnionAlias() != null) {
                     final TsMethodModel unionDeserializationMethod = createDeserializationMethodForTaggedUnion(symbolTable, tsModel, bean);
                     methods.add(1, unionDeserializationMethod);
                 }

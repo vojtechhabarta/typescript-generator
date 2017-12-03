@@ -693,7 +693,7 @@ public class ModelCompiler {
         final List<TsBeanModel> beans = new ArrayList<>();
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         for (TsBeanModel bean : tsModel.getBeans()) {
-            if (!bean.getTaggedUnionClasses().isEmpty()) {
+            if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null) {
                 final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
