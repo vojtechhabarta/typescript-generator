@@ -227,11 +227,14 @@ public class JsonDeserializationExtension extends Extension {
 
     private static TsExpression getPropertyCopy(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean, TsPropertyModel property) {
         final TsExpression copyFunction = getCopyFunctionForTsType(symbolTable, tsModel, property.getTsType());
-        if (copyFunction instanceof TsIdentifierReference) {
-            final TsIdentifierReference reference = (TsIdentifierReference) copyFunction;
-            if (reference.getIdentifier().equals("__identity")) {
-                // function degenerates to the same value (data.property)
-                return new TsMemberExpression(new TsIdentifierReference("data"), property.name);
+        if (copyFunction instanceof TsCallExpression) {
+            final TsCallExpression callExpression = (TsCallExpression) copyFunction;
+            if (callExpression.getExpression() instanceof TsIdentifierReference) {
+                final TsIdentifierReference reference = (TsIdentifierReference) callExpression.getExpression();
+                if (reference.getIdentifier().equals("__identity")) {
+                    // function degenerates to the same value (data.property)
+                    return new TsMemberExpression(new TsIdentifierReference("data"), property.name);
+                }
             }
         }
         return new TsCallExpression(
@@ -289,7 +292,11 @@ public class JsonDeserializationExtension extends Extension {
             return new TsIdentifierReference("constructorFnOf" + genericVariableType.name);
         }
         // __identity
-        return new TsIdentifierReference("__identity");
+        return new TsCallExpression(
+                new TsIdentifierReference("__identity"),
+                Arrays.asList(tsType),
+                Collections.<TsExpression>emptyList()
+        );
     }
 
     private static TsMethodModel createDeserializationMethodForTaggedUnion(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {

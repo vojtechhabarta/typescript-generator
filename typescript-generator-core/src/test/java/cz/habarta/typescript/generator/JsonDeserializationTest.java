@@ -77,6 +77,9 @@ public class JsonDeserializationTest {
         public Map<String, Address> taggedAddresses;
         public Map<String, List<Address>> groupedAddresses;
         public List<Map<String, Address>> listOfTaggedAddresses;
+        public List<String> tags;
+        public Map<String, String> mapping;
+        public List<List<String>> listOfListOfString;
         public PagedList<Order, Authentication> orders;
         public List<PagedList<Order, Authentication>> allOrders;
         public Shape shape;

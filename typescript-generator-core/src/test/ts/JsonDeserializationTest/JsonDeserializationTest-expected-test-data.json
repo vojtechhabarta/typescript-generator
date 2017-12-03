@@ -35,6 +35,17 @@
             }
         }
     ],
+    "tags": [
+        "item"
+    ],
+    "mapping": {
+        "key": "value"
+    },
+    "listOfListOfString": [
+        [
+            "string"
+        ]
+    ],
     "orders": {
         "page": 7,
         "items": [

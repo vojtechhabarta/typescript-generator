@@ -44,6 +44,19 @@ assertType(user.listOfTaggedAddresses, Array);
 assertType(user.listOfTaggedAddresses[0], "object");
 assertType(user.listOfTaggedAddresses[0]["address6"], Address);
 
+// .tags
+assertType(user.tags, Array);
+assertType(user.tags[0], "string");
+
+// .mapping
+assertType(user.mapping, "object");
+assertType(user.mapping["key"], "string");
+
+// .listOfListOfString
+assertType(user.listOfListOfString, Array);
+assertType(user.listOfListOfString[0], Array);
+assertType(user.listOfListOfString[0][0], "string");
+
 // .orders
 assertType(user.orders, PagedList);
 assertType(user.orders.page, "number");

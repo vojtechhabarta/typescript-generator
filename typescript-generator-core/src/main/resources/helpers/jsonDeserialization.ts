@@ -24,6 +24,6 @@ function __copyObject<T>(object: { [index: string]: T }, itemCopyFn: (item: T) =
     return result;
 }
 
-function __identity<T>(value: T): T {
-    return value;
+function __identity<T>(): (value: T) => T {
+    return value => value;
 }
