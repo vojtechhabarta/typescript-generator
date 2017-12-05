@@ -4,8 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.habarta.typescript.generator.ext.ClassEnumExtension;
 import java.util.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -92,6 +91,25 @@ public class EnumTest {
                 "    West = 'West',\n" +
                 "}"
                 ).replace("'", "\"");
+        assertEquals(expected.trim(), output.trim());
+    }
+
+    @Test
+    public void testClassAsEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asEnum;
+        settings.jsonLibrary = JsonLibrary.jaxb;
+        final ClassEnumExtension classEnumExtension = new ClassEnumExtension();
+        classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "ClassEnum"));
+        settings.extensions.add(classEnumExtension);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyClassEnum.class));
+        final String expected = (
+            "\ndeclare const enum DummyClassEnum {\n" +
+            "    ATYPE = 'ATYPE',\n" +
+            "    BTYPE = 'BTYPE',\n" +
+            "    CTYPE = 'CTYPE',\n" +
+            "}\n"
+        ).replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
     }
 
