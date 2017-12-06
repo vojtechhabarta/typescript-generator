@@ -144,8 +144,8 @@ public class GenerateTask extends DefaultTask {
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.generateNpmPackageJson = generateNpmPackageJson;
-        settings.npmName = npmName != null && generateNpmPackageJson ? getProject().getName() : npmName;
-        settings.npmVersion = npmVersion != null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+        settings.npmName = npmName != null ? npmName : getProject().getName();
+        settings.npmVersion = npmVersion != null ? npmVersion : settings.getDefaultNpmVersion();
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;
