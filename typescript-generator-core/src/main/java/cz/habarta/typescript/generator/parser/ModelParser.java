@@ -93,7 +93,12 @@ public abstract class ModelParser {
         }
     }
 
-    protected boolean isAnnotatedPropertyOptional(AnnotatedElement annotatedProperty) {
+    // replace with lambda on Java8
+    protected static interface AnnotatedProperty {
+        public <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    }
+
+    protected boolean isAnnotatedPropertyOptional(AnnotatedProperty annotatedProperty) {
         if (settings.optionalProperties == OptionalProperties.all) {
             return true;
         }

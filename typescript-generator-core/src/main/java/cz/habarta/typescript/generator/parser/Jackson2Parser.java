@@ -20,7 +20,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -69,7 +68,7 @@ public class Jackson2Parser extends ModelParser {
 
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
-            for (BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
+            for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
@@ -91,7 +90,12 @@ public class Jackson2Parser extends ModelParser {
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
                         ? !beanPropertyWriter.isRequired()
-                        : isAnnotatedPropertyOptional((AnnotatedElement) propertyMember);
+                        : isAnnotatedPropertyOptional(new AnnotatedProperty() {
+                            @Override
+                            public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+                                return beanPropertyWriter.getAnnotation(annotationClass);
+                            }
+                        });
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
                 final Member originalMember = beanPropertyWriter.getMember().getMember();
