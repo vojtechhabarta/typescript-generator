@@ -38,4 +38,15 @@ public class StandardJsonPrettyPrinter extends DefaultPrettyPrinter {
         jg.writeRaw(": ");
     }
 
+    @Override
+    public void writeEndArray(JsonGenerator g, int nrOfValues) throws IOException {
+        if (!_arrayIndenter.isInline()) {
+            --_nesting;
+        }
+        if (nrOfValues > 0) {
+            _arrayIndenter.writeIndentation(g, _nesting);
+        }
+        g.writeRaw(']');
+    }
+
 }
