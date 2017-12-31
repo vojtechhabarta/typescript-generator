@@ -9,11 +9,16 @@ public class TypeScriptGeneratorPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final Task task = project.task(Collections.singletonMap(Task.TASK_TYPE, GenerateTask.class), "generateTypeScript");
-        task.dependsOn("compileJava");
-        for (Task classesTask : project.getTasksByName("classes", false)) {
-            classesTask.dependsOn(task);
+        final Task generateTsTask = project.task(Collections.singletonMap(Task.TASK_TYPE, GenerateTask.class), "generateTypeScript");
+
+        for (Task task : project.getTasks()) {
+            if (task.getName().startsWith("compile")) {
+                generateTsTask.dependsOn(task.getName());
+            }
+        }
+
+        for (Task classesTask : project.getTasksByName("build", false)) {
+            classesTask.dependsOn(generateTsTask);
         }
     }
-    
 }

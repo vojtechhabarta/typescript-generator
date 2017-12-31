@@ -1,5 +1,9 @@
 
 apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: "kotlin"
+apply plugin: "scala"
+
 apply plugin: 'cz.habarta.typescript-generator'
 
 
@@ -8,31 +12,49 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 dependencies {
     compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.6.3'
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile 'org.scala-lang:scala-library:2.11.8'
 }
 
 buildscript {
+    ext.kotlin_version = '1.2.10'
+
     repositories {
-//        mavenCentral()
         mavenLocal()
+        jcenter()
     }
+
     dependencies {
         classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.+'
+
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 generateTypeScript {
     outputFile = 'build/sample.d.ts'
     classes = [
-        'cz.habarta.typescript.generator.sample.Person'
+        'cz.habarta.typescript.generator.sample.Person',
+        'cz.habarta.typescript.generator.sample.PersonGroovy',
+        'cz.habarta.typescript.generator.sample.PersonKt',
+        'cz.habarta.typescript.generator.sample.PersonScala',
     ]
     jsonLibrary = 'jackson2'
     outputKind = 'global'
-    namespace = 'GradleSample';
+    namespace = 'GradleSample'
+    excludeClasses = [
+        GroovyObject.name
+    ]
 //    declarePropertiesAsOptional = false
 //    removeTypeNameSuffix = 'Json'
 //    mapDate = 'asNumber'
+}
+
+// Modify the gradle version here then execute ./gradlew wrapper to change the gradle version
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4.1'
 }

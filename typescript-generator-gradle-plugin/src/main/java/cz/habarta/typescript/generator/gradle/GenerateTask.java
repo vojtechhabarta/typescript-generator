@@ -86,16 +86,19 @@ public class GenerateTask extends DefaultTask {
 
         // class loader
         final List<URL> urls = new ArrayList<>();
-        for (String taskName: Arrays.asList("compileJava", "compileGroovy")) {
-            for (Task task : getProject().getTasksByName(taskName, false)) {
+
+        for (Task task : getProject().getTasks()) {
+            if (task.getName().startsWith("compile")) {
                 for (File file : task.getOutputs().getFiles()) {
                     urls.add(file.toURI().toURL());
                 }
             }
         }
+
         for (File file : getProject().getConfigurations().getAt("compile").getFiles()) {
             urls.add(file.toURI().toURL());
         }
+
         final URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
         // Settings
