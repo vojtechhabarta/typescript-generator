@@ -8,6 +8,8 @@ Quick links:
 [Breaking changes](https://github.com/vojtechhabarta/typescript-generator/wiki/Breaking-Changes)
 |
 [Release notes](https://github.com/vojtechhabarta/typescript-generator/releases)
+|
+[Playground _(beta)_](https://jechlin.github.io/ts-gen-aws/)
 
 typescript-generator
 ====================
