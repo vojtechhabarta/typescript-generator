@@ -439,6 +439,12 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
+     * If <code>true</code> optional property types will be generated as foo: T | null instead of as foo?: T
+     */
+    @Parameter
+    private boolean optionalAsNull;
+
+    /**
      * If <code>true</code> NPM <code>package.json</code> will be generated.
      * Only applicable when {@link #outputKind} is set to <code>module</code>.
      * NPM package name and version can be specified using {@link #npmName} and {@link #npmVersion} parameters.
@@ -543,6 +549,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jsonLibrary = jsonLibrary;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
+            settings.optionalAsNull = optionalAsNull;
             settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;

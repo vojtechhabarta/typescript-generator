@@ -200,7 +200,7 @@ public class Emitter implements EmitterExtension.Writer {
         final TsType tsType = property.getTsType();
         final String staticString = property.modifiers.isStatic ? "static " : "";
         final String readonlyString = property.modifiers.isReadonly ? "readonly " : "";
-        final String questionMark = tsType instanceof TsType.OptionalType ? "?" : "";
+        final String questionMark = tsType instanceof TsType.OptionalType && !settings.optionalAsNull ? "?" : "";
         writeIndentedLine(staticString + readonlyString + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
     }
 

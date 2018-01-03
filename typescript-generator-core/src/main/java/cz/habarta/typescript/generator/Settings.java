@@ -34,6 +34,7 @@ public class Settings {
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
+    public boolean optionalAsNull = false;
     public boolean declarePropertiesAsReadOnly = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;

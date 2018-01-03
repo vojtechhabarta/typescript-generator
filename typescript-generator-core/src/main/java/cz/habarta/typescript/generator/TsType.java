@@ -200,7 +200,11 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return type.format(settings);
+            if (settings.optionalAsNull) {
+                return type.format(settings) + " | null";
+            } else {
+                return type.format(settings);
+            }
         }
 
     }
