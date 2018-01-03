@@ -1,9 +1,7 @@
-version: 1.30.{build}
+version: 2.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-environment:
-  JAVA_HOME: C:\Program Files\Java\jdk1.7.0
 install:
 - ps: |-
     git remote set-url origin https://github.com/vojtechhabarta/typescript-generator.git
@@ -12,13 +10,14 @@ install:
 build_script:
 - ps: |-
     Write-Host -ForegroundColor Cyan "Building version: $($env:APPVEYOR_BUILD_VERSION)"
-    choco install maven -version 3.3.9.1 -y
-    $mvn = "C:\tools\apache-maven-3.3.9\bin\mvn.cmd"
-    &$mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
-    &$mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    $env:JAVA_HOME = "C:\Program Files\Java\jdk1.8.0"
+    $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+    mvn -version
+    mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
     {
-       &$mvn --batch-mode site-deploy "-Dgithub.site.oauth2Token=$($env:access_token)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+       mvn --batch-mode site-deploy "-Dgithub.site.oauth2Token=$($env:access_token)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     }
 
     Write-Host -ForegroundColor Cyan "Archiving artifacts"

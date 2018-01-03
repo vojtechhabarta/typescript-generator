@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * @see cz.habarta.typescript.generator.maven.GenerateMojo
+ * See cz.habarta.typescript.generator.maven.GenerateMojo
  * @see <a href="https://github.com/vojtechhabarta/typescript-generator">README.md</a> on GitHub or in project root directory
  * @see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki">Wiki</a> on GitHub
  */
