@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -478,16 +479,8 @@ public class ModelCompiler {
     }
 
     private Map<Symbol, List<JaxrsMethodModel>> groupingByMethodContainer(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix) {
-        // rewrite on Java 8 using streams
-        final Map<Symbol, List<JaxrsMethodModel>> groupedMethods = new LinkedHashMap<>();
-        for (JaxrsMethodModel method : jaxrsApplication.getMethods()) {
-            final Symbol symbol = getContainerSymbol(jaxrsApplication, symbolTable, nameSuffix, method);
-            if (!groupedMethods.containsKey(symbol)) {
-                groupedMethods.put(symbol, new ArrayList<JaxrsMethodModel>());
-            }
-            groupedMethods.get(symbol).add(method);
-        }
-        return groupedMethods;
+        return jaxrsApplication.getMethods().stream()
+                .collect(Collectors.groupingBy(method -> getContainerSymbol(jaxrsApplication, symbolTable, nameSuffix, method)));
     }
 
     private Symbol getContainerSymbol(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix, JaxrsMethodModel method) {
@@ -515,15 +508,7 @@ public class ModelCompiler {
     }
 
     private static Map<String, Long> groupingByMethodName(List<JaxrsMethodModel> methods) {
-        // Java 8
-//        return methods.stream().collect(Collectors.groupingBy(JaxrsMethodModel::getName, Collectors.counting()));
-        final Map<String, Long> methodNamesCount = new LinkedHashMap<>();
-        for (JaxrsMethodModel method : methods) {
-            final String name = method.getName();
-            final long count = methodNamesCount.containsKey(name) ? methodNamesCount.get(name) : 0;
-            methodNamesCount.put(name, count + 1);
-        }
-        return methodNamesCount;
+        return methods.stream().collect(Collectors.groupingBy(JaxrsMethodModel::getName, Collectors.counting()));
     }
 
     private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {

@@ -50,7 +50,6 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
 
     /**
      * Natural order with null last.
-     * Remove on Java 8.
      */
     private static <T extends Comparable<T>> int compare(T o1, T o2) {
         if (o1 != null) {

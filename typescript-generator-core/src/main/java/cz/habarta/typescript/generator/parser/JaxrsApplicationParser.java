@@ -3,12 +3,12 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.JaxrsApplicationScanner;
 import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.util.Parameter;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -122,8 +122,7 @@ public class JaxrsApplicationParser {
         // subContext
         context = context.subPath(pathAnnotation);
         final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
-        final List<Parameter> methodParameters = Parameter.ofMethod(method);
-        for (Parameter parameter : methodParameters) {
+        for (Parameter parameter : method.getParameters()) {
             final PathParam pathParamAnnotation = parameter.getAnnotation(PathParam.class);
             if (pathParamAnnotation != null) {
                 pathParamTypes.put(pathParamAnnotation.value(), parameter.getParameterizedType());
@@ -159,8 +158,7 @@ public class JaxrsApplicationParser {
             }
             // query parameters
             final List<MethodParameterModel> queryParams = new ArrayList<>();
-            final List<Parameter> params = Parameter.ofMethod(method);
-            for (Parameter param : params) {
+            for (Parameter param : method.getParameters()) {
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
                     queryParams.add(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()));
@@ -241,8 +239,7 @@ public class JaxrsApplicationParser {
     }
 
     private static MethodParameterModel getEntityParameter(Method method) {
-        final List<Parameter> parameters = Parameter.ofMethod(method);
-        for (Parameter parameter : parameters) {
+        for (Parameter parameter : method.getParameters()) {
             if (!hasAnyAnnotation(parameter, Arrays.asList(
                     MatrixParam.class,
                     QueryParam.class,
