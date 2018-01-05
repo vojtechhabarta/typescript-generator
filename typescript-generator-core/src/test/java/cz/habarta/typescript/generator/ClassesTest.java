@@ -246,7 +246,6 @@ public class ClassesTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Bc.class, Bi.class, Derived1.class, Derived2.class));
-        System.out.println(output);
         Assert.assertEquals(expected.replace('\'', '"').trim(), output.trim());
     }
 

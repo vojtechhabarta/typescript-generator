@@ -11,6 +11,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 
 /**
@@ -176,20 +178,18 @@ public class SymbolTable {
     }
 
     private static boolean isUndefined(Object variable) {
-        // Java 8
-//        return ScriptObjectMirror.isUndefined(variable);
-
-        // Hack for Java 7, it should match both:
-        // org.mozilla.javascript.Undefined (Java 7)
-        // jdk.nashorn.internal.runtime.Undefined (Java 8)
-        return variable != null && variable.getClass().getSimpleName().equals("Undefined");
+        return ScriptObjectMirror.isUndefined(variable);
     }
 
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
         if (customTypeNamingFunction == null) {
             final String engineMimeType = "application/javascript";
             final ScriptEngineManager manager = new ScriptEngineManager();
-            final ScriptEngine engine = manager.getEngineByMimeType(engineMimeType);
+
+            // getting ScriptEngine from manager doesn't work in Maven plugin on Java 9
+//            final ScriptEngine engine = manager.getEngineByMimeType(engineMimeType);
+            final ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
+
             if (engine == null) {
                 System.out.println(String.format("Error: Script engine for '%s' MIME type not found. Available engines: %s", engineMimeType, manager.getEngineFactories().size()));
                 for (ScriptEngineFactory factory : manager.getEngineFactories()) {
