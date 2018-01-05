@@ -100,7 +100,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.13.1</version>
+                <version>0.13.3</version>
                 <executions>
                     <execution>
                         <id>generate</id>
@@ -118,7 +118,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>test-xml-doclet</id>
@@ -128,7 +128,7 @@
                         </goals>
                         <configuration>
                             <doclet>com.github.markusbernhardt.xmldoclet.XmlDoclet</doclet>
-                            <additionalparam>-d ${project.build.directory} -filename test-javadoc.xml</additionalparam>
+                            <additionalOptions>-d ${project.build.directory} -filename test-javadoc.xml</additionalOptions>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
                             <docletArtifact>
                                 <groupId>com.github.markusbernhardt</groupId>

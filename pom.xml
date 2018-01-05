@@ -62,7 +62,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -70,15 +70,14 @@
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
                         <arg>-Xlint</arg>
-                        <!--this doesn't work on Java 7-->
-                        <!--<arg>-parameters</arg>-->
+                        <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>2.20.1</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                     <trimStackTrace>false</trimStackTrace>
@@ -87,30 +86,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
+                <version>3.0.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.0.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.1</version>
+                <version>3.0.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.4</version>
+                <version>3.6</version>
                 <configuration>
                     <skipDeploy>true</skipDeploy>
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>net.ju-n.maven.doxia</groupId>
+                        <groupId>org.apache.maven.doxia</groupId>
                         <artifactId>doxia-module-markdown</artifactId>
-                        <version>1.0.0</version>
+                        <version>1.8</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -145,7 +144,7 @@
                 <plugin>
                     <groupId>com.github.github</groupId>
                     <artifactId>site-maven-plugin</artifactId>
-                    <version>0.11</version>
+                    <version>0.12</version>
                     <executions>
                         <execution>
                             <id>site</id>
@@ -250,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.9</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
