@@ -16,9 +16,6 @@ public class TypeScriptGeneratorPlugin implements Plugin<Project> {
                 generateTsTask.dependsOn(task.getName());
             }
         }
-
-        for (Task classesTask : project.getTasksByName("build", false)) {
-            classesTask.dependsOn(generateTsTask);
-        }
     }
+
 }
