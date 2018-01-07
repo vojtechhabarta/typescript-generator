@@ -12,32 +12,30 @@
     <packaging>jar</packaging>
     <name>typescript-generator-gradle-plugin</name>
 
+    <properties>
+        <gradle.version>2.1</gradle.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-core</artifactId>
-            <version>2.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/gradle-lib/gradle-core-2.0.jar</systemPath>
+            <version>${gradle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-base-services</artifactId>
-            <version>2.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/gradle-lib/gradle-base-services-2.0.jar</systemPath>
+            <version>${gradle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-base-services-groovy</artifactId>
-            <version>2.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/gradle-lib/gradle-base-services-groovy-2.0.jar</systemPath>
+            <version>${gradle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.4</version>
+            <version>2.4.13</version>
         </dependency>
         <dependency>
             <groupId>cz.habarta.typescript-generator</groupId>
@@ -45,6 +43,13 @@
             <version>2.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>repo.gradle.org</id>
+            <url>https://repo.gradle.org/gradle/libs-releases-local/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
