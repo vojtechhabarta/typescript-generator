@@ -110,6 +110,9 @@ generateTypeScript {
 }
 ```
 
+You can run typescript-generator on demand using `gradle generateTypeScript` command
+or you can invoke it as part of another task by adding dependency from that task to `generateTypeScript` task in Gradle build file.
+
 More complete sample can be found [here](sample-gradle).
 Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html). 
 
