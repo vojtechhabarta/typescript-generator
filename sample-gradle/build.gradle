@@ -1,42 +1,38 @@
 
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: "kotlin"
-apply plugin: "scala"
-
+apply plugin: 'kotlin'
+apply plugin: 'scala'
 apply plugin: 'cz.habarta.typescript-generator'
 
-
-version = '1.0'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+version = '2.0'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     jcenter()
 }
+
 dependencies {
-    compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.6.3'
-    compile 'org.codehaus.groovy:groovy-all:2.4.12'
-    compile 'org.scala-lang:scala-library:2.11.8'
+    compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.2'
+    compile 'org.codehaus.groovy:groovy-all:2.4.13'
+    compile 'org.scala-lang:scala-library:2.12.4'
 }
 
 buildscript {
-    ext.kotlin_version = '1.2.10'
-
     repositories {
         mavenLocal()
         jcenter()
     }
 
     dependencies {
-        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '1.+'
-
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.+'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.10'
+        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.12:2.9.2'
     }
 }
 
 generateTypeScript {
-    outputFile = 'build/sample.d.ts'
     classes = [
         'cz.habarta.typescript.generator.sample.Person',
         'cz.habarta.typescript.generator.sample.PersonGroovy',
@@ -44,17 +40,17 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.PersonScala',
     ]
     jsonLibrary = 'jackson2'
-    outputKind = 'global'
-    namespace = 'GradleSample'
+    outputKind = 'module'
     excludeClasses = [
-        GroovyObject.name
+        'groovy.lang.GroovyObject',
+        'java.io.Serializable',
+        'scala.Equals',
+        'scala.Product',
+        'scala.Serializable',
     ]
-//    declarePropertiesAsOptional = false
-//    removeTypeNameSuffix = 'Json'
-//    mapDate = 'asNumber'
+    jackson2Modules = [
+        'com.fasterxml.jackson.module.scala.DefaultScalaModule'
+    ]
 }
 
-// Modify the gradle version here then execute ./gradlew wrapper to change the gradle version
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.4.1'
-}
+build.dependsOn generateTypeScript
