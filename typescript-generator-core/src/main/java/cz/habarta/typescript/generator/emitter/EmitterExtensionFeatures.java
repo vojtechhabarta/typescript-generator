@@ -11,6 +11,7 @@ public class EmitterExtensionFeatures {
     public boolean generatesModuleCode = false;
     public boolean worksWithPackagesMappedToNamespaces = false;
     public boolean overridesStringEnums = false;
+    public boolean addsCodeToGeneratedClasses = false;
 
     // overridden settings
     public boolean generatesJaxrsApplicationClient = false;

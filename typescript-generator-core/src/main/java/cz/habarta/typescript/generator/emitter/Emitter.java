@@ -191,6 +191,13 @@ public class Emitter implements EmitterExtension.Writer {
         for (TsMethodModel method : bean.getMethods()) {
             emitCallable(method);
         }
+        if (bean.isClass()) {
+            for (EmitterExtension emitterExtension : settings.extensions) {
+                if (emitterExtension.getFeatures().addsCodeToGeneratedClasses) {
+                    emitterExtension.beanGenerationAddCode(this, settings, bean);
+                }
+            }
+        }
         indent--;
         writeIndentedLine("}");
     }
