@@ -25,6 +25,7 @@ public class Input {
     }
 
     public static Input from(Type... types) {
+        Objects.requireNonNull(types, "types");
         final List<SourceType<Type>> sourceTypes = new ArrayList<>();
         for (Type type : types) {
             sourceTypes.add(new SourceType<>(type));
@@ -32,7 +33,9 @@ public class Input {
         return new Input(sourceTypes);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName, boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
+            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
+        Objects.requireNonNull(classLoader, "classLoader");
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
