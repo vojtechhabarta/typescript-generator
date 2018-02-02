@@ -13,7 +13,9 @@ import javax.ws.rs.core.*;
 public class JaxrsApplicationScanner {
 
     public static List<SourceType<Type>> scanJaxrsApplication(Class<?> jaxrsApplicationClass, Predicate<String> isClassNameExcluded) {
+        final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            Thread.currentThread().setContextClassLoader(jaxrsApplicationClass.getClassLoader());
             System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClass.getName());
             final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -27,6 +29,8 @@ public class JaxrsApplicationScanner {
             return new JaxrsApplicationScanner().scanJaxrsApplication(jaxrsApplicationClass, resourceClasses, isClassNameExcluded);
         } catch (ReflectiveOperationException e) {
             throw reportError(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
     }
 
