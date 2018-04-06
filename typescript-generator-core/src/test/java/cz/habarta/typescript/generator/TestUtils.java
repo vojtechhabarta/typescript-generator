@@ -15,6 +15,7 @@ public class TestUtils {
         settings.outputKind = TypeScriptOutputKind.global;
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.noFileComment = true;
+        settings.noTslintDisable = true;
         settings.newline = "\n";
         return settings;
     }

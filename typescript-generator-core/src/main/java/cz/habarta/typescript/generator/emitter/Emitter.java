@@ -38,6 +38,9 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     private void emitFileComment() {
+        if (!settings.noTslintDisable) {
+            writeIndentedLine("/* tslint:disable */");
+        }
         if (!settings.noFileComment) {
             final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             writeIndentedLine("// Generated using typescript-generator version " + TypeScriptGenerator.Version + " on " + timestamp + ".");
