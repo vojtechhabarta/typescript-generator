@@ -103,6 +103,10 @@ public class DefaultTypeProcessor implements TypeProcessor {
         }
         if (javaType instanceof TypeVariable) {
             final TypeVariable<?> typeVariable = (TypeVariable<?>) javaType;
+            if (typeVariable.getGenericDeclaration() instanceof Method) {
+                // example method: public <T extends Number> T getData();
+                return context.processType(typeVariable.getBounds()[0]);
+            }
             return new Result(new TsType.GenericVariableType(typeVariable.getName()));
         }
         if (javaType instanceof WildcardType) {
@@ -138,6 +142,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
         knownTypes.put(String.class, TsType.String);
         knownTypes.put(void.class, TsType.Void);
         knownTypes.put(Void.class, TsType.Void);
+        knownTypes.put(Number.class, TsType.Number);
         // other java packages
         knownTypes.put(BigDecimal.class, TsType.Number);
         knownTypes.put(BigInteger.class, TsType.Number);
