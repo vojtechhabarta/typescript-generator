@@ -125,6 +125,17 @@ public class GenericsTest {
         assertEquals(expected, output.trim());
     }
 
+    @Test
+    public void testArbitraryGenericParameter() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ExecutionResult.class));
+        final String expected =
+                "interface ExecutionResult {\n" +
+                "    data: number;\n" +
+                "}";
+        assertEquals(expected, output.trim());
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -171,6 +182,10 @@ public class GenericsTest {
 
     class TableGA<T> {
         public T[] rows;
+    }
+
+    interface ExecutionResult {
+        public <T extends Number> T getData();
     }
 
 }
