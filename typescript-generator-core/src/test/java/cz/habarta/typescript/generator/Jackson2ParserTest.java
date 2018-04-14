@@ -175,4 +175,44 @@ public class Jackson2ParserTest {
         }
     }
 
+    @Test
+    public void testStandardEnumValue() {
+        testEnumByType(TestEnums.StandardEnum.class, "A", "B", "C");
+    }
+
+    @Test
+    public void testStringPropertyEnumValue() {
+        testEnumByType(TestEnums.StringPropertyValuedEnum.class, "_A", "_B", "_C");
+    }
+
+    @Test
+    public void testNumberPropertyEnumValue() {
+        testEnumByType(TestEnums.NumberPropertyValuedEnum.class, 0, 1, 2);
+    }
+
+    @Test
+    public void testMethodEnumValue() {
+        testEnumByType(TestEnums.GeneralMethodValuedEnum.class, "_A", "_B", "_C");
+    }
+
+    @Test
+    public void testToStringEnumValue() {
+        testEnumByType(TestEnums.ToStringValuedEnum.class, "_A", "_B", "_C");
+    }
+
+    @Test
+    public void testJsonPropertyEnumValue() {
+        testEnumByType(TestEnums.JsonPropertyValuedEnum.class, "_A", "_B", "_C");
+    }
+
+    private void testEnumByType(Class<? extends Enum<?>> type, Object... expectedValues) {
+        final Jackson2Parser jacksonParser = getJackson2Parser();
+        final Model model = jacksonParser.parseModel(type);
+        Assert.assertEquals(1, model.getEnums().size());
+        final EnumModel enumModel = model.getEnums().get(0);
+        Assert.assertEquals(expectedValues.length, enumModel.getMembers().size());
+        for (int i = 0; i < expectedValues.length; i++) {
+            Assert.assertEquals(expectedValues[i], enumModel.getMembers().get(i).getEnumValue());
+        }
+    }
 }

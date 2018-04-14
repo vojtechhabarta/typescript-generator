@@ -17,7 +17,7 @@ import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Predicate;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import java.beans.MethodDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Jackson2Parser extends ModelParser {
@@ -295,24 +296,41 @@ public class Jackson2Parser extends ModelParser {
 
             try {
                 Method valueMethod = null;
+                Field valueField = null;
+
+                Field[] allEnumFields = enumClass.getDeclaredFields();
+                List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
+
                 final BeanInfo beanInfo = Introspector.getBeanInfo(enumClass);
-                for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
-                    final Method readMethod = propertyDescriptor.getReadMethod();
-                    if (readMethod.isAnnotationPresent(JsonValue.class)) {
-                        valueMethod = readMethod;
-                    }
+                valueMethod = Arrays.stream(beanInfo.getMethodDescriptors())
+                        .map(MethodDescriptor::getMethod)
+                        .filter(method -> method.isAnnotationPresent(JsonValue.class))
+                        .findAny().orElse(null);
+
+                if (valueMethod == null) {
+                    List<Field> instanceFields = Arrays.stream(allEnumFields).filter(field -> !field.isEnumConstant()).collect(Collectors.toList());
+                    valueField = instanceFields.stream()
+                            .filter(field -> field.isAnnotationPresent(JsonValue.class))
+                            .findAny().orElse(null);
                 }
 
                 int index = 0;
-                for (Field field : enumClass.getFields()) {
-                    if (field.isEnumConstant()) {
-                        if (isNumberBased) {
-                            final Number value = getNumberEnumValue(field, valueMethod, index++);
-                            enumMembers.add(new EnumMemberModel(field.getName(), value, null));
-                        } else {
-                            final String value = getStringEnumValue(field, valueMethod);
-                            enumMembers.add(new EnumMemberModel(field.getName(), value, null));
-                        }
+                for (Field constant : constants) {
+                    Object value;
+                    if (valueField != null) {
+                        value = getFieldJsonValue(constant, valueField);
+                    } else if (isNumberBased) {
+                        value = getNumberEnumValue(constant, valueMethod, index++);
+                    } else {
+                        value = getStringEnumValue(constant, valueMethod);
+                    }
+
+                    if (value instanceof String) {
+                        enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, null));
+                    } else if (value instanceof Number) {
+                        enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, null));
+                    } else {
+                        System.out.println(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
                     }
                 }
             } catch (Exception e) {
@@ -358,4 +376,10 @@ public class Jackson2Parser extends ModelParser {
         return valueObject;
     }
 
+    private Object getFieldJsonValue(Field field, Field jsonValueField) throws ReflectiveOperationException {
+        field.setAccessible(true);
+        final Object constant = field.get(null);
+        jsonValueField.setAccessible(true);
+        return jsonValueField.get(constant);
+    }
 }
