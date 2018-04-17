@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator.parser;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
 
 
 public class PropertyModel {
