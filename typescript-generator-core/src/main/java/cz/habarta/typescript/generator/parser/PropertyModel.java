@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 
 public class PropertyModel {
@@ -63,6 +64,10 @@ public class PropertyModel {
     }
 
     public PropertyModel withComments(List<String> comments) {
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+    }
+
+    public PropertyModel withType(Type type) {
         return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
     }
 
