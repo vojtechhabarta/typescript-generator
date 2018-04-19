@@ -66,6 +66,10 @@ public class PropertyModel {
         return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
     }
 
+    public PropertyModel withType(Type type) {
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+    }
+
     @Override
     public String toString() {
         return "PropertyModel{" + "name=" + name + ", type=" + type + "}";

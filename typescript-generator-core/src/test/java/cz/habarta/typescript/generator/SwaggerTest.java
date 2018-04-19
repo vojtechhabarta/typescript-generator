@@ -44,6 +44,20 @@ public class SwaggerTest {
         Assert.assertTrue(output.contains("Not Found"));
         Assert.assertTrue(output.contains("Documentation for the bean."));
         Assert.assertTrue(output.contains("Documentation for property 1."));
+        Assert.assertTrue(output.contains("property1: string"));
+    }
+
+    @Test
+    public void testDocumentationAndDataType() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
+        Assert.assertTrue(output.contains("Documentation for operation 1."));
+        Assert.assertTrue(output.contains("Bad Request"));
+        Assert.assertTrue(output.contains("Not Found"));
+        Assert.assertTrue(output.contains("Documentation for the bean."));
+        Assert.assertTrue(output.contains("Documentation for property 2."));
+        Assert.assertTrue(output.contains("property2: string")); // see if type was overridden from number to string
     }
 
     private static class TestApplication extends Application {
@@ -128,6 +142,13 @@ public class SwaggerTest {
 
         @ApiModelProperty("Documentation for property 1.")
         public String property1;
+
+        /**
+         * Sometimes custom serializers are used. In such cases target type is overridden explicitly
+         * with dataType annotation attribute.
+         */
+        @ApiModelProperty(value = "Documentation for property 2.", dataType = "java.lang.String")
+        public Long property2;
     }
 
 }
