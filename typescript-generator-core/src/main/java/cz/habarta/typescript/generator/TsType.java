@@ -20,6 +20,9 @@ public abstract class TsType implements Emittable {
     public static final TsType String = new BasicType("string");
     public static final TsType Date = new BasicType("Date");
     public static final TsType Void = new BasicType("void");
+    public static final TsType Undefined = new BasicType("undefined");
+    public static final TsType Null = new BasicType("null");
+    public static final TsType Never = new BasicType("never");
 
     @Override
     public boolean equals(Object rhs) {
@@ -169,7 +172,7 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return types.isEmpty()
-                    ? "never"
+                    ? Never.format(settings)
                     : Emitter.formatList(settings, types, " | ");
         }
 

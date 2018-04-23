@@ -30,6 +30,7 @@ public class GenerateTask extends DefaultTask {
     public JsonLibrary jsonLibrary;
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
+    public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
     public boolean declarePropertiesAsReadOnly;
     public String removeTypeNamePrefix;
     public String removeTypeNameSuffix;
@@ -115,6 +116,7 @@ public class GenerateTask extends DefaultTask {
         settings.jsonLibrary = jsonLibrary;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
+        settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
         settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
         settings.removeTypeNamePrefix = removeTypeNamePrefix;
         settings.removeTypeNameSuffix = removeTypeNameSuffix;

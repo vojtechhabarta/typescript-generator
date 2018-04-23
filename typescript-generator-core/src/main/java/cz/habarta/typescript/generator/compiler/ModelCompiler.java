@@ -92,6 +92,9 @@ public class ModelCompiler {
         // tagged unions
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
+        // optional properties
+        tsModel = transformOptionalProperties(symbolTable, tsModel);
+
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
@@ -709,6 +712,35 @@ public class ModelCompiler {
             }
         });
         return modelWithUsedTaggedUnions;
+    }
+
+    private TsModel transformOptionalProperties(final SymbolTable symbolTable, TsModel tsModel) {
+        return tsModel.withBeans(tsModel.getBeans().stream()
+                .map(bean -> {
+                    if (bean.getCategory() != TsBeanCategory.Data) {
+                        return bean;
+                    }
+                    return bean.withProperties(bean.getProperties().stream()
+                            .map(property -> {
+                                if (property.getTsType() instanceof TsType.OptionalType) {
+                                    final TsType.OptionalType optionalType = (TsType.OptionalType) property.getTsType();
+                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableType) {
+                                        return property.setTsType(
+                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null)));
+                                    }
+                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.questionMarkAndNullableType) {
+                                        return property.setTsType(
+                                                new TsType.OptionalType(
+                                                        new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null))));
+                                    }
+                                }
+                                return property;
+                            })
+                            .collect(Collectors.toList())
+                    );
+                })
+                .collect(Collectors.toList())
+        );
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

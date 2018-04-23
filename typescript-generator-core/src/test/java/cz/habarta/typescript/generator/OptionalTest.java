@@ -48,6 +48,46 @@ public class OptionalTest {
         Assert.assertEquals(personWithoutEmail, objectMapper.readValue(jsonWithoutEmail, Person.class));
     }
 
+    @Test
+    public void testDeclarationQuestionMark() {
+        testDeclaration(OptionalPropertiesDeclaration.questionMark,
+                "interface Person {\n" +
+                "    name: string;\n" +
+                "    email?: string;\n" +
+                "    age?: number;\n" +
+                "}"
+        );
+    }
+
+    @Test
+    public void testDeclarationNullableType() {
+        testDeclaration(OptionalPropertiesDeclaration.nullableType,
+                "interface Person {\n" +
+                "    name: string;\n" +
+                "    email: string | null;\n" +
+                "    age: number | null;\n" +
+                "}"
+        );
+    }
+
+    @Test
+    public void testDeclarationQuestionMarkAndNullableType() {
+        testDeclaration(OptionalPropertiesDeclaration.questionMarkAndNullableType,
+                "interface Person {\n" +
+                "    name: string;\n" +
+                "    email?: string | null;\n" +
+                "    age?: number | null;\n" +
+                "}"
+        );
+    }
+
+    private static void testDeclaration(OptionalPropertiesDeclaration declaration, String expected) {
+        final Settings settings = TestUtils.settings();
+        settings.optionalPropertiesDeclaration = declaration;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Person.class));
+        Assert.assertEquals(expected.trim(), output.trim());
+    }
+
     private static class Person {
         public String name;
         public Optional<String> email;

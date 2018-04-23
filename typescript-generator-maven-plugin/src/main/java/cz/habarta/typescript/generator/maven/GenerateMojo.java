@@ -165,6 +165,21 @@ public class GenerateMojo extends AbstractMojo {
     private OptionalProperties optionalProperties;
 
     /**
+     * Specifies how optional properties will be declared in generated file.
+     * This parameter applies to properties detected as optional.
+     * The detection can be specified using {@link #optionalProperties} parameter.
+     * Supported values are:
+     * <ul>
+     * <li><code>questionMark</code> - property will be marked using <code>?</code> character as optional</li>
+     * <li><code>nullableType</code> - property will not be optional but its type will be union with <code>null</code> value</li>
+     * <li><code>questionMarkAndNullableType</code> - property will be optional and it will also have union with <code>null</code> value</li>
+     * </ul>
+     * Default value is <code>questionMark</code>.
+     */
+    @Parameter
+    private OptionalPropertiesDeclaration optionalPropertiesDeclaration;
+
+    /**
      * If <code>true</code> declared properties will be <code>readonly</code>.
      */
     @Parameter
@@ -543,6 +558,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jsonLibrary = jsonLibrary;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
+            settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
             settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
