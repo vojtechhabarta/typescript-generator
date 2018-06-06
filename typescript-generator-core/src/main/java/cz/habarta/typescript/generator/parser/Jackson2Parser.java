@@ -85,7 +85,7 @@ public class Jackson2Parser extends ModelParser {
                         }
                     }
                     if (!isInAnnotationFilter) {
-                        System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
+                        TypeScriptGenerator.getLogger().info("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
                         continue;
                     }
                 }
@@ -258,7 +258,7 @@ public class Jackson2Parser extends ModelParser {
             } else {
                 final String jsonSerializerName = jsonSerializer.getClass().getName();
                 if (settings.displaySerializerWarning) {
-                    System.out.println(String.format("Warning: Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
+                    TypeScriptGenerator.getLogger().warning(String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
                 }
                 return null;
             }
@@ -330,11 +330,11 @@ public class Jackson2Parser extends ModelParser {
                     } else if (value instanceof Number) {
                         enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, null));
                     } else {
-                        System.out.println(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
+                        TypeScriptGenerator.getLogger().warning(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
                     }
                 }
             } catch (Exception e) {
-                System.out.println(String.format("Cannot get enum values for '%s' enum", enumClass.getName()));
+                TypeScriptGenerator.getLogger().error(String.format("Cannot get enum values for '%s' enum", enumClass.getName()));
                 e.printStackTrace(System.out);
             }
         }

@@ -63,7 +63,7 @@ public class Jackson1Parser extends ModelParser {
                         }
                     }
                     if (!isInAnnotationFilter) {
-                        System.out.println("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
+                        TypeScriptGenerator.getLogger().info("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
                         continue;
                     }
                 }

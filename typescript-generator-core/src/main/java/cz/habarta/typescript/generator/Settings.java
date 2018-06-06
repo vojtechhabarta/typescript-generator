@@ -200,7 +200,7 @@ public class Settings {
             final String extensionName = extension.getClass().getSimpleName();
             final DeprecationText deprecation = extension.getClass().getAnnotation(DeprecationText.class);
             if (deprecation != null) {
-                System.out.println(String.format("Warning: Extension '%s' is deprecated: %s", extensionName, deprecation.value()));
+                TypeScriptGenerator.getLogger().warning(String.format("Extension '%s' is deprecated: %s", extensionName, deprecation.value()));
             }
             final EmitterExtensionFeatures features = extension.getFeatures();
             if (features.generatesRuntimeCode && outputFileType != TypeScriptFileType.implementationFile) {
@@ -274,18 +274,18 @@ public class Settings {
         }
 
         if (declarePropertiesAsOptional) {
-            System.out.println("Warning: Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
+            TypeScriptGenerator.getLogger().warning("Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
             if (optionalProperties == null) {
                 optionalProperties = OptionalProperties.all;
             }
         }
         if (disableJackson2ModuleDiscovery) {
-            System.out.println("Warning: Parameter 'disableJackson2ModuleDiscovery' was removed. See 'jackson2ModuleDiscovery' and 'jackson2Modules' parameters.");
+            TypeScriptGenerator.getLogger().warning("Parameter 'disableJackson2ModuleDiscovery' was removed. See 'jackson2ModuleDiscovery' and 'jackson2Modules' parameters.");
         }
     }
 
     private static void reportConfigurationChange(String extensionName, String parameterName, String parameterValue) {
-        System.out.println(String.format("Configuration: '%s' extension set '%s' parameter to '%s'", extensionName, parameterName, parameterValue));
+        TypeScriptGenerator.getLogger().info(String.format("Configuration: '%s' extension set '%s' parameter to '%s'", extensionName, parameterName, parameterValue));
     }
 
     public String getExtension() {
@@ -384,7 +384,7 @@ public class Settings {
 
     private static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
         try {
-            System.out.println("Loading class " + className);
+            TypeScriptGenerator.getLogger().verbose("Loading class " + className);
             final Class<?> loadedClass = classLoader.loadClass(className);
             if (requiredClassType.isAssignableFrom(loadedClass)) {
                 @SuppressWarnings("unchecked")
@@ -411,7 +411,7 @@ public class Settings {
 
     private static <T> T loadInstance(ClassLoader classLoader, String className, Class<T> requiredType) {
         try {
-            System.out.println("Loading class " + className);
+            TypeScriptGenerator.getLogger().verbose("Loading class " + className);
             return requiredType.cast(classLoader.loadClass(className).newInstance());
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

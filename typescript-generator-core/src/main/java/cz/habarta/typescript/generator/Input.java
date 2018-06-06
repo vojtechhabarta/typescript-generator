@@ -55,7 +55,7 @@ public class Input {
             }
             if (types.isEmpty()) {
                 final String errorMessage = "No input classes found.";
-                System.out.println(errorMessage);
+                TypeScriptGenerator.getLogger().error(errorMessage);
                 throw new RuntimeException(errorMessage);
             }
             return new Input(types);
@@ -77,7 +77,7 @@ public class Input {
 
         public ScanResult scanClasspath() {
             if (scanResult == null) {
-                System.out.println("Scanning classpath");
+                TypeScriptGenerator.getLogger().info("Scanning classpath");
                 final Date scanStart = new Date();
                 final ScanResult result = new FastClasspathScanner()
                         .overrideClasspath((Object[])classLoader.getURLs())
@@ -86,7 +86,7 @@ public class Input {
                 final int count = result.getNamesOfAllClasses().size();
                 final Date scanEnd = new Date();
                 final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
-                System.out.println(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+                TypeScriptGenerator.getLogger().info(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
                 scanResult = result;
             }
             return scanResult;
@@ -100,7 +100,7 @@ public class Input {
         allClassNames.addAll(scanResult.getNamesOfAllInterfaceClasses());
         Collections.sort(allClassNames);
         final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
-        System.out.println(String.format("Found %d classes matching pattern.", classNames.size()));
+        TypeScriptGenerator.getLogger().info(String.format("Found %d classes matching pattern.", classNames.size()));
         return fromClassNames(classNames);
     }
 
@@ -123,7 +123,7 @@ public class Input {
                 final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 classes.add(cls);
             } catch (ReflectiveOperationException e) {
-                System.out.println(String.format("Error: Cannot load class '%s'", className));
+                TypeScriptGenerator.getLogger().error(String.format("Cannot load class '%s'", className));
                 e.printStackTrace(System.out);
             }
         }

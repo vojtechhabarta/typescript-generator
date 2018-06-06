@@ -314,9 +314,9 @@ public class ModelCompiler {
             return result.getTsType();
         } else {
             if (usedInClass != null && usedInProperty != null) {
-                System.out.println(String.format("Warning: Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
+                TypeScriptGenerator.getLogger().warning(String.format("Unsupported type '%s' used in '%s.%s'", javaType, usedInClass.getSimpleName(), usedInProperty));
             } else {
-                System.out.println(String.format("Warning: Unsupported type '%s'", javaType));
+                TypeScriptGenerator.getLogger().warning(String.format("Unsupported type '%s'", javaType));
             }
             return TsType.Any;
         }
@@ -498,7 +498,7 @@ public class ModelCompiler {
                 if (Emitter.isValidIdentifierName(annotationValue)) {
                     return symbolTable.getSyntheticSymbol(annotationValue, nameSuffix);
                 } else {
-                    System.out.println(String.format("Warning: Ignoring annotation value '%s' since it is not a valid identifier, '%s' will be in default namespace", annotationValue, method.getOriginClass().getName() + "." + method.getName()));
+                    TypeScriptGenerator.getLogger().warning(String.format("Ignoring annotation value '%s' since it is not a valid identifier, '%s' will be in default namespace", annotationValue, method.getOriginClass().getName() + "." + method.getName()));
                 }
             }
         }

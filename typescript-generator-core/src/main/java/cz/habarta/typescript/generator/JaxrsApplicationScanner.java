@@ -16,7 +16,7 @@ public class JaxrsApplicationScanner {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(jaxrsApplicationClass.getClassLoader());
-            System.out.println("Scanning JAX-RS application: " + jaxrsApplicationClass.getName());
+            TypeScriptGenerator.getLogger().info("Scanning JAX-RS application: " + jaxrsApplicationClass.getName());
             final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             final Application application = (Application) constructor.newInstance();
@@ -37,14 +37,14 @@ public class JaxrsApplicationScanner {
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
         final List<String> namesOfResourceClasses = scanResult.getNamesOfClassesWithAnnotation(Path.class);
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
-        System.out.println(String.format("Found %d root resources.", resourceClasses.size()));
+        TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));
         return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
     }
 
     private static RuntimeException reportError(ReflectiveOperationException e) {
         final String url = "https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application";
         final String message = "Cannot load JAX-RS application. For more information see " + url + ".";
-        System.out.println(message);
+        TypeScriptGenerator.getLogger().error(message);
         return new RuntimeException(message, e);
     }
 
