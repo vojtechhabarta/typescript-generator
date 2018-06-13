@@ -62,7 +62,7 @@ public abstract class ModelParser {
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
-                    System.out.println("Parsing '" + cls.getName() + "'" +
+                    TypeScriptGenerator.getLogger().verbose("Parsing '" + cls.getName() + "'" +
                             (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
                     final DeclarationModel model = parseClass(sourceType.asSourceClass());
                     if (model instanceof EnumModel) {

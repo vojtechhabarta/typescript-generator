@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Utils;
 import cz.habarta.typescript.generator.xmldoclet.Class;
@@ -29,7 +30,7 @@ public class Javadoc {
         final List<Root> dRoots = new ArrayList<>();
         if (javadocXmlFiles != null) {
             for (File file : javadocXmlFiles) {
-                System.out.println("Loading Javadoc XML file: " + file);
+                TypeScriptGenerator.getLogger().info("Loading Javadoc XML file: " + file);
                 final Root dRoot = JAXB.unmarshal(file, Root.class);
                 dRoots.add(dRoot);
             }

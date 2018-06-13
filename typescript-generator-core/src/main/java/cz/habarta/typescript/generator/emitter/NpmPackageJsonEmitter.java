@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.emitter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.StandardJsonPrettyPrinter;
 import java.io.*;
 
@@ -15,7 +16,7 @@ public class NpmPackageJsonEmitter {
     public void emit(NpmPackageJson npmPackageJson, Writer output, String outputName, boolean closeOutput) {
         this.writer = output;
         if (outputName != null) {
-            System.out.println("Writing NPM package to: " + outputName);
+            TypeScriptGenerator.getLogger().info("Writing NPM package to: " + outputName);
         }
         emitPackageJson(npmPackageJson);
         if (closeOutput) {

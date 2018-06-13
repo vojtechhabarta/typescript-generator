@@ -25,7 +25,7 @@ public class Emitter implements EmitterExtension.Writer {
         this.forceExportKeyword = forceExportKeyword;
         this.indent = initialIndentationLevel;
         if (outputName != null) {
-            System.out.println("Writing declarations to: " + outputName);
+            TypeScriptGenerator.getLogger().info("Writing declarations to: " + outputName);
         }
         emitFileComment();
         emitReferences();

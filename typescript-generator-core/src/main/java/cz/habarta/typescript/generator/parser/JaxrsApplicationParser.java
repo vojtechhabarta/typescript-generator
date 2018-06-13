@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.JaxrsApplicationScanner;
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
@@ -77,7 +78,7 @@ public class JaxrsApplicationParser {
         // resource
         final Path path = cls.getAnnotation(Path.class);
         if (path != null) {
-            System.out.println("Parsing JAX-RS resource: " + cls.getName());
+            TypeScriptGenerator.getLogger().verbose("Parsing JAX-RS resource: " + cls.getName());
             final Result result = new Result();
             parseResource(result, new ResourceContext(cls, path.value()), cls);
             return result;

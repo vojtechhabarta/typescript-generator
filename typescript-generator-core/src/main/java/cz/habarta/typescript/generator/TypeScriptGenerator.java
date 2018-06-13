@@ -13,12 +13,22 @@ public class TypeScriptGenerator {
 
     public static final String Version = getVersion();
 
+    private static Logger logger = new Logger();
+
     private final Settings settings;
     private TypeProcessor typeProcessor = null;
     private ModelParser modelParser = null;
     private ModelCompiler modelCompiler = null;
     private Emitter emitter = null;
     private NpmPackageJsonEmitter npmPackageJsonEmitter = null;
+
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    public static void setLogger(Logger logger) {
+        TypeScriptGenerator.logger = logger;
+    }
 
     public TypeScriptGenerator() {
         this (new Settings());
@@ -30,7 +40,7 @@ public class TypeScriptGenerator {
     }
 
     public static void printVersion() {
-        System.out.println("Running TypeScriptGenerator version " + Version);
+        TypeScriptGenerator.getLogger().info("Running TypeScriptGenerator version " + Version);
     }
 
     public String generateTypeScript(Input input) {

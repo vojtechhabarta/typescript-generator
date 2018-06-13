@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.compiler;
 
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
@@ -100,7 +101,7 @@ public class SymbolTable {
             final String name = entry.getKey();
             final List<Class<?>> classes = entry.getValue();
             if (classes.size() > 1) {
-                System.out.println(String.format("Multiple classes are mapped to '%s' name. Conflicting classes: %s", name, classes));
+                TypeScriptGenerator.getLogger().warning(String.format("Multiple classes are mapped to '%s' name. Conflicting classes: %s", name, classes));
                 conflict = true;
             }
         }
@@ -191,9 +192,9 @@ public class SymbolTable {
             final ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
 
             if (engine == null) {
-                System.out.println(String.format("Error: Script engine for '%s' MIME type not found. Available engines: %s", engineMimeType, manager.getEngineFactories().size()));
+                TypeScriptGenerator.getLogger().error(String.format("Script engine for '%s' MIME type not found. Available engines: %s", engineMimeType, manager.getEngineFactories().size()));
                 for (ScriptEngineFactory factory : manager.getEngineFactories()) {
-                    System.out.println(String.format("  %s %s - MIME types: %s", factory.getEngineName(), factory.getEngineVersion(), factory.getMimeTypes()));
+                    TypeScriptGenerator.getLogger().info(String.format("  %s %s - MIME types: %s", factory.getEngineName(), factory.getEngineVersion(), factory.getMimeTypes()));
                 }
                 throw new RuntimeException("Cannot evaluate function specified using 'customTypeNamingFunction' parameter. See log for details.");
             }

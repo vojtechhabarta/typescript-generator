@@ -496,9 +496,10 @@ public class GenerateMojo extends AbstractMojo {
     private String indentString;
 
     /**
-     * Display warnings when bean serializer is not found.
+     * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
      */
-    @Parameter(defaultValue = "true")
+    @Parameter
+    @Deprecated
     private boolean displaySerializerWarning;
 
     /**
@@ -521,10 +522,26 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> jackson2Modules;
 
     /**
-     * Turns on verbose output for debugging purposes.
+     * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
      */
     @Parameter
+    @Deprecated
     private boolean debug;
+
+    /**
+     * Specifies level of logging output.
+     * Supported values are:
+     * <ul>
+     * <li><code>Debug</code></li>
+     * <li><code>Verbose</code></li>
+     * <li><code>Info</code></li>
+     * <li><code>Warning</code></li>
+     * <li><code>Error</code></li>
+     * </ul>
+     * Default value is <code>Verbose</code>.
+     */
+    @Parameter
+    private Logger.Level loggingLevel;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -535,6 +552,7 @@ public class GenerateMojo extends AbstractMojo {
     @Override
     public void execute() {
         try {
+            TypeScriptGenerator.setLogger(new Logger(loggingLevel));
             TypeScriptGenerator.printVersion();
 
             // class loader
@@ -596,6 +614,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.setStringQuotes(stringQuotes);
             settings.setIndentString(indentString);
             settings.displaySerializerWarning = displaySerializerWarning;
+            settings.debug = debug;
             settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
@@ -607,7 +626,8 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader, debug),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
+                            settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
                     Output.to(output)
             );
 
