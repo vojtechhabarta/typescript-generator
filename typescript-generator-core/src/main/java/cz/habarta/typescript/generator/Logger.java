@@ -4,12 +4,24 @@ package cz.habarta.typescript.generator;
 
 public class Logger {
 
-    protected enum Level {
-        Verbose, Info, Warning, Error;
+    private final Level level;
+
+    public enum Level {
+        Debug, Verbose, Info, Warning, Error;
+    }
+
+    public Logger() {
+        this(null);
+    }
+
+    public Logger(Level level) {
+        this.level = level != null ? level : Level.Verbose;
     }
 
     protected void write(Level level, String message) {
-        System.out.println(message);
+        if (level.compareTo(this.level) >= 0) {
+            System.out.println(message);
+        }
     }
 
     public final void verbose(String message) {

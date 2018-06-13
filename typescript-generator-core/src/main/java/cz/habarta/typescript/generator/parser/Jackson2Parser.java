@@ -258,7 +258,7 @@ public class Jackson2Parser extends ModelParser {
             } else {
                 final String jsonSerializerName = jsonSerializer.getClass().getName();
                 if (settings.displaySerializerWarning) {
-                    TypeScriptGenerator.getLogger().warning(String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
+                    TypeScriptGenerator.getLogger().verbose(String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
                 }
                 return null;
             }

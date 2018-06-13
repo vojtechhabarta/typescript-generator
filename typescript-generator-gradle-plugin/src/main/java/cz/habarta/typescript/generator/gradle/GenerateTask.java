@@ -68,11 +68,12 @@ public class GenerateTask extends DefaultTask {
     public String npmVersion;
     public StringQuotes stringQuotes;
     public String indentString;
-    public boolean displaySerializerWarning = true;
+    @Deprecated public boolean displaySerializerWarning;
     @Deprecated public boolean disableJackson2ModuleDiscovery;
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
-    public boolean debug;
+    @Deprecated public boolean debug;
+    public Logger.Level loggingLevel;
 
     @TaskAction
     public void generate() throws Exception {
@@ -83,6 +84,7 @@ public class GenerateTask extends DefaultTask {
             throw new RuntimeException("Please specify 'jsonLibrary' property.");
         }
 
+        TypeScriptGenerator.setLogger(new Logger(loggingLevel));
         TypeScriptGenerator.printVersion();
 
         // class loader
@@ -154,6 +156,7 @@ public class GenerateTask extends DefaultTask {
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;
+        settings.debug = debug;
         settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
@@ -165,7 +168,8 @@ public class GenerateTask extends DefaultTask {
 
         // TypeScriptGenerator
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(), classLoader, debug),
+                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
+                        settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
                 Output.to(output)
         );
     }
