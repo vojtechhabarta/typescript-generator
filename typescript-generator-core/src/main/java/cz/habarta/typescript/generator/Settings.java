@@ -284,10 +284,10 @@ public class Settings {
             TypeScriptGenerator.getLogger().warning("Parameter 'disableJackson2ModuleDiscovery' was removed. See 'jackson2ModuleDiscovery' and 'jackson2Modules' parameters.");
         }
         if (displaySerializerWarning) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'displaySerializerWarning' was removed. Please set 'loggingLevel' parameter to 'Info' value (or higher).");
+            TypeScriptGenerator.getLogger().warning("Parameter 'displaySerializerWarning' was removed. Please use 'loggingLevel' parameter, these messages have 'Verbose' level.");
         }
         if (debug) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'debug' was removed. Please set 'loggingLevel' parameter to 'Debug' value.");
+            TypeScriptGenerator.getLogger().warning("Parameter 'debug' was removed. Please set 'loggingLevel' parameter to 'Debug'.");
         }
     }
 
