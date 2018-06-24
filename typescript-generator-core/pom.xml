@@ -13,6 +13,8 @@
     <name>typescript-generator-core</name>
 
     <properties>
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <jaxb.version>2.3.0</jaxb.version>
         <jackson1.version>1.9.13</jackson1.version>
         <jackson2.version>2.9.3</jackson2.version>
         <jersey.version>2.26</jersey.version>
@@ -33,12 +35,22 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>javax.activation-api</artifactId>
-            <version>1.2.0</version>
+            <version>${javax.activation.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -130,11 +142,33 @@
                             <doclet>com.github.markusbernhardt.xmldoclet.XmlDoclet</doclet>
                             <additionalOptions>-d ${project.build.directory} -filename test-javadoc.xml</additionalOptions>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
-                            <docletArtifact>
-                                <groupId>com.github.markusbernhardt</groupId>
-                                <artifactId>xml-doclet</artifactId>
-                                <version>1.0.5</version>
-                            </docletArtifact>
+                            <docletArtifacts>
+                                <docletArtifact>
+                                    <groupId>com.github.markusbernhardt</groupId>
+                                    <artifactId>xml-doclet</artifactId>
+                                    <version>1.0.5</version>
+                                </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>javax.xml.bind</groupId>
+                                    <artifactId>jaxb-api</artifactId>
+                                    <version>${jaxb.version}</version>
+                                </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>com.sun.xml.bind</groupId>
+                                    <artifactId>jaxb-impl</artifactId>
+                                    <version>${jaxb.version}</version>
+                                </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>org.glassfish.jaxb</groupId>
+                                    <artifactId>jaxb-runtime</artifactId>
+                                    <version>${jaxb.version}</version>
+                                </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>javax.activation</groupId>
+                                    <artifactId>javax.activation-api</artifactId>
+                                    <version>${javax.activation.version}</version>
+                                </docletArtifact>
+                            </docletArtifacts>
                         </configuration>
                     </execution>
                 </executions>
