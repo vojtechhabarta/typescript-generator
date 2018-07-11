@@ -35,6 +35,11 @@ public class Input {
 
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
             boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
+        return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader, debug);
+    }
+
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, List<String> classesWithAnnotations, String jaxrsApplicationClassName,
+		    boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
         Objects.requireNonNull(classLoader, "classLoader");
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -46,6 +51,9 @@ public class Input {
             }
             if (classNamePatterns != null) {
                 types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns));
+            }
+            if(classesWithAnnotations != null) {
+                types.addAll(fromClassNames(classpathScanner.scanClasspath().getNamesOfClassesWithAnnotationsAnyOf(classesWithAnnotations.stream().toArray(String[]::new))));
             }
             if (jaxrsApplicationClassName != null) {
                 types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));

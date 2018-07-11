@@ -95,6 +95,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private List<String> classPatterns;
 
+
+    /**
+     * Only retrieve classes from the classpath with the specified annotations
+     */
+    @Parameter
+    private List<String> classesWithAnnotations;
+
     /**
      * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for JSON classes to process.
      * Parameter contains fully-qualified class name.
@@ -626,7 +633,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
                             settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
                     Output.to(output)
             );
