@@ -95,9 +95,8 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private List<String> classPatterns;
 
-
     /**
-     * Only retrieve classes from the classpath with the specified annotations
+     * JSON classes to process specified by annotations.
      */
     @Parameter
     private List<String> classesWithAnnotations;

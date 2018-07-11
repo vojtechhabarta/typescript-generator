@@ -39,7 +39,7 @@ public class Input {
     }
 
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, List<String> classesWithAnnotations, String jaxrsApplicationClassName,
-		    boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
+            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
         Objects.requireNonNull(classLoader, "classLoader");
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
