@@ -22,11 +22,13 @@ public class CustomTypeMappingTest {
         assertTrue(output.contains("import * as myModule from '../src/test/ts/my-module.d.ts';"));
         assertTrue(output.contains("date1: MyDate;"));
         assertTrue(output.contains("calendar1: myModule.MyCalendar;"));
+        assertTrue(output.contains("map1: Map<MyDate, myModule.MyCalendar>;"));
     }
 
     private static class CustomTypesUsage {
         public Date date1;
         public Calendar calendar1;
+        public Map<Date, Calendar> map1;
     }
 
 }

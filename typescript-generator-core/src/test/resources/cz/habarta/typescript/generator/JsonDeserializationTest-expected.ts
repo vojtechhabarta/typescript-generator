@@ -6,11 +6,11 @@ export class User {
     age: number;
     address: Address;
     addresses: Address[];
-    taggedAddresses: { [index: string]: Address };
-    groupedAddresses: { [index: string]: Address[] };
-    listOfTaggedAddresses: { [index: string]: Address }[];
+    taggedAddresses: Map<string, Address>;
+    groupedAddresses: Map<string, Address[]>;
+    listOfTaggedAddresses: Map<string, Address>[];
     tags: string[];
-    mapping: { [index: string]: string };
+    mapping: Map<string, string>;
     listOfListOfString: string[][];
     orders: PagedList<Order, Authentication>;
     allOrders: PagedList<Order, Authentication>[];

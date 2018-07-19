@@ -30,7 +30,7 @@ public class SwaggerTest {
         Assert.assertTrue(output.contains("testOperation1(): RestResponse<TestResponse>;"));
         Assert.assertTrue(output.contains("testOperation2(): RestResponse<TestResponse[]>;"));
         Assert.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
-        Assert.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
+        Assert.assertTrue(output.contains("testOperation4(): RestResponse<Map<string, TestResponse>>;"));
         Assert.assertTrue(!output.contains("testHiddenOperation"));
     }
 

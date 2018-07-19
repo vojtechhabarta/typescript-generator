@@ -160,6 +160,19 @@ public abstract class TsType implements Emittable {
         }
 
     }
+    
+    public static class MapType extends IndexedArrayType {
+
+        public MapType(TsType indexType, TsType elementType) {
+            super(indexType, elementType);
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return "Map<" + indexType.format(settings) + ", " + elementType.format(settings) + ">";
+        }
+
+    }
 
     public static class UnionType extends TsType {
 
@@ -272,9 +285,11 @@ public abstract class TsType implements Emittable {
         }
         if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
-            return new TsType.IndexedArrayType(
-                    transformTsType(context, indexedArrayType.indexType, transformer),
-                    transformTsType(context, indexedArrayType.elementType, transformer));
+            TsType indexType = transformTsType(context, indexedArrayType.indexType, transformer);
+            TsType elementType = transformTsType(context, indexedArrayType.elementType, transformer);
+            return type instanceof MapType
+                ? new TsType.MapType(indexType, elementType)
+                : new TsType.IndexedArrayType(indexType, elementType);
         }
         if (type instanceof TsType.ObjectType) {
             final TsType.ObjectType objectType = (TsType.ObjectType) type;

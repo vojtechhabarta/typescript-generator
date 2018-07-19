@@ -32,6 +32,7 @@ public class TsTypeTest {
         assertEquals("(string | number)[]", new BasicArrayType(new UnionType(Arrays.asList(String, Number))).format(settings));
         assertEquals("(string | number)[][]", new BasicArrayType(new BasicArrayType(new UnionType(Arrays.asList(String, Number)))).format(settings));
         assertEquals("{ [index: string]: string | number }", new IndexedArrayType(String, new UnionType(Arrays.asList(String, Number))).format(settings));
+        assertEquals("Map<string, any>", new MapType(String, Any).format(settings));
     }
 
     @Test
