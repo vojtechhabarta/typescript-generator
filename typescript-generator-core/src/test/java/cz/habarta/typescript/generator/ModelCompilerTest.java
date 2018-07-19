@@ -18,7 +18,7 @@ public class ModelCompilerTest {
     public void testEnum() throws Exception {
         final Settings settings = getTestSettings();
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: Direction }[]", TestUtils.compileType(settings, javaType).toString());
+        Assert.assertEquals("Map<string, Direction>[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ModelCompilerTest {
     public void testExclusion() throws Exception {
         final Settings settings = getTestSettings(Direction.class.getName());
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
+        Assert.assertEquals("Map<string, any>[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ModelCompilerTest {
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(null, Arrays.asList("**Direction"));
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
+        Assert.assertEquals("Map<string, any>[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test

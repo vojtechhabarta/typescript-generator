@@ -6,6 +6,8 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.math.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.JAXBElement;
 
 
@@ -50,7 +52,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.BasicArrayType(TsType.Any));
             }
             if (Map.class.isAssignableFrom(javaClass)) {
-                return new Result(new TsType.IndexedArrayType(TsType.String, TsType.Any));
+                return new Result(new TsType.MapType(TsType.String, TsType.Any));
             }
             if (javaClass.getName().equals("java.util.OptionalInt") ||
                     javaClass.getName().equals("java.util.OptionalLong") ||
@@ -77,8 +79,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[1]);
-                    return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
+                    final Result indexResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result elementResult = context.processType(parameterizedType.getActualTypeArguments()[1]);
+                    return new Result(
+                        new TsType.MapType(
+                            indexResult.getTsType(),
+                            elementResult.getTsType()),
+                        Stream.concat(indexResult.getDiscoveredClasses().stream(), elementResult.getDiscoveredClasses().stream()).collect(Collectors.toList()));
                 }
                 if (javaClass.getName().equals("java.util.Optional")) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);

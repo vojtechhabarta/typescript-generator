@@ -18,7 +18,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Dates.class));
         Assert.assertTrue(dts.contains("date: Date;"));
         Assert.assertTrue(dts.contains("dateList: Date[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, Date[]>;"));
         Assert.assertTrue(dts.contains("dates: Date[];"));
     }
 
@@ -29,7 +29,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
         Assert.assertTrue(dts.contains("date: Date;"));
         Assert.assertTrue(dts.contains("dateList: Date[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, Date[]>;"));
         Assert.assertTrue(dts.contains("dates: Date[];"));
     }
 
@@ -40,7 +40,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Dates.class));
         Assert.assertTrue(dts.contains("date: DateAsNumber;"));
         Assert.assertTrue(dts.contains("dateList: DateAsNumber[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsNumber[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, DateAsNumber[]>;"));
         Assert.assertTrue(dts.contains("dates: DateAsNumber[];"));
         Assert.assertTrue(dts.contains("type DateAsNumber = number;"));
     }
@@ -52,7 +52,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
         Assert.assertTrue(dts.contains("date: number;"));
         Assert.assertTrue(dts.contains("dateList: number[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: number[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, number[]>;"));
         Assert.assertTrue(dts.contains("dates: number[];"));
         Assert.assertTrue(!dts.contains("type DateAsNumber = number;"));
     }
@@ -64,7 +64,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Dates.class));
         Assert.assertTrue(dts.contains("date: DateAsString;"));
         Assert.assertTrue(dts.contains("dateList: DateAsString[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, DateAsString[]>;"));
         Assert.assertTrue(dts.contains("dates: DateAsString[];"));
         Assert.assertTrue(dts.contains("type DateAsString = string;"));
     }
@@ -76,7 +76,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
         Assert.assertTrue(dts.contains("date: string;"));
         Assert.assertTrue(dts.contains("dateList: string[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: string[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, string[]>;"));
         Assert.assertTrue(dts.contains("dates: string[];"));
         Assert.assertTrue(!dts.contains("type DateAsString = string;"));
     }
@@ -88,7 +88,7 @@ public class DateTest {
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Java8Dates.class));
         Assert.assertTrue(dts.contains("date: DateAsString;"));
         Assert.assertTrue(dts.contains("dateList: DateAsString[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
+        Assert.assertTrue(dts.contains("datesMap: Map<string, DateAsString[]>;"));
         Assert.assertTrue(dts.contains("dates: DateAsString[];"));
         Assert.assertTrue(dts.contains("type DateAsString = string;"));
     }
