@@ -160,6 +160,19 @@ public abstract class TsType implements Emittable {
         }
 
     }
+    
+    public static class MapType extends IndexedArrayType {
+
+        public MapType(TsType indexType, TsType elementType) {
+            super(indexType, elementType);
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return "Map<" + indexType.format(settings) + ", " + elementType.format(settings) + ">";
+        }
+
+    }
 
     public static class UnionType extends TsType {
 
