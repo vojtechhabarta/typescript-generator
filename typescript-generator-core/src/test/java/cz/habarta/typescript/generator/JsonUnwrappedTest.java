@@ -48,6 +48,24 @@ public class JsonUnwrappedTest {
         Assert.assertEquals(expected.trim(), output.trim());
     }
 
+    @Test
+    public void testPrivateField() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Person2.class));
+        final String expected = "\n"
+                + "interface Person2 {\n"
+                + "    first: string;\n"
+                + "    last: string;\n"
+                + "}\n"
+                + "\n"
+                + "interface Name {\n"
+                + "    first: string;\n"
+                + "    last: string;\n"
+                + "}\n"
+                + "";
+        Assert.assertEquals(expected.trim(), output.trim());
+    }
+
     public static class Person {
         @JsonUnwrapped(prefix = "A", suffix = "A")
         public Parent parentA;
@@ -69,6 +87,15 @@ public class JsonUnwrappedTest {
         public String first, last;
     }
 
+    public static class Person2 {
+        @JsonUnwrapped
+        private Name name;
+
+        public Name getName() {
+            return name;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         final Parent parent = new Parent();
         parent.age = 18;
@@ -84,10 +111,13 @@ public class JsonUnwrappedTest {
         final Person person = new Person();
         person.parentA = parent;
         person.parentB = parent;
+        final Person2 person2 = new Person2();
+        person2.name = parent.name;
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter());
         System.out.println(objectMapper.writeValueAsString(person));
+        System.out.println(objectMapper.writeValueAsString(person2));
     }
 
 }

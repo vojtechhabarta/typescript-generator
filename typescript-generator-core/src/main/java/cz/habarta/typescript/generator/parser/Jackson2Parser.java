@@ -113,15 +113,11 @@ public class Jackson2Parser extends ModelParser {
                         });
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
-                final Member originalMember = beanPropertyWriter.getMember().getMember();
-                if (originalMember instanceof AccessibleObject) {
-                    final AccessibleObject accessibleObject = (AccessibleObject) originalMember;
-                    final JsonUnwrapped annotation = accessibleObject.getAnnotation(JsonUnwrapped.class);
-                    if (annotation != null && annotation.enabled()) {
-                        pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
-                    }
+                final JsonUnwrapped annotation = beanPropertyWriter.getAnnotation(JsonUnwrapped.class);
+                if (annotation != null && annotation.enabled()) {
+                    pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember, pullProperties));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, propertyMember, pullProperties));
             }
         }
         if (sourceClass.type.isEnum()) {
