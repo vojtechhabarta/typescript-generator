@@ -12,6 +12,7 @@ public class TsEnumModel extends TsDeclarationModel {
 
     private final EnumKind kind;
     private final List<EnumMemberModel> members;
+    private boolean isConstEnum = true;
 
     public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
         super(origin, null, name, comments);
@@ -32,7 +33,17 @@ public class TsEnumModel extends TsDeclarationModel {
     }
 
     public TsEnumModel withMembers(List<EnumMemberModel> members) {
-        return new TsEnumModel(origin, name, kind, members, comments);
+        TsEnumModel model = new TsEnumModel(origin, name, kind, members, comments);
+        model.setConstEnum(isConstEnum());
+        return model;
+    }
+
+    public boolean isConstEnum() {
+        return isConstEnum;
+    }
+
+    public void setConstEnum(boolean isConstEnum) {
+        this.isConstEnum = isConstEnum;
     }
 
 }

@@ -297,7 +297,22 @@ public class ModelCompiler {
 
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
         final Symbol beanIdentifier = symbolTable.getSymbol(enumModel.getOrigin());
-        return TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
+        TsEnumModel tsEnumModel = TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
+        tsEnumModel.setConstEnum(isEnumConst(enumModel));
+        return tsEnumModel;
+    }
+
+    private boolean isEnumConst(EnumModel enumModel) {
+        boolean isConst = !settings.nonConstEnums;
+        if (isConst) {
+            for (Class<? extends Annotation> nonConstAnnotation : settings.nonConstEnumAnnotations) {
+                if (enumModel.getOrigin().isAnnotationPresent(nonConstAnnotation)) {
+                    isConst = false;
+                    break;
+                }
+            }
+        }
+        return isConst;
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {

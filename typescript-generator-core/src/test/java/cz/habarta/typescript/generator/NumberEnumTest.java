@@ -8,6 +8,10 @@ import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.ModelParser;
 import java.io.File;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,6 +59,20 @@ public class NumberEnumTest {
     }
 
     @Test
+    public void testNonConstAnnotationEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.nonConstEnumAnnotations.add(SomeNonConstAnnotation.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeCode.class));
+        Assert.assertEquals(
+                "enum SomeCode {\n" +
+                "    VALUE0 = 10,\n" +
+                "    VALUE1 = 11,\n" +
+                "}",
+                output.trim());
+    }
+
+    @Test
     public void testJavadoc() {
         final Settings settings = TestUtils.settings();
         settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
@@ -68,6 +86,7 @@ public class NumberEnumTest {
      * Documentation for SomeCode enum.
      */
     @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    @SomeNonConstAnnotation
     public static enum SomeCode {
 
         /**
@@ -89,6 +108,11 @@ public class NumberEnumTest {
         public Integer getJsonValue() {
             return this.jsonValue;
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE})
+    public @interface SomeNonConstAnnotation {
     }
 
 }
