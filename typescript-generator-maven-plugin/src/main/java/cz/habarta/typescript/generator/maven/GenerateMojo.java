@@ -294,6 +294,15 @@ public class GenerateMojo extends AbstractMojo {
     private boolean nonConstEnums;
 
     /**
+     * If this list is not empty, then generated enums will not have <code>const</code> keyword,
+     * if the enum contains one of the annotations defined in this list.
+     * See {@link #nonConstEnums}
+     *
+     */
+    @Parameter
+    private List<String> nonConstEnumAnnotations;
+
+    /**
      * Specifies whether Java classes will be mapped to TypeScript classes or interfaces.
      * Java interfaces are always mapped as TypeScript interfaces.
      * Supported values are:
@@ -596,6 +605,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
             settings.nonConstEnums = nonConstEnums;
+            settings.nonConstEnumAnnotations = Settings.loadAnnotations(classLoader, nonConstEnumAnnotations);
             settings.mapClasses = mapClasses;
             settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
             settings.disableTaggedUnions = disableTaggedUnions;

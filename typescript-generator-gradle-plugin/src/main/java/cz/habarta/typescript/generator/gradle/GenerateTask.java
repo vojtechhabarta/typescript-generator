@@ -45,6 +45,7 @@ public class GenerateTask extends DefaultTask {
     public DateMapping mapDate;
     public EnumMapping mapEnum;
     public boolean nonConstEnums;
+    public List<String> nonConstEnumAnnotations;
     public ClassMapping mapClasses;
     public List<String> mapClassesAsClassesPatterns;
     public boolean disableTaggedUnions;
@@ -133,6 +134,7 @@ public class GenerateTask extends DefaultTask {
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
         settings.nonConstEnums = nonConstEnums;
+        settings.nonConstEnumAnnotations = Settings.loadAnnotations(classLoader, nonConstEnumAnnotations);
         settings.mapClasses = mapClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.disableTaggedUnions = disableTaggedUnions;

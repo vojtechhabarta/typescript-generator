@@ -48,6 +48,7 @@ public class Settings {
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public boolean nonConstEnums = false;
+    public List<Class<? extends Annotation>> nonConstEnumAnnotations = new ArrayList<>();
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public List<String> mapClassesAsClassesPatterns;
     private Predicate<String> mapClassesAsClassesFilter = null;
@@ -102,7 +103,7 @@ public class Settings {
         public String toString() {
             return "TsGenURLClassLoader{" + name + ", parent: " + getParent() + "}";
         }
-        
+
     }
 
     public static URLClassLoader createClassLoader(String name, URL[] urls, ClassLoader parent) {
@@ -138,6 +139,13 @@ public class Settings {
                 this.extensions.add(emitterExtension);
             }
         }
+    }
+
+    public static List<Class<? extends Annotation>> loadAnnotations(ClassLoader classLoader, List<String> stringAnnotations) {
+        if (stringAnnotations != null) {
+            return new ArrayList<>(loadClasses(classLoader, stringAnnotations, Annotation.class));
+        }
+        return new ArrayList<>(0);
     }
 
     public void loadIncludePropertyAnnotations(ClassLoader classLoader, List<String> includePropertyAnnotations) {
@@ -232,7 +240,7 @@ public class Settings {
                 defaultStringEnumsOverriddenByExtension = true;
             }
         }
-        if (nonConstEnums && outputFileType != TypeScriptFileType.implementationFile) {
+        if ((nonConstEnums || !nonConstEnumAnnotations.isEmpty()) && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("Non-const enums can only be used in implementation files but 'outputFileType' parameter is not set to 'implementationFile'.");
         }
         if (mapClasses == ClassMapping.asClasses && outputFileType != TypeScriptFileType.implementationFile) {
