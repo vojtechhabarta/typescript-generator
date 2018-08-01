@@ -14,8 +14,6 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import javax.management.ImmutableDescriptor;
-
 
 /**
  * See cz.habarta.typescript.generator.maven.GenerateMojo
@@ -105,7 +103,7 @@ public class Settings {
         public String toString() {
             return "TsGenURLClassLoader{" + name + ", parent: " + getParent() + "}";
         }
-        
+
     }
 
     public static URLClassLoader createClassLoader(String name, URL[] urls, ClassLoader parent) {

@@ -176,7 +176,7 @@ public class ModelCompiler {
                 extendsList.add(parentType);
         }
         }
-        
+
         final List<TsType> interfaces = new ArrayList<>();
         for (Type aInterface : bean.getInterfaces()) {
             final TsType interfaceType = typeFromJava(symbolTable, aInterface);
@@ -189,7 +189,7 @@ public class ModelCompiler {
         } else {
             extendsList.addAll(interfaces);
         }
-        
+
         final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean, "", "");
 
         if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
@@ -298,21 +298,21 @@ public class ModelCompiler {
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
         final Symbol beanIdentifier = symbolTable.getSymbol(enumModel.getOrigin());
         TsEnumModel tsEnumModel = TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
-        tsEnumModel.setConstEnum(isEnumConst(enumModel));
+        tsEnumModel.setNonConstEnum(isEnumNonConst(enumModel));
         return tsEnumModel;
     }
 
-    private boolean isEnumConst(EnumModel enumModel) {
-        boolean isConst = !settings.nonConstEnums;
-        if (isConst) {
+    private boolean isEnumNonConst(EnumModel enumModel) {
+        boolean isNonConst = settings.nonConstEnums;
+        if (!isNonConst) {
             for (Class<? extends Annotation> nonConstAnnotation : settings.nonConstEnumAnnotations) {
                 if (enumModel.getOrigin().isAnnotationPresent(nonConstAnnotation)) {
-                    isConst = false;
+                    isNonConst = true;
                     break;
                 }
             }
         }
-        return isConst;
+        return isNonConst;
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType) {
@@ -357,13 +357,13 @@ public class ModelCompiler {
         for (TsBeanModel bean : tsModel.getBeans()) {
             if (bean.isClass()) {
                 final List<TsPropertyModel> resultProperties = new ArrayList<>(bean.getProperties());
-                
+
                 final Set<String> classPropertyNames = new LinkedHashSet<>();
                 for (TsPropertyModel property : bean.getProperties()) {
                     classPropertyNames.add(property.getName());
                 }
                 classPropertyNames.addAll(getInheritedProperties(symbolTable, tsModel, bean.getExtendsList()).keySet());
-                
+
                 final List<TsPropertyModel> implementedProperties = getImplementedProperties(symbolTable, tsModel, bean.getImplementsList());
                 Collections.reverse(implementedProperties);
                 for (TsPropertyModel implementedProperty : implementedProperties) {
@@ -372,7 +372,7 @@ public class ModelCompiler {
                         classPropertyNames.add(implementedProperty.getName());
                     }
                 }
-                
+
                 beans.add(bean.withProperties(resultProperties));
             } else {
                 beans.add(bean);
@@ -637,7 +637,7 @@ public class ModelCompiler {
                     }
                 }
                 return type;
-                
+
             }
         });
         return model.withTypeAliases(new ArrayList<>(typeAliases));

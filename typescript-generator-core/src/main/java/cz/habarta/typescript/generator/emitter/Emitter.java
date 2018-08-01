@@ -365,7 +365,7 @@ public class Emitter implements EmitterExtension.Writer {
         writeNewLine();
         emitComments(enumModel.getComments());
         final String declareText = declareKeyword ? "declare " : "";
-        final String constText = enumModel.isConstEnum() ? "const " : "";
+        final String constText = enumModel.isNonConstEnum() ? "" : "const ";
         writeIndentedLine(exportKeyword, declareText + constText + "enum " + enumModel.getName().getSimpleName() + " {");
         indent++;
         for (EnumMemberModel member : enumModel.getMembers()) {
