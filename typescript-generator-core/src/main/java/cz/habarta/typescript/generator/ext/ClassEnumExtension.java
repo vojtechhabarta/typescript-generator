@@ -59,7 +59,8 @@ public class ClassEnumExtension extends Extension {
                             tsBeanModel.getName(),
                             EnumKind.StringBased,
                             members,
-                            null
+                            null,
+                            false
                     );
                     stringEnums.add(temp);
                 }

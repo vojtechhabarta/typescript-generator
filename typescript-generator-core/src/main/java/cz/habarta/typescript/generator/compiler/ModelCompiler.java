@@ -297,8 +297,7 @@ public class ModelCompiler {
 
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {
         final Symbol beanIdentifier = symbolTable.getSymbol(enumModel.getOrigin());
-        TsEnumModel tsEnumModel = TsEnumModel.fromEnumModel(beanIdentifier, enumModel);
-        tsEnumModel.setNonConstEnum(isEnumNonConst(enumModel));
+        TsEnumModel tsEnumModel = TsEnumModel.fromEnumModel(beanIdentifier, enumModel, isEnumNonConst(enumModel));
         return tsEnumModel;
     }
 

@@ -12,16 +12,17 @@ public class TsEnumModel extends TsDeclarationModel {
 
     private final EnumKind kind;
     private final List<EnumMemberModel> members;
-    private boolean isNonConstEnum = false;
+    private final boolean isNonConstEnum;
 
-    public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
+    public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments, boolean isNonConstEnum) {
         super(origin, null, name, comments);
         this.kind = kind;
         this.members = members;
+        this.isNonConstEnum = isNonConstEnum;
     }
 
-    public static TsEnumModel fromEnumModel(Symbol name, EnumModel enumModel) {
-        return new TsEnumModel(enumModel.getOrigin(), name, enumModel.getKind(), enumModel.getMembers(), enumModel.getComments());
+    public static TsEnumModel fromEnumModel(Symbol name, EnumModel enumModel, boolean isNonConstEnum) {
+        return new TsEnumModel(enumModel.getOrigin(), name, enumModel.getKind(), enumModel.getMembers(), enumModel.getComments(), isNonConstEnum);
     }
 
     public EnumKind getKind() {
@@ -32,18 +33,13 @@ public class TsEnumModel extends TsDeclarationModel {
         return members;
     }
 
-    public TsEnumModel withMembers(List<EnumMemberModel> members) {
-        TsEnumModel model = new TsEnumModel(origin, name, kind, members, comments);
-        model.setNonConstEnum(isNonConstEnum());
-        return model;
-    }
-
     public boolean isNonConstEnum() {
         return isNonConstEnum;
     }
 
-    public void setNonConstEnum(boolean isConstEnum) {
-        this.isNonConstEnum = isConstEnum;
+    public TsEnumModel withMembers(List<EnumMemberModel> members) {
+        TsEnumModel model = new TsEnumModel(origin, name, kind, members, comments, isNonConstEnum);
+        return model;
     }
 
 }
