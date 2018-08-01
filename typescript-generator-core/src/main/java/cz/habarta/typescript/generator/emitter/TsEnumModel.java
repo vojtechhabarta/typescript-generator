@@ -14,6 +14,11 @@ public class TsEnumModel extends TsDeclarationModel {
     private final List<EnumMemberModel> members;
     private final boolean isNonConstEnum;
 
+    @Deprecated
+    public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
+        this(origin, name, kind, members, comments, false);
+    }
+
     public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments, boolean isNonConstEnum) {
         super(origin, null, name, comments);
         this.kind = kind;
