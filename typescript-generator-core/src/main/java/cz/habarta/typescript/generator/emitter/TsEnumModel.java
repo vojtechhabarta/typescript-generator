@@ -43,8 +43,7 @@ public class TsEnumModel extends TsDeclarationModel {
     }
 
     public TsEnumModel withMembers(List<EnumMemberModel> members) {
-        TsEnumModel model = new TsEnumModel(origin, name, kind, members, comments, isNonConstEnum);
-        return model;
+        return new TsEnumModel(origin, name, kind, members, comments, isNonConstEnum);
     }
 
 }

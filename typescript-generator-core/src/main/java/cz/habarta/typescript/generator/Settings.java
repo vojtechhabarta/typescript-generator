@@ -126,9 +126,7 @@ public class Settings {
 
     public void loadExtensions(ClassLoader classLoader, List<String> extensions, List<Settings.ConfiguredExtension> extensionsWithConfiguration) {
         this.extensions = new ArrayList<>();
-        if (extensions != null) {
-            this.extensions.addAll(loadInstances(classLoader, extensions, EmitterExtension.class));
-        }
+        this.extensions.addAll(loadInstances(classLoader, extensions, EmitterExtension.class));
         if (extensionsWithConfiguration != null) {
             for (ConfiguredExtension configuredExtension : extensionsWithConfiguration) {
                 final EmitterExtension emitterExtension = loadInstance(classLoader, configuredExtension.className, EmitterExtension.class);
@@ -141,29 +139,20 @@ public class Settings {
         }
     }
 
-    public static List<Class<? extends Annotation>> loadAnnotations(ClassLoader classLoader, List<String> stringAnnotations) {
-        if (stringAnnotations != null) {
-            return new ArrayList<>(loadClasses(classLoader, stringAnnotations, Annotation.class));
-        }
-        return new ArrayList<>(0);
+    public void loadNonConstEnumAnnotations(ClassLoader classLoader, List<String> stringAnnotations) {
+        this.nonConstEnumAnnotations = loadClasses(classLoader, stringAnnotations, Annotation.class);
     }
 
     public void loadIncludePropertyAnnotations(ClassLoader classLoader, List<String> includePropertyAnnotations) {
-        if (includePropertyAnnotations != null) {
-            this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
-        }
+        this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
     }
 
     public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {
-        if (optionalAnnotations != null) {
-            this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
-        }
+        this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
     }
 
     public void loadJackson2Modules(ClassLoader classLoader, List<String> jackson2Modules) {
-        if (jackson2Modules != null) {
-            this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
-        }
+        this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
     }
 
     public static Map<String, String> convertToMap(List<String> mappings) {
@@ -388,7 +377,7 @@ public class Settings {
 
     private static <T> List<Class<? extends T>> loadClasses(ClassLoader classLoader, List<String> classNames, Class<T> requiredClassType) {
         if (classNames == null) {
-            return null;
+            return Collections.emptyList();
         }
         final List<Class<? extends T>> classes = new ArrayList<>();
         for (String className : classNames) {
@@ -415,7 +404,7 @@ public class Settings {
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
         if (classNames == null) {
-            return null;
+            return Collections.emptyList();
         }
         final List<T> instances = new ArrayList<>();
         for (String className : classNames) {

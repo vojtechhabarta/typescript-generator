@@ -134,7 +134,7 @@ public class GenerateTask extends DefaultTask {
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
         settings.nonConstEnums = nonConstEnums;
-        settings.nonConstEnumAnnotations = Settings.loadAnnotations(classLoader, nonConstEnumAnnotations);
+        settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
         settings.mapClasses = mapClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.disableTaggedUnions = disableTaggedUnions;
