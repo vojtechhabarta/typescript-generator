@@ -215,4 +215,27 @@ public class Jackson2ParserTest {
             Assert.assertEquals(expectedValues[i], enumModel.getMembers().get(i).getEnumValue());
         }
     }
+
+    @Test
+    public void testIgnoredProperty() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithIgnoredProperty.class));
+        Assert.assertTrue(output.contains("name1: string"));
+        Assert.assertTrue(!output.contains("name2: string"));
+    }
+
+    private static class ClassWithIgnoredProperty {
+        public String name1;
+        @JsonIgnore
+        public String name2;
+    }
+
+//    public static void main(String[] args) throws JsonProcessingException {
+//        final ObjectMapper objectMapper = new ObjectMapper();
+//        final ClassWithIgnoredProperty instance = new ClassWithIgnoredProperty();
+//        instance.name1 = "xxx";
+//        instance.name2 = "xxx";
+//        System.out.println(objectMapper.writeValueAsString(instance));
+//    }
+
 }
