@@ -1,8 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.compiler.Symbol;
+import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.lang.reflect.Type;
 import java.util.*;
 

@@ -1,10 +1,10 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.parser.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.habarta.typescript.generator.parser.*;
 import java.util.Optional;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Assert;

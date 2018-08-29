@@ -201,5 +201,5 @@ Contributing
 ### Code formatting
 
 - use 4 spaces for indentation in Java files
-- sort java imports alphabetically, you can use wildcards
+- sort java imports alphabetically (including static imports), you can use wildcards
 - please do not reformat whole files in IDE
