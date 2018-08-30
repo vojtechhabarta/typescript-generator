@@ -1,12 +1,11 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.compiler.EnumMemberModel;
-import cz.habarta.typescript.generator.compiler.EnumKind;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.compiler.EnumKind;
+import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
