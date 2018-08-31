@@ -3,9 +3,8 @@ package cz.habarta.typescript.generator;
 import static cz.habarta.typescript.generator.TsType.*;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.Arrays;
-import static org.junit.Assert.*;
-
 import org.junit.*;
+import static org.junit.Assert.*;
 
 public class TsTypeTest {
 

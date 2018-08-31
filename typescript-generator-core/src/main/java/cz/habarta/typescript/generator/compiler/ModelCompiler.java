@@ -42,6 +42,7 @@ public class ModelCompiler {
     }
 
     public enum TransformationPhase {
+        BeforeTsModel,
         BeforeEnums,
         BeforeSymbolResolution,
     }
@@ -49,6 +50,7 @@ public class ModelCompiler {
     public TsModel javaToTypeScript(Model model) {
         final SymbolTable symbolTable = new SymbolTable(settings);
         final List<Extension.TransformerDefinition> extensionTransformers = getExtensionTransformers();
+        model = applyExtensionModelTransformers(symbolTable, model, extensionTransformers);
         TsModel tsModel = processModel(symbolTable, model);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
@@ -110,6 +112,15 @@ public class ModelCompiler {
             }
         }
         return transformers;
+    }
+
+    private static Model applyExtensionModelTransformers(SymbolTable symbolTable, Model model, List<Extension.TransformerDefinition> transformerDefinitions) {
+        for (Extension.TransformerDefinition definition : transformerDefinitions) {
+            if (definition.phase == TransformationPhase.BeforeTsModel) {
+                model = definition.transformer.transformModel(symbolTable, model);
+            }
+        }
+        return model;
     }
 
     private static TsModel applyExtensionTransformers(SymbolTable symbolTable, TsModel model, TransformationPhase phase, List<Extension.TransformerDefinition> transformerDefinitions) {

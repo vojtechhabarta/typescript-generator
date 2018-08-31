@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.ext;
 
+import cz.habarta.typescript.generator.DeprecationText;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
@@ -9,7 +10,6 @@ import cz.habarta.typescript.generator.emitter.TsEnumModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import java.util.Collections;
 import java.util.List;
-import cz.habarta.typescript.generator.DeprecationText;
 
 
 @DeprecationText("Consider using parameter 'mapEnum' with value 'asEnum' and parameter 'nonConstEnums' with 'true'")

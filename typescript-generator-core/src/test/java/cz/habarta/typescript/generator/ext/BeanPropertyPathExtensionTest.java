@@ -1,8 +1,8 @@
 package cz.habarta.typescript.generator.ext;
 
-import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsModel;
