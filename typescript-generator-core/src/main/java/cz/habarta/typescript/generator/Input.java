@@ -4,12 +4,15 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
+
 import java.lang.reflect.*;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class Input {
@@ -44,109 +47,65 @@ public class Input {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
-            final ClasspathScanner classpathScanner = new ClasspathScanner(classLoader, debug);
-            final List<SourceType<Type>> types = new ArrayList<>();
-            if (classNames != null) {
-                types.addAll(fromClassNames(classNames));
+            try (ScanResult scanResult =
+                         new ClassGraph()
+                                 .enableAllInfo()       // Scan classes, methods, fields, annotations
+                                 .scan()) {
+                final List<SourceType<Type>> types = new ArrayList<>();
+                ClassInfoList allClasses = scanResult.getAllClasses();
+                if (classNames != null) {
+                    types.addAll(fromClassNames(allClasses, classNames));
+                }
+                if (classNamePatterns != null) {
+                    types.addAll(fromClassNamePatterns(allClasses, classNamePatterns));
+                }
+                if (classesWithAnnotations != null) {
+                    classesWithAnnotations.stream()
+                            .forEach(anno -> types.addAll(fromClassNames(scanResult.getClassesWithAnnotation(anno))));
+                }
+                if (jaxrsApplicationClassName != null) {
+                    types.addAll(fromClassNamePatterns(allClasses, Arrays.asList(jaxrsApplicationClassName)));
+                }
+                if (automaticJaxrsApplication) {
+                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(scanResult, isClassNameExcluded));
+                }
+                if (types.isEmpty()) {
+                    final String errorMessage = "No input classes found.";
+                    TypeScriptGenerator.getLogger().error(errorMessage);
+                    throw new RuntimeException(errorMessage);
+                }
+                return new Input(types);
             }
-            if (classNamePatterns != null) {
-                types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns));
-            }
-            if(classesWithAnnotations != null) {
-                types.addAll(fromClassNames(classpathScanner.scanClasspath().getNamesOfClassesWithAnnotationsAnyOf(classesWithAnnotations.stream().toArray(String[]::new))));
-            }
-            if (jaxrsApplicationClassName != null) {
-                types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));
-            }
-            if (automaticJaxrsApplication) {
-                types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.scanClasspath(), isClassNameExcluded));
-            }
-            if (types.isEmpty()) {
-                final String errorMessage = "No input classes found.";
-                TypeScriptGenerator.getLogger().error(errorMessage);
-                throw new RuntimeException(errorMessage);
-            }
-            return new Input(types);
         } finally {
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
     }
 
-    private static class ClasspathScanner {
-
-        private final URLClassLoader classLoader;
-        private final boolean verbose;
-        private ScanResult scanResult = null;
-
-        public ClasspathScanner(URLClassLoader classLoader, boolean verbose) {
-            this.classLoader = classLoader;
-            this.verbose = verbose;
-        }
-
-        public ScanResult scanClasspath() {
-            if (scanResult == null) {
-                TypeScriptGenerator.getLogger().info("Scanning classpath");
-                final Date scanStart = new Date();
-                final ScanResult result = new FastClasspathScanner()
-                        .overrideClasspath((Object[])classLoader.getURLs())
-                        .verbose(verbose)
-                        .scan();
-                final int count = result.getNamesOfAllClasses().size();
-                final Date scanEnd = new Date();
-                final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
-                TypeScriptGenerator.getLogger().info(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
-                scanResult = result;
-            }
-            return scanResult;
-        }
-
+    private static List<SourceType<Type>> fromClassNamePatterns(ClassInfoList classNames, List<String> classNamePatterns) {
+        return fromClassNames(filterClassNames(classNames, classNamePatterns));
     }
 
-    private static List<SourceType<Type>> fromClassNamePatterns(ScanResult scanResult, List<String> classNamePatterns) {
-        final List<String> allClassNames = new ArrayList<>();
-        allClassNames.addAll(scanResult.getNamesOfAllStandardClasses());
-        allClassNames.addAll(scanResult.getNamesOfAllInterfaceClasses());
-        Collections.sort(allClassNames);
-        final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
-        TypeScriptGenerator.getLogger().info(String.format("Found %d classes matching pattern.", classNames.size()));
-        return fromClassNames(classNames);
+    private static List<SourceType<Type>> fromClassNames(ClassInfoList classNames, List<String> names) {
+        return fromClassNames(classNames.filter(ci -> names.contains(ci.getName())));
     }
 
-    private static List<SourceType<Type>> fromClassNames(List<String> classNames) {
-        final List<SourceType<Type>> types = new ArrayList<>();
-        for (Class<?> cls : loadClasses(classNames)) {
-            // skip synthetic classes (as those generated by java compiler for switch with enum)
-            // and anonymous classes (should not be processed and they do not have SimpleName)
-            if (!cls.isSynthetic() && !cls.isAnonymousClass()) {
-                types.add(new SourceType<Type>(cls, null, null));
-            }
-        }
-        return types;
+    private static List<SourceType<Type>> fromClassNames(ClassInfoList classNames) {
+        return classNames
+                .filter(ci -> !ci.isSynthetic() && !ci.isAnonymousInnerClass())
+                .loadClasses().stream()
+                .map(cl -> new SourceType<Type>(cl, null, null))
+                .collect(Collectors.toList());
     }
 
-    static List<Class<?>> loadClasses(List<String> classNames) {
-        final List<Class<?>> classes = new ArrayList<>();
-        for (String className : classNames) {
-            try {
-                final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
-                classes.add(cls);
-            } catch (ReflectiveOperationException e) {
-                TypeScriptGenerator.getLogger().error(String.format("Cannot load class '%s'", className));
-                e.printStackTrace(System.out);
-            }
-        }
-        return classes;
-    }
-
-    static List<String> filterClassNames(List<String> classNames, List<String> globs) {
+    static ClassInfoList filterClassNames(ClassInfoList classNames, List<String> globs) {
         final List<Pattern> regexps = Utils.globsToRegexps(globs);
-        final List<String> result = new ArrayList<>();
-        for (String className : classNames) {
-            if (Utils.classNameMatches(className, regexps)) {
-                result.add(className);
-            }
-        }
-        return result;
+        return classNames.filter(ci -> Utils.classNameMatches(ci.getName(), regexps));
+    }
+    static List<String> filterClassNames(List<String> names, List<String> globs) {
+        final List<Pattern> regexps = Utils.globsToRegexps(globs);
+        return names.stream()
+                .filter(s -> Utils.classNameMatches(s, regexps))
+                .collect(Collectors.toList());
     }
 
 }
