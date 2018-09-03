@@ -47,10 +47,17 @@ public class Input {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
+            final Date scanStart = new Date();
             try (ScanResult scanResult =
                          new ClassGraph()
+                                 .overrideClasspath((Object[])classLoader.getURLs())
                                  .enableAllInfo()       // Scan classes, methods, fields, annotations
                                  .scan()) {
+                final int count = scanResult.getAllClasses().size();
+                final Date scanEnd = new Date();
+                final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
+                TypeScriptGenerator.getLogger().info(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+
                 final List<SourceType<Type>> types = new ArrayList<>();
                 ClassInfoList allClasses = scanResult.getAllClasses();
                 if (classNames != null) {
