@@ -7,6 +7,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.*;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.*;
@@ -21,6 +22,16 @@ public class Jackson1Parser extends ModelParser {
 
     public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
         super(settings, typeProcessor);
+
+        if (settings.useFieldsOnlyForJackson) {
+            objectMapper.setVisibilityChecker(objectMapper.getSerializationConfig().getDefaultVisibilityChecker()
+                    .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                    .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                    .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                    .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+                    .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
+        }
+
         if (!settings.optionalAnnotations.isEmpty()) {
             final AnnotationIntrospector defaultAnnotationIntrospector = objectMapper.getSerializationConfig().getAnnotationIntrospector();
             final AnnotationIntrospector allAnnotationIntrospector = new NopAnnotationIntrospector() {
