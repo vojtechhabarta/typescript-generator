@@ -41,22 +41,37 @@ public class Input {
         return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader, debug);
     }
 
+    private static ScanResult scanClasses(URLClassLoader classLoader, boolean verbose) {
+        ClassGraph classGraph = new ClassGraph()
+                .overrideClasspath((Object[]) classLoader.getURLs())
+                .enableClassInfo()
+                .enableAnnotationInfo()
+//                .enableAllInfo()
+                ;
+        if (verbose) {
+            classGraph = classGraph.verbose();
+        }
+
+        final Date scanStart = new Date();
+
+        final ScanResult result = classGraph.scan();
+
+        final int count = result.getAllClasses().size();
+        final Date scanEnd = new Date();
+        final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
+        TypeScriptGenerator.getLogger().info(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+
+        return result;
+    }
+
+
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, List<String> classesWithAnnotations, String jaxrsApplicationClassName,
             boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
         Objects.requireNonNull(classLoader, "classLoader");
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
-            final Date scanStart = new Date();
-            try (ScanResult scanResult =
-                         new ClassGraph()
-                                 .overrideClasspath((Object[])classLoader.getURLs())
-                                 .enableAllInfo()       // Scan classes, methods, fields, annotations
-                                 .scan()) {
-                final int count = scanResult.getAllClasses().size();
-                final Date scanEnd = new Date();
-                final double timeInSeconds = (scanEnd.getTime() - scanStart.getTime()) / 1000.0;
-                TypeScriptGenerator.getLogger().info(String.format("Scanning finished in %.2f seconds. Total number of classes: %d.", timeInSeconds, count));
+            try (ScanResult scanResult = scanClasses(classLoader, debug)) {
 
                 final List<SourceType<Type>> types = new ArrayList<>();
                 ClassInfoList allClasses = scanResult.getAllClasses();
@@ -99,7 +114,16 @@ public class Input {
     private static List<SourceType<Type>> fromClassNames(ClassInfoList classNames) {
         return classNames
                 .filter(ci -> !ci.isSynthetic() && !ci.isAnonymousInnerClass())
-                .loadClasses().stream()
+                .stream()
+                .map(ci -> {
+                    try {
+                        return Thread.currentThread().getContextClassLoader().loadClass(ci.getName());
+                    }
+                    catch(java.lang.ClassNotFoundException ex) {
+                        return null;
+                    }
+                })
+                .filter(cl -> null != cl)
                 .map(cl -> new SourceType<Type>(cl, null, null))
                 .collect(Collectors.toList());
     }
