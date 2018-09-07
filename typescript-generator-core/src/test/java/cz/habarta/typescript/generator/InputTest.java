@@ -1,9 +1,12 @@
 
 package cz.habarta.typescript.generator;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
+
 import java.util.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,10 +15,14 @@ public class InputTest {
 
     @Test
     public void testScanner() {
-        final ScanResult scanResult = new FastClasspathScanner().scan();
-        final List<String> allClassNames = scanResult.getNamesOfAllClasses();
-        final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
-        Assert.assertTrue("Typescript-generator must have at least 20 tests :-)", testClassNames.size() > 20);
+        try (ScanResult scanResult =
+                     new ClassGraph()
+//                                 .verbose()             // Enable verbose logging
+                             .enableAllInfo()       // Scan classes, methods, fields, annotations
+                             .scan()) {
+            final ClassInfoList testClassNames = Input.filterClassNames(scanResult.getAllClasses(), Arrays.asList("cz.habarta.typescript.generator.**Test"));
+            Assert.assertTrue("Typescript-generator must have at least 20 tests :-)", testClassNames.size() > 20);
+        }
     }
 
     @Test
