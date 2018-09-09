@@ -3,7 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
+import io.github.classgraph.ScanResult;
 import java.lang.reflect.*;
 import java.util.*;
 import javax.ws.rs.*;
@@ -35,7 +35,7 @@ public class JaxrsApplicationScanner {
     }
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
-        final List<String> namesOfResourceClasses = scanResult.getNamesOfClassesWithAnnotation(Path.class);
+        final List<String> namesOfResourceClasses = scanResult.getClassesWithAnnotation(Path.class.getName()).getNames();
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
         TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));
         return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);

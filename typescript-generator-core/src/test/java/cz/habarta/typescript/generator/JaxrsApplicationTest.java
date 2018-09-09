@@ -4,7 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.core.type.*;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
 import java.io.*;
 import java.lang.reflect.*;
@@ -63,7 +63,7 @@ public class JaxrsApplicationTest {
 
     @Test
     public void testWithParsingWithDefaultApplication() {
-        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanAutomaticJaxrsApplication(new FastClasspathScanner().scan(), null);
+        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanAutomaticJaxrsApplication(new ClassGraph().enableAllInfo().scan(), null);
         testWithParsing(sourceTypes, false);
     }
 
