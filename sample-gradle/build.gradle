@@ -27,7 +27,7 @@ buildscript {
 
     dependencies {
         classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.+'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.10'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.61'
         classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.12:2.9.2'
     }
 }

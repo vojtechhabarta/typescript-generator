@@ -31,6 +31,7 @@ public class Settings {
     public boolean mapPackagesToNamespaces = false;
     public String umdNamespace = null;
     public JsonLibrary jsonLibrary = null;
+    public Jackson2Configuration jackson2Configuration = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
@@ -193,6 +194,9 @@ public class Settings {
         }
         if (jsonLibrary == null) {
             throw new RuntimeException("Required 'jsonLibrary' parameter is not configured.");
+        }
+        if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
+            throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
         }
         for (EmitterExtension extension : extensions) {
             final String extensionName = extension.getClass().getSimpleName();

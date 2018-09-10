@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
@@ -31,7 +34,6 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -49,6 +51,20 @@ public class Jackson2Parser extends ModelParser {
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
         this(settings, typeProcessor, false);
+        final Jackson2Configuration config = settings.jackson2Configuration;
+        if (config != null) {
+            setVisibility(PropertyAccessor.FIELD, config.fieldVisibility);
+            setVisibility(PropertyAccessor.GETTER, config.getterVisibility);
+            setVisibility(PropertyAccessor.IS_GETTER, config.isGetterVisibility);
+            setVisibility(PropertyAccessor.SETTER, config.setterVisibility);
+            setVisibility(PropertyAccessor.CREATOR, config.creatorVisibility);
+        }
+    }
+
+    private void setVisibility(PropertyAccessor accessor, JsonAutoDetect.Visibility visibility) {
+        if (visibility != null) {
+            objectMapper.setVisibility(accessor, visibility);
+        }
     }
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {

@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.*;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.parser.*;
@@ -237,5 +238,30 @@ public class Jackson2ParserTest {
 //        instance.name2 = "xxx";
 //        System.out.println(objectMapper.writeValueAsString(instance));
 //    }
+
+    @Test
+    public void testVisibilityConfiguration() {
+        {
+            final Settings settings = TestUtils.settings();
+            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
+            Assert.assertTrue(!output.contains("property1: string"));
+            Assert.assertTrue(output.contains("property2: string"));
+        }
+        {
+            final Settings settings = TestUtils.settings();
+            settings.jackson2Configuration = new Jackson2Configuration();
+            settings.jackson2Configuration.setVisibility(ANY, NONE, NONE, NONE, NONE);
+            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
+            Assert.assertTrue(output.contains("property1: string"));
+            Assert.assertTrue(!output.contains("property2: string"));
+        }
+    }
+
+    private static class ClassWithDifferentMemberVisibilities {
+        private String property1;
+        public String getProperty2() {
+            return null;
+        }
+    }
 
 }

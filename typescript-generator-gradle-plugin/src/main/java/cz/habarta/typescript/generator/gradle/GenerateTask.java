@@ -29,6 +29,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
     public JsonLibrary jsonLibrary;
+    public Jackson2Configuration jackson2Configuration;
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
@@ -118,6 +119,7 @@ public class GenerateTask extends DefaultTask {
         settings.umdNamespace = umdNamespace;
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
+        settings.jackson2Configuration = jackson2Configuration;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;

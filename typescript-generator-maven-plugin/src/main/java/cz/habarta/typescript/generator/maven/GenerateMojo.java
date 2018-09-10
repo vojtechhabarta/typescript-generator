@@ -150,6 +150,15 @@ public class GenerateMojo extends AbstractMojo {
     private JsonLibrary jsonLibrary;
 
     /**
+     * Specifies Jackson 2 global configuration.
+     * Description of individual parameters is in
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Settings.java">Jackson2Configuration</a>
+     * class on GitHub (latest version).
+     */
+    @Parameter
+    private Jackson2Configuration jackson2Configuration;
+
+    /**
      * <b>Deprecated</b>, use {@link #optionalProperties} parameter.
      */
     @Deprecated
@@ -589,6 +598,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.umdNamespace = umdNamespace;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
+            settings.jackson2Configuration = jackson2Configuration;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
