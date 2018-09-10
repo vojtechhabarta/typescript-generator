@@ -84,6 +84,11 @@ public class Settings {
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
 
+    /**
+     * If true, when using Jackson, only fields will be used instead of getters/setters
+     */
+    public boolean useFieldsOnlyForJackson;
+
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
     public static class ConfiguredExtension {

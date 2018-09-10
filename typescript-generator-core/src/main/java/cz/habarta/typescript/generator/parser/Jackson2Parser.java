@@ -69,6 +69,12 @@ public class Jackson2Parser extends ModelParser {
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
         super(settings, typeProcessor);
+
+        if (settings.useFieldsOnlyForJackson) {
+            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        }
+
         if (settings.jackson2ModuleDiscovery) {
             objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
         }
