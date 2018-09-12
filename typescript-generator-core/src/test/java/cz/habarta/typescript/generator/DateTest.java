@@ -93,6 +93,14 @@ public class DateTest {
         Assert.assertTrue(dts.contains("type DateAsString = string;"));
     }
 
+    @Test
+    public void testJava8DateWithJackson2CustomSerialization() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("java.time.LocalDate", "[number, number, number]");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Java8Jackson2Dates.class));
+        Assert.assertTrue(output.contains("date: [number, number, number];"));
+    }
+
     public static void main(String[] args) throws JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper()
                 .findAndRegisterModules()
@@ -132,4 +140,8 @@ class Java8Dates {
     public List<LocalDateTime> dateList;
     public Map<String, List<LocalDateTime>> datesMap;
     public LocalDateTime[] dates;
+}
+
+class Java8Jackson2Dates {
+    public LocalDate date;
 }
