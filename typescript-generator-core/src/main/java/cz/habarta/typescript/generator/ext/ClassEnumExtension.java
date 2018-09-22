@@ -39,7 +39,6 @@ public class ClassEnumExtension extends Extension {
             @Override
             public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
                 List<TsBeanModel> beans = model.getBeans();
-
                 List<TsBeanModel> classEnums = new ArrayList<>();
                 for (TsBeanModel bean : beans) {
                     if (bean.getName().getSimpleName().contains(classEnumPattern))
@@ -65,6 +64,7 @@ public class ClassEnumExtension extends Extension {
                     stringEnums.add(temp);
                 }
 
+                stringEnums.addAll(model.getEnums());
                 return model.withEnums(stringEnums).withoutBeans(classEnums);
             }
         }));

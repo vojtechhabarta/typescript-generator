@@ -5,9 +5,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import cz.habarta.typescript.generator.ext.ClassEnumExtension;
-import java.util.*;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class EnumTest {
@@ -95,21 +101,26 @@ public class EnumTest {
     }
 
     @Test
-    public void testClassAsEnum() {
+    public void testEnumsWithClassEnumPattern() {
         final Settings settings = TestUtils.settings();
         settings.mapEnum = EnumMapping.asEnum;
-        settings.jsonLibrary = JsonLibrary.jaxb;
+        settings.jsonLibrary = JsonLibrary.jackson2;
         final ClassEnumExtension classEnumExtension = new ClassEnumExtension();
-        classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "ClassEnum"));
+        classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "Enum"));
         settings.extensions.add(classEnumExtension);
-        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyClassEnum.class));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyEnum.class, DummyClassEnum.class));
         final String expected = (
-            "\ndeclare const enum DummyClassEnum {\n" +
-            "    ATYPE = 'ATYPE',\n" +
-            "    BTYPE = 'BTYPE',\n" +
-            "    CTYPE = 'CTYPE',\n" +
-            "}\n"
-        ).replace("'", "\"");
+                "\ndeclare const enum DummyClassEnum {\n" +
+                        "    ATYPE = 'ATYPE',\n" +
+                        "    BTYPE = 'BTYPE',\n" +
+                        "    CTYPE = 'CTYPE',\n" +
+                        "}\n" +
+                "\ndeclare const enum DummyEnum {\n" +
+                        "    Red = 'Red',\n" +
+                        "    Green = 'Green',\n" +
+                        "    Blue = 'Blue',\n" +
+                        "}\n"
+                ).replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
     }
 
