@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import cz.habarta.typescript.generator.ext.ClassEnumExtension;
-import org.junit.Test;
-
 import java.util.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class EnumTest {
 
