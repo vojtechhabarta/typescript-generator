@@ -61,6 +61,7 @@ public class GenerateTask extends DefaultTask {
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
+    public boolean noTslintDisable;
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
     public List<String> extensions;
@@ -151,6 +152,7 @@ public class GenerateTask extends DefaultTask {
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
+        settings.noTslintDisable = noTslintDisable;
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
