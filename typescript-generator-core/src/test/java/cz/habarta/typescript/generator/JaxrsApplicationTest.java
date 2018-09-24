@@ -6,12 +6,15 @@ import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.URI;
 import java.util.*;
 import javax.activation.*;
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import javax.xml.bind.*;
 import javax.xml.transform.*;
@@ -195,10 +198,18 @@ public class JaxrsApplicationTest {
                 @QueryParam("") String queryParam,
                 @PathParam("") String pathParam,
                 @CookieParam("") String cookieParam,
+                @Suspended AsyncResponse suspendedParam,
                 @HeaderParam("") String headerParam,
                 @Context String context,
                 @FormParam("") String formParam,
                 I entityI) {
+        }
+    
+        @POST
+        @ApiOperation(value = "async", response = String.class)
+        public void setAsync(
+                @Suspended AsyncResponse suspendedParam
+        ) {
         }
         @POST
         public void setJs(J[] js) {
@@ -265,6 +276,7 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("getA(): RestResponse<A>;"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
         Assert.assertTrue(errorMessage, !output.contains("function uriEncoding"));
+        Assert.assertTrue(errorMessage, output.contains("setAsync(): RestResponse<string>"));
     }
 
     @Test
