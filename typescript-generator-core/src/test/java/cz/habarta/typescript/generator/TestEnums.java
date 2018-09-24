@@ -17,6 +17,32 @@ public class TestEnums {
         }
     }
 
+    public enum NumberFieldValuedEnum {
+        A(1), B(2), C(3);
+
+        @JsonValue
+        private int value;
+
+        NumberFieldValuedEnum(int value) {
+            this.value = value;
+        }
+    }
+    
+    public enum NumberMethodValuedEnum {
+        A(1), B(2), C(3);
+
+        private int value;
+
+        NumberMethodValuedEnum(int value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public int getValue() {
+            return value;
+        }
+    }
+
     public enum ToStringValuedEnum {
         A, B, C;
 

@@ -348,7 +348,7 @@ public class Jackson2Parser extends ModelParser {
                     } else if (isNumberBased) {
                         value = getNumberEnumValue(constant, valueMethod, index++);
                     } else {
-                        value = getStringEnumValue(constant, valueMethod);
+                        value = getMethodEnumValue(constant, valueMethod);
                     }
 
                     if (value instanceof String) {
@@ -378,11 +378,11 @@ public class Jackson2Parser extends ModelParser {
         return index;
     }
 
-    private String getStringEnumValue(Field field, Method valueMethod) throws Exception {
+    private Object getMethodEnumValue(Field field, Method valueMethod) throws Exception {
         if (valueMethod != null) {
             final Object valueObject = invokeJsonValueMethod(field, valueMethod);
-            if (valueObject instanceof String) {
-                return (String) valueObject;
+            if (valueObject instanceof String || valueObject instanceof Number) {
+                return valueObject;
             }
         }
         if (field.isAnnotationPresent(JsonProperty.class)) {
