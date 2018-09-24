@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.URI;
@@ -18,8 +19,6 @@ import javax.ws.rs.core.*;
 import javax.xml.bind.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
-
-import io.swagger.annotations.ApiOperation;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.*;

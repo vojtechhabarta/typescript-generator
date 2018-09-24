@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.util.Utils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
