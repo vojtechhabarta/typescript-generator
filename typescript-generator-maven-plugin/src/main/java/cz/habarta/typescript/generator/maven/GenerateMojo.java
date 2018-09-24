@@ -433,9 +433,9 @@ public class GenerateMojo extends AbstractMojo {
     private boolean noFileComment;
 
     /**
-     * If <code>true</code> generated file will be linted by TsLint.
-     * By default there is a {@code tslint:disable } comment that will force TsLint to ignore the generated file.
-     * This can be enabled to supress this comment so that the file can be linted by TsLint.
+     * If <code>true</code> generated file will not be prevented from linting by TSLint.
+     * By default there is a {@code tslint:disable} comment that will force TSLint to ignore the generated file.
+     * This can be enabled to suppress this comment so that the file can be linted by TSLint.
      */
     @Parameter
     private boolean noTslintDisable;
