@@ -22,6 +22,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -175,7 +176,17 @@ public class JaxrsApplicationParser {
             final Type genericReturnType = method.getGenericReturnType();
             final Type modelReturnType;
             if (returnType == void.class) {
-                modelReturnType = returnType;
+                //for async response also use swagger
+                if (hasAnyAnnotation(method.getParameters(), Collections.singletonList(Suspended.class))) {
+                    if (swaggerOperation.responseType != null) {
+                        modelReturnType = swaggerOperation.responseType;
+                        foundType(result, modelReturnType, resourceClass, method.getName());
+                    } else {
+                        modelReturnType = Object.class;
+                    }
+                } else {
+                    modelReturnType = returnType;
+                }
             } else if (returnType == Response.class) {
                 if (swaggerOperation.responseType != null) {
                     modelReturnType = swaggerOperation.responseType;
@@ -247,6 +258,7 @@ public class JaxrsApplicationParser {
                     PathParam.class,
                     CookieParam.class,
                     HeaderParam.class,
+                    Suspended.class,
                     Context.class,
                     FormParam.class
                     ))) {
@@ -255,7 +267,16 @@ public class JaxrsApplicationParser {
         }
         return null;
     }
-
+    
+    private static boolean hasAnyAnnotation(Parameter[] parameters, List<Class<? extends Annotation>> annotationClasses) {
+        for (Parameter parameter : parameters) {
+            if (hasAnyAnnotation(parameter, annotationClasses)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private static boolean hasAnyAnnotation(Parameter parameter, List<Class<? extends Annotation>> annotationClasses) {
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
             for (Annotation parameterAnnotation : parameter.getAnnotations()) {
