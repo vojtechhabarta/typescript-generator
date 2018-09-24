@@ -99,6 +99,7 @@ public class ModelCompiler {
 
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
         symbolTable.resolveSymbolNames();
+        tsModel = removeDeclarationsImportedFromDependencies(symbolTable, tsModel);
         tsModel = sortDeclarations(symbolTable, tsModel);
         return tsModel;
     }
@@ -766,6 +767,19 @@ public class ModelCompiler {
                 })
                 .collect(Collectors.toList())
         );
+    }
+
+    private static TsModel removeDeclarationsImportedFromDependencies(SymbolTable symbolTable, TsModel tsModel) {
+        return tsModel
+                .withBeans(filterOutImported(symbolTable, tsModel.getBeans()))
+                .withEnums(filterOutImported(symbolTable, tsModel.getEnums()))
+                .withTypeAliases(filterOutImported(symbolTable, tsModel.getTypeAliases()));
+    }
+
+    private static <T extends TsDeclarationModel> List<T> filterOutImported(SymbolTable symbolTable, List<T> declarations) {
+        return declarations.stream()
+                .filter(declaration -> !symbolTable.isImported(declaration.getName()))
+                .collect(Collectors.toList());
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

@@ -84,9 +84,8 @@ public class SymbolTable {
             final Class<?> cls = entry.getKey().getValue1();
             final String suffix = entry.getKey().getValue2();
             final Symbol symbol = entry.getValue();
-            final String suffixString = suffix != null ? suffix : "";
-            final String fullName = getMappedFullName(cls) + suffixString;
-            symbol.setFullName(fullName);
+            setSymbolQualifiedName(symbol, cls, suffix);
+            final String fullName = symbol.getFullName();
             if (!names.containsKey(fullName)) {
                 names.put(fullName, new ArrayList<Class<?>>());
             }
@@ -110,7 +109,22 @@ public class SymbolTable {
         }
     }
 
-    public String getMappedFullName(Class<?> cls) {
+    private void setSymbolQualifiedName(Symbol symbol, Class<?> cls, String suffix) {
+        final String module;
+        final String namespacedName;
+        final Pair<String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
+        if (fullNameFromDependency != null) {
+            module = fullNameFromDependency.getValue1();
+            namespacedName = fullNameFromDependency.getValue2();
+        } else {
+            module = null;
+            namespacedName = getMappedNamespacedName(cls);
+        }
+        final String suffixString = suffix != null ? suffix : "";
+        symbol.setFullName(module, namespacedName + suffixString);
+    }
+
+    public String getMappedNamespacedName(Class<?> cls) {
         if (cls == null) {
             return null;
         }
@@ -207,6 +221,14 @@ public class SymbolTable {
 
     public static interface CustomTypeNamingFunction {
         public Object getName(String className, String classSimpleName);
+    }
+
+    public boolean isImported(Symbol symbol) {
+        final Class<?> cls = getSymbolClass(symbol);
+        if (cls != null) {
+            return settings.getModuleDependencies().getFullName(cls) != null;
+        }
+        return false;
     }
 
     public static class NameConflictException extends RuntimeException {

@@ -1,12 +1,11 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
-import cz.habarta.typescript.generator.util.StandardJsonPrettyPrinter;
-import java.io.*;
+import cz.habarta.typescript.generator.util.Utils;
+import java.io.IOException;
+import java.io.Writer;
 
 
 public class NpmPackageJsonEmitter {
@@ -26,10 +25,7 @@ public class NpmPackageJsonEmitter {
 
     private void emitPackageJson(NpmPackageJson npmPackageJson) {
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-            objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
+            final ObjectMapper objectMapper = Utils.getObjectMapper();
             objectMapper.writeValue(writer, npmPackageJson);
         } catch (IOException e) {
             throw new RuntimeException(e);

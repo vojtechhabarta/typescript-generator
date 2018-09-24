@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.yield.KeywordInPackage;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeNamingFunction = "function(name, simpleName) { if (name.indexOf('cz.') === 0) return 'Test' + simpleName; }";
         final SymbolTable symbolTable = new SymbolTable(settings);
-        final String name = symbolTable.getMappedFullName(A.class);
+        final String name = symbolTable.getMappedNamespacedName(A.class);
         Assert.assertEquals("TestA", name);
     }
 
@@ -62,7 +63,7 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeNamingFunction = "function() {}";
         final SymbolTable symbolTable = new SymbolTable(settings);
-        final String name = symbolTable.getMappedFullName(A.class);
+        final String name = symbolTable.getMappedNamespacedName(A.class);
         Assert.assertEquals("A", name);
     }
 
@@ -73,8 +74,8 @@ public class NamingTest {
         settings.addTypeNamePrefix = "Conf";
         settings.mapPackagesToNamespaces = true;
         final SymbolTable symbolTable = new SymbolTable(settings);
-        Assert.assertEquals("FuncA", symbolTable.getMappedFullName(A.class));
-        Assert.assertEquals("java.lang.ConfObject", symbolTable.getMappedFullName(Object.class));
+        Assert.assertEquals("FuncA", symbolTable.getMappedNamespacedName(A.class));
+        Assert.assertEquals("java.lang.ConfObject", symbolTable.getMappedNamespacedName(Object.class));
     }
 
     @Test
@@ -82,8 +83,28 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.mapPackagesToNamespaces = true;
         final SymbolTable symbolTable = new SymbolTable(settings);
-        final String name = symbolTable.getMappedFullName(KeywordInPackage.class);
+        final String name = symbolTable.getMappedNamespacedName(KeywordInPackage.class);
         Assert.assertEquals("cz.habarta.typescript.generator._yield.KeywordInPackage", name);
+    }
+
+    @Test
+    public void testNamespaced() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeNaming = Collections.singletonMap("cz.habarta.typescript.generator.NamingTest$C", "NS.C");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(C.class, D.class));
+        Assert.assertTrue(output.contains("namespace NS"));
+        Assert.assertTrue(output.contains("interface C"));
+        Assert.assertTrue(output.contains("interface D extends NS.C"));
+        Assert.assertTrue(output.contains("objectC: NS.C"));
+    }
+
+    private static class C {
+        public String c;
+    }
+
+    private static class D extends C {
+        public String d;
+        public C objectC;
     }
 
 }
