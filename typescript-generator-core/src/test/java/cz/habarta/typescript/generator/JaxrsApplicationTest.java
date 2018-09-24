@@ -12,6 +12,8 @@ import java.net.URI;
 import java.util.*;
 import javax.activation.*;
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import javax.xml.bind.*;
 import javax.xml.transform.*;
@@ -195,6 +197,7 @@ public class JaxrsApplicationTest {
                 @QueryParam("") String queryParam,
                 @PathParam("") String pathParam,
                 @CookieParam("") String cookieParam,
+                @Suspended AsyncResponse suspendedParam,
                 @HeaderParam("") String headerParam,
                 @Context String context,
                 @FormParam("") String formParam,
