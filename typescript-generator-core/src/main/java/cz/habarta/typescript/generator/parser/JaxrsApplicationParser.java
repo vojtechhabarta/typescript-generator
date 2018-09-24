@@ -178,7 +178,17 @@ public class JaxrsApplicationParser {
             final Type genericReturnType = method.getGenericReturnType();
             final Type modelReturnType;
             if (returnType == void.class) {
-                modelReturnType = returnType;
+                //for async response also use swagger
+                if (hasAnyAnnotation(method.getParameters(), Collections.singletonList(Suspended.class))) {
+                    if (swaggerOperation.responseType != null) {
+                        modelReturnType = swaggerOperation.responseType;
+                        foundType(result, modelReturnType, resourceClass, method.getName());
+                    } else {
+                        modelReturnType = Object.class;
+                    }
+                } else {
+                    modelReturnType = returnType;
+                }
             } else if (returnType == Response.class) {
                 if (swaggerOperation.responseType != null) {
                     modelReturnType = swaggerOperation.responseType;
@@ -258,6 +268,15 @@ public class JaxrsApplicationParser {
             }
         }
         return null;
+    }
+    
+    private static boolean hasAnyAnnotation(Parameter[] parameters, List<Class<? extends Annotation>> annotationClasses) {
+        for (Parameter parameter : parameters) {
+            if (hasAnyAnnotation(parameter, annotationClasses)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private static boolean hasAnyAnnotation(Parameter parameter, List<Class<? extends Annotation>> annotationClasses) {
