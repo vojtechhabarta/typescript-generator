@@ -102,7 +102,8 @@ public class Swagger {
             }
             try {
                 final Type type = Class.forName(dataTypeString);
-                return propertyModel.withType(type);
+                final boolean required = Utils.getAnnotationElementValue(annotatedElement, "io.swagger.annotations.ApiModelProperty", "required", Boolean.class);
+                return propertyModel.withType(type).withOptional(!required);
             } catch (ClassNotFoundException | ClassCastException e) {
                 return propertyModel;
             }

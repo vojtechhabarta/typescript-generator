@@ -44,20 +44,36 @@ public class SwaggerTest {
         Assert.assertTrue(output.contains("Not Found"));
         Assert.assertTrue(output.contains("Documentation for the bean."));
         Assert.assertTrue(output.contains("Documentation for property 1."));
-        Assert.assertTrue(output.contains("property1: string"));
+        Assert.assertTrue(output.contains("Documentation for property 2."));
+        Assert.assertTrue(output.contains("Documentation for property 3."));
     }
 
     @Test
-    public void testDocumentationAndDataType() {
+    public void testDataType() {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
-        Assert.assertTrue(output.contains("Documentation for operation 1."));
-        Assert.assertTrue(output.contains("Bad Request"));
-        Assert.assertTrue(output.contains("Not Found"));
-        Assert.assertTrue(output.contains("Documentation for the bean."));
-        Assert.assertTrue(output.contains("Documentation for property 2."));
-        Assert.assertTrue(output.contains("property2: string")); // see if type was overridden from number to string
+        Assert.assertTrue(output.contains("property1: string"));
+        Assert.assertTrue(output.contains("property2?: string"));
+        Assert.assertTrue(output.contains("property3: string"));
+    }
+
+    @Test
+    public void testSwaggerOff() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        settings.ignoreSwaggerAnnotations = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
+        Assert.assertTrue(!output.contains("Documentation for operation 1."));
+        Assert.assertTrue(!output.contains("Bad Request"));
+        Assert.assertTrue(!output.contains("Not Found"));
+        Assert.assertTrue(!output.contains("Documentation for the bean."));
+        Assert.assertTrue(!output.contains("Documentation for property 1."));
+        Assert.assertTrue(!output.contains("Documentation for property 2."));
+        Assert.assertTrue(!output.contains("Documentation for property 3."));
+        Assert.assertTrue(output.contains("property1: string"));
+        Assert.assertTrue(output.contains("property2: number"));
+        Assert.assertTrue(output.contains("property3: number"));
     }
 
     private static class TestApplication extends Application {
@@ -149,6 +165,9 @@ public class SwaggerTest {
          */
         @ApiModelProperty(value = "Documentation for property 2.", dataType = "java.lang.String")
         public Long property2;
+
+        @ApiModelProperty(value = "Documentation for property 3.", dataType = "java.lang.String", required = true)
+        public Long property3;
     }
 
 }
