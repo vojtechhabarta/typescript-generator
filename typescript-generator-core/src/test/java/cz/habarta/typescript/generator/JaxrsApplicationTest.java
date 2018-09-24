@@ -18,6 +18,8 @@ import javax.ws.rs.core.*;
 import javax.xml.bind.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
+
+import io.swagger.annotations.ApiOperation;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.*;
@@ -203,6 +205,13 @@ public class JaxrsApplicationTest {
                 @FormParam("") String formParam,
                 I entityI) {
         }
+    
+        @POST
+        @ApiOperation(value = "async", response = String.class)
+        public void setAsync(
+                @Suspended AsyncResponse suspendedParam
+        ) {
+        }
         @POST
         public void setJs(J[] js) {
         }
@@ -268,6 +277,7 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("getA(): RestResponse<A>;"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
         Assert.assertTrue(errorMessage, !output.contains("function uriEncoding"));
+        Assert.assertTrue(errorMessage, output.contains("setAsync(): RestResponse<string>"));
     }
 
     @Test
