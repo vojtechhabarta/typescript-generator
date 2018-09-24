@@ -34,7 +34,7 @@
         <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2018-09-24<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 2.6.438</li>
+          <li id="projectVersion">Version: 2.6.439</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -67,7 +67,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:2.6.438:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:2.6.439:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -826,6 +826,20 @@ build.<br /></td>
           
 <tr class="a">
             
+<td><b><a href="#noTslintDisable">noTslintDisable</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>If <tt>true</tt> generated file will be linted by TsLint. By
+default there is a <tt>tslint:disable</tt> comment that will
+force TsLint to ignore the generated file. This can be enabled to
+supress this comment so that the file can be linted by TsLint.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
 <td><b><a href="#nonConstEnumAnnotations">nonConstEnumAnnotations</a></b></td>
             
 <td><tt>List</tt></td>
@@ -837,7 +851,7 @@ build.<br /></td>
 annotations defined in this list. See <tt>nonConstEnums</tt><br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#nonConstEnums">nonConstEnums</a></b></td>
             
@@ -850,7 +864,7 @@ annotations defined in this list. See <tt>nonConstEnums</tt><br /></td>
 This can be used only in implementation files.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#npmName">npmName</a></b></td>
             
@@ -864,7 +878,7 @@ is <tt>true</tt>.<br />
 Default value is <tt>${project.artifactId}</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#npmVersion">npmVersion</a></b></td>
             
@@ -878,7 +892,7 @@ is <tt>true</tt>.<br />
 Default value is <tt>1.0.0</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#optionalAnnotations">optionalAnnotations</a></b></td>
             
@@ -892,7 +906,7 @@ when generating the corresponding TypeScript interface. Example
 optional annotation: <tt>javax.annotation.Nullable</tt><br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#optionalProperties">optionalProperties</a></b></td>
             
@@ -918,7 +932,7 @@ false)</tt> when using <tt>jaxb</tt> library</li>
 Default value is <tt>useSpecifiedAnnotations</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#optionalPropertiesDeclaration">optionalPropertiesDeclaration</a></b></td>
             
@@ -946,7 +960,7 @@ value</li>
 Default value is <tt>questionMark</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#outputFile">outputFile</a></b></td>
             
@@ -957,7 +971,7 @@ Default value is <tt>questionMark</tt>.<br /></td>
 <td>Path and name of generated TypeScript file.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#outputFileType">outputFileType</a></b></td>
             
@@ -978,7 +992,7 @@ generate runnable TypeScript code.<br />
 Default value is <tt>declarationFile</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#referencedFiles">referencedFiles</a></b></td>
             
@@ -992,7 +1006,7 @@ can be used with <tt>customTypeMappings</tt> to provide needed
 TypeScript types.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#removeTypeNamePrefix">removeTypeNamePrefix</a></b></td>
             
@@ -1005,7 +1019,7 @@ enums. For example if set to <tt>Json</tt> then mapping for
 <tt>JsonData</tt> will be <tt>Data</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#removeTypeNameSuffix">removeTypeNameSuffix</a></b></td>
             
@@ -1018,7 +1032,7 @@ enums. For example if set to <tt>JSON</tt> then mapping for
 <tt>DataJSON</tt> will be <tt>Data</tt>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#restOptionsType">restOptionsType</a></b></td>
             
@@ -1034,7 +1048,7 @@ be specific (for example <tt>AxiosRequestConfig</tt>) or
 generic (for example <tt>&lt;O&gt;</tt>).<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#restResponseType">restResponseType</a></b></td>
             
@@ -1050,7 +1064,7 @@ or <tt>AxiosPromise</tt>) is returned instead of actual
 response data.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#sortDeclarations">sortDeclarations</a></b></td>
             
@@ -1062,7 +1076,7 @@ response data.<br /></td>
 properties) will be sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#sortTypeDeclarations">sortTypeDeclarations</a></b></td>
             
@@ -1074,7 +1088,7 @@ properties) will be sorted alphabetically.<br /></td>
 be sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><b><a href="#stringQuotes">stringQuotes</a></b></td>
             
@@ -1093,7 +1107,7 @@ be sorted alphabetically.<br /></td>
 Default value is <tt>doubleQuotes</tt>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><b><a href="#umdNamespace">umdNamespace</a></b></td>
             
@@ -1738,6 +1752,19 @@ top. By default there is a comment with timestamp and
 typescript-generator version. So it might be useful to suppress
 this comment if the file is in source control and is regenerated in
 build.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="noTslintDisable">noTslintDisable</a>:</b></p>
+        
+<div>If <tt>true</tt> generated file will be linted by TsLint. By
+default there is a <tt>tslint:disable</tt> comment that will
+force TsLint to ignore the generated file. This can be enabled to
+supress this comment so that the file can be linted by TsLint.</div>
         
 <ul>
           
