@@ -191,6 +191,16 @@ public class Jackson2ParserTest {
     }
 
     @Test
+    public void testJsonNumberFieldValuedEnum() {
+        testEnumByType(TestEnums.NumberFieldValuedEnum.class, 1, 2, 3);
+    }
+
+    @Test
+    public void testJsonNumberMethodValuedEnum() {
+        testEnumByType(TestEnums.NumberMethodValuedEnum.class, 1, 2, 3);
+    }
+
+    @Test
     public void testMethodEnumValue() {
         testEnumByType(TestEnums.GeneralMethodValuedEnum.class, "_A", "_B", "_C");
     }
