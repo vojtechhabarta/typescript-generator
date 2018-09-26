@@ -20,6 +20,7 @@ public class GenerateTask extends DefaultTask {
     public String namespace;
     public boolean mapPackagesToNamespaces;
     public String umdNamespace;
+    public List<ModuleDependency> moduleDependencies;
     public List<String> classes;
     public List<String> classPatterns;
     public List<String> classesWithAnnotations;
@@ -67,6 +68,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> extensions;
     public List<Settings.ConfiguredExtension> extensionsWithConfiguration;
     public List<String> optionalAnnotations;
+    public boolean generateInfoJson;
     public boolean generateNpmPackageJson;
     public String npmName;
     public String npmVersion;
@@ -118,6 +120,7 @@ public class GenerateTask extends DefaultTask {
         settings.namespace = namespace;
         settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
         settings.umdNamespace = umdNamespace;
+        settings.moduleDependencies = moduleDependencies;
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.jackson2Configuration = jackson2Configuration;
@@ -157,6 +160,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;

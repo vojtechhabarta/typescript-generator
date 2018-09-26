@@ -4,11 +4,16 @@ package cz.habarta.typescript.generator.compiler;
 
 public class Symbol {
 
+    private String module;
     private String namespace;
     private String simpleName;
 
     public Symbol(String temporaryName) {
         this.simpleName = temporaryName;
+    }
+
+    public String getModule() {
+        return module;
     }
 
     public String getNamespace() {
@@ -20,18 +25,30 @@ public class Symbol {
     }
 
     public String getFullName() {
-        return namespace != null ? namespace + "." + simpleName : simpleName;
+        String fullName = simpleName;
+        if (namespace != null) {
+            fullName = namespace + "." + fullName;
+        }
+        if (module != null) {
+            fullName = module + "." + fullName;
+        }
+        return fullName;
     }
 
-    public void setFullName(String fullName) {
-        final int index = fullName.lastIndexOf('.');
+    public void setFullName(String module, String namespacedName) {
+        this.module = module;
+        final int index = namespacedName.lastIndexOf('.');
         if (index == -1) {
             namespace = null;
-            simpleName = fullName;
+            simpleName = namespacedName;
         } else {
-            namespace = fullName.substring(0, index);
-            simpleName = fullName.substring(index + 1);
+            namespace = namespacedName.substring(0, index);
+            simpleName = namespacedName.substring(index + 1);
         }
+    }
+
+    void addSuffix(String suffix) {
+        simpleName = simpleName + suffix;
     }
 
 }

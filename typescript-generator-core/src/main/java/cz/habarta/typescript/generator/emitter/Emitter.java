@@ -57,6 +57,12 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     private void emitImports() {
+        if (settings.moduleDependencies != null && !settings.moduleDependencies.isEmpty()) {
+            writeNewLine();
+            for (ModuleDependency dependency : settings.moduleDependencies) {
+                writeIndentedLine("import * as " + dependency.importAs + " from " + quote(dependency.importFrom, settings) + ";");
+            }
+        }
         if (settings.importDeclarations != null && !settings.importDeclarations.isEmpty()) {
             writeNewLine();
             for (String importDeclaration : settings.importDeclarations) {

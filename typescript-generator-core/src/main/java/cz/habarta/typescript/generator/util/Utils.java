@@ -1,6 +1,10 @@
 
 package cz.habarta.typescript.generator.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -251,6 +255,22 @@ public class Utils {
         }
         sb.append(Pattern.quote(glob.substring(lastEnd, glob.length())));
         return Pattern.compile(sb.toString());
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
+        return objectMapper;
+    }
+
+    public static String objectToString(Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
