@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class TypeScriptGenerator {
@@ -103,7 +104,11 @@ public class TypeScriptGenerator {
                 npmPackageJson.main = Utils.replaceExtension(outputFile, ".js").getName();
                 npmPackageJson.dependencies.putAll(settings.npmPackageDependencies);
                 npmPackageJson.devDependencies = Collections.singletonMap("typescript", settings.typescriptVersion);
-                npmPackageJson.scripts = Collections.singletonMap("build", "tsc --module umd --moduleResolution node --target es5 --lib es6 --declaration --sourceMap " + outputFile.getName());
+                final String npmBuildScript = settings.npmBuildScript != null
+                        ? settings.npmBuildScript
+                        : "tsc --module umd --moduleResolution node --target es5 --lib es6 --declaration --sourceMap $outputFile";
+                final String build = npmBuildScript.replaceAll(Pattern.quote("$outputFile"), outputFile.getName());
+                npmPackageJson.scripts = Collections.singletonMap("build", build);
             }
             if (npmPackageJson.dependencies.isEmpty()) {
                 npmPackageJson.dependencies = null;

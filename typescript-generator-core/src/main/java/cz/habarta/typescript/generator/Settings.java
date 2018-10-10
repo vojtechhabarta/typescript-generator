@@ -80,6 +80,7 @@ public class Settings {
     public String npmVersion = null;
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
     public String typescriptVersion = "^2.4";
+    public String npmBuildScript = null;
     @Deprecated public boolean displaySerializerWarning;
     @Deprecated public boolean debug;
     @Deprecated public boolean disableJackson2ModuleDiscovery = false;
@@ -279,6 +280,12 @@ public class Settings {
             if (npmName != null || npmVersion != null) {
                 throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM 'package.json'.");
             }
+            if (npmBuildScript != null) {
+                throw new RuntimeException("'npmBuildScript' is only applicable when generating NPM 'package.json'.");
+            }
+        }
+        if (npmBuildScript != null && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("'npmBuildScript' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
         getModuleDependencies();
 

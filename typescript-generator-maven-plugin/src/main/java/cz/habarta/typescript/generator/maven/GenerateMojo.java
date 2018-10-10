@@ -535,6 +535,14 @@ public class GenerateMojo extends AbstractMojo {
     private String npmVersion;
 
     /**
+     * Specifies NPM "build" script.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
+     * Default value is <code>tsc --module umd --moduleResolution node --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.
+     */
+    @Parameter
+    private String npmBuildScript;
+
+    /**
      * Specifies how strings will be quoted.
      * Supported values are:
      * <ul>
@@ -673,6 +681,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.generateNpmPackageJson = generateNpmPackageJson;
             settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;
             settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+            settings.npmBuildScript = npmBuildScript;
             settings.setStringQuotes(stringQuotes);
             settings.setIndentString(indentString);
             settings.displaySerializerWarning = displaySerializerWarning;
