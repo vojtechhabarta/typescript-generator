@@ -46,7 +46,7 @@ foreach ($file in dir -Recurse -File $basePath) {
     [xml]$pomXml = Get-Content $pom
     $groupId = if ($pomXml.project.groupId) { $pomXml.project.groupId } else { $pomXml.project.parent.groupId }
     $uri = $groupId.Replace(".", "/") + $path.Substring($groupId.Length).Replace("\", "/")
-    $response = Invoke-WebRequest -InFile $file.FullName -Method Put "$repoUri/$uri" -Headers $headers
+    $response = Invoke-WebRequest -InFile $file.FullName -Method Put "$repoUri/$uri" -Headers $headers -UseBasicParsing
 }
 
 Write-Host -ForegroundColor Cyan "Build successfully uploaded. Go to https://oss.sonatype.org and promote the release."
