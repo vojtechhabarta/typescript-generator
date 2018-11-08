@@ -857,7 +857,7 @@ public class ModelCompiler {
     }
 
     private static String replaceDashPattern(String name) {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         final Matcher matcher = Pattern.compile("-[^-]").matcher(name);
         while (matcher.find()) {
             matcher.appendReplacement(sb, Matcher.quoteReplacement("" + Character.toUpperCase(matcher.group().charAt(1))));
