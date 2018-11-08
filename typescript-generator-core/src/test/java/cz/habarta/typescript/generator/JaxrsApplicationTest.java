@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.core.type.*;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.util.Predicate;
 import io.github.classgraph.ClassGraph;
@@ -292,7 +293,7 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("getOrganization(organizationCode: string, organizationId: number): RestResponse<Organization>;"));
         Assert.assertTrue(errorMessage, output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }): RestResponse<Organization[]>;"));
         Assert.assertTrue(errorMessage, output.replace("arg1", "organization").contains("setOrganization(organizationCode: string, organizationId: number, organization: Organization): RestResponse<void>;"));
-        Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/people/{personId}/address/{addressId}"));
+        Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/people/{personId}/address/{address-id}"));
         Assert.assertTrue(errorMessage, output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>;"));
         Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/people/{personId}"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>;"));
@@ -337,6 +338,8 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
         Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
         Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}` });"));
+        Assert.assertTrue(errorMessage, output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>"));
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}/address/${addressId}` });"));
         Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
         // helper
         Assert.assertTrue(errorMessage, output.contains("function uriEncoding"));
@@ -441,8 +444,8 @@ public class JaxrsApplicationTest {
             return null;
         }
         @GET
-        @Path("address/{addressId}")
-        public Address getAddress(@PathParam("addressId") long addressId) {
+        @Path("address/{address-id}")
+        public Address getAddress(@PathParam("address-id") long addressId) {
             return null;
         }
     }
@@ -477,10 +480,21 @@ public class JaxrsApplicationTest {
             return new Person("B");
         }
         @GET
-        @Path("{personId:.+}")
-        public Person person(@PathParam("personId") long personId) {
+        @Path("{person-id:.+}")
+        public Person person(@PathParam("person-id") long personId) {
             return new Person("C");
         }
+    }
+
+    @Test
+    public void testGettingValidIdentifierName() {
+        Assert.assertEquals("foo", ModelCompiler.getValidIdentifierName("foo"));
+        Assert.assertEquals("personId", ModelCompiler.getValidIdentifierName("person-id"));
+        Assert.assertEquals("veryLongParameterName", ModelCompiler.getValidIdentifierName("very-long-parameter-name"));
+        Assert.assertEquals("$nameWithDollar", ModelCompiler.getValidIdentifierName("$nameWithDollar"));
+        Assert.assertEquals("NameWithManyDashes", ModelCompiler.getValidIdentifierName("-name--with-many---dashes-"));
+        Assert.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("1a2b3c4"));
+        Assert.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("111a2b3c4"));
     }
 
     public static void main(String[] args) {

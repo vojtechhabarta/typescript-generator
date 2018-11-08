@@ -8,6 +8,8 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -521,7 +523,7 @@ public class ModelCompiler {
             final String element = settings.jaxrsNamespacingAnnotationElement != null ? settings.jaxrsNamespacingAnnotationElement : "value";
             final String annotationValue = Utils.getAnnotationElementValue(annotation, element, String.class);
             if (annotationValue != null) {
-                if (Emitter.isValidIdentifierName(annotationValue)) {
+                if (isValidIdentifierName(annotationValue)) {
                     return symbolTable.getSyntheticSymbol(annotationValue, nameSuffix);
                 } else {
                     TypeScriptGenerator.getLogger().warning(String.format("Ignoring annotation value '%s' since it is not a valid identifier, '%s' will be in default namespace", annotationValue, method.getOriginClass().getName() + "." + method.getName()));
@@ -624,7 +626,7 @@ public class ModelCompiler {
             }
             if (part instanceof PathTemplate.Parameter) {
                 final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
-                spans.add(new TsIdentifierReference(parameter.getName()));
+                spans.add(new TsIdentifierReference(parameter.getValidName()));
             }
         }
         return new TsTaggedTemplateLiteral(new TsIdentifierReference("uriEncoding"), spans);
@@ -848,6 +850,54 @@ public class ModelCompiler {
             return symbolTable.getSymbolClass(referenceType.symbol);
         }
         return null;
+    }
+
+    public static String getValidIdentifierName(String name) {
+        return removeInvalidIdentifierCharacters(replaceDashPattern(name));
+    }
+
+    private static String replaceDashPattern(String name) {
+        final StringBuilder sb = new StringBuilder();
+        final Matcher matcher = Pattern.compile("-[^-]").matcher(name);
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, Matcher.quoteReplacement("" + Character.toUpperCase(matcher.group().charAt(1))));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private static String removeInvalidIdentifierCharacters(String name) {
+        final StringBuilder sb = new StringBuilder();
+        for (char c : name.toCharArray()) {
+            if (sb.length() == 0 ? isValidIdentifierStart(c) : isValidIdentifierPart(c)) {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static boolean isValidIdentifierName(String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < name.length(); i++) {
+            final char c = name.charAt(i);
+            if (i == 0 ? !isValidIdentifierStart(c) : !isValidIdentifierPart(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
+    // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-names-and-keywords
+
+    private static boolean isValidIdentifierStart(char start) {
+        return Character.isUnicodeIdentifierStart(start) || start == '$' || start == '_';
+    }
+
+    private static boolean isValidIdentifierPart(char c) {
+        return Character.isUnicodeIdentifierPart(c) || c == '$' || c == '_' || c == '\u200C' || c == '\u200D';
     }
 
 }

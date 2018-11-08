@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,15 +42,15 @@ public class PathTemplate {
         for (Part part : parts) {
             if (part instanceof Literal) {
                 final Literal literal = (Literal) part;
-                sb.append(literal.literal);
+                sb.append(literal.getLiteral());
             }
             if (part instanceof Parameter) {
                 final Parameter parameter = (Parameter) part;
                 sb.append(parameterLeftDelimiter);
-                sb.append(parameter.name);
-                if (includeParameterRegex && parameter.regex != null) {
+                sb.append(parameter.getValidName());
+                if (includeParameterRegex && parameter.getRegex() != null) {
                     sb.append(":");
-                    sb.append(parameter.regex);
+                    sb.append(parameter.getRegex());
                 }
                 sb.append(parameterRightDelimiter);
             }
@@ -81,7 +82,11 @@ public class PathTemplate {
             this.regex = regex;
         }
 
-        public String getName() {
+        public String getValidName() {
+            return ModelCompiler.getValidIdentifierName(name);
+        }
+
+        public String getOriginalName() {
             return name;
         }
 

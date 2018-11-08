@@ -154,8 +154,8 @@ public class JaxrsApplicationParser {
             for (PathTemplate.Part part : pathTemplate.getParts()) {
                 if (part instanceof PathTemplate.Parameter) {
                     final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
-                    final Type type = context.pathParamTypes.get(parameter.getName());
-                    pathParams.add(new MethodParameterModel(parameter.getName(), type != null ? type : String.class));
+                    final Type type = context.pathParamTypes.get(parameter.getOriginalName());
+                    pathParams.add(new MethodParameterModel(parameter.getValidName(), type != null ? type : String.class));
                 }
             }
             // query parameters

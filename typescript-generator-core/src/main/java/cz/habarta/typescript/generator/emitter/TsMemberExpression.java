@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 
 
 public class TsMemberExpression extends TsExpression {
@@ -24,7 +25,7 @@ public class TsMemberExpression extends TsExpression {
 
     @Override
     public String format(Settings settings) {
-        if (Emitter.isValidIdentifierName(identifierName)) {
+        if (ModelCompiler.isValidIdentifierName(identifierName)) {
             return expression.format(settings) + "." + identifierName;
         } else {
             return expression.format(settings) + "[" + Emitter.quote(identifierName, settings) + "]";

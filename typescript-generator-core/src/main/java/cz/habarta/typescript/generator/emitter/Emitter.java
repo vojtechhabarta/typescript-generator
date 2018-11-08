@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.text.*;
@@ -214,29 +215,11 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     public static String quoteIfNeeded(String name, Settings settings) {
-        return isValidIdentifierName(name) ? name : quote(name, settings);
+        return ModelCompiler.isValidIdentifierName(name) ? name : quote(name, settings);
     }
 
     public static String quote(String value, Settings settings) {
         return settings.quotes + value + settings.quotes;
-    }
-
-    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
-    // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-names-and-keywords
-    public static boolean isValidIdentifierName(String name) {
-        if (name == null || name.isEmpty()) {
-            return false;
-        }
-        final char start = name.charAt(0);
-        if (!Character.isUnicodeIdentifierStart(start) && start != '$' && start != '_') {
-            return false;
-        }
-        for (char c : name.substring(1).toCharArray()) {
-            if (!Character.isUnicodeIdentifierPart(c) && c != '$' && c != '_' && c != '\u200C' && c != '\u200D') {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static String formatList(Settings settings, List<? extends Emittable> list) {

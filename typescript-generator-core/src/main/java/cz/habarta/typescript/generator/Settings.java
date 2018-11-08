@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.databind.Module;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
@@ -193,7 +194,7 @@ public class Settings {
         if (outputFileType == TypeScriptFileType.implementationFile && umdNamespace != null) {
             throw new RuntimeException("'umdNamespace' parameter is not applicable to implementation files. " + seeLink());
         }
-        if (umdNamespace != null && !Emitter.isValidIdentifierName(umdNamespace)) {
+        if (umdNamespace != null && !ModelCompiler.isValidIdentifierName(umdNamespace)) {
             throw new RuntimeException("Value of 'umdNamespace' parameter is not valid identifier: " + umdNamespace + ". " + seeLink());
         }
         if (jsonLibrary == null) {
