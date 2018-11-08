@@ -21,9 +21,20 @@ public abstract class ModelParser {
     private final Queue<SourceType<? extends Type>> typeQueue = new LinkedList<>();
 
     public ModelParser(Settings settings, TypeProcessor typeProcessor) {
+        this(settings, typeProcessor, null);
+    }
+
+    public ModelParser(Settings settings, TypeProcessor typeProcessor, List<String> parserSpecificExcludes) {
         this.settings = settings;
-        this.typeProcessor = typeProcessor;
+        this.typeProcessor = new TypeProcessor.Chain(
+                new ExcludingTypeProcessor(parserSpecificExcludes),
+                typeProcessor
+        );
         this.javadoc = new Javadoc(settings.javadocXmlFiles);
+    }
+
+    public TypeProcessor getSpecificTypeProcessor() {
+        return typeProcessor;
     }
 
     public Model parseModel(Type type) {

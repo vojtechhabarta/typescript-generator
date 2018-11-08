@@ -4,8 +4,10 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.*;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.parser.*;
+import java.util.List;
 import java.util.Optional;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Assert;
@@ -272,6 +274,19 @@ public class Jackson2ParserTest {
         public String getProperty2() {
             return null;
         }
+    }
+
+    @Test
+    public void testJsonNode() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonNode.class));
+        Assert.assertTrue(output.contains("node: any"));
+        Assert.assertTrue(output.contains("nodes: any[]"));
+    }
+
+    private static class ClassWithJsonNode {
+        public JsonNode node;
+        public List<JsonNode> nodes;
     }
 
 }

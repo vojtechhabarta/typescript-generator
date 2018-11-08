@@ -68,7 +68,7 @@ public class Jackson2Parser extends ModelParser {
     }
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
-        super(settings, typeProcessor);
+        super(settings, typeProcessor, Arrays.asList(JsonNode.class.getName()));
         if (settings.jackson2ModuleDiscovery) {
             objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
         }
@@ -103,9 +103,6 @@ public class Jackson2Parser extends ModelParser {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
-                if (propertyType == JsonNode.class) {
-                    propertyType = Object.class;
-                }
                 boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
                 if (!isInAnnotationFilter) {
                     for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {

@@ -20,7 +20,7 @@ public class Jackson1Parser extends ModelParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
-        super(settings, typeProcessor);
+        super(settings, typeProcessor, Arrays.asList(JsonNode.class.getName()));
         if (!settings.optionalAnnotations.isEmpty()) {
             final AnnotationIntrospector defaultAnnotationIntrospector = objectMapper.getSerializationConfig().getAnnotationIntrospector();
             final AnnotationIntrospector allAnnotationIntrospector = new NopAnnotationIntrospector() {
@@ -51,9 +51,6 @@ public class Jackson1Parser extends ModelParser {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = beanPropertyWriter.getGenericPropertyType();
-                if (propertyType == JsonNode.class) {
-                    propertyType = Object.class;
-                }
                 boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
                 if (!isInAnnotationFilter) {
                     for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {

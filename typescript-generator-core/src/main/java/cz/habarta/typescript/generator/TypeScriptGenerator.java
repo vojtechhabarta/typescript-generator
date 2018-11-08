@@ -153,7 +153,8 @@ public class TypeScriptGenerator {
 
     public ModelCompiler getModelCompiler() {
         if (modelCompiler == null) {
-            modelCompiler = new ModelCompiler(settings, getTypeProcessor());
+            final TypeProcessor specificTypeProcessor = getModelParser().getSpecificTypeProcessor();
+            modelCompiler = new ModelCompiler(settings, specificTypeProcessor);
         }
         return modelCompiler;
     }
