@@ -29,7 +29,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
+import javax.ws.rs.BeanParam;
 
 public class JaxrsApplicationParser {
 
@@ -260,7 +260,8 @@ public class JaxrsApplicationParser {
                     HeaderParam.class,
                     Suspended.class,
                     Context.class,
-                    FormParam.class
+                    FormParam.class,
+                    BeanParam.class
                     ))) {
                 return new MethodParameterModel(parameter.getName(), parameter.getParameterizedType());
             }
