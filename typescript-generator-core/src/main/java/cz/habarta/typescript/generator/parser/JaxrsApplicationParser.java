@@ -14,6 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
@@ -29,7 +30,6 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
 
 public class JaxrsApplicationParser {
 
@@ -260,7 +260,8 @@ public class JaxrsApplicationParser {
                     HeaderParam.class,
                     Suspended.class,
                     Context.class,
-                    FormParam.class
+                    FormParam.class,
+                    BeanParam.class
                     ))) {
                 return new MethodParameterModel(parameter.getName(), parameter.getParameterizedType());
             }
