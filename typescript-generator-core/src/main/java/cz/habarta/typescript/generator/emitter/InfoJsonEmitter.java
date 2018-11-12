@@ -6,7 +6,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class InfoJsonEmitter {
@@ -36,15 +37,22 @@ public class InfoJsonEmitter {
 
     private InfoJson getInfoJson(TsModel tsModel) {
         final InfoJson infoJson = new InfoJson();
-        infoJson.classes = new ArrayList<>();
-        for (TsBeanModel tsBeanModel : tsModel.getBeans()) {
-            if (tsBeanModel.origin != null) {
-                final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo();
-                typeMapping.javaClass = tsBeanModel.origin.getName();
-                typeMapping.typeName = tsBeanModel.name.getFullName();
-                infoJson.classes.add(typeMapping);
-            }
-        }
+
+        infoJson.classes = Stream
+                .of(
+                        tsModel.getBeans(),
+                        tsModel.getEnums(),
+                        tsModel.getTypeAliases()
+                )
+                .flatMap(s -> s.stream())
+                .filter(declaration -> declaration.origin != null)
+                .map(declaration -> {
+                    final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo();
+                    typeMapping.javaClass = declaration.origin.getName();
+                    typeMapping.typeName = declaration.name.getFullName();
+                    return typeMapping;
+                })
+                .collect(Collectors.toList());
         return infoJson;
     }
 

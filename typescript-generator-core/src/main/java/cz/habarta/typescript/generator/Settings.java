@@ -3,7 +3,6 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.databind.Module;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.util.Predicate;
