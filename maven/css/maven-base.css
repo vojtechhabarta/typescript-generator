@@ -21,9 +21,6 @@ body {
   margin: 0px;
   padding: 0px;
 }
-img {
-  border:none;
-}
 table {
   padding:0px;
   width: 100%;
@@ -60,9 +57,6 @@ div.clear hr{
 }
 #banner {
   padding: 0px;
-}
-#banner img {
-  border: none;
 }
 #breadcrumbs {
   padding: 3px 10px 3px 10px;
