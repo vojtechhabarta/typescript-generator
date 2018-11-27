@@ -261,7 +261,7 @@ public class Jackson2ParserTest {
         }
         {
             final Settings settings = TestUtils.settings();
-            settings.jackson2Configuration = new Jackson2Configuration();
+            settings.jackson2Configuration = new Jackson2ConfigurationResolved();
             settings.jackson2Configuration.setVisibility(ANY, NONE, NONE, NONE, NONE);
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
             Assert.assertTrue(output.contains("property1: string"));

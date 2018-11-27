@@ -640,7 +640,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.moduleDependencies = moduleDependencies;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
-            settings.jackson2Configuration = jackson2Configuration;
+            settings.setJackson2Configuration(classLoader, jackson2Configuration);
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;

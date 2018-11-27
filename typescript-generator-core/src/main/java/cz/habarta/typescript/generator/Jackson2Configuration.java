@@ -2,8 +2,13 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import java.util.List;
 
 
+/**
+ * This class is used for configuration in Maven and Gradle plugins
+ * so we need to pay attention to use only types supported in both build plugins.
+ */
 public class Jackson2Configuration {
 
     /**
@@ -31,18 +36,13 @@ public class Jackson2Configuration {
      */
     public JsonAutoDetect.Visibility creatorVisibility;
 
-
-    public void setVisibility(
-            JsonAutoDetect.Visibility fieldVisibility,
-            JsonAutoDetect.Visibility getterVisibility,
-            JsonAutoDetect.Visibility isGetterVisibility,
-            JsonAutoDetect.Visibility setterVisibility,
-            JsonAutoDetect.Visibility creatorVisibility) {
-        this.fieldVisibility = fieldVisibility;
-        this.getterVisibility = getterVisibility;
-        this.isGetterVisibility = isGetterVisibility;
-        this.setterVisibility = setterVisibility;
-        this.creatorVisibility = creatorVisibility;
-    }
+    /**
+     * Shape format overrides for specified classes.
+     * Multiple overrides can be specified, each using this format: <code>javaClassName:shape</code> 
+     * where shape is one of the values from
+     * <a href="https://github.com/FasterXML/jackson-annotations/blob/master/src/main/java/com/fasterxml/jackson/annotation/JsonFormat.java">JsonFormat.Shape</a> enum.
+     * Example: <code>java.util.Map$Entry:OBJECT</code>
+     */
+    public List<String> shapeConfigOverrides;
 
 }

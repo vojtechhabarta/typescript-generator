@@ -106,6 +106,14 @@ public class Utils {
         }
     }
 
+    public static Type replaceRawClassInType(Type type, Class<?> newClass) {
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
+            return createParameterizedType(newClass, parameterizedType.getActualTypeArguments());
+        }
+        return newClass;
+    }
+
     public static ParameterizedType createParameterizedType(final Type rawType, final Type... actualTypeArguments) {
         final Type ownerType = null;
         return new ParameterizedType() {

@@ -11,18 +11,20 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
-import cz.habarta.typescript.generator.Jackson2Configuration;
+import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
@@ -30,6 +32,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Predicate;
+import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
@@ -42,6 +45,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -51,13 +55,17 @@ public class Jackson2Parser extends ModelParser {
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
         this(settings, typeProcessor, false);
-        final Jackson2Configuration config = settings.jackson2Configuration;
+        final Jackson2ConfigurationResolved config = settings.jackson2Configuration;
         if (config != null) {
             setVisibility(PropertyAccessor.FIELD, config.fieldVisibility);
             setVisibility(PropertyAccessor.GETTER, config.getterVisibility);
             setVisibility(PropertyAccessor.IS_GETTER, config.isGetterVisibility);
             setVisibility(PropertyAccessor.SETTER, config.setterVisibility);
             setVisibility(PropertyAccessor.CREATOR, config.creatorVisibility);
+            if (config.shapeConfigOverrides != null) {
+                config.shapeConfigOverrides.entrySet()
+                        .forEach(entry -> setShapeOverride(entry.getKey(), entry.getValue()));
+            }
         }
     }
 
@@ -65,6 +73,14 @@ public class Jackson2Parser extends ModelParser {
         if (visibility != null) {
             objectMapper.setVisibility(accessor, visibility);
         }
+    }
+
+    private void setShapeOverride(Class<?> cls, JsonFormat.Shape shape) {
+        final MutableConfigOverride configOverride = objectMapper.configOverride(cls);
+        configOverride.setFormat(
+                JsonFormat.Value.merge(
+                        configOverride.getFormat(),
+                        JsonFormat.Value.forShape(shape)));
     }
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
@@ -103,6 +119,18 @@ public class Jackson2Parser extends ModelParser {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
+
+                final Class<?> propertyRawClass = Utils.getRawClassOrNull(propertyType);
+                if (propertyRawClass != null && Map.Entry.class.isAssignableFrom(propertyRawClass)) {
+                    final BeanDescription propertyDescription = objectMapper.getSerializationConfig().introspect(beanPropertyWriter.getType());
+                    final JsonFormat.Value formatOverride = objectMapper.getSerializationConfig().getDefaultPropertyFormat(Map.Entry.class);
+                    final JsonFormat.Value formatFromAnnotation = propertyDescription.findExpectedFormat(null);
+                    final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
+                    if (format.getShape() != JsonFormat.Shape.OBJECT) {
+                        propertyType = Utils.replaceRawClassInType(propertyType, Map.class);
+                    }
+                }
+
                 boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
                 if (!isInAnnotationFilter) {
                     for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
