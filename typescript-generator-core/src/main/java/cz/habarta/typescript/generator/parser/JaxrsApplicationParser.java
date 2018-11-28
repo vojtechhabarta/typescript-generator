@@ -155,7 +155,9 @@ public class JaxrsApplicationParser {
                 if (part instanceof PathTemplate.Parameter) {
                     final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
                     final Type type = context.pathParamTypes.get(parameter.getOriginalName());
-                    pathParams.add(new MethodParameterModel(parameter.getValidName(), type != null ? type : String.class));
+                    final Type paramType = type != null ? type : String.class;
+                    pathParams.add(new MethodParameterModel(parameter.getValidName(), paramType));
+                    foundType(result, paramType, resourceClass, method.getName());
                 }
             }
             // query parameters
@@ -164,6 +166,7 @@ public class JaxrsApplicationParser {
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
                     queryParams.add(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()));
+                    foundType(result, param.getParameterizedType(), resourceClass, method.getName());
                 }
             }
             // JAX-RS specification - 3.3.2.1 Entity Parameters
