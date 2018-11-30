@@ -29,6 +29,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludeClasses;
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
+    public List<String> excludePropertyAnnotations;
     public JsonLibrary jsonLibrary;
     public Jackson2Configuration jackson2Configuration;
     @Deprecated public boolean declarePropertiesAsOptional;
@@ -160,6 +161,7 @@ public class GenerateTask extends DefaultTask {
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
+        settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;

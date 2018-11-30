@@ -131,27 +131,12 @@ public class Jackson2Parser extends ModelParser {
                     }
                 }
 
-                boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
-                if (!isInAnnotationFilter) {
-                    for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
-                        if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                            isInAnnotationFilter = true;
-                            break;
-                        }
-                    }
-                    if (!isInAnnotationFilter) {
-                        TypeScriptGenerator.getLogger().info("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
-                        continue;
-                    }
+                if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
+                    continue;
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
                         ? !beanPropertyWriter.isRequired()
-                        : isAnnotatedPropertyOptional(new AnnotatedProperty() {
-                            @Override
-                            public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-                                return beanPropertyWriter.getAnnotation(annotationClass);
-                            }
-                        });
+                        : isAnnotatedPropertyOptional(beanPropertyWriter::getAnnotation);
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
                 final JsonUnwrapped annotation = beanPropertyWriter.getAnnotation(JsonUnwrapped.class);

@@ -145,11 +145,16 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> excludeClassPatterns;
 
     /**
-     * If this list is not empty then TypeScript will only be generated for
-     * methods with one of the annotations defined in this list.
+     * If this list is not empty then only properties with any of these annotations will be included.
      */
     @Parameter
     private List<String> includePropertyAnnotations;
+
+    /**
+     * Properties with any of these annotations will be excluded.
+     */
+    @Parameter
+    private List<String> excludePropertyAnnotations;
 
     /**
      * Library used in JSON classes.
@@ -676,6 +681,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions, extensionsWithConfiguration);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
+            settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.generateInfoJson = generateInfoJson;
             settings.generateNpmPackageJson = generateNpmPackageJson;

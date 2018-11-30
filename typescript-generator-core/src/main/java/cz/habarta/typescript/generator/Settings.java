@@ -73,6 +73,7 @@ public class Settings {
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
+    public List<Class<? extends Annotation>> excludePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
@@ -156,6 +157,10 @@ public class Settings {
 
     public void loadIncludePropertyAnnotations(ClassLoader classLoader, List<String> includePropertyAnnotations) {
         this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
+    }
+
+    public void loadExcludePropertyAnnotations(ClassLoader classLoader, List<String> excludePropertyAnnotations) {
+        this.excludePropertyAnnotations = loadClasses(classLoader, excludePropertyAnnotations, Annotation.class);
     }
 
     public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {

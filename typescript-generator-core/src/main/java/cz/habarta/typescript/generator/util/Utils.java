@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +70,17 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static boolean hasAnyAnnotation(
+            Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
+            List<Class<? extends Annotation>> annotations) {
+        for (Class<? extends Annotation> annotation : annotations) {
+            if (getAnnotationFunction.apply(annotation) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
