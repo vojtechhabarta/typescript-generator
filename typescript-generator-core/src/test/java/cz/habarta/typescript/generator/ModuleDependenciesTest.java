@@ -25,12 +25,13 @@ public class ModuleDependenciesTest {
         settings.npmVersion = "1.0.0";
         settings.generateInfoJson = true;
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(A1.class, A2.class),
+                Input.from(A1.class, A2.class, Enum1.class),
                 Output.to(new File("target/test-module-dependencies/a/a.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/a/a.d.ts");
         Assert.assertTrue(output.contains("interface A1"));
         Assert.assertTrue(output.contains("namespace NS"));
         Assert.assertTrue(output.contains("interface A2"));
+        Assert.assertTrue(output.contains("type Enum1"));
     }
 
     private void generateModuleB() {
@@ -49,11 +50,14 @@ public class ModuleDependenciesTest {
         Assert.assertTrue(output.contains("import * as a from \"../a\""));
         Assert.assertTrue(output.contains("interface B1 extends a.A1"));
         Assert.assertTrue(output.contains("objectA: a.A1"));
+        Assert.assertTrue(output.contains("enum1: a.Enum1"));
         Assert.assertTrue(output.contains("interface B2 extends a.NS.A2"));
         Assert.assertTrue(output.contains("objectA: a.NS.A2"));
         Assert.assertTrue(output.contains("interface D1 extends C<a.A1>"));
         Assert.assertTrue(output.contains("interface D2 extends C<a.NS.A2>"));
     }
+
+    /// module "a"
 
     private static class A1 {
         public String a;
@@ -63,9 +67,16 @@ public class ModuleDependenciesTest {
         public String a;
     }
 
+    private static enum Enum1 {
+        c1, c2
+    }
+
+    /// module "b"
+
     private static class B1 extends A1 {
         public String b;
         public A1 objectA;
+        public Enum1 enum1;
     }
 
     private static class B2 extends A2 {

@@ -193,8 +193,7 @@ Links
 Contributing
 ------------
 
-- current major version supports Java 8, 9 and 10 (version 1 supported Java 7 and 8)
-- build currently only works on Java 8 (JAXB Maven plugin is not compatible with Java 9 yet)
+- current major version supports Java 8 and later (version 1 supported Java 7 and 8)
 - keep pull requests small and focused ([10 tips for better Pull Requests](http://blog.ploeh.dk/2015/01/15/10-tips-for-better-pull-requests/))
 - do not add dependencies unless previously discussed in issue
 

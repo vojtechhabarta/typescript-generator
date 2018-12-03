@@ -3,7 +3,6 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.databind.Module;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.util.Predicate;
@@ -34,7 +33,7 @@ public class Settings {
     public List<ModuleDependency> moduleDependencies = new ArrayList<>();
     private LoadedModuleDependencies loadedModuleDependencies = null;
     public JsonLibrary jsonLibrary = null;
-    public Jackson2Configuration jackson2Configuration = null;
+    public Jackson2ConfigurationResolved jackson2Configuration = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
@@ -74,6 +73,7 @@ public class Settings {
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
+    public List<Class<? extends Annotation>> excludePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
@@ -124,6 +124,12 @@ public class Settings {
         this.indentString = indentString != null ? indentString : "    ";
     }
 
+    public void setJackson2Configuration(ClassLoader classLoader, Jackson2Configuration configuration) {
+        if (configuration != null) {
+            jackson2Configuration = Jackson2ConfigurationResolved.from(configuration, classLoader);
+        }
+    }
+
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
         if (customTypeProcessor != null) {
             this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);
@@ -151,6 +157,10 @@ public class Settings {
 
     public void loadIncludePropertyAnnotations(ClassLoader classLoader, List<String> includePropertyAnnotations) {
         this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
+    }
+
+    public void loadExcludePropertyAnnotations(ClassLoader classLoader, List<String> excludePropertyAnnotations) {
+        this.excludePropertyAnnotations = loadClasses(classLoader, excludePropertyAnnotations, Annotation.class);
     }
 
     public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {
@@ -412,7 +422,10 @@ public class Settings {
         return classes;
     }
 
-    private static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
+    static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
+        Objects.requireNonNull(classLoader, "classLoader");
+        Objects.requireNonNull(className, "className");
+        Objects.requireNonNull(requiredClassType, "requiredClassType");
         try {
             TypeScriptGenerator.getLogger().verbose("Loading class " + className);
             final Class<?> loadedClass = classLoader.loadClass(className);

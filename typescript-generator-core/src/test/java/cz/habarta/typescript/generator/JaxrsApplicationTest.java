@@ -497,6 +497,28 @@ public class JaxrsApplicationTest {
         Assert.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("111a2b3c4"));
     }
 
+    @Test
+    public void testEnumQueryParam() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EnumQueryParamResource.class));
+        Assert.assertTrue(output.contains("queryParams?: { target?: TargetEnum; }"));
+        Assert.assertTrue(output.contains("type TargetEnum = \"Target1\" | \"Target2\""));
+    }
+
+    @Path("enum-query-param")
+    public static class EnumQueryParamResource {
+        @GET
+        @Path("somePath")
+        public List<String> getFoo(@QueryParam("target") TargetEnum target) {
+            return Collections.emptyList();
+        }
+    }
+
+    public enum TargetEnum {
+        Target1, Target2
+    }
+
     public static void main(String[] args) {
         final ResourceConfig config = new ResourceConfig(NameConflictResource.class);
         JdkHttpServerFactory.createHttpServer(URI.create("http://localhost:9998/"), config);

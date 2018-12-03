@@ -145,11 +145,16 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> excludeClassPatterns;
 
     /**
-     * If this list is not empty then TypeScript will only be generated for
-     * methods with one of the annotations defined in this list.
+     * If this list is not empty then only properties with any of these annotations will be included.
      */
     @Parameter
     private List<String> includePropertyAnnotations;
+
+    /**
+     * Properties with any of these annotations will be excluded.
+     */
+    @Parameter
+    private List<String> excludePropertyAnnotations;
 
     /**
      * Library used in JSON classes.
@@ -167,7 +172,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies Jackson 2 global configuration.
      * Description of individual parameters is in
-     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Settings.java">Jackson2Configuration</a>
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a>
      * class on GitHub (latest version).
      */
     @Parameter
@@ -640,7 +645,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.moduleDependencies = moduleDependencies;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
-            settings.jackson2Configuration = jackson2Configuration;
+            settings.setJackson2Configuration(classLoader, jackson2Configuration);
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
@@ -676,6 +681,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions, extensionsWithConfiguration);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
+            settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
             settings.generateInfoJson = generateInfoJson;
             settings.generateNpmPackageJson = generateNpmPackageJson;

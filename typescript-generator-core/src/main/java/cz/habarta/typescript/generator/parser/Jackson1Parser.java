@@ -51,27 +51,11 @@ public class Jackson1Parser extends ModelParser {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = beanPropertyWriter.getGenericPropertyType();
-                boolean isInAnnotationFilter = settings.includePropertyAnnotations.isEmpty();
-                if (!isInAnnotationFilter) {
-                    for (Class<? extends Annotation> optionalAnnotation : settings.includePropertyAnnotations) {
-                        if (beanPropertyWriter.getAnnotation(optionalAnnotation) != null) {
-                            isInAnnotationFilter = true;
-                            break;
-                        }
-                    }
-                    if (!isInAnnotationFilter) {
-                        TypeScriptGenerator.getLogger().info("Skipping " + sourceClass.type + "." + beanPropertyWriter.getName() + " because it is missing an annotation from includePropertyAnnotations!");
-                        continue;
-                    }
+                if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
+                    continue;
                 }
-                final boolean optional = isAnnotatedPropertyOptional(new AnnotatedProperty() {
-                    @Override
-                    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-                        return beanPropertyWriter.getAnnotation(annotationClass);
-                    }
-                });
-                final Member originalMember = beanPropertyWriter.getMember().getMember();
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, originalMember, null));
+                final boolean optional = isAnnotatedPropertyOptional(beanPropertyWriter::getAnnotation);
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, propertyMember, null));
             }
         }
 

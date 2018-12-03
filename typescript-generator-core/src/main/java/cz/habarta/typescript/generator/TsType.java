@@ -60,6 +60,25 @@ public abstract class TsType implements Emittable {
         }
     }
 
+    public static class GenericBasicType extends TsType.BasicType {
+
+        public final List<TsType> typeArguments;
+
+        public GenericBasicType(String name, TsType... typeArguments) {
+            this(name, Arrays.asList(typeArguments));
+        }
+
+        public GenericBasicType(String name, List<? extends TsType> typeArguments) {
+            super(name);
+            this.typeArguments = new ArrayList<TsType>(typeArguments);
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return name + "<" + Emitter.formatList(settings, typeArguments) + ">";
+        }
+    }
+
     public static class VerbatimType extends TsType {
 
         public final String verbatimType;
@@ -254,6 +273,14 @@ public abstract class TsType implements Emittable {
 
     public static TsType transformTsType(Context context, TsType tsType, Transformer transformer) {
         final TsType type = transformer.transform(context, tsType);
+        if (type instanceof TsType.GenericBasicType) {
+            final GenericBasicType genericBasicType = (TsType.GenericBasicType) type;
+            final List<TsType> typeArguments = new ArrayList<>();
+            for (TsType typeArgument : genericBasicType.typeArguments) {
+                typeArguments.add(transformTsType(context, typeArgument, transformer));
+            }
+            return new TsType.GenericBasicType(genericBasicType.name, typeArguments);
+        }
         if (type instanceof TsType.GenericReferenceType) {
             final GenericReferenceType genericReferenceType = (TsType.GenericReferenceType) type;
             final List<TsType> typeArguments = new ArrayList<>();

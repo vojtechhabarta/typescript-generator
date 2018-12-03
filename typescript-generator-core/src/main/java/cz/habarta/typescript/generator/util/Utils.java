@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,6 +72,17 @@ public class Utils {
         return null;
     }
 
+    public static boolean hasAnyAnnotation(
+            Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
+            List<Class<? extends Annotation>> annotations) {
+        for (Class<? extends Annotation> annotation : annotations) {
+            if (getAnnotationFunction.apply(annotation) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
         final Annotation annotation = getAnnotation(annotatedElement, annotationClassName);
         return getAnnotationElementValue(annotation, annotationElementName, annotationElementType);
@@ -104,6 +116,14 @@ public class Utils {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Type replaceRawClassInType(Type type, Class<?> newClass) {
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
+            return createParameterizedType(newClass, parameterizedType.getActualTypeArguments());
+        }
+        return newClass;
     }
 
     public static ParameterizedType createParameterizedType(final Type rawType, final Type... actualTypeArguments) {

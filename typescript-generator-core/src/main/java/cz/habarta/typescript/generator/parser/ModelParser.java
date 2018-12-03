@@ -5,12 +5,14 @@ import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 
 
 public abstract class ModelParser {
@@ -105,21 +107,27 @@ public abstract class ModelParser {
         }
     }
 
-    // replace with lambda on Java8
-    protected static interface AnnotatedProperty {
-        public <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    protected boolean isAnnotatedPropertyIncluded(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction, String propertyDescription) {
+        boolean isIncluded = settings.includePropertyAnnotations.isEmpty()
+                || Utils.hasAnyAnnotation(getAnnotationFunction, settings.includePropertyAnnotations);
+        if (!isIncluded) {
+            TypeScriptGenerator.getLogger().verbose("Skipping '" + propertyDescription + "' because it doesn't have any annotation from 'includePropertyAnnotations'");
+            return false;
+        }
+        boolean isExcluded = Utils.hasAnyAnnotation(getAnnotationFunction, settings.excludePropertyAnnotations);
+        if (isExcluded) {
+            TypeScriptGenerator.getLogger().verbose("Skipping '" + propertyDescription + "' because it has some annotation from 'excludePropertyAnnotations'");
+            return false;
+        }
+        return true;
     }
 
-    protected boolean isAnnotatedPropertyOptional(AnnotatedProperty annotatedProperty) {
+    protected boolean isAnnotatedPropertyOptional(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction) {
         if (settings.optionalProperties == OptionalProperties.all) {
             return true;
         }
         if (settings.optionalProperties == null || settings.optionalProperties == OptionalProperties.useSpecifiedAnnotations) {
-            for (Class<? extends Annotation> optionalAnnotation : settings.optionalAnnotations) {
-                if (annotatedProperty.getAnnotation(optionalAnnotation) != null) {
-                    return true;
-                }
-            }
+            return Utils.hasAnyAnnotation(getAnnotationFunction, settings.optionalAnnotations);
         }
         return false;
     }
