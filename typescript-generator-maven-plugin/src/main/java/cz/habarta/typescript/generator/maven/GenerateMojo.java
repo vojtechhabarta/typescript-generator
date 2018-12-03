@@ -621,16 +621,20 @@ public class GenerateMojo extends AbstractMojo {
 
     @Override
     public void execute() {
-        try {
-            TypeScriptGenerator.setLogger(new Logger(loggingLevel));
-            TypeScriptGenerator.printVersion();
+        TypeScriptGenerator.setLogger(new Logger(loggingLevel));
+        TypeScriptGenerator.printVersion();
 
-            // class loader
-            final List<URL> urls = new ArrayList<>();
+        // class loader
+        final List<URL> urls = new ArrayList<>();
+        try {
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
-            final URLClassLoader classLoader = Settings.createClassLoader(project.getArtifactId(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+        } catch (DependencyResolutionRequiredException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (URLClassLoader classLoader = Settings.createClassLoader(project.getArtifactId(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
 
             // Settings
             final Settings settings = new Settings();
@@ -707,8 +711,7 @@ public class GenerateMojo extends AbstractMojo {
                             settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
                     Output.to(output)
             );
-
-        } catch (DependencyResolutionRequiredException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

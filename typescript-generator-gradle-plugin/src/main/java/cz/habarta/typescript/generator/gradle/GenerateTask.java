@@ -97,7 +97,6 @@ public class GenerateTask extends DefaultTask {
 
         // class loader
         final List<URL> urls = new ArrayList<>();
-
         for (Task task : getProject().getTasks()) {
             if (task.getName().startsWith("compile")) {
                 for (File file : task.getOutputs().getFiles()) {
@@ -105,88 +104,88 @@ public class GenerateTask extends DefaultTask {
                 }
             }
         }
-
         for (File file : getProject().getConfigurations().getAt("compile").getFiles()) {
             urls.add(file.toURI().toURL());
         }
 
-        final URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+        try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
 
-        // Settings
-        final Settings settings = new Settings();
-        if (outputFileType != null) {
-            settings.outputFileType = outputFileType;
+            // Settings
+            final Settings settings = new Settings();
+            if (outputFileType != null) {
+                settings.outputFileType = outputFileType;
+            }
+            settings.outputKind = outputKind;
+            settings.module = module;
+            settings.namespace = namespace;
+            settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
+            settings.umdNamespace = umdNamespace;
+            settings.moduleDependencies = moduleDependencies;
+            settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
+            settings.jsonLibrary = jsonLibrary;
+            settings.setJackson2Configuration(classLoader, jackson2Configuration);
+            settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+            settings.optionalProperties = optionalProperties;
+            settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
+            settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
+            settings.removeTypeNamePrefix = removeTypeNamePrefix;
+            settings.removeTypeNameSuffix = removeTypeNameSuffix;
+            settings.addTypeNamePrefix = addTypeNamePrefix;
+            settings.addTypeNameSuffix = addTypeNameSuffix;
+            settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+            settings.customTypeNamingFunction = customTypeNamingFunction;
+            settings.referencedFiles = referencedFiles;
+            settings.importDeclarations = importDeclarations;
+            settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
+            settings.mapDate = mapDate;
+            settings.mapEnum = mapEnum;
+            settings.nonConstEnums = nonConstEnums;
+            settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
+            settings.mapClasses = mapClasses;
+            settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
+            settings.disableTaggedUnions = disableTaggedUnions;
+            settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
+            settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
+            settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
+            settings.jaxrsNamespacing = jaxrsNamespacing;
+            settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
+            settings.restResponseType = restResponseType;
+            settings.setRestOptionsType(restOptionsType);
+            settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
+            settings.sortDeclarations = sortDeclarations;
+            settings.sortTypeDeclarations = sortTypeDeclarations;
+            settings.noFileComment = noFileComment;
+            settings.noTslintDisable = noTslintDisable;
+            settings.javadocXmlFiles = javadocXmlFiles;
+            settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
+            settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
+            settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
+            settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.generateInfoJson = generateInfoJson;
+            settings.generateNpmPackageJson = generateNpmPackageJson;
+            settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
+            settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+            settings.npmBuildScript = npmBuildScript;
+            settings.setStringQuotes(stringQuotes);
+            settings.setIndentString(indentString);
+            settings.displaySerializerWarning = displaySerializerWarning;
+            settings.debug = debug;
+            settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+            settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
+            settings.loadJackson2Modules(classLoader, jackson2Modules);
+            settings.classLoader = classLoader;
+            final File output = outputFile != null
+                    ? getProject().file(outputFile)
+                    : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
+            settings.validateFileName(output);
+
+            // TypeScriptGenerator
+            new TypeScriptGenerator(settings).generateTypeScript(
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
+                            settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
+                    Output.to(output)
+            );
         }
-        settings.outputKind = outputKind;
-        settings.module = module;
-        settings.namespace = namespace;
-        settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
-        settings.umdNamespace = umdNamespace;
-        settings.moduleDependencies = moduleDependencies;
-        settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
-        settings.jsonLibrary = jsonLibrary;
-        settings.setJackson2Configuration(classLoader, jackson2Configuration);
-        settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
-        settings.optionalProperties = optionalProperties;
-        settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
-        settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
-        settings.removeTypeNamePrefix = removeTypeNamePrefix;
-        settings.removeTypeNameSuffix = removeTypeNameSuffix;
-        settings.addTypeNamePrefix = addTypeNamePrefix;
-        settings.addTypeNameSuffix = addTypeNameSuffix;
-        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
-        settings.customTypeNamingFunction = customTypeNamingFunction;
-        settings.referencedFiles = referencedFiles;
-        settings.importDeclarations = importDeclarations;
-        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
-        settings.mapDate = mapDate;
-        settings.mapEnum = mapEnum;
-        settings.nonConstEnums = nonConstEnums;
-        settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
-        settings.mapClasses = mapClasses;
-        settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
-        settings.disableTaggedUnions = disableTaggedUnions;
-        settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
-        settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
-        settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
-        settings.jaxrsNamespacing = jaxrsNamespacing;
-        settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
-        settings.restResponseType = restResponseType;
-        settings.setRestOptionsType(restOptionsType);
-        settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
-        settings.sortDeclarations = sortDeclarations;
-        settings.sortTypeDeclarations = sortTypeDeclarations;
-        settings.noFileComment = noFileComment;
-        settings.noTslintDisable = noTslintDisable;
-        settings.javadocXmlFiles = javadocXmlFiles;
-        settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
-        settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
-        settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
-        settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
-        settings.generateInfoJson = generateInfoJson;
-        settings.generateNpmPackageJson = generateNpmPackageJson;
-        settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
-        settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
-        settings.npmBuildScript = npmBuildScript;
-        settings.setStringQuotes(stringQuotes);
-        settings.setIndentString(indentString);
-        settings.displaySerializerWarning = displaySerializerWarning;
-        settings.debug = debug;
-        settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
-        settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
-        settings.loadJackson2Modules(classLoader, jackson2Modules);
-        settings.classLoader = classLoader;
-        final File output = outputFile != null
-                ? getProject().file(outputFile)
-                : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
-        settings.validateFileName(output);
-
-        // TypeScriptGenerator
-        new TypeScriptGenerator(settings).generateTypeScript(
-                Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
-                        settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
-                Output.to(output)
-        );
     }
 
 }
