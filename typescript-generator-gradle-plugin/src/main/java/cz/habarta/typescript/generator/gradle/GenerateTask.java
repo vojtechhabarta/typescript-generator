@@ -187,6 +187,8 @@ public class GenerateTask extends DefaultTask {
                         settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
                 Output.to(output)
         );
+        
+        classLoader.close();
     }
 
 }
