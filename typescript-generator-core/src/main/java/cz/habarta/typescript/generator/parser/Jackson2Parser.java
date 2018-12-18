@@ -137,9 +137,9 @@ public class Jackson2Parser extends ModelParser {
                         propertyType = Utils.replaceRawClassInType(propertyType, Map.class);
                     }
                 }
-                
+
                 // @JsonIdentityInfo and @JsonIdentityReference
-                propertyType = processIdentity(propertyType);
+                propertyType = processIdentity(propertyType, beanPropertyWriter);
 
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;
@@ -201,14 +201,16 @@ public class Jackson2Parser extends ModelParser {
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
     }
 
-    private Type processIdentity(Type propertyType) {
+    private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
         final Class<?> cls = Utils.getRawClassOrNull(propertyType);
         if (cls != null) {
             final JsonIdentityInfo identityInfo = cls.getAnnotation(JsonIdentityInfo.class);
             if (identityInfo == null) {
                 return propertyType;
             }
-            final JsonIdentityReference identityReference = cls.getAnnotation(JsonIdentityReference.class);
+            final JsonIdentityReference identityReferenceC = cls.getAnnotation(JsonIdentityReference.class);
+            final JsonIdentityReference identityReferenceP = propertyWriter.getAnnotation(JsonIdentityReference.class);
+            final JsonIdentityReference identityReference = identityReferenceP != null ? identityReferenceP : identityReferenceC;
             final boolean alwaysAsId = identityReference != null && identityReference.alwaysAsId();
 
             final Type idType;
@@ -216,14 +218,14 @@ public class Jackson2Parser extends ModelParser {
                 return propertyType;
             } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
                 final BeanPropertyWriter[] properties = getBeanHelper(cls).getProperties();
-                final Optional<BeanPropertyWriter> property = Stream.of(properties)
+                final Optional<BeanPropertyWriter> idProperty = Stream.of(properties)
                         .filter(p -> p.getName().equals(identityInfo.property()))
                         .findFirst();
-                if (property.isPresent()) {
-                    final BeanPropertyWriter beanPropertyWriter = property.get();
-                    final Member propertyMember = beanPropertyWriter.getMember().getMember();
-                    checkMember(propertyMember, beanPropertyWriter.getName(), cls);
-                    idType = getGenericType(propertyMember);
+                if (idProperty.isPresent()) {
+                    final BeanPropertyWriter idPropertyWriter = idProperty.get();
+                    final Member idPropertyMember = idPropertyWriter.getMember().getMember();
+                    checkMember(idPropertyMember, idPropertyWriter.getName(), cls);
+                    idType = getGenericType(idPropertyMember);
                 } else {
                     return propertyType;
                 }

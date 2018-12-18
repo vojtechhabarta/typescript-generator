@@ -20,6 +20,7 @@ public class ObjectAsIdTest {
         final TestObjectA testObjectA = new TestObjectA();
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
+        final TestObjectD testObjectD = new TestObjectD();
         final Wrapper wrapper = new Wrapper();
         wrapper.testObjectA1 = testObjectA;
         wrapper.testObjectA2 = testObjectA;
@@ -27,6 +28,8 @@ public class ObjectAsIdTest {
         wrapper.testObjectB2 = testObjectB;
         wrapper.testObjectC1 = testObjectC;
         wrapper.testObjectC2 = testObjectC;
+        wrapper.testObjectD1 = testObjectD;
+        wrapper.testObjectD2 = testObjectD;
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         final String json = objectMapper.writeValueAsString(wrapper);
@@ -35,7 +38,9 @@ public class ObjectAsIdTest {
         Assert.assertTrue(json.contains("\"testObjectB1\": {"));
         Assert.assertTrue(json.contains("\"testObjectB2\": \"id2\""));
         Assert.assertTrue(json.contains("\"testObjectC1\": {"));
-        Assert.assertTrue(json.contains("\"testObjectC2\": \"id2\""));
+        Assert.assertTrue(json.contains("\"testObjectC2\": \"id3\""));
+        Assert.assertTrue(json.contains("\"testObjectD1\": \"id4\""));
+        Assert.assertTrue(json.contains("\"testObjectD2\": \"id4\""));
     }
 
     @Test
@@ -45,9 +50,11 @@ public class ObjectAsIdTest {
         Assert.assertTrue(output.contains("testObjectA1: string"));
         Assert.assertTrue(output.contains("testObjectB1: TestObjectB | string"));
         Assert.assertTrue(output.contains("testObjectC1: TestObjectC<string> | string"));
+        Assert.assertTrue(output.contains("testObjectD1: string"));
         Assert.assertTrue(!output.contains("interface TestObjectA"));
         Assert.assertTrue(output.contains("interface TestObjectB"));
         Assert.assertTrue(output.contains("interface TestObjectC<T>"));
+        Assert.assertTrue(!output.contains("interface TestObjectD"));
     }
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
@@ -73,13 +80,22 @@ public class ObjectAsIdTest {
     private static class TestObjectC<T> {
 
         @JsonProperty("@@@id")
-        public String myIdentification = "id2";
+        public String myIdentification = "id3";
 
         public T myProperty;
 
         public TestObjectC(T myProperty) {
             this.myProperty = myProperty;
         }
+    }
+
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
+    private static class TestObjectD {
+
+        @JsonProperty("@@@id")
+        public String myIdentification = "id4";
+
+        public String myProperty = "valueD";
     }
 
     private static class Wrapper {
@@ -89,6 +105,8 @@ public class ObjectAsIdTest {
         public TestObjectB testObjectB2;
         public TestObjectC<String> testObjectC1;
         public TestObjectC<String> testObjectC2;
+        public @JsonIdentityReference(alwaysAsId = true) TestObjectD testObjectD1;
+        public @JsonIdentityReference(alwaysAsId = true) TestObjectD testObjectD2;
     }
 
 }
