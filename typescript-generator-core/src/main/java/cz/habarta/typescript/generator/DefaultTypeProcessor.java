@@ -2,10 +2,12 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.*;
 import java.math.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
 
 
@@ -115,6 +117,20 @@ public class DefaultTypeProcessor implements TypeProcessor {
             return upperBounds.length > 0
                     ? context.processType(upperBounds[0])
                     : new Result(TsType.Any);
+        }
+        if (javaType instanceof UnionType) {
+            final UnionType unionType = (UnionType) javaType;
+            final List<Result> results = unionType.types.stream()
+                    .map(type -> context.processType(type))
+                    .collect(Collectors.toList());
+            return new Result(
+                    new TsType.UnionType(results.stream()
+                            .map(result -> result.getTsType())
+                            .collect(Collectors.toList())),
+                    results.stream()
+                            .flatMap(result -> result.getDiscoveredClasses().stream())
+                            .collect(Collectors.toList())
+            );
         }
         return null;
     }

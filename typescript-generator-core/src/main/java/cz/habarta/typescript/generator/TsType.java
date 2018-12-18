@@ -184,6 +184,10 @@ public abstract class TsType implements Emittable {
 
         public final List<TsType> types;
 
+        public UnionType(TsType... types) {
+            this(Arrays.asList(types));
+        }
+
         public UnionType(List<? extends TsType> types) {
             this.types = new ArrayList<TsType>(new LinkedHashSet<TsType>(types));
         }

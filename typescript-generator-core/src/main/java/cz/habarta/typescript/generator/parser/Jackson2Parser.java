@@ -3,12 +3,15 @@ package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -32,6 +35,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Predicate;
+import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -46,7 +50,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class Jackson2Parser extends ModelParser {
@@ -120,6 +126,7 @@ public class Jackson2Parser extends ModelParser {
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
 
+                // Map.Entry
                 final Class<?> propertyRawClass = Utils.getRawClassOrNull(propertyType);
                 if (propertyRawClass != null && Map.Entry.class.isAssignableFrom(propertyRawClass)) {
                     final BeanDescription propertyDescription = objectMapper.getSerializationConfig().introspect(beanPropertyWriter.getType());
@@ -130,6 +137,9 @@ public class Jackson2Parser extends ModelParser {
                         propertyType = Utils.replaceRawClassInType(propertyType, Map.class);
                     }
                 }
+                
+                // @JsonIdentityInfo and @JsonIdentityReference
+                propertyType = processIdentity(propertyType);
 
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;
@@ -189,6 +199,49 @@ public class Jackson2Parser extends ModelParser {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
+    }
+
+    private Type processIdentity(Type propertyType) {
+        final Class<?> cls = Utils.getRawClassOrNull(propertyType);
+        if (cls != null) {
+            final JsonIdentityInfo identityInfo = cls.getAnnotation(JsonIdentityInfo.class);
+            if (identityInfo == null) {
+                return propertyType;
+            }
+            final JsonIdentityReference identityReference = cls.getAnnotation(JsonIdentityReference.class);
+            final boolean alwaysAsId = identityReference != null && identityReference.alwaysAsId();
+
+            final Type idType;
+            if (identityInfo.generator() == ObjectIdGenerators.None.class) {
+                return propertyType;
+            } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
+                final BeanPropertyWriter[] properties = getBeanHelper(cls).getProperties();
+                final Optional<BeanPropertyWriter> property = Stream.of(properties)
+                        .filter(p -> p.getName().equals(identityInfo.property()))
+                        .findFirst();
+                if (property.isPresent()) {
+                    final BeanPropertyWriter beanPropertyWriter = property.get();
+                    final Member propertyMember = beanPropertyWriter.getMember().getMember();
+                    checkMember(propertyMember, beanPropertyWriter.getName(), cls);
+                    idType = getGenericType(propertyMember);
+                } else {
+                    return propertyType;
+                }
+            } else if (identityInfo.generator() == ObjectIdGenerators.IntSequenceGenerator.class) {
+                idType = Integer.class;
+            } else if (identityInfo.generator() == ObjectIdGenerators.UUIDGenerator.class) {
+                idType = String.class;
+            } else if (identityInfo.generator() == ObjectIdGenerators.StringIdGenerator.class) {
+                idType = String.class;
+            } else {
+                idType = Object.class;
+            }
+            return alwaysAsId
+                    ? idType
+                    : new UnionType(propertyType, idType);
+            
+        }
+        return propertyType;
     }
 
     private static Type getGenericType(Member member) {
@@ -378,7 +431,7 @@ public class Jackson2Parser extends ModelParser {
         return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, null);
     }
 
-    private Number getNumberEnumValue(Field field, Method valueMethod, int index) throws Exception {
+    private static Number getNumberEnumValue(Field field, Method valueMethod, int index) throws Exception {
         if (valueMethod != null) {
             final Object valueObject = invokeJsonValueMethod(field, valueMethod);
             if (valueObject instanceof Number) {
@@ -388,7 +441,7 @@ public class Jackson2Parser extends ModelParser {
         return index;
     }
 
-    private Object getMethodEnumValue(Field field, Method valueMethod) throws Exception {
+    private static Object getMethodEnumValue(Field field, Method valueMethod) throws Exception {
         if (valueMethod != null) {
             final Object valueObject = invokeJsonValueMethod(field, valueMethod);
             if (valueObject instanceof String || valueObject instanceof Number) {
@@ -404,7 +457,7 @@ public class Jackson2Parser extends ModelParser {
         return field.getName();
     }
 
-    private Object invokeJsonValueMethod(Field field, Method valueMethod) throws ReflectiveOperationException {
+    private static Object invokeJsonValueMethod(Field field, Method valueMethod) throws ReflectiveOperationException {
         field.setAccessible(true);
         final Object constant = field.get(null);
         valueMethod.setAccessible(true);
@@ -412,7 +465,7 @@ public class Jackson2Parser extends ModelParser {
         return valueObject;
     }
 
-    private Object getFieldJsonValue(Field field, Field jsonValueField) throws ReflectiveOperationException {
+    private static Object getFieldJsonValue(Field field, Field jsonValueField) throws ReflectiveOperationException {
         field.setAccessible(true);
         final Object constant = field.get(null);
         jsonValueField.setAccessible(true);
