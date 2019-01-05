@@ -45,4 +45,15 @@ public class Jackson2Configuration {
      */
     public List<String> shapeConfigOverrides;
 
+    /**
+     * Feature that determines standard Enum values representation:
+     * if enabled, return value of <code>Enum.toString()</code> is used;
+     * if disabled, return value of <code>Enum.name()</code> is used.<br>
+     * (In <code>ObjectMapper</code> this feature is controlled using
+     * <code>SerializationFeature.WRITE_ENUMS_USING_TO_STRING</code> and
+     * <code>DeserializationFeature.READ_ENUMS_USING_TO_STRING</code> constants.)<br>
+     * Default value is <code>false</code>.
+     */
+    public boolean enumsUsingToString;
+
 }

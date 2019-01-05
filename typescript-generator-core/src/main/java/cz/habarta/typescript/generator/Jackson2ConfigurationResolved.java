@@ -16,6 +16,7 @@ public class Jackson2ConfigurationResolved {
     public JsonAutoDetect.Visibility setterVisibility;
     public JsonAutoDetect.Visibility creatorVisibility;
     public Map<Class<?>, JsonFormat.Shape> shapeConfigOverrides;
+    public boolean enumsUsingToString;
 
     public static Jackson2ConfigurationResolved from(Jackson2Configuration configuration, ClassLoader classLoader) {
         final Jackson2ConfigurationResolved resolved = new Jackson2ConfigurationResolved();
@@ -26,6 +27,7 @@ public class Jackson2ConfigurationResolved {
         resolved.creatorVisibility = configuration.creatorVisibility;
         resolved.fieldVisibility = configuration.fieldVisibility;
         resolved.shapeConfigOverrides = resolveShapeConfigOverrides(configuration.shapeConfigOverrides, classLoader);
+        resolved.enumsUsingToString = configuration.enumsUsingToString;
         return resolved;
     }
 
