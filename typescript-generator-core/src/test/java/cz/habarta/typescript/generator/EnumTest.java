@@ -129,12 +129,36 @@ public class EnumTest {
     }
 
     @Test
-    public void testEnumWithJsonValueAnnotation() {
+    public void testEnumWithJsonValueMethodAnnotation() {
         final Settings settings = TestUtils.settings();
-        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueAnnotations.class));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueMethodAnnotation.class));
         final String expected = (
                 "\n" +
-                "type SideWithJsonValueAnnotations = 'left-side' | 'right-side';\n"
+                "type SideWithJsonValueMethodAnnotation = 'left-side' | 'right-side';\n"
+                ).replace("'", "\"");
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testEnumWithJsonValueFieldAnnotation() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueFieldAnnotation.class));
+        final String expected = (
+                "\n" +
+                "type SideWithJsonValueFieldAnnotation = 'left-side' | 'right-side';\n"
+                ).replace("'", "\"");
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testEnumUsingToString() {
+        final Settings settings = TestUtils.settings();
+        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
+        settings.jackson2Configuration.enumsUsingToString = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideUsingToString.class));
+        final String expected = (
+                "\n" +
+                "type SideUsingToString = 'toString:left-side' | 'toString:right-side';\n"
                 ).replace("'", "\"");
         assertEquals(expected, output);
     }
@@ -188,7 +212,7 @@ public class EnumTest {
         Right
     }
 
-    enum SideWithJsonValueAnnotations {
+    enum SideWithJsonValueMethodAnnotation {
         @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
         Left("left-side"),
         @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
@@ -196,13 +220,50 @@ public class EnumTest {
 
         private final String jsonValue;
 
-        private SideWithJsonValueAnnotations(String jsonValue) {
+        private SideWithJsonValueMethodAnnotation(String jsonValue) {
             this.jsonValue = jsonValue;
         }
 
         @JsonValue
         public Object getJsonValue() {
             return jsonValue;
+        }
+    }
+
+    enum SideWithJsonValueFieldAnnotation {
+        @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
+        Left("left-side"),
+        @JsonProperty("@JsonProperty ignored since @JsonValue has higher precedence")
+        Right("right-side");
+
+        @JsonValue
+        private final String jsonValue;
+
+        private SideWithJsonValueFieldAnnotation(String jsonValue) {
+            this.jsonValue = jsonValue;
+        }
+
+        @Override
+        public String toString() {
+            return "AAA " + name();
+        }
+    }
+
+    enum SideUsingToString {
+        @JsonProperty("@JsonProperty ignored since toString() has higher precedence")
+        Left("left-side"),
+        @JsonProperty("@JsonProperty ignored since toString() has higher precedence")
+        Right("right-side");
+
+        private final String jsonValue;
+
+        private SideUsingToString(String jsonValue) {
+            this.jsonValue = jsonValue;
+        }
+
+        @Override
+        public String toString() {
+            return "toString:" + jsonValue;
         }
     }
 

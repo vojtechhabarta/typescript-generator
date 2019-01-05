@@ -5,22 +5,23 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
@@ -37,9 +38,6 @@ import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.MethodDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -71,6 +69,10 @@ public class Jackson2Parser extends ModelParser {
             if (config.shapeConfigOverrides != null) {
                 config.shapeConfigOverrides.entrySet()
                         .forEach(entry -> setShapeOverride(entry.getKey(), entry.getValue()));
+            }
+            if (config.enumsUsingToString) {
+                objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+                objectMapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
             }
         }
     }
@@ -386,35 +388,12 @@ public class Jackson2Parser extends ModelParser {
             final Class<?> enumClass = (Class<?>) sourceClass.type;
 
             try {
-                Method valueMethod = null;
-                Field valueField = null;
-
-                Field[] allEnumFields = enumClass.getDeclaredFields();
-                List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
-
-                final BeanInfo beanInfo = Introspector.getBeanInfo(enumClass);
-                valueMethod = Arrays.stream(beanInfo.getMethodDescriptors())
-                        .map(MethodDescriptor::getMethod)
-                        .filter(method -> method.isAnnotationPresent(JsonValue.class))
-                        .findAny().orElse(null);
-
-                if (valueMethod == null) {
-                    List<Field> instanceFields = Arrays.stream(allEnumFields).filter(field -> !field.isEnumConstant()).collect(Collectors.toList());
-                    valueField = instanceFields.stream()
-                            .filter(field -> field.isAnnotationPresent(JsonValue.class))
-                            .findAny().orElse(null);
-                }
-
-                int index = 0;
+                final Field[] allEnumFields = enumClass.getDeclaredFields();
+                final List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
                 for (Field constant : constants) {
-                    Object value;
-                    if (valueField != null) {
-                        value = getFieldJsonValue(constant, valueField);
-                    } else if (isNumberBased) {
-                        value = getNumberEnumValue(constant, valueMethod, index++);
-                    } else {
-                        value = getMethodEnumValue(constant, valueMethod);
-                    }
+                    constant.setAccessible(true);
+                    final String enumJson = objectMapper.writeValueAsString(constant.get(null));
+                    final Object value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
 
                     if (value instanceof String) {
                         enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, null));
@@ -433,44 +412,4 @@ public class Jackson2Parser extends ModelParser {
         return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, null);
     }
 
-    private static Number getNumberEnumValue(Field field, Method valueMethod, int index) throws Exception {
-        if (valueMethod != null) {
-            final Object valueObject = invokeJsonValueMethod(field, valueMethod);
-            if (valueObject instanceof Number) {
-                return (Number) valueObject;
-            }
-        }
-        return index;
-    }
-
-    private static Object getMethodEnumValue(Field field, Method valueMethod) throws Exception {
-        if (valueMethod != null) {
-            final Object valueObject = invokeJsonValueMethod(field, valueMethod);
-            if (valueObject instanceof String || valueObject instanceof Number) {
-                return valueObject;
-            }
-        }
-        if (field.isAnnotationPresent(JsonProperty.class)) {
-            final JsonProperty jsonProperty = field.getAnnotation(JsonProperty.class);
-            if (!jsonProperty.value().equals(JsonProperty.USE_DEFAULT_NAME)) {
-                return jsonProperty.value();
-            }
-        }
-        return field.getName();
-    }
-
-    private static Object invokeJsonValueMethod(Field field, Method valueMethod) throws ReflectiveOperationException {
-        field.setAccessible(true);
-        final Object constant = field.get(null);
-        valueMethod.setAccessible(true);
-        final Object valueObject = valueMethod.invoke(constant);
-        return valueObject;
-    }
-
-    private static Object getFieldJsonValue(Field field, Field jsonValueField) throws ReflectiveOperationException {
-        field.setAccessible(true);
-        final Object constant = field.get(null);
-        jsonValueField.setAccessible(true);
-        return jsonValueField.get(constant);
-    }
 }
