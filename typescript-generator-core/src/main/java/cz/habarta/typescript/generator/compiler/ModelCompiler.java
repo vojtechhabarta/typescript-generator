@@ -511,7 +511,10 @@ public class ModelCompiler {
 
     private Map<Symbol, List<JaxrsMethodModel>> groupingByMethodContainer(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix) {
         return jaxrsApplication.getMethods().stream()
-                .collect(Collectors.groupingBy(method -> getContainerSymbol(jaxrsApplication, symbolTable, nameSuffix, method)));
+                .collect(Collectors.groupingBy(
+                        method -> getContainerSymbol(jaxrsApplication, symbolTable, nameSuffix, method),
+                        Utils.toSortedList(Comparator.comparing(method -> method.getPath()))
+                ));
     }
 
     private Symbol getContainerSymbol(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix, JaxrsMethodModel method) {

@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 public class Utils {
@@ -199,6 +201,16 @@ public class Utils {
         final ArrayList<T> result = new ArrayList<>(list);
         result.removeAll(toBeRemoved);
         return result;
+    }
+
+    public static <T> Collector<T, ?, List<T>> toSortedList(Comparator<? super T> comparator) {
+        return Collectors.collectingAndThen(
+                Collectors.toCollection(ArrayList::new),
+                list -> {
+                    list.sort(comparator);
+                    return list;
+                }
+        );
     }
 
     public static List<String> readLines(InputStream stream) {
