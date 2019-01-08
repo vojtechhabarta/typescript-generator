@@ -62,33 +62,40 @@ public class Input {
                 if (classNames != null) {
                     types.addAll(fromClassNames(classNames));
                 }
-                if (classNamePatterns != null) {
-                    types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns));
-                }
-                if (classesImplementingInterfaces != null) {
+
+                // Scan only if once, and only if necessary
+                if (classNamePatterns != null || classesWithAnnotations != null || classesImplementingInterfaces != null || automaticJaxrsApplication) {
                     final ScanResult scanResult = classpathScanner.scanClasspath();
-                    final List<SourceType<Type>> c = fromClassNames(
-                        classesImplementingInterfaces.stream()
-                            .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames()
-                                .stream())
+
+                    if (classNamePatterns != null) {
+                        types.addAll(fromClassNamePatterns(scanResult, classNamePatterns));
+                    }
+                    if (classesImplementingInterfaces != null) {
+                        final List<SourceType<Type>> c = fromClassNames(
+                            classesImplementingInterfaces.stream()
+                                .flatMap(
+                                    interf -> scanResult.getClassesImplementing(interf).getNames()
+                                        .stream())
+                                .distinct()
+                                .collect(Collectors.toList())
+                        );
+                        types.addAll(c);
+                    }
+                    if (classesWithAnnotations != null) {
+                        types.addAll(fromClassNames(classesWithAnnotations.stream()
+                            .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation)
+                                .getNames().stream())
                             .distinct()
                             .collect(Collectors.toList())
-                    );
-                    types.addAll(c);
-                }
-                if (classesWithAnnotations != null) {
-                    final ScanResult scanResult = classpathScanner.scanClasspath();
-                    types.addAll(fromClassNames(classesWithAnnotations.stream()
-                            .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
-                            .distinct()
-                            .collect(Collectors.toList())
-                    ));
+                        ));
+                    }
+                    if (automaticJaxrsApplication) {
+                        types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(
+                            scanResult, isClassNameExcluded));
+                    }
                 }
                 if (jaxrsApplicationClassName != null) {
                     types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));
-                }
-                if (automaticJaxrsApplication) {
-                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.scanClasspath(), isClassNameExcluded));
                 }
                 if (types.isEmpty()) {
                     final String errorMessage = "No input classes found.";
