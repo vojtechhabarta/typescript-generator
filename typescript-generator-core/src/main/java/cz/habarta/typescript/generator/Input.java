@@ -1,14 +1,19 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
-import java.lang.reflect.*;
+import java.lang.reflect.Type;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -36,11 +41,17 @@ public class Input {
 
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
             boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
-        return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader, debug);
+        return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, null,
+            jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader,
+            debug);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, List<String> classesWithAnnotations, String jaxrsApplicationClassName,
-            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames,
+        List<String> classNamePatterns, List<String> classesWithAnnotations,
+        List<String> classesImplementingInterfaces,
+        String jaxrsApplicationClassName,
+        boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded,
+        URLClassLoader classLoader, boolean debug) {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             if (classLoader != null) {
@@ -52,10 +63,21 @@ public class Input {
                     types.addAll(fromClassNames(classNames));
                 }
                 if (classNamePatterns != null) {
-                    types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns));
+                    types.addAll(fromClassNamePatterns(classpathScanner.getScanResult(), classNamePatterns));
+                }
+                if (classesImplementingInterfaces != null) {
+                    final ScanResult scanResult = classpathScanner.getScanResult();
+                    final List<SourceType<Type>> c = fromClassNames(
+                        classesImplementingInterfaces.stream()
+                            .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames()
+                                .stream())
+                            .distinct()
+                            .collect(Collectors.toList())
+                    );
+                    types.addAll(c);
                 }
                 if (classesWithAnnotations != null) {
-                    final ScanResult scanResult = classpathScanner.scanClasspath();
+                    final ScanResult scanResult = classpathScanner.getScanResult();
                     types.addAll(fromClassNames(classesWithAnnotations.stream()
                             .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
                             .distinct()
@@ -66,7 +88,7 @@ public class Input {
                     types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));
                 }
                 if (automaticJaxrsApplication) {
-                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.scanClasspath(), isClassNameExcluded));
+                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.getScanResult(), isClassNameExcluded));
                 }
                 if (types.isEmpty()) {
                     final String errorMessage = "No input classes found.";
@@ -91,7 +113,7 @@ public class Input {
             this.verbose = verbose;
         }
 
-        public ScanResult scanClasspath() {
+        public ScanResult getScanResult() {
             if (scanResult == null) {
                 TypeScriptGenerator.getLogger().info("Scanning classpath");
                 final Date scanStart = new Date();

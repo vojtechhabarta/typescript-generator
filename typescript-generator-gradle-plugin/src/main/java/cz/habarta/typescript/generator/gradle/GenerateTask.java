@@ -24,6 +24,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> classes;
     public List<String> classPatterns;
     public List<String> classesWithAnnotations;
+    public List<String> classesImplementingInterfaces;
     public String classesFromJaxrsApplication;
     public boolean classesFromAutomaticJaxrsApplication;
     public List<String> excludeClasses;
@@ -181,8 +182,10 @@ public class GenerateTask extends DefaultTask {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations, classesFromJaxrsApplication, classesFromAutomaticJaxrsApplication,
-                            settings.getExcludeFilter(), classLoader, loggingLevel == Logger.Level.Debug),
+                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations, classesImplementingInterfaces,
+                        classesFromJaxrsApplication,
+                        classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(),
+                        classLoader, loggingLevel == Logger.Level.Debug),
                     Output.to(output)
             );
         }
