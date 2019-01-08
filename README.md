@@ -129,7 +129,7 @@ Input classes can be specified using several parameters:
 - **`classPatterns`** - list of glob patterns like `com.example.*Json`, includes all classes matched by the pattern, supported are `*` and `**` wildcards
 - **`classesFromJaxrsApplication`** - fully qualified name of JAX-RS application class, all classes used by application resources will be included, recommended if you have JAX-RS application class
 - **`classesFromAutomaticJaxrsApplication`** - value `true` will include classes from automatically discovered REST resources, recommended if you have JAX-RS application without `Application` subclass
-- **`excludeClasses`** - list of fully qualified class names, excluded classes will be mapped to TypeScript `any` type, if exluded class is a resource then this resource will not be scanned for used classes
+- **`excludeClasses`** - list of fully qualified class names, excluded classes will be mapped to TypeScript `any` type, if excluded class is a resource then this resource will not be scanned for used classes
 
 > Note: it is possible to use multiple parameters at the same time.
 
