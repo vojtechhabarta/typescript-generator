@@ -63,10 +63,10 @@ public class Input {
                     types.addAll(fromClassNames(classNames));
                 }
                 if (classNamePatterns != null) {
-                    types.addAll(fromClassNamePatterns(classpathScanner.scanClasspath(), classNamePatterns));
+                    types.addAll(fromClassNamePatterns(classpathScanner.getScanResult(), classNamePatterns));
                 }
                 if (classesImplementingInterfaces != null) {
-                    final ScanResult scanResult = classpathScanner.scanClasspath();
+                    final ScanResult scanResult = classpathScanner.getScanResult();
                     final List<SourceType<Type>> c = fromClassNames(
                         classesImplementingInterfaces.stream()
                             .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames()
@@ -77,7 +77,7 @@ public class Input {
                     types.addAll(c);
                 }
                 if (classesWithAnnotations != null) {
-                    final ScanResult scanResult = classpathScanner.scanClasspath();
+                    final ScanResult scanResult = classpathScanner.getScanResult();
                     types.addAll(fromClassNames(classesWithAnnotations.stream()
                             .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
                             .distinct()
@@ -88,7 +88,7 @@ public class Input {
                     types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));
                 }
                 if (automaticJaxrsApplication) {
-                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.scanClasspath(), isClassNameExcluded));
+                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.getScanResult(), isClassNameExcluded));
                 }
                 if (types.isEmpty()) {
                     final String errorMessage = "No input classes found.";
@@ -113,7 +113,7 @@ public class Input {
             this.verbose = verbose;
         }
 
-        public ScanResult scanClasspath() {
+        public ScanResult getScanResult() {
             if (scanResult == null) {
                 TypeScriptGenerator.getLogger().info("Scanning classpath");
                 final Date scanStart = new Date();
