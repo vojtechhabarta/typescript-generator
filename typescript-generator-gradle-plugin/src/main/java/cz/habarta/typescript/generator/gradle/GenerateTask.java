@@ -81,6 +81,7 @@ public class GenerateTask extends DefaultTask {
     @Deprecated public boolean disableJackson2ModuleDiscovery;
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
+    public boolean emitAbstractMethodsInBeans;
     @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
 
@@ -175,6 +176,7 @@ public class GenerateTask extends DefaultTask {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
+            settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
             final File output = outputFile != null
                     ? getProject().file(outputFile)
                     : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());

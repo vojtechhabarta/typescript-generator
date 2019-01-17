@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.parser.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,8 +71,46 @@ public class Jackson2ParserTest {
         Assert.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName4", bean4.getDiscriminantLiteral());
     }
 
+    @Test
+    public void testMethodsInInterface() {
+        final Jackson2Parser jacksonParser = getJackson2Parser(settings -> settings.emitAbstractMethodsInBeans = true);
+        final Model model = jacksonParser.parseModel(InterfaceWithMethodsAndBeanProperties.class);
+        assertMethodsInInterface(model);
+
+        // Now let's test w/ the setting disabled
+        final Jackson2Parser parserNoMethods = getJackson2Parser(settings -> settings.emitAbstractMethodsInBeans = false);
+        final Model modelNoMethods = parserNoMethods.parseModel(InterfaceWithMethodsAndBeanProperties.class);
+
+        Assert.assertEquals(0, modelNoMethods.getBeans().get(0).getMethods().size());
+    }
+
+    static void assertMethodsInInterface(Model model) {
+        Assert.assertEquals(1, model.getBeans().size());
+        BeanModel beanModel = model.getBeans().get(0);
+
+        // Expect "enabled" and "name"
+        Assert.assertEquals(2, beanModel.getProperties().size());
+        PropertyModel propertyModel = beanModel.getProperties().get(1);
+        Assert.assertEquals("enabled", propertyModel.getName());
+        propertyModel = beanModel.getProperties().get(0);
+        Assert.assertEquals("name", propertyModel.getName());
+
+        Assert.assertEquals(1, beanModel.getMethods().size());
+        MethodModel methodModel = beanModel.getMethods().get(0);
+        Assert.assertEquals("callMeMaybe", methodModel.getName());
+        Assert.assertEquals(2, methodModel.getParameters().size());
+        Assert.assertEquals("java.util.List<java.lang.String>", methodModel.getParameters().get(0).getType().getTypeName());
+        Assert.assertEquals("arg0", methodModel.getParameters().get(0).getName());
+        Assert.assertEquals("arg1", methodModel.getParameters().get(1).getName());
+    }
+
     static Jackson2Parser getJackson2Parser() {
+        return getJackson2Parser(settings -> {});
+    }
+
+    static Jackson2Parser getJackson2Parser(Consumer<Settings> settingsModifier) {
         final Settings settings = new Settings();
+        settingsModifier.accept(settings);
         return new Jackson2Parser(settings, new DefaultTypeProcessor());
     }
 
@@ -79,6 +119,15 @@ public class Jackson2ParserTest {
         @JsonProperty("changedNameProperty")
         public String _changed_name_property;
 
+    }
+
+    public interface InterfaceWithMethodsAndBeanProperties {
+        boolean isEnabled();
+
+        String getName();
+        void setName(String name);
+
+        DummyBeanJackson2 callMeMaybe(List<String> sources, Map<String, Object> metadata);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

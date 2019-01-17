@@ -159,7 +159,7 @@ public class Jackson2Parser extends ModelParser {
             }
         }
         if (sourceClass.type.isEnum()) {
-            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, null);
+            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, null, null);
         }
 
         final String discriminantProperty;
@@ -180,7 +180,7 @@ public class Jackson2Parser extends ModelParser {
             discriminantProperty = null;
             discriminantLiteral = null;
         }
-        
+
         final List<Class<?>> taggedUnionClasses;
         final JsonSubTypes jsonSubTypes = sourceClass.type.getAnnotation(JsonSubTypes.class);
         if (jsonSubTypes != null) {
@@ -200,7 +200,14 @@ public class Jackson2Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
+
+        List<MethodModel> methods = new ArrayList<>();
+
+        if (settings.emitAbstractMethodsInBeans) {
+            processAbstractMethods(sourceClass, properties, methods);
+        }
+
+        return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null, methods);
     }
 
     private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
@@ -243,7 +250,6 @@ public class Jackson2Parser extends ModelParser {
             return alwaysAsId
                     ? idType
                     : new UnionType(propertyType, idType);
-            
         }
         return propertyType;
     }

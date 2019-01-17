@@ -42,4 +42,11 @@ public class MethodModel {
         return comments;
     }
 
+    public MethodModel withParameters(List<MethodParameterModel> parameters) {
+        return new MethodModel(originClass, name, parameters, returnType, comments);
+    }
+
+    public MethodModel withComments(List<String> comments) {
+        return new MethodModel(originClass, name, parameters, returnType, comments);
+    }
 }

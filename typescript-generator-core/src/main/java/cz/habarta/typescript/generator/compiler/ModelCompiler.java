@@ -137,7 +137,7 @@ public class ModelCompiler {
 
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
-                Collections.singletonList(new PropertyModel("property", type, false, null, null, null)), null);
+                Collections.singletonList(new PropertyModel("property", type, false, null, null, null)), null, null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -221,6 +221,9 @@ public class ModelCompiler {
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, modifiers, /*ownProperty*/ true, null));
         }
 
+        List<MethodModel> beanMethods = bean.getMethods();
+        List<TsMethodModel> methods = beanMethods == null ? null :
+                beanMethods.stream().map(it -> processMethod(symbolTable, it)).collect(Collectors.toList());
         return new TsBeanModel(
                 bean.getOrigin(),
                 TsBeanCategory.Data,
@@ -232,9 +235,23 @@ public class ModelCompiler {
                 implementsList,
                 properties,
                 /*constructor*/ null,
-                /*methods*/ null,
+                methods,
                 bean.getComments())
                 .withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral());
+    }
+
+    private TsMethodModel processMethod(SymbolTable symbolTable, MethodModel method) {
+        List<TsParameterModel> parameters =
+                method.getParameters().stream().map(it -> processParameter(symbolTable, method, it))
+                        .collect(Collectors.toList());
+
+        return new TsMethodModel(method.getName(),
+                                 TsModifierFlags.None,
+                                 null,
+                                 parameters,
+                                 javaToTypeScript(method.getReturnType()),
+                                 null,
+                                 method.getComments());
     }
 
     private boolean mappedToClass(Class<?> cls) {

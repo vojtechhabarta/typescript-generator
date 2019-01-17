@@ -22,4 +22,7 @@ public class MethodParameterModel {
         return type;
     }
 
+    public MethodParameterModel withName(String name) {
+        return new MethodParameterModel(name, type);
+    }
 }

@@ -10,11 +10,13 @@ import cz.habarta.typescript.generator.xmldoclet.EnumConstant;
 import cz.habarta.typescript.generator.xmldoclet.Field;
 import cz.habarta.typescript.generator.xmldoclet.Interface;
 import cz.habarta.typescript.generator.xmldoclet.Method;
+import cz.habarta.typescript.generator.xmldoclet.MethodParameter;
 import cz.habarta.typescript.generator.xmldoclet.Package;
 import cz.habarta.typescript.generator.xmldoclet.Root;
 import cz.habarta.typescript.generator.xmldoclet.TagInfo;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXB;
 
 
@@ -75,7 +77,12 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return bean.withProperties(enrichedProperties).withComments(Utils.concat(getComments(beanComment, tags), bean.getComments()));
+        List<MethodModel> enrichedMethods =
+                bean.getMethods().stream().map(it -> enrichMethod(it, dMethods)).collect(Collectors.toList());
+
+        return bean.withProperties(enrichedProperties)
+                .withComments(Utils.concat(getComments(beanComment, tags), bean.getComments()))
+                .withMethods(enrichedMethods);
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
@@ -95,6 +102,35 @@ public class Javadoc {
             tags = dField != null ? dField.getTag() : null;
         }
         return property.withComments(getComments(propertyComment, tags));
+    }
+
+    private MethodModel enrichMethod(MethodModel methodModel, List<Method> dMethods) {
+        Method dMethod = findJavadocMethod(methodModel.getName(), dMethods);
+        String propertyComment = dMethod != null ? dMethod.getComment() : null;
+        List<TagInfo> tags = dMethod != null ? dMethod.getTag() : null;
+
+        return methodModel.withParameters(enrichParameters(methodModel.getParameters(), dMethod)).withComments(getComments(propertyComment, tags));
+    }
+
+    private List<MethodParameterModel> enrichParameters(List<MethodParameterModel> parameters, Method dMethod) {
+        if (dMethod == null) {
+            return parameters;
+        }
+
+        List<MethodParameterModel> result = new ArrayList<>();
+
+        List<MethodParameter> dParameters = dMethod.getParameter();
+
+        int commonSize = Math.min(dParameters.size(), parameters.size());
+
+        for (int i = 0; i < commonSize; i++) {
+            MethodParameter dParameter = dParameters.get(i);
+            MethodParameterModel parameterModel = parameters.get(i);
+
+            result.add(parameterModel.withName(dParameter.getName()));
+        }
+
+        return result;
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {

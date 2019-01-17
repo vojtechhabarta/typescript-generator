@@ -598,6 +598,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> jackson2Modules;
 
     /**
+     * If <code>true</code>, include abstract methods when emitting bean definitions. Works with Jackson2 only.
+     * If Javadoc XML is enabled, the Javadoc will be propagated to the methods.
+     */
+    @Parameter
+    private boolean emitAbstractMethodsInBeans;
+
+    /**
      * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
      */
     @Parameter
@@ -706,6 +713,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
+            settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());

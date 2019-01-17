@@ -10,9 +10,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public abstract class ModelParser {
@@ -174,4 +177,47 @@ public abstract class ModelParser {
         return false;
     }
 
+    protected void processAbstractMethods(SourceType<Class<?>> sourceClass, List<PropertyModel> properties,
+                                          List<MethodModel> methods) {
+        Set<String> propertyMethods = findMethodNamesForMethodProperties(properties);
+
+        Method[] declaredMethods = sourceClass.type.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            if (propertyMethods.contains(declaredMethod.getName())) {
+                continue;
+            }
+
+            // Only include abstract methods
+            if (!Modifier.isAbstract(declaredMethod.getModifiers())) {
+                continue;
+            }
+
+            List<MethodParameterModel> params = processTypedButUnnamedParameters(declaredMethod);
+            methods.add(new MethodModel(sourceClass.type,
+                                        declaredMethod.getName(),
+                                        params,
+                                        declaredMethod.getGenericReturnType(),
+                                        null));
+        }
+    }
+
+    private List<MethodParameterModel> processTypedButUnnamedParameters(Method declaredMethod) {
+        int[] paramIndex = {0};
+        return Arrays.stream(declaredMethod.getAnnotatedParameterTypes())
+                .map(annotatedType -> new MethodParameterModel("arg" + paramIndex[0]++,
+                                                               annotatedType.getType()))
+                .collect(Collectors.toList());
+    }
+
+    private Set<String> findMethodNamesForMethodProperties(List<PropertyModel> properties) {
+        return properties.stream()
+                .filter(propertyModel -> propertyModel.getOriginalMember() instanceof Method)
+                .flatMap(propertyModel -> Stream.of(
+                        propertyModel.getOriginalMember().getName(), makeSetter(propertyModel)))
+                .collect(Collectors.toSet());
+    }
+
+    private String makeSetter(PropertyModel propertyModel) {
+        return "set" + propertyModel.getName().substring(0, 1).toUpperCase() + propertyModel.getName().substring(1);
+    }
 }
