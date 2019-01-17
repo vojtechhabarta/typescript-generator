@@ -13,12 +13,17 @@ public class GenericCustomTypeMappingsTest {
 
     @Test
     public void testListWrapper() {
-        final Settings settings = TestUtils.settings();
-        settings.customTypeNaming = Collections.singletonMap(ListWrapper1.class.getName(), "ListWrapper");
-        settings.customTypeMappings = Collections.singletonMap(ListWrapper2.class.getName(), "ListWrapper");
+        final Settings settings = createListWrapperSettings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Class1.class));
         Assert.assertTrue(output.contains("list1: ListWrapper<string>"));
         Assert.assertTrue(output.contains("list2: ListWrapper<number>"));
+    }
+
+    private Settings createListWrapperSettings() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeNaming = Collections.singletonMap(ListWrapper1.class.getName(), "ListWrapper");
+        settings.customTypeMappings = Collections.singletonMap(ListWrapper2.class.getName(), "ListWrapper");
+        return settings;
     }
 
     private static class Class1 {
@@ -47,6 +52,19 @@ public class GenericCustomTypeMappingsTest {
     private static class Class2 {
         public Map<String, Object> someMap;
         public Map<String, Date> dateMap;
+    }
+
+    @Test
+    public void testMethodReturnValue() {
+        final Settings settings = createListWrapperSettings();
+        settings.emitAbstractMethodsInBeans = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(InterfaceWithCustomReturnValue.class));
+        //System.out.println(output);
+        Assert.assertTrue(output.contains("find(arg0: ListWrapper<number>): ListWrapper<string>"));
+    }
+
+    private interface InterfaceWithCustomReturnValue {
+        ListWrapper1<String> find(ListWrapper2<Integer> incoming);
     }
 
 }
