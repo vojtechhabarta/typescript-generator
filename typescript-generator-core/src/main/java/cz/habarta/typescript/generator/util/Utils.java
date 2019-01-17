@@ -214,7 +214,7 @@ public class Utils {
     }
 
     public static List<String> readLines(InputStream stream) {
-        return splitMultiline(readString(stream), false);        
+        return splitMultiline(readString(stream), false);
     }
 
     public static String readString(InputStream stream) {
@@ -234,9 +234,16 @@ public class Utils {
         final List<String> result = new ArrayList<>();
         final String[] lines = text.split("\\r\\n|\\n|\\r");
         for (String line : lines) {
-            result.add(trimLines ? line.trim() : line);
+            result.add(trimLines ? trimOneLeadingSpaceOnly(line) : line);
         }
         return result;
+    }
+
+    private static String trimOneLeadingSpaceOnly(String line) {
+        if (line.startsWith(" ")) {
+            return line.substring(1);
+        }
+        return line;
     }
 
     public static File replaceExtension(File file, String newExtension) {

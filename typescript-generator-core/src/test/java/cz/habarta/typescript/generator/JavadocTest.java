@@ -40,7 +40,9 @@ public class JavadocTest {
             Assert.assertNull(property.getComments());
         }
         {
-            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class));
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(
+                    Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
+
             Assert.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
             Assert.assertTrue(generated.contains("Second line."));
             Assert.assertTrue(generated.contains("Documentation for documentedField."));
@@ -52,6 +54,9 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains("Documentation for interface getter property."));
             Assert.assertTrue(generated.contains("@return value of getterPropery"));
             Assert.assertTrue(generated.contains("@deprecated replaced by something else"));
+
+            Assert.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
+            Assert.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
         }
     }
 
@@ -104,6 +109,26 @@ public class JavadocTest {
     public static class ClassWithoutJavadoc {
 
         public String undocumentedField;
+
+    }
+
+    /**
+     * This class comes with an embedded example!
+     *
+     * <pre>{@code
+     * public class Example {
+     *     // indentation and line breaks are kept
+     *
+     *     {@literal @}SuppressWarnings
+     *     public List<String> generics() {
+     *         return null;
+     *     }
+     * }
+     * }</pre>
+     */
+    public static class ClassWithEmbeddedExample {
+
+        public String field;
 
     }
 
