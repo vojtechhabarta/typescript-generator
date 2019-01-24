@@ -295,6 +295,14 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> customTypeMappings;
 
     /**
+     * List of custom package name mappings. Only has effect when {@link #mapPackagesToNamespaces} is <code>true</code>.
+     * Each item specifies a Typescript namespace name which will be used for a particular Java package name.
+     * The package names must match completely.
+     */
+    @Parameter
+    private List<String> customPackageMappings;
+
+    /**
      * Specifies how {@link java.util.Date} will be mapped.
      * Supported values are:
      * <ul>
@@ -669,6 +677,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.referencedFiles = referencedFiles;
             settings.importDeclarations = importDeclarations;
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
+            settings.customPackageMappings = Settings.convertToMap(customPackageMappings);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
             settings.nonConstEnums = nonConstEnums;
