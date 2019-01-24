@@ -5,7 +5,7 @@
     <parent>
         <groupId>cz.habarta.typescript-generator</groupId>
         <artifactId>typescript-generator</artifactId>
-        <version>2.11-evg1</version>
+        <version>2.11-evg2</version>
     </parent>
 
     <artifactId>typescript-generator-gradle-plugin</artifactId>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>cz.habarta.typescript-generator</groupId>
             <artifactId>typescript-generator-core</artifactId>
-            <version>2.11-evg1</version>
+            <version>2.11-evg2</version>
         </dependency>
     </dependencies>
 
