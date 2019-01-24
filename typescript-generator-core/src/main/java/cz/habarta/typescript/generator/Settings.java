@@ -48,6 +48,7 @@ public class Settings {
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
+    public Map<String, String> customPackageMappings = new LinkedHashMap<>();
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public boolean nonConstEnums = false;

@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -159,7 +160,7 @@ public class SymbolTable {
 
         if (settings.mapPackagesToNamespaces) {
             final String classNameDotted = cls.getName().replace('$', '.');
-            final String[] parts = classNameDotted.split(Pattern.quote("."));
+            final String[] parts = maybeMapToCustomPackageName(classNameDotted).split(Pattern.quote("."));
             final List<String> safeParts = new ArrayList<>();
             for (String part : Arrays.asList(parts).subList(0, parts.length - 1)) {
                 safeParts.add(isReservedWord(part) ? "_" + part : part);
@@ -169,6 +170,19 @@ public class SymbolTable {
         } else {
             return simpleName;
         }
+    }
+
+    private String maybeMapToCustomPackageName(String classNameDotted) {
+        if (settings.customPackageMappings != null && !settings.customPackageMappings.isEmpty()) {
+            for (Entry<String, String> mapping : settings.customPackageMappings.entrySet()) {
+                String sourcePackage = mapping.getKey();
+                if (classNameDotted.startsWith(sourcePackage + ".")) {
+                    return mapping.getValue() + classNameDotted.substring(sourcePackage.length());
+                }
+            }
+        }
+        return classNameDotted;
+
     }
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
