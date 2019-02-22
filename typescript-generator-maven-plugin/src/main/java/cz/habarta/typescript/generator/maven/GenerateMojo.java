@@ -213,7 +213,9 @@ public class GenerateMojo extends AbstractMojo {
      * <ul>
      * <li><code>questionMark</code> - property will be marked using <code>?</code> character as optional</li>
      * <li><code>nullableType</code> - property will not be optional but its type will be union with <code>null</code> value</li>
+     * <li><code>nullableTypeAndUndefined</code> - property will not be optional but its type will be union with <code>null</code> and <code>undefined</code> values</li>
      * <li><code>questionMarkAndNullableType</code> - property will be optional and it will also have union with <code>null</code> value</li>
+     * <li><code>undefined</code> - property will not be optional but its type will be union with <code>undefined</code> value</li>
      * </ul>
      * Default value is <code>questionMark</code>.
      */
