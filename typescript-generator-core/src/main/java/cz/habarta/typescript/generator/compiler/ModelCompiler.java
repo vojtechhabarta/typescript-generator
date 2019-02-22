@@ -764,11 +764,11 @@ public class ModelCompiler {
                                                 new TsType.OptionalType(
                                                         new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null))));
                                     }
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableTypeAndUndefined) {
+                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableAndUndefinableType) {
                                         return property.setTsType(
                                                 new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined)));
                                     }
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.undefined) {
+                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.undefinableType) {
                                         return property.setTsType(
                                                 new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined)));
                                     }

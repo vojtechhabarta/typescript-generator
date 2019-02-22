@@ -82,8 +82,8 @@ public class OptionalTest {
     }
 
     @Test
-    public void testDeclarationNullableTypeAndUndefined() {
-        testDeclaration(OptionalPropertiesDeclaration.nullableTypeAndUndefined,
+    public void testDeclarationNullableAndUndefinableType() {
+        testDeclaration(OptionalPropertiesDeclaration.nullableAndUndefinableType,
                 "interface Person {\n" +
                         "    name: string;\n" +
                         "    email: string | null | undefined;\n" +
@@ -93,8 +93,8 @@ public class OptionalTest {
     }
 
     @Test
-    public void testDeclarationUndefined() {
-        testDeclaration(OptionalPropertiesDeclaration.undefined,
+    public void testDeclarationUndefinableType() {
+        testDeclaration(OptionalPropertiesDeclaration.undefinableType,
                 "interface Person {\n" +
                         "    name: string;\n" +
                         "    email: string | undefined;\n" +
