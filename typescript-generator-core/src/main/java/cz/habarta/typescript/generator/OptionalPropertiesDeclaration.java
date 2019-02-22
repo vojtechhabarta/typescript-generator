@@ -3,7 +3,9 @@ package cz.habarta.typescript.generator;
 
 
 public enum OptionalPropertiesDeclaration {
-    questionMark,
     nullableType,
+    nullableTypeAndUndefined,
+    questionMark,
     questionMarkAndNullableType,
+    undefined,
 }

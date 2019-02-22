@@ -81,6 +81,28 @@ public class OptionalTest {
         );
     }
 
+    @Test
+    public void testDeclarationNullableTypeAndUndefined() {
+        testDeclaration(OptionalPropertiesDeclaration.nullableTypeAndUndefined,
+                "interface Person {\n" +
+                        "    name: string;\n" +
+                        "    email: string | null | undefined;\n" +
+                        "    age: number | null | undefined;\n" +
+                        "}"
+        );
+    }
+
+    @Test
+    public void testDeclarationUndefined() {
+        testDeclaration(OptionalPropertiesDeclaration.undefined,
+                "interface Person {\n" +
+                        "    name: string;\n" +
+                        "    email: string | undefined;\n" +
+                        "    age: number | undefined;\n" +
+                        "}"
+        );
+    }
+
     private static void testDeclaration(OptionalPropertiesDeclaration declaration, String expected) {
         final Settings settings = TestUtils.settings();
         settings.optionalPropertiesDeclaration = declaration;
