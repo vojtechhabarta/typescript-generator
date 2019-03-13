@@ -14,6 +14,19 @@ public interface TypeProcessor {
      */
     public Result processType(Type javaType, Context context);
 
+    public default Result processTypeInTemporaryContext(Type type, Settings settings) {
+        return processType(type, new Context(new SymbolTable(settings), this));
+    }
+
+    public default List<Class<?>> discoverClassesUsedInType(Type type, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, settings);
+        return result != null ? result.getDiscoveredClasses() : Collections.emptyList();
+    }
+
+    public default boolean isTypeExcluded(Type type, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, settings);
+        return result != null && result.tsType == TsType.Any;
+    }
 
     public static class Context {
 

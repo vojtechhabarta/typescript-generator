@@ -3,7 +3,7 @@ package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JaxrsApplicationTest;
-import cz.habarta.typescript.generator.JaxrsNamespacing;
+import cz.habarta.typescript.generator.RestNamespacing;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
@@ -21,7 +21,7 @@ public class AxiosClientExtensionTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = JaxrsNamespacing.perResource;
+        settings.jaxrsNamespacing = RestNamespacing.perResource;
         settings.extensions.add(new AxiosClientExtension());
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;

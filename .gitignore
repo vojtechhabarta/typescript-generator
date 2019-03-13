@@ -11,6 +11,10 @@ release.properties
 /sample-gradle/.nb-gradle/
 /sample-gradle/bin/
 /sample-gradle/build/
+/sample-gradle-spring/.gradle/
+/sample-gradle-spring/.nb-gradle/
+/sample-gradle-spring/bin/
+/sample-gradle-spring/build/
 
 # npm
 node_modules

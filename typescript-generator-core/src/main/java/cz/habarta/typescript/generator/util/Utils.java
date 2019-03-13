@@ -14,10 +14,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 public class Utils {
@@ -74,15 +78,67 @@ public class Utils {
         return null;
     }
 
+    public static Comparator<Method> methodComparator() {
+        return (Method m1, Method m2) -> {
+            final int nameDiff = m1.getName().compareToIgnoreCase(m2.getName());
+            if (nameDiff != 0) {
+                return nameDiff;
+            }
+            final int parameterTypesDiff = Arrays.asList(m1.getParameterTypes()).toString().compareTo(Arrays.asList(m2.getParameterTypes()).toString());
+            if (parameterTypesDiff != 0) {
+                return parameterTypesDiff;
+            }
+            return 0;
+        };
+    }
+
+    public static List<Method> getAllMethods(Class<?> cls) {
+        return getInheritanceChain(cls)
+                .flatMap(c -> Stream.of(c.getDeclaredMethods()))
+                .collect(Collectors.toList());
+    }
+
+    private static Stream<Class<?>> getInheritanceChain(Class<?> cls) {
+        return generateStream(cls, c -> c != null, (Class<?> c) -> c.getSuperclass())
+                .collect(toReversedCollection())
+                .stream();
+    }
+
+    public static <T> Collector<T, ?, Collection<T>> toReversedCollection() {
+        return Collector.<T, ArrayDeque<T>, Collection<T>>of(
+                ArrayDeque::new,
+                (deque, item) -> deque.addFirst(item),
+                (deque1, deque2) -> { deque2.addAll(deque1); return deque2; },
+                deque -> deque);
+    }
+
+    // remove on Java 9 and replace with Stream.iterate
+    private static <T> Stream<T> generateStream(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+        final Spliterator<T> spliterator = Spliterators.spliteratorUnknownSize(new Iterator<T>() {
+            private T last = seed;
+
+            @Override
+            public boolean hasNext() {
+                return hasNext.test(last);
+            }
+
+            @Override
+            public T next() {
+                final T current = last;
+                last = next.apply(last);
+                return current;
+            }
+        }, Spliterator.ORDERED);
+
+        return StreamSupport.stream(spliterator, false);
+    }
+
     public static boolean hasAnyAnnotation(
             Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
             List<Class<? extends Annotation>> annotations) {
-        for (Class<? extends Annotation> annotation : annotations) {
-            if (getAnnotationFunction.apply(annotation) != null) {
-                return true;
-            }
-        }
-        return false;
+        return annotations.stream()
+                .map(getAnnotationFunction)
+                .anyMatch(Objects::nonNull);
     }
 
     public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
@@ -230,11 +286,11 @@ public class Utils {
         return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
     }
 
-    public static List<String> splitMultiline(String text, boolean trimLines) {
+    public static List<String> splitMultiline(String text, boolean trimOneLeadingSpaceOnLines) {
         final List<String> result = new ArrayList<>();
         final String[] lines = text.split("\\r\\n|\\n|\\r");
         for (String line : lines) {
-            result.add(trimLines ? trimOneLeadingSpaceOnly(line) : line);
+            result.add(trimOneLeadingSpaceOnLines ? trimOneLeadingSpaceOnly(line) : line);
         }
         return result;
     }

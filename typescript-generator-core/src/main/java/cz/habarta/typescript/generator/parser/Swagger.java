@@ -76,7 +76,7 @@ public class Swagger {
             final BeanModel dBean = enrichBean(bean);
             dBeans.add(dBean);
         }
-        return new Model(dBeans, model.getEnums(), model.getJaxrsApplication());
+        return new Model(dBeans, model.getEnums(), model.getRestApplications());
     }
 
     private static BeanModel enrichBean(BeanModel bean) {

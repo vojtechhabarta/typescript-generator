@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.core.type.*;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.parser.*;
-import cz.habarta.typescript.generator.util.Predicate;
 import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +11,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.URI;
 import java.util.*;
+import java.util.function.Predicate;
 import javax.activation.*;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
@@ -40,7 +40,8 @@ public class JaxrsApplicationTest {
 
     @Test
     public void testReturnedTypesFromResource() {
-        final JaxrsApplicationParser.Result result = new JaxrsApplicationParser(TestUtils.settings()).tryParse(new SourceType<>(TestResource1.class));
+        JaxrsApplicationParser jaxrsApplicationParser = createJaxrsApplicationParser(TestUtils.settings());
+        final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
         Assert.assertNotNull(result);
         List<Type> types = getTypes(result.discoveredTypes);
         final List<Type> expectedTypes = Arrays.asList(
@@ -54,7 +55,9 @@ public class JaxrsApplicationTest {
                 G.class,
                 new TypeReference<Map<String, H>>(){}.getType(),
                 I.class,
-                J[].class
+                J[].class,
+                // types handled by DefaultTypeProcessor
+                String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class
         );
         assertHasSameItems(expectedTypes, types);
     }
@@ -114,11 +117,17 @@ public class JaxrsApplicationTest {
                 A.class.getName(),
                 J.class.getName()
         ), null);
-        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings);
+        final JaxrsApplicationParser jaxrsApplicationParser = createJaxrsApplicationParser(settings);
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
         Assert.assertNotNull(result);
         Assert.assertTrue(!getTypes(result.discoveredTypes).contains(A.class));
         Assert.assertTrue(getTypes(result.discoveredTypes).contains(J[].class));
+    }
+
+    private static JaxrsApplicationParser createJaxrsApplicationParser(Settings settings) {
+        final TypeProcessor typeProcessor = new TypeScriptGenerator(settings).getCommonTypeProcessor();
+        final JaxrsApplicationParser jaxrsApplicationParser = new JaxrsApplicationParser(settings, typeProcessor);
+        return jaxrsApplicationParser;
     }
 
     private List<Type> getTypes(final List<? extends SourceType<? extends Type>> sourceTypes) {
@@ -369,7 +378,7 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = JaxrsNamespacing.perResource;
+        settings.jaxrsNamespacing = RestNamespacing.perResource;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         Assert.assertTrue(errorMessage, !output.contains("class OrganizationApplicationClient"));
@@ -384,7 +393,7 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = JaxrsNamespacing.byAnnotation;
+        settings.jaxrsNamespacing = RestNamespacing.byAnnotation;
         settings.jaxrsNamespacingAnnotation = Api.class;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;

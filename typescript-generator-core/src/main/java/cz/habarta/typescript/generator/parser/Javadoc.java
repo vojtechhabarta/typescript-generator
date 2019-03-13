@@ -51,7 +51,7 @@ public class Javadoc {
             final EnumModel dEnumModel = enrichEnum(enumModel);
             dEnums.add(dEnumModel);
         }
-        return new Model(dBeans, dEnums, model.getJaxrsApplication());
+        return new Model(dBeans, dEnums, model.getRestApplications());
     }
 
     private BeanModel enrichBean(BeanModel bean) {

@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.SourceType;
-import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
@@ -14,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
@@ -35,7 +36,6 @@ import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
-import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
@@ -46,19 +46,71 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class Jackson2Parser extends ModelParser {
 
+    public static class Jackson2ParserFactory extends ModelParser.Factory {
+
+        private final boolean useJaxbAnnotations;
+
+        public Jackson2ParserFactory() {
+            this(false);
+        }
+
+        private Jackson2ParserFactory(boolean useJaxbAnnotations) {
+            this.useJaxbAnnotations = useJaxbAnnotations;
+        }
+
+        @Override
+        public TypeProcessor getSpecificTypeProcessor() {
+            return createSpecificTypeProcessor();
+        }
+
+        @Override
+        public Jackson2Parser create(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers) {
+            return new Jackson2Parser(settings, commonTypeProcessor, restApplicationParsers, useJaxbAnnotations);
+        }
+
+    }
+
+    public static class JaxbParserFactory extends Jackson2ParserFactory {
+        
+        public JaxbParserFactory() {
+            super(true);
+        }
+        
+    }
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
-        this(settings, typeProcessor, false);
+        this(settings, typeProcessor, Collections.emptyList(), false);
+    }
+
+    public Jackson2Parser(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers, boolean useJaxbAnnotations) {
+        super(settings, commonTypeProcessor, restApplicationParsers);
+        if (settings.jackson2ModuleDiscovery) {
+            objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
+        }
+        for (Class<? extends Module> moduleClass : settings.jackson2Modules) {
+            try {
+                objectMapper.registerModule(moduleClass.newInstance());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(String.format("Cannot instantiate Jackson2 module '%s'", moduleClass.getName()), e);
+            }
+        }
+        if (useJaxbAnnotations) {
+            AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
+            objectMapper.setAnnotationIntrospector(introspector);
+        }
         final Jackson2ConfigurationResolved config = settings.jackson2Configuration;
         if (config != null) {
             setVisibility(PropertyAccessor.FIELD, config.fieldVisibility);
@@ -91,22 +143,8 @@ public class Jackson2Parser extends ModelParser {
                         JsonFormat.Value.forShape(shape)));
     }
 
-    public Jackson2Parser(Settings settings, TypeProcessor typeProcessor, boolean useJaxbAnnotations) {
-        super(settings, typeProcessor, Arrays.asList(JsonNode.class.getName()));
-        if (settings.jackson2ModuleDiscovery) {
-            objectMapper.registerModules(ObjectMapper.findModules(settings.classLoader));
-        }
-        for (Class<? extends Module> moduleClass : settings.jackson2Modules) {
-            try {
-                objectMapper.registerModule(moduleClass.newInstance());
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(String.format("Cannot instantiate Jackson2 module '%s'", moduleClass.getName()), e);
-            }
-        }
-        if (useJaxbAnnotations) {
-            AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
-            objectMapper.setAnnotationIntrospector(introspector);
-        }
+    private static TypeProcessor createSpecificTypeProcessor() {
+        return new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName()));
     }
 
     @Override

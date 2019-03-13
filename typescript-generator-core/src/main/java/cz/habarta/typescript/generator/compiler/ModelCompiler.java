@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.emitter.*;
 import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -57,22 +58,26 @@ public class ModelCompiler {
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
 
-        // JAX-RS
-        if (settings.generateJaxrsApplicationInterface || settings.generateJaxrsApplicationClient) {
-            final JaxrsApplicationModel jaxrsApplication = model.getJaxrsApplication() != null ? model.getJaxrsApplication() : new JaxrsApplicationModel();
-            final Symbol responseSymbol = createJaxrsResponseType(symbolTable, tsModel);
+        // REST
+        if (settings.isGenerateRest()) {
+            final Symbol responseSymbol = createRestResponseType(symbolTable, tsModel);
             final TsType optionsType = settings.restOptionsType != null
                     ? new TsType.VerbatimType(settings.restOptionsType)
                     : null;
             final TsType.GenericVariableType optionsGenericVariable = settings.restOptionsTypeIsGeneric
                     ? new TsType.GenericVariableType(settings.restOptionsType)
                     : null;
-
-            if (settings.generateJaxrsApplicationInterface) {
-                tsModel = createJaxrsInterfaces(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsGenericVariable, optionsType);
+            final List<RestApplicationModel> restApplicationsWithInterface = model.getRestApplications().stream()
+                    .filter(restApplication -> restApplication.getType().generateInterface.apply(settings))
+                    .collect(Collectors.toList());
+            final List<RestApplicationModel> restApplicationsWithClient = model.getRestApplications().stream()
+                    .filter(restApplication -> restApplication.getType().generateClient.apply(settings))
+                    .collect(Collectors.toList());
+            if (!restApplicationsWithInterface.isEmpty()) {
+                tsModel = createRestInterfaces(symbolTable, tsModel, restApplicationsWithInterface, responseSymbol, optionsGenericVariable, optionsType);
             }
-            if (settings.generateJaxrsApplicationClient) {
-                tsModel = createJaxrsClients(symbolTable, tsModel, jaxrsApplication, responseSymbol, optionsGenericVariable, optionsType);
+            if (!restApplicationsWithClient.isEmpty()) {
+                tsModel = createRestClients(symbolTable, tsModel, restApplicationsWithClient, responseSymbol, optionsGenericVariable, optionsType);
             }
         }
 
@@ -420,7 +425,7 @@ public class ModelCompiler {
         return properties;
     }
 
-    private Symbol createJaxrsResponseType(SymbolTable symbolTable, TsModel tsModel) {
+    private Symbol createRestResponseType(SymbolTable symbolTable, TsModel tsModel) {
         // response type
         final Symbol responseSymbol = symbolTable.getSyntheticSymbol("RestResponse");
         final TsType.GenericVariableType varR = new TsType.GenericVariableType("R");
@@ -435,10 +440,10 @@ public class ModelCompiler {
         return responseSymbol;
     }
 
-    private TsModel createJaxrsInterfaces(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication,
+    private TsModel createRestInterfaces(SymbolTable symbolTable, TsModel tsModel, List<RestApplicationModel> restApplications,
             Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
-        final Map<Symbol, List<TsMethodModel>> groupedMethods = processJaxrsMethods(jaxrsApplication, symbolTable, null, responseSymbol, optionsType, false);
+        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(restApplications, symbolTable, null, responseSymbol, optionsType, false);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, null, entry.getValue(), null);
             tsModel.getBeans().add(interfaceModel);
@@ -446,7 +451,7 @@ public class ModelCompiler {
         return tsModel;
     }
 
-    private TsModel createJaxrsClients(SymbolTable symbolTable, TsModel tsModel, JaxrsApplicationModel jaxrsApplication,
+    private TsModel createRestClients(SymbolTable symbolTable, TsModel tsModel, List<RestApplicationModel> restApplications,
             Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
         final Symbol httpClientSymbol = symbolTable.getSyntheticSymbol("HttpClient");
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
@@ -476,11 +481,12 @@ public class ModelCompiler {
                 Collections.<TsStatement>emptyList(),
                 null
         );
-        final String groupingSuffix = settings.generateJaxrsApplicationInterface ? null : "Client";
-        final Map<Symbol, List<TsMethodModel>> groupedMethods = processJaxrsMethods(jaxrsApplication, symbolTable, groupingSuffix, responseSymbol, optionsType, true);
+        final boolean bothInterfacesAndClients = settings.generateJaxrsApplicationInterface || settings.generateSpringApplicationInterface;
+        final String groupingSuffix = bothInterfacesAndClients ? null : "Client";
+        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(restApplications, symbolTable, groupingSuffix, responseSymbol, optionsType, true);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
-            final Symbol symbol = settings.generateJaxrsApplicationInterface ? symbolTable.addSuffixToSymbol(entry.getKey(), "Client") : entry.getKey();
-            final TsType interfaceType = settings.generateJaxrsApplicationInterface ? new TsType.ReferenceType(entry.getKey()) : null;
+            final Symbol symbol = bothInterfacesAndClients ? symbolTable.addSuffixToSymbol(entry.getKey(), "Client") : entry.getKey();
+            final TsType interfaceType = bothInterfacesAndClients ? new TsType.ReferenceType(entry.getKey()) : null;
             final TsBeanModel clientModel = new TsBeanModel(null, TsBeanCategory.Service, true, symbol, typeParameters, null, null,
                     Utils.listFromNullable(interfaceType), null, constructor, entry.getValue(), null);
             tsModel.getBeans().add(clientModel);
@@ -490,40 +496,43 @@ public class ModelCompiler {
         return tsModel;
     }
 
-    private Map<Symbol, List<TsMethodModel>> processJaxrsMethods(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix, Symbol responseSymbol, TsType optionsType, boolean implement) {
+    private Map<Symbol, List<TsMethodModel>> processRestMethods(List<RestApplicationModel> restApplications, SymbolTable symbolTable, String nameSuffix, Symbol responseSymbol, TsType optionsType, boolean implement) {
         final Map<Symbol, List<TsMethodModel>> result = new LinkedHashMap<>();
-        final Map<Symbol, List<JaxrsMethodModel>> groupedMethods = groupingByMethodContainer(jaxrsApplication, symbolTable, nameSuffix);
-        for (Map.Entry<Symbol, List<JaxrsMethodModel>> entry : groupedMethods.entrySet()) {
-            result.put(entry.getKey(), processJaxrsMethodGroup(jaxrsApplication, entry.getValue(), symbolTable, responseSymbol, optionsType, implement));
+        final Map<Symbol, List<Pair<RestApplicationModel, RestMethodModel>>> groupedMethods = groupingByMethodContainer(restApplications, symbolTable, nameSuffix);
+        for (Map.Entry<Symbol, List<Pair<RestApplicationModel, RestMethodModel>>> entry : groupedMethods.entrySet()) {
+            result.put(entry.getKey(), processRestMethodGroup(entry.getValue(), symbolTable, responseSymbol, optionsType, implement));
         }
         return result;
     }
 
-    private List<TsMethodModel> processJaxrsMethodGroup(JaxrsApplicationModel jaxrsApplication, List<JaxrsMethodModel> methods, SymbolTable symbolTable, Symbol responseSymbol, TsType optionsType, boolean implement) {
+    private List<TsMethodModel> processRestMethodGroup(List<Pair<RestApplicationModel, RestMethodModel>> methods, SymbolTable symbolTable, Symbol responseSymbol, TsType optionsType, boolean implement) {
         final List<TsMethodModel> resultMethods = new ArrayList<>();
         final Map<String, Long> methodNamesCount = groupingByMethodName(methods);
-        for (JaxrsMethodModel method : methods) {
+        for (Pair<RestApplicationModel, RestMethodModel> pair : methods) {
+            final RestApplicationModel restApplication = pair.getValue1();
+            final RestMethodModel method = pair.getValue2();
             final boolean createLongName = methodNamesCount.get(method.getName()) > 1;
-            resultMethods.add(processJaxrsMethod(symbolTable, jaxrsApplication.getApplicationPath(), responseSymbol, method, createLongName, optionsType, implement));
+            resultMethods.add(processRestMethod(symbolTable, restApplication.getApplicationPath(), responseSymbol, method, createLongName, optionsType, implement));
         }
         return resultMethods;
     }
 
-    private Map<Symbol, List<JaxrsMethodModel>> groupingByMethodContainer(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix) {
-        return jaxrsApplication.getMethods().stream()
+    private Map<Symbol, List<Pair<RestApplicationModel, RestMethodModel>>> groupingByMethodContainer(List<RestApplicationModel> restApplications, SymbolTable symbolTable, String nameSuffix) {
+        return restApplications.stream()
+                .flatMap(restApplication -> restApplication.getMethods().stream().map(method -> Pair.of(restApplication, method)))
                 .collect(Collectors.groupingBy(
-                        method -> getContainerSymbol(jaxrsApplication, symbolTable, nameSuffix, method),
-                        Utils.toSortedList(Comparator.comparing(method -> method.getPath()))
+                        pair -> getContainerSymbol(pair.getValue1(), symbolTable, nameSuffix, pair.getValue2()),
+                        Utils.toSortedList(Comparator.comparing(pair -> pair.getValue2().getPath()))
                 ));
     }
 
-    private Symbol getContainerSymbol(JaxrsApplicationModel jaxrsApplication, SymbolTable symbolTable, String nameSuffix, JaxrsMethodModel method) {
-        if (settings.jaxrsNamespacing == JaxrsNamespacing.perResource) {
+    private Symbol getContainerSymbol(RestApplicationModel restApplication, SymbolTable symbolTable, String nameSuffix, RestMethodModel method) {
+        if (settings.restNamespacing == RestNamespacing.perResource) {
             return symbolTable.getSymbol(method.getRootResource(), nameSuffix);
         }
-        if (settings.jaxrsNamespacing == JaxrsNamespacing.byAnnotation) {
-            final Annotation annotation = method.getRootResource().getAnnotation(settings.jaxrsNamespacingAnnotation);
-            final String element = settings.jaxrsNamespacingAnnotationElement != null ? settings.jaxrsNamespacingAnnotationElement : "value";
+        if (settings.restNamespacing == RestNamespacing.byAnnotation) {
+            final Annotation annotation = method.getRootResource().getAnnotation(settings.restNamespacingAnnotation);
+            final String element = settings.restNamespacingAnnotationElement != null ? settings.restNamespacingAnnotationElement : "value";
             final String annotationValue = Utils.getAnnotationElementValue(annotation, element, String.class);
             if (annotationValue != null) {
                 if (isValidIdentifierName(annotationValue)) {
@@ -533,19 +542,21 @@ public class ModelCompiler {
                 }
             }
         }
-        final String applicationName = getApplicationName(jaxrsApplication);
+        final String applicationName = getApplicationName(restApplication);
         return symbolTable.getSyntheticSymbol(applicationName, nameSuffix);
     }
 
-    private static String getApplicationName(JaxrsApplicationModel jaxrsApplication) {
-        return jaxrsApplication.getApplicationName() != null ? jaxrsApplication.getApplicationName() : "RestApplication";
+    private static String getApplicationName(RestApplicationModel restApplication) {
+        return restApplication.getApplicationName() != null ? restApplication.getApplicationName() : "RestApplication";
     }
 
-    private static Map<String, Long> groupingByMethodName(List<JaxrsMethodModel> methods) {
-        return methods.stream().collect(Collectors.groupingBy(JaxrsMethodModel::getName, Collectors.counting()));
+    private static Map<String, Long> groupingByMethodName(List<Pair<RestApplicationModel, RestMethodModel>> methods) {
+        return methods.stream()
+                .map(pair -> pair.getValue2())
+                .collect(Collectors.groupingBy(RestMethodModel::getName, Collectors.counting()));
     }
 
-    private TsMethodModel processJaxrsMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, JaxrsMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
+    private TsMethodModel processRestMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, RestMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
         final String path = Utils.joinPath(pathPrefix, method.getPath());
         final PathTemplate pathTemplate = PathTemplate.parse(path);
         final List<String> comments = Utils.concat(method.getComments(), Arrays.asList(

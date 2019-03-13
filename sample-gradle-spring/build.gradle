@@ -1,0 +1,40 @@
+
+apply plugin: 'java'
+apply plugin: 'cz.habarta.typescript-generator'
+
+version = '2.0'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.12-SNAPSHOT'
+        classpath 'cz.habarta.typescript-generator:typescript-generator-spring:2.12-SNAPSHOT'
+    }
+}
+
+generateTypeScript {
+    classes = [
+        'cz.habarta.typescript.generator.sample.spring.SpringTestApplication'
+    ]
+    outputFileType = 'implementationFile'
+    jsonLibrary = 'jackson2'
+    outputKind = 'module'
+    scanSpringApplication = true
+    generateSpringApplicationClient = true
+}
+
+build.dependsOn generateTypeScript

@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.Module;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
-import cz.habarta.typescript.generator.util.Predicate;
+import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.parser.RestApplicationParser;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 
@@ -59,12 +62,19 @@ public class Settings {
     public boolean ignoreSwaggerAnnotations = false;
     public boolean generateJaxrsApplicationInterface = false;
     public boolean generateJaxrsApplicationClient = false;
-    public JaxrsNamespacing jaxrsNamespacing;
-    public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
-    public String jaxrsNamespacingAnnotationElement;  // default is "value"
+    public boolean generateSpringApplicationInterface = false;
+    public boolean generateSpringApplicationClient = false;
+    public boolean scanSpringApplication;
+    @Deprecated public RestNamespacing jaxrsNamespacing;
+    @Deprecated public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
+    @Deprecated public String jaxrsNamespacingAnnotationElement;  // default is "value"
+    public RestNamespacing restNamespacing;
+    public Class<? extends Annotation> restNamespacingAnnotation = null;
+    public String restNamespacingAnnotationElement;  // default is "value"
     public String restResponseType = null;
     public String restOptionsType = null;
     public boolean restOptionsTypeIsGeneric;
+    private List<RestApplicationParser.Factory> restApplicationParserFactories;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
@@ -260,21 +270,35 @@ public class Settings {
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
-        final boolean generateJaxrs = generateJaxrsApplicationClient || generateJaxrsApplicationInterface;
-        if (jaxrsNamespacing != null && !generateJaxrs) {
-            throw new RuntimeException("'jaxrsNamespacing' parameter can only be used when generating JAX-RS client or interface.");
+        if (generateSpringApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("'generateSpringApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
-        if (jaxrsNamespacingAnnotation != null && jaxrsNamespacing != JaxrsNamespacing.byAnnotation) {
-            throw new RuntimeException("'jaxrsNamespacingAnnotation' parameter can only be used when 'jaxrsNamespacing' parameter is set to 'byAnnotation'.");
+        if (jaxrsNamespacing != null) {
+            TypeScriptGenerator.getLogger().warning("Parameter 'jaxrsNamespacing' is deprecated. Use 'restNamespacing' parameter.");
+            if (restNamespacing == null) {
+                restNamespacing = jaxrsNamespacing;
+            }
         }
-        if (jaxrsNamespacingAnnotation == null && jaxrsNamespacing == JaxrsNamespacing.byAnnotation) {
-            throw new RuntimeException("'jaxrsNamespacingAnnotation' must be specified when 'jaxrsNamespacing' parameter is set to 'byAnnotation'.");
+        if (jaxrsNamespacingAnnotation != null) {
+            TypeScriptGenerator.getLogger().warning("Parameter 'jaxrsNamespacingAnnotation' is deprecated. Use 'restNamespacingAnnotation' parameter.");
+            if (restNamespacingAnnotation == null) {
+                restNamespacingAnnotation = jaxrsNamespacingAnnotation;
+            }
         }
-        if (restResponseType != null && !generateJaxrs) {
-            throw new RuntimeException("'restResponseType' parameter can only be used when generating JAX-RS client or interface.");
+        if (restNamespacing != null && !isGenerateRest()) {
+            throw new RuntimeException("'restNamespacing' parameter can only be used when generating REST client or interface.");
         }
-        if (restOptionsType != null && !generateJaxrs) {
-            throw new RuntimeException("'restOptionsType' parameter can only be used when generating JAX-RS client or interface.");
+        if (restNamespacingAnnotation != null && restNamespacing != RestNamespacing.byAnnotation) {
+            throw new RuntimeException("'restNamespacingAnnotation' parameter can only be used when 'restNamespacing' parameter is set to 'byAnnotation'.");
+        }
+        if (restNamespacingAnnotation == null && restNamespacing == RestNamespacing.byAnnotation) {
+            throw new RuntimeException("'restNamespacingAnnotation' must be specified when 'restNamespacing' parameter is set to 'byAnnotation'.");
+        }
+        if (restResponseType != null && !isGenerateRest()) {
+            throw new RuntimeException("'restResponseType' parameter can only be used when generating REST client or interface.");
+        }
+        if (restOptionsType != null && !isGenerateRest()) {
+            throw new RuntimeException("'restOptionsType' parameter can only be used when generating REST client or interface.");
         }
         if (generateInfoJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateInfoJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
@@ -381,14 +405,32 @@ public class Settings {
         return mapClassesAsClassesFilter;
     }
 
+    @Deprecated
     public void setJaxrsNamespacingAnnotation(ClassLoader classLoader, String jaxrsNamespacingAnnotation) {
-        if (jaxrsNamespacingAnnotation != null) {
-            final String[] split = jaxrsNamespacingAnnotation.split("#");
-            final String className = split[0];
-            final String elementName = split.length > 1 ? split[1] : "value";
-            this.jaxrsNamespacingAnnotation = loadClass(classLoader, className, Annotation.class);
-            this.jaxrsNamespacingAnnotationElement = elementName;
+        final Pair<Class<? extends Annotation>, String> pair = resolveRestNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
+        if (pair != null) {
+            this.jaxrsNamespacingAnnotation = pair.getValue1();
+            this.jaxrsNamespacingAnnotationElement = pair.getValue2();
         }
+    }
+
+    public void setRestNamespacingAnnotation(ClassLoader classLoader, String restNamespacingAnnotation) {
+        final Pair<Class<? extends Annotation>, String> pair = resolveRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
+        if (pair != null) {
+            this.restNamespacingAnnotation = pair.getValue1();
+            this.restNamespacingAnnotationElement = pair.getValue2();
+        }
+    }
+
+    private static Pair<Class<? extends Annotation>, String> resolveRestNamespacingAnnotation(ClassLoader classLoader, String restNamespacingAnnotation) {
+        if (restNamespacingAnnotation == null) {
+            return null;
+        }
+        final String[] split = restNamespacingAnnotation.split("#");
+        final String className = split[0];
+        final String elementName = split.length > 1 ? split[1] : "value";
+        final Class<? extends Annotation> annotationClass = loadClass(classLoader, className, Annotation.class);
+        return Pair.of(annotationClass, elementName);
     }
 
     public void setRestOptionsType(String restOptionsType) {
@@ -401,6 +443,47 @@ public class Settings {
                 this.restOptionsTypeIsGeneric = false;
             }
         }
+    }
+
+    public List<RestApplicationParser.Factory> getRestApplicationParserFactories() {
+        if (restApplicationParserFactories == null) {
+            final List<RestApplicationParser.Factory> factories = new ArrayList<>();
+            if (isGenerateJaxrs() || !isGenerateSpring()) {
+                factories.add(new JaxrsApplicationParser.Factory());
+            }
+            if (isGenerateSpring()) {
+                final String springClassName = "cz.habarta.typescript.generator.spring.SpringApplicationParser$Factory";
+                final Class<?> springClass;
+                try {
+                    springClass = Class.forName(springClassName);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("'generateStringApplicationInterface' or 'generateStringApplicationClient' parameter "
+                            + "was specified but '" + springClassName + "' was not found. "
+                            + "Please add 'cz.habarta.typescript-generator:typescript-generator-spring' artifact "
+                            + "to typescript-generator plugin dependencies (not module dependencies).");
+                }
+                try {
+                    final Object instance = springClass.getConstructor().newInstance();
+                    factories.add((RestApplicationParser.Factory) instance);
+                } catch (ReflectiveOperationException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            restApplicationParserFactories = factories;
+        }
+        return restApplicationParserFactories;
+    }
+
+    public boolean isGenerateJaxrs() {
+        return generateJaxrsApplicationInterface || generateJaxrsApplicationClient;
+    }
+
+    public boolean isGenerateSpring() {
+        return generateSpringApplicationInterface || generateSpringApplicationClient;
+    }
+
+    public boolean isGenerateRest() {
+        return isGenerateJaxrs() || isGenerateSpring();
     }
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {

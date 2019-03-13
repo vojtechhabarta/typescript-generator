@@ -2,7 +2,7 @@
 package cz.habarta.typescript.generator;
 
 
-public enum JaxrsNamespacing {
+public enum RestNamespacing {
 
     singleObject, perResource, byAnnotation
 

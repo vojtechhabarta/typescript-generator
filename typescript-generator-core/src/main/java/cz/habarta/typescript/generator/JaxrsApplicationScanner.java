@@ -2,10 +2,10 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.*;
-import cz.habarta.typescript.generator.util.Predicate;
 import io.github.classgraph.ScanResult;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Predicate;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 

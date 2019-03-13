@@ -1,13 +1,13 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.util.Predicate;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 
 public class ExcludingTypeProcessor implements TypeProcessor {

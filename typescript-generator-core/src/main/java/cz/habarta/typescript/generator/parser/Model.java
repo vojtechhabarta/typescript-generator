@@ -8,14 +8,14 @@ public class Model {
 
     private final List<BeanModel> beans;
     private final List<EnumModel> enums;
-    private final JaxrsApplicationModel jaxrsApplication;
+    private final List<RestApplicationModel> restApplications;
 
-    public Model(List<BeanModel> beans, List<EnumModel> enums, JaxrsApplicationModel jaxrsApplication) {
+    public Model(List<BeanModel> beans, List<EnumModel> enums, List<RestApplicationModel> restApplications) {
         if (beans == null) throw new NullPointerException();
         if (enums == null) throw new NullPointerException();
         this.beans = beans;
         this.enums = enums;
-        this.jaxrsApplication = jaxrsApplication;
+        this.restApplications = restApplications;
     }
 
     public List<BeanModel> getBeans() {
@@ -35,8 +35,8 @@ public class Model {
         return enums;
     }
 
-    public JaxrsApplicationModel getJaxrsApplication() {
-        return jaxrsApplication;
+    public List<RestApplicationModel> getRestApplications() {
+        return restApplications;
     }
 
     @Override

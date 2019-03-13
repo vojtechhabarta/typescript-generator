@@ -8,6 +8,8 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class TypeScriptGenerator {
@@ -17,7 +19,7 @@ public class TypeScriptGenerator {
     private static Logger logger = new Logger();
 
     private final Settings settings;
-    private TypeProcessor typeProcessor = null;
+    private TypeProcessor commonTypeProcessor = null;
     private ModelParser modelParser = null;
     private ModelCompiler modelCompiler = null;
     private Emitter emitter = null;
@@ -55,6 +57,7 @@ public class TypeScriptGenerator {
         generateTypeScript(input, output, false, 0);
     }
 
+    @Deprecated
     public void generateEmbeddableTypeScript(Input input, Output output, boolean addExportKeyword, int initialIndentationLevel) {
         generateTypeScript(input, output, addExportKeyword, initialIndentationLevel);
     }
@@ -117,17 +120,32 @@ public class TypeScriptGenerator {
         }
     }
 
-    public TypeProcessor getTypeProcessor() {
-        if (typeProcessor == null) {
-            final List<TypeProcessor> processors = new ArrayList<>();
-            processors.add(new ExcludingTypeProcessor(settings.getExcludeFilter()));
-            if (settings.customTypeProcessor != null) {
-                processors.add(settings.customTypeProcessor);
-            }
-            processors.add(new CustomMappingTypeProcessor(settings.customTypeMappings));
-            processors.add(new DefaultTypeProcessor());
-            typeProcessor = new TypeProcessor.Chain(processors);
+    public TypeProcessor getCommonTypeProcessor() {
+        if (commonTypeProcessor == null) {
+            final List<RestApplicationParser.Factory> restFactories = settings.getRestApplicationParserFactories();
+            final ModelParser.Factory modelParserFactory = getModelParserFactory();
+            final List<TypeProcessor> specificTypeProcessors = Stream
+                    .concat(
+                            restFactories.stream().map(factory -> factory.getSpecificTypeProcessor()),
+                            Stream.of(modelParserFactory.getSpecificTypeProcessor())
+                    )
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            commonTypeProcessor = createTypeProcessor(specificTypeProcessors);
         }
+        return commonTypeProcessor;
+    }
+
+    private TypeProcessor createTypeProcessor(List<TypeProcessor> specificTypeProcessors) {
+        final List<TypeProcessor> processors = new ArrayList<>();
+        processors.add(new ExcludingTypeProcessor(settings.getExcludeFilter()));
+        if (settings.customTypeProcessor != null) {
+            processors.add(settings.customTypeProcessor);
+        }
+        processors.add(new CustomMappingTypeProcessor(settings.customTypeMappings));
+        processors.addAll(specificTypeProcessors);
+        processors.add(new DefaultTypeProcessor());
+        final TypeProcessor typeProcessor = new TypeProcessor.Chain(processors);
         return typeProcessor;
     }
 
@@ -139,13 +157,21 @@ public class TypeScriptGenerator {
     }
 
     private ModelParser createModelParser() {
+        final List<RestApplicationParser.Factory> factories = settings.getRestApplicationParserFactories();
+        final List<RestApplicationParser> restApplicationParsers = factories.stream()
+                .map(factory -> factory.create(settings, getCommonTypeProcessor()))
+                .collect(Collectors.toList());
+        return getModelParserFactory().create(settings, getCommonTypeProcessor(), restApplicationParsers);
+    }
+
+    private ModelParser.Factory getModelParserFactory() {
         switch (settings.jsonLibrary) {
             case jackson1:
-                return new Jackson1Parser(settings, getTypeProcessor());
+                return new Jackson1Parser.Factory();
             case jackson2:
-                return new Jackson2Parser(settings, getTypeProcessor());
+                return new Jackson2Parser.Jackson2ParserFactory();
             case jaxb:
-                return new Jackson2Parser(settings, getTypeProcessor(), /*useJaxbAnnotations*/ true);
+                return new Jackson2Parser.JaxbParserFactory();
             default:
                 throw new RuntimeException();
         }
@@ -153,8 +179,7 @@ public class TypeScriptGenerator {
 
     public ModelCompiler getModelCompiler() {
         if (modelCompiler == null) {
-            final TypeProcessor specificTypeProcessor = getModelParser().getSpecificTypeProcessor();
-            modelCompiler = new ModelCompiler(settings, specificTypeProcessor);
+            modelCompiler = new ModelCompiler(settings, getCommonTypeProcessor());
         }
         return modelCompiler;
     }

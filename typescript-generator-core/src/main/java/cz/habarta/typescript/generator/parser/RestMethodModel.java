@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 
-public class JaxrsMethodModel extends MethodModel {
+public class RestMethodModel extends MethodModel {
 
     private final Class<?> rootResource;
     private final String httpMethod;
@@ -14,7 +14,7 @@ public class JaxrsMethodModel extends MethodModel {
     private final List<MethodParameterModel> queryParams;
     private final MethodParameterModel entityParam;
 
-    public JaxrsMethodModel(Class<?> originClass, String name, Type returnType,
+    public RestMethodModel(Class<?> originClass, String name, Type returnType,
             Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam,
             List<String> comments) {
         super(originClass, name, null, returnType, comments);

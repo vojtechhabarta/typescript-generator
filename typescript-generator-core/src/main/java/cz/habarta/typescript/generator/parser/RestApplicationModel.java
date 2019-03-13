@@ -4,11 +4,20 @@ package cz.habarta.typescript.generator.parser;
 import java.util.*;
 
 
-public class JaxrsApplicationModel {
+public class RestApplicationModel {
 
+    private final RestApplicationType type;
     private String applicationPath;
     private String applicationName;
-    private final List<JaxrsMethodModel> methods = new ArrayList<>();
+    private final List<RestMethodModel> methods = new ArrayList<>();
+
+    public RestApplicationModel(RestApplicationType type) {
+        this.type = type;
+    }
+
+    public RestApplicationType getType() {
+        return type;
+    }
 
     public String getApplicationPath() {
         return applicationPath;
@@ -26,7 +35,7 @@ public class JaxrsApplicationModel {
         this.applicationName = applicationName;
     }
 
-    public List<JaxrsMethodModel> getMethods() {
+    public List<RestMethodModel> getMethods() {
         return methods;
     }
 

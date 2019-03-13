@@ -48,7 +48,7 @@ public class ExtensionTest {
                         beans.remove(implementationBean);
                         beans.add(beanWithComments);
 
-                        return new Model(beans, model.getEnums(), model.getJaxrsApplication());
+                        return new Model(beans, model.getEnums(), model.getRestApplications());
                     }
                 }));
             }

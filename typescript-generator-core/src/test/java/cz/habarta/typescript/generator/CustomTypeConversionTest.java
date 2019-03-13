@@ -57,7 +57,7 @@ public class CustomTypeConversionTest {
                 return null;
             }
         };
-        final TypeProcessor typeProcessor = new TypeScriptGenerator(settings).getTypeProcessor();
+        final TypeProcessor typeProcessor = new TypeScriptGenerator(settings).getCommonTypeProcessor();
         final TypeProcessor.Context context = DefaultTypeProcessorTest.getTestContext(typeProcessor);
         {
             final Type maybeObjectFieldType = CustomOptionalUsage.class.getField("maybeObject").getGenericType();

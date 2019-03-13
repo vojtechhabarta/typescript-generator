@@ -19,8 +19,26 @@ public class Jackson1Parser extends ModelParser {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Jackson1Parser(Settings settings, TypeProcessor typeProcessor) {
-        super(settings, typeProcessor, Arrays.asList(JsonNode.class.getName()));
+    public static class Factory extends ModelParser.Factory {
+
+        @Override
+        public TypeProcessor getSpecificTypeProcessor() {
+            return createSpecificTypeProcessor();
+        }
+
+        @Override
+        public Jackson1Parser create(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers) {
+            return new Jackson1Parser(settings, commonTypeProcessor, restApplicationParsers);
+        }
+
+    }
+
+    public Jackson1Parser(Settings settings, TypeProcessor commonTypeProcessor) {
+        this(settings, commonTypeProcessor, Collections.emptyList());
+    }
+
+    public Jackson1Parser(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers) {
+        super(settings, commonTypeProcessor, restApplicationParsers);
         if (!settings.optionalAnnotations.isEmpty()) {
             final AnnotationIntrospector defaultAnnotationIntrospector = objectMapper.getSerializationConfig().getAnnotationIntrospector();
             final AnnotationIntrospector allAnnotationIntrospector = new NopAnnotationIntrospector() {
@@ -31,6 +49,10 @@ public class Jackson1Parser extends ModelParser {
             };
             this.objectMapper.setAnnotationIntrospector(new AnnotationIntrospector.Pair(defaultAnnotationIntrospector, allAnnotationIntrospector));
         }
+    }
+
+    private static TypeProcessor createSpecificTypeProcessor() {
+        return new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName()));
     }
 
     @Override
