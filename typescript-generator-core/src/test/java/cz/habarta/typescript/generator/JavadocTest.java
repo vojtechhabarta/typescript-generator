@@ -58,6 +58,18 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
             Assert.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
         }
+        {
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithBrElements.class));
+            Assert.assertTrue(!generated.contains("<br>"));
+            Assert.assertTrue(generated.contains("Class documentation\n * \n"));
+            Assert.assertTrue(generated.contains("Some documentation\n * \n * for this class."));
+        }
+        {
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPElements.class));
+            Assert.assertTrue(!generated.contains("<p>"));
+            Assert.assertTrue(!generated.contains("</p>"));
+            Assert.assertTrue(generated.contains("Long\n * paragraph\n * \n * Second\n * paragraph"));
+        }
     }
 
     /**
@@ -130,6 +142,26 @@ public class JavadocTest {
 
         public String field;
 
+    }
+
+    /**
+     * Class documentation <br>
+     * ------------------- <br>
+     * Some documentation <br> for this class.<br>
+     */
+    public static class ClassWithBrElements {
+    }
+
+    /**
+     * First sentence.
+     * 
+     * <p> Long
+     * paragraph </p>
+     * 
+     * <p>Second
+     * paragraph</p>
+     */
+    public static class ClassWithPElements {
     }
 
 }

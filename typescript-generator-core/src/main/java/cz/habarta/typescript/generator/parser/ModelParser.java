@@ -35,7 +35,7 @@ public abstract class ModelParser {
 
     public ModelParser(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers) {
         this.settings = settings;
-        this.javadoc = new Javadoc(settings.javadocXmlFiles);
+        this.javadoc = new Javadoc(settings);
         this.typeQueue = new LinkedList<>();
         this.restApplicationParsers = restApplicationParsers;
         this.commonTypeProcessor = commonTypeProcessor;
