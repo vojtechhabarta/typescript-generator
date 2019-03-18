@@ -61,6 +61,8 @@ public class JavadocTest {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithBrElements.class));
             Assert.assertTrue(!generated.contains("<br>"));
+            Assert.assertTrue(!generated.contains("<br/>"));
+            Assert.assertTrue(!generated.contains("<br />"));
             Assert.assertTrue(generated.contains("Class documentation\n * \n"));
             Assert.assertTrue(generated.contains("Some documentation\n * \n * for this class."));
         }
@@ -146,8 +148,8 @@ public class JavadocTest {
 
     /**
      * Class documentation <br>
-     * ------------------- <br>
-     * Some documentation <br> for this class.<br>
+     * ------------------- <br/>
+     * Some documentation <br /> for this class.<br>
      */
     public static class ClassWithBrElements {
     }

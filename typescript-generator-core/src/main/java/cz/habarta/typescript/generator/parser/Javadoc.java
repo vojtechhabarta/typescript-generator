@@ -206,6 +206,8 @@ public class Javadoc {
             final String nn = newline + newline;
             final String replacedHtmlLines = dComments
                     .replaceAll("\\s*<br>\\s*", nn)
+                    .replaceAll("\\s*<br/>\\s*", nn)
+                    .replaceAll("\\s*<br />\\s*", nn)
                     .replaceAll("\\s*<p>\\s*", nn)
                     .replaceAll("\\s*</p>\\s*", nn);
             result.addAll(Utils.splitMultiline(replacedHtmlLines, true));
