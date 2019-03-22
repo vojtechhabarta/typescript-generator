@@ -79,7 +79,7 @@ public abstract class ModelParser {
                 continue;
             }
 
-            final TypeProcessor.Result result = commonTypeProcessor.processTypeInTemporaryContext(sourceType.type, settings);
+            final TypeProcessor.Result result = commonTypeProcessor.processTypeInTemporaryContext(sourceType.type, null, settings);
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
@@ -158,12 +158,12 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties) {
-        final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(type, settings);
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties) {
+        final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(type, typeContext, settings);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, null);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, typeContext, null);
     }
 
     public static boolean containsProperty(List<PropertyModel> properties, String propertyName) {

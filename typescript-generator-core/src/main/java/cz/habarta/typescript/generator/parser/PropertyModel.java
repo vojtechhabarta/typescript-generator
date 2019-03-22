@@ -13,6 +13,7 @@ public class PropertyModel {
     private final boolean optional;
     private final Member originalMember;
     private final PullProperties pullProperties;
+    private final Object context;
     private final List<String> comments;
 
     public static class PullProperties {
@@ -25,12 +26,13 @@ public class PropertyModel {
         }
     }
 
-    public PropertyModel(String name, Type type, boolean optional, Member originalMember, PullProperties pullProperties, List<String> comments) {
+    public PropertyModel(String name, Type type, boolean optional, Member originalMember, PullProperties pullProperties, Object context, List<String> comments) {
         this.name = name;
         this.type = type;
         this.optional = optional;
         this.originalMember = originalMember;
         this.pullProperties = pullProperties;
+        this.context = context;
         this.comments = comments;
     }
 
@@ -51,11 +53,15 @@ public class PropertyModel {
     }
 
     public PropertyModel originalMember(Member originalMember) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
     }
 
     public PullProperties getPullProperties() {
         return pullProperties;
+    }
+
+    public Object getContext() {
+        return context;
     }
 
     public List<String> getComments() {
@@ -63,15 +69,15 @@ public class PropertyModel {
     }
 
     public PropertyModel withComments(List<String> comments) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
     }
 
     public PropertyModel withType(Type type) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
     }
 
     public PropertyModel withOptional(boolean optional) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, comments);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
     }
 
     @Override

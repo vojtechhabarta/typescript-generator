@@ -14,17 +14,17 @@ public interface TypeProcessor {
      */
     public Result processType(Type javaType, Context context);
 
-    public default Result processTypeInTemporaryContext(Type type, Settings settings) {
-        return processType(type, new Context(new SymbolTable(settings), this));
+    public default Result processTypeInTemporaryContext(Type type, Object typeContext, Settings settings) {
+        return processType(type, new Context(new SymbolTable(settings), this, typeContext));
     }
 
-    public default List<Class<?>> discoverClassesUsedInType(Type type, Settings settings) {
-        final TypeProcessor.Result result = processTypeInTemporaryContext(type, settings);
+    public default List<Class<?>> discoverClassesUsedInType(Type type, Object typeContext, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
         return result != null ? result.getDiscoveredClasses() : Collections.emptyList();
     }
 
-    public default boolean isTypeExcluded(Type type, Settings settings) {
-        final TypeProcessor.Result result = processTypeInTemporaryContext(type, settings);
+    public default boolean isTypeExcluded(Type type, Object typeContext, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
         return result != null && result.tsType == TsType.Any;
     }
 
@@ -32,10 +32,12 @@ public interface TypeProcessor {
 
         private final SymbolTable symbolTable;
         private final TypeProcessor typeProcessor;
+        private final Object typeContext;
 
-        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor) {
-            this.symbolTable = symbolTable;
-            this.typeProcessor = typeProcessor;
+        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, Object typeContext) {
+            this.symbolTable = Objects.requireNonNull(symbolTable, "symbolTable");
+            this.typeProcessor = Objects.requireNonNull(typeProcessor, "typeProcessor");
+            this.typeContext = typeContext;
         }
 
         public Symbol getSymbol(Class<?> cls) {
@@ -44,6 +46,14 @@ public interface TypeProcessor {
 
         public Result processType(Type javaType) {
             return typeProcessor.processType(javaType, this);
+        }
+
+        public Object getTypeContext() {
+            return typeContext;
+        }
+
+        public Context withTypeContext(Object typeContext) {
+            return new Context(symbolTable, typeProcessor, typeContext);
         }
 
     }

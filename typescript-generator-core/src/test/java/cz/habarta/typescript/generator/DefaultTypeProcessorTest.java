@@ -46,7 +46,7 @@ public class DefaultTypeProcessorTest {
     }
 
     public static TypeProcessor.Context getTestContext(final TypeProcessor typeProcessor) {
-        return new TypeProcessor.Context(new SymbolTable(TestUtils.settings()), typeProcessor);
+        return new TypeProcessor.Context(new SymbolTable(TestUtils.settings()), typeProcessor, null);
     }
 
 }

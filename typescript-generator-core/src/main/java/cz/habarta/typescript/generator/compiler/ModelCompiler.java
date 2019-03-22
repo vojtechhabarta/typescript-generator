@@ -142,7 +142,7 @@ public class ModelCompiler {
 
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
-                Collections.singletonList(new PropertyModel("property", type, false, null, null, null)), null);
+                Collections.singletonList(new PropertyModel("property", type, false, null, null, null, null)), null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -308,7 +308,7 @@ public class ModelCompiler {
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
-        final TsType type = typeFromJava(symbolTable, property.getType(), property.getName(), bean.getOrigin());
+        final TsType type = typeFromJava(symbolTable, property.getType(), property.getContext(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
         return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, property.getComments());
@@ -338,10 +338,14 @@ public class ModelCompiler {
     }
 
     private TsType typeFromJava(SymbolTable symbolTable, Type javaType, String usedInProperty, Class<?> usedInClass) {
+        return typeFromJava(symbolTable, javaType, null, usedInProperty, usedInClass);
+    }
+
+    private TsType typeFromJava(SymbolTable symbolTable, Type javaType, Object typeContext, String usedInProperty, Class<?> usedInClass) {
         if (javaType == null) {
             return null;
         }
-        final TypeProcessor.Context context = new TypeProcessor.Context(symbolTable, typeProcessor);
+        final TypeProcessor.Context context = new TypeProcessor.Context(symbolTable, typeProcessor, typeContext);
         final TypeProcessor.Result result = context.processType(javaType);
         if (result != null) {
             return result.getTsType();

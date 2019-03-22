@@ -52,7 +52,7 @@ public abstract class RestApplicationParser {
     }
 
     protected void foundType(Result result, Type type, Class<?> usedInClass, String usedInMember) {
-        if (!commonTypeProcessor.isTypeExcluded(type, settings)) {
+        if (!commonTypeProcessor.isTypeExcluded(type, null, settings)) {
             result.discoveredTypes.add(new SourceType<>(type, usedInClass, usedInMember));
         }
     }

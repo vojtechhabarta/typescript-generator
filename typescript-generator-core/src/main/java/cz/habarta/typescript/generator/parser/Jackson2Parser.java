@@ -102,7 +102,7 @@ public class Jackson2Parser extends ModelParser {
         }
         for (Class<? extends Module> moduleClass : settings.jackson2Modules) {
             try {
-                objectMapper.registerModule(moduleClass.newInstance());
+                objectMapper.registerModule(moduleClass.getConstructor().newInstance());
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(String.format("Cannot instantiate Jackson2 module '%s'", moduleClass.getName()), e);
             }
@@ -144,7 +144,32 @@ public class Jackson2Parser extends ModelParser {
     }
 
     private static TypeProcessor createSpecificTypeProcessor() {
-        return new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName()));
+        return new TypeProcessor.Chain(
+                new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName())),
+                new TypeProcessor() {
+                    @Override
+                    public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+                        if (context.getTypeContext() instanceof Jackson2TypeContext) {
+                            final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
+                            final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanPropertyWriter);
+                            if (resultType != null) {
+                                return context.withTypeContext(null).processType(resultType);
+                            }
+                        }
+                        return null;
+                    }
+                }
+        );
+    }
+
+    private static class Jackson2TypeContext {
+        public final Jackson2Parser parser;
+        public final BeanPropertyWriter beanPropertyWriter;
+
+        public Jackson2TypeContext(Jackson2Parser parser, BeanPropertyWriter beanPropertyWriter) {
+            this.parser = parser;
+            this.beanPropertyWriter = beanPropertyWriter;
+        }
     }
 
     @Override
@@ -178,8 +203,7 @@ public class Jackson2Parser extends ModelParser {
                     }
                 }
 
-                // @JsonIdentityInfo and @JsonIdentityReference
-                propertyType = processIdentity(propertyType, beanPropertyWriter);
+                final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(this, beanPropertyWriter);
 
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;
@@ -193,7 +217,7 @@ public class Jackson2Parser extends ModelParser {
                 if (annotation != null && annotation.enabled()) {
                     pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, optional, sourceClass.type, propertyMember, pullProperties));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, propertyMember, pullProperties));
             }
         }
         if (sourceClass.type.isEnum()) {
@@ -241,12 +265,13 @@ public class Jackson2Parser extends ModelParser {
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
     }
 
+    // @JsonIdentityInfo and @JsonIdentityReference
     private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
         final Class<?> cls = Utils.getRawClassOrNull(propertyType);
         if (cls != null) {
             final JsonIdentityInfo identityInfo = cls.getAnnotation(JsonIdentityInfo.class);
             if (identityInfo == null) {
-                return propertyType;
+                return null;
             }
             final JsonIdentityReference identityReferenceC = cls.getAnnotation(JsonIdentityReference.class);
             final JsonIdentityReference identityReferenceP = propertyWriter.getAnnotation(JsonIdentityReference.class);
@@ -255,7 +280,7 @@ public class Jackson2Parser extends ModelParser {
 
             final Type idType;
             if (identityInfo.generator() == ObjectIdGenerators.None.class) {
-                return propertyType;
+                return null;
             } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
                 final BeanPropertyWriter[] properties = getBeanHelper(cls).getProperties();
                 final Optional<BeanPropertyWriter> idProperty = Stream.of(properties)
@@ -267,7 +292,7 @@ public class Jackson2Parser extends ModelParser {
                     checkMember(idPropertyMember, idPropertyWriter.getName(), cls);
                     idType = getGenericType(idPropertyMember);
                 } else {
-                    return propertyType;
+                    return null;
                 }
             } else if (identityInfo.generator() == ObjectIdGenerators.IntSequenceGenerator.class) {
                 idType = Integer.class;
@@ -281,9 +306,8 @@ public class Jackson2Parser extends ModelParser {
             return alwaysAsId
                     ? idType
                     : new UnionType(propertyType, idType);
-            
         }
-        return propertyType;
+        return null;
     }
 
     private static Type getGenericType(Member member) {
