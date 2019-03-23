@@ -176,19 +176,16 @@ public class Jackson2Parser extends ModelParser {
 
     @Override
     protected DeclarationModel parseClass(SourceType<Class<?>> sourceClass) {
+        final List<String> classComments = getComments(sourceClass.type.getAnnotation(JsonClassDescription.class));
         if (sourceClass.type.isEnum()) {
-            return parseEnumOrObjectEnum(sourceClass);
+            return parseEnumOrObjectEnum(sourceClass, classComments);
         } else {
-            return parseBean(sourceClass);
+            return parseBean(sourceClass, classComments);
         }
     }
 
-    private BeanModel parseBean(SourceType<Class<?>> sourceClass) {
+    private BeanModel parseBean(SourceType<Class<?>> sourceClass, List<String> classComments) {
         final List<PropertyModel> properties = new ArrayList<>();
-
-        final JsonClassDescription classDescriptionAnnotation = sourceClass.type.getAnnotation(JsonClassDescription.class);
-        final String classDescriptionValue = classDescriptionAnnotation != null ? classDescriptionAnnotation.value() : null;
-        final List<String> classComments = Utils.splitMultiline(classDescriptionValue, false);
 
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
@@ -196,10 +193,7 @@ public class Jackson2Parser extends ModelParser {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
-
-                final JsonPropertyDescription propertyDescriptionAnnotation = beanPropertyWriter.getAnnotation(JsonPropertyDescription.class);
-                final String propertyDescriptionValue = propertyDescriptionAnnotation != null ? propertyDescriptionAnnotation.value() : null;
-                final List<String> propertyComments = Utils.splitMultiline(propertyDescriptionValue, false);
+                final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
 
                 // Map.Entry
                 final Class<?> propertyRawClass = Utils.getRawClassOrNull(propertyType);
@@ -445,10 +439,10 @@ public class Jackson2Parser extends ModelParser {
 
     }
 
-    private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass) {
+    private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass, List<String> classComments) {
         final JsonFormat jsonFormat = sourceClass.type.getAnnotation(JsonFormat.class);
         if (jsonFormat != null && jsonFormat.shape() == JsonFormat.Shape.OBJECT) {
-            return parseBean(sourceClass);
+            return parseBean(sourceClass, classComments);
         }
         final boolean isNumberBased = jsonFormat != null && (
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
@@ -467,10 +461,11 @@ public class Jackson2Parser extends ModelParser {
                     final String enumJson = objectMapper.writeValueAsString(constant.get(null));
                     final Object value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
 
+                    final List<String> constantComments = getComments(constant.getAnnotation(JsonPropertyDescription.class));
                     if (value instanceof String) {
-                        enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, null));
+                        enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, constantComments));
                     } else if (value instanceof Number) {
-                        enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, null));
+                        enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, constantComments));
                     } else {
                         TypeScriptGenerator.getLogger().warning(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
                     }
@@ -481,7 +476,19 @@ public class Jackson2Parser extends ModelParser {
             }
         }
 
-        return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, null);
+        return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, classComments);
+    }
+
+    private static List<String> getComments(JsonClassDescription classDescriptionAnnotation) {
+        final String propertyDescriptionValue = classDescriptionAnnotation != null ? classDescriptionAnnotation.value() : null;
+        final List<String> classComments = Utils.splitMultiline(propertyDescriptionValue, false);
+        return classComments;
+    }
+
+    private static List<String> getComments(JsonPropertyDescription propertyDescriptionAnnotation) {
+        final String propertyDescriptionValue = propertyDescriptionAnnotation != null ? propertyDescriptionAnnotation.value() : null;
+        final List<String> propertyComments = Utils.splitMultiline(propertyDescriptionValue, false);
+        return propertyComments;
     }
 
 }

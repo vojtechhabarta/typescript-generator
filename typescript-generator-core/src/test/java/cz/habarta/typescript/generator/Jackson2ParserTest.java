@@ -292,16 +292,25 @@ public class Jackson2ParserTest {
     @Test
     public void testDescriptions() {
         final Settings settings = TestUtils.settings();
-        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDescriptions.class));
+        settings.mapEnum = EnumMapping.asEnum;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDescriptions.class, EnumWithDescriptions.class));
         Assert.assertTrue(output.contains("Class description"));
         Assert.assertTrue(output.contains("Property description"));
         Assert.assertTrue(output.contains("second line"));
+        Assert.assertTrue(output.contains("Enum description"));
+        Assert.assertTrue(output.contains("Enum constant description"));
     }
 
     @JsonClassDescription("Class description\nsecond line")
     private static class ClassWithDescriptions {
         @JsonPropertyDescription("Property description\nsecond line")
         public String value;
+    }
+
+    @JsonClassDescription("Enum description")
+    private static enum EnumWithDescriptions {
+        @JsonPropertyDescription("Enum constant description")
+        Empty
     }
 
 }

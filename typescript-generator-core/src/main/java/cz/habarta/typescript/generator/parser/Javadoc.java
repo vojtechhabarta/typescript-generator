@@ -117,7 +117,7 @@ public class Javadoc {
         final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
         final List<TagInfo> tags = dConstant != null ? dConstant.getTag(): null;
         final String memberComment = dConstant != null ? dConstant.getComment() : null;
-        return enumMember.withComments(getComments(memberComment, tags));
+        return enumMember.withComments(Utils.concat(getComments(memberComment, tags), enumMember.getComments()));
     }
 
     // finders
