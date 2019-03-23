@@ -158,12 +158,12 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties) {
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
         final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(type, typeContext, settings);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, typeContext, null);
+        return new PropertyModel(name, type, optional, originalMember, pullProperties, typeContext, comments);
     }
 
     public static boolean containsProperty(List<PropertyModel> properties, String propertyName) {

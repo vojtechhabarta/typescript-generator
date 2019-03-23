@@ -287,6 +287,9 @@ public class Utils {
     }
 
     public static List<String> splitMultiline(String text, boolean trimOneLeadingSpaceOnLines) {
+        if (text == null) {
+            return null;
+        }
         final List<String> result = new ArrayList<>();
         final String[] lines = text.split("\\r\\n|\\n|\\r");
         for (String line : lines) {

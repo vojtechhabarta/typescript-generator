@@ -289,4 +289,19 @@ public class Jackson2ParserTest {
         public List<JsonNode> nodes;
     }
 
+    @Test
+    public void testDescriptions() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDescriptions.class));
+        Assert.assertTrue(output.contains("Class description"));
+        Assert.assertTrue(output.contains("Property description"));
+        Assert.assertTrue(output.contains("second line"));
+    }
+
+    @JsonClassDescription("Class description\nsecond line")
+    private static class ClassWithDescriptions {
+        @JsonPropertyDescription("Property description\nsecond line")
+        public String value;
+    }
+
 }

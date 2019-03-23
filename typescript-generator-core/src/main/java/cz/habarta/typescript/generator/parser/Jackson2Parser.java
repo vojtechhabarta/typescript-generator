@@ -2,9 +2,11 @@
 package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -184,12 +186,20 @@ public class Jackson2Parser extends ModelParser {
     private BeanModel parseBean(SourceType<Class<?>> sourceClass) {
         final List<PropertyModel> properties = new ArrayList<>();
 
+        final JsonClassDescription classDescriptionAnnotation = sourceClass.type.getAnnotation(JsonClassDescription.class);
+        final String classDescriptionValue = classDescriptionAnnotation != null ? classDescriptionAnnotation.value() : null;
+        final List<String> classComments = Utils.splitMultiline(classDescriptionValue, false);
+
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member propertyMember = beanPropertyWriter.getMember().getMember();
                 checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = getGenericType(propertyMember);
+
+                final JsonPropertyDescription propertyDescriptionAnnotation = beanPropertyWriter.getAnnotation(JsonPropertyDescription.class);
+                final String propertyDescriptionValue = propertyDescriptionAnnotation != null ? propertyDescriptionAnnotation.value() : null;
+                final List<String> propertyComments = Utils.splitMultiline(propertyDescriptionValue, false);
 
                 // Map.Entry
                 final Class<?> propertyRawClass = Utils.getRawClassOrNull(propertyType);
@@ -217,11 +227,11 @@ public class Jackson2Parser extends ModelParser {
                 if (annotation != null && annotation.enabled()) {
                     pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, propertyMember, pullProperties));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, propertyMember, pullProperties, propertyComments));
             }
         }
         if (sourceClass.type.isEnum()) {
-            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, null);
+            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, classComments);
         }
 
         final String discriminantProperty;
@@ -262,7 +272,7 @@ public class Jackson2Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null);
+        return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, classComments);
     }
 
     // @JsonIdentityInfo and @JsonIdentityReference
