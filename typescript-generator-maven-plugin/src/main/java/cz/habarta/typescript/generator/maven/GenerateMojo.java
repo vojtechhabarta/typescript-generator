@@ -606,11 +606,11 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> jackson2Modules;
 
     /**
-     * If <code>true</code>, include abstract methods when emitting bean definitions. Works with Jackson2 only.
+     * If <code>true</code>, include methods when emitting bean definitions. Works with Jackson2 only.
      * If Javadoc XML is enabled, the Javadoc will be propagated to the methods.
      */
     @Parameter
-    private boolean emitAbstractMethodsInBeans;
+    private boolean emitMethodsInBeans;
 
     /**
      * If <code>true</code>, emit classes that contain a SAM (Single Abstract Method) as a typescript function signature for the abstract method.
@@ -739,7 +739,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
-            settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
+            settings.emitMethodsInBeans = emitMethodsInBeans;
             settings.emitSAMs = emitSAMs;
             final File output = outputFile != null
                     ? outputFile

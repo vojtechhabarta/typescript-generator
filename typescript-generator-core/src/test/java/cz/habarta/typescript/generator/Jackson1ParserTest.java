@@ -24,13 +24,13 @@ public class Jackson1ParserTest {
 
     @Test
     public void testEmitMethods() {
-        final Jackson1Parser jacksonParser = getJackson1Parser(it -> it.emitAbstractMethodsInBeans = true);
+        final Jackson1Parser jacksonParser = getJackson1Parser(it -> it.emitMethodsInBeans = true);
         final Class<?> bean = InterfaceWithMethodsAndBeanProperties.class;
         final Model model = jacksonParser.parseModel(bean);
 
         Jackson2ParserTest.assertMethodsInInterface(model);
 
-        final Jackson1Parser parserNoMethods = getJackson1Parser(it -> it.emitAbstractMethodsInBeans = false);
+        final Jackson1Parser parserNoMethods = getJackson1Parser(it -> it.emitMethodsInBeans = false);
         final Model modelNoMethods = parserNoMethods.parseModel(bean);
         Assert.assertEquals(0, modelNoMethods.getBeans().get(0).getMethods().size());
     }

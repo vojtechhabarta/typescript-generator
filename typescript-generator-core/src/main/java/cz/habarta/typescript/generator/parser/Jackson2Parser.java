@@ -203,8 +203,8 @@ public class Jackson2Parser extends ModelParser {
 
         List<MethodModel> methods = new ArrayList<>();
 
-        if (settings.emitAbstractMethodsInBeans) {
-            processAbstractMethods(sourceClass, properties, methods);
+        if (settings.emitMethodsInBeans) {
+            processMethods(sourceClass, properties, methods);
         }
 
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, null, methods);

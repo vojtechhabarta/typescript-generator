@@ -21,10 +21,11 @@ public class SAMTest {
         testOutput(FixedReturnSAMTest.class, "interface FixedReturnSAMTest {\n    convertToString: (arg0: number, arg1: string) => string;\n}");
         testOutput(VoidReturnSAMTest.class, "interface VoidReturnSAMTest {\n    consumeInt: (arg0: number) => void;\n}");
         testOutput(SupplierSAMTest.class, "interface SupplierSAMTest {\n    supplyInt: () => number;\n}");
+        testOutput(SetterTest.class, "interface SetterTest {\n\n    setThing(arg0: string, arg1: any, arg2: (arg0: string) => string): void;\n}");
     }
 
 
-    private abstract class FunctionTest {
+    private class FunctionTest {
         public Function<Integer, String> convertToString;
     }
 
@@ -32,7 +33,7 @@ public class SAMTest {
         R apply(T t, String fixedType);
     }
 
-    public abstract class MixedGenericFixedParamTest {
+    public class MixedGenericFixedParamTest {
         public MixedGenericFixedParamSAM<Integer, String> convertToString;
     }
 
@@ -40,7 +41,7 @@ public class SAMTest {
         String apply(T t, String fixedType);
     }
 
-    public abstract class FixedReturnSAMTest {
+    public class FixedReturnSAMTest {
         public FixedReturnSAM<Integer> convertToString;
     }
 
@@ -48,7 +49,7 @@ public class SAMTest {
         String apply(Integer foo);
     }
 
-    public abstract class NonParameterizedSAMTest {
+    public class NonParameterizedSAMTest {
        public NonParameterizedSAM convertToString;
     }
 
@@ -56,7 +57,7 @@ public class SAMTest {
         void apply(T arg);
     }
 
-    public abstract class VoidReturnSAMTest {
+    public class VoidReturnSAMTest {
         public VoidReturnSAM<Integer> consumeInt;
     }
 
@@ -64,13 +65,18 @@ public class SAMTest {
         T get();
     }
 
-    public abstract class SupplierSAMTest {
+    public class SupplierSAMTest {
         public SupplierSAM<Integer> supplyInt;
+    }
+
+    public class SetterTest {
+        public void setThing(String thingKey, Object val, Function<String, String> function) {}
     }
 
     private static void testOutput(Class<?> inputClass, String expected) {
         final Settings settings = TestUtils.settings();
         settings.emitSAMs = true;
+        settings.emitMethodsInBeans = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.mapClasses = ClassMapping.asInterfaces;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(inputClass));

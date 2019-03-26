@@ -82,7 +82,7 @@ public class GenerateTask extends DefaultTask {
     @Deprecated public boolean disableJackson2ModuleDiscovery;
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
-    public boolean emitAbstractMethodsInBeans;
+    public boolean emitMethodsInBeans;
     public boolean emitSAMSs;
     @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
@@ -179,7 +179,7 @@ public class GenerateTask extends DefaultTask {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
-            settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
+            settings.emitMethodsInBeans = emitMethodsInBeans;
             settings.emitSAMs = emitSAMSs;
             final File output = outputFile != null
                     ? getProject().file(outputFile)

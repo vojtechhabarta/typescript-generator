@@ -57,7 +57,7 @@ public class GenericCustomTypeMappingsTest {
     @Test
     public void testMethodReturnValue() {
         final Settings settings = createListWrapperSettings();
-        settings.emitAbstractMethodsInBeans = true;
+        settings.emitMethodsInBeans = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(InterfaceWithCustomReturnValue.class));
         //System.out.println(output);
         Assert.assertTrue(output.contains("find(arg0: ListWrapper<number>): ListWrapper<string>"));

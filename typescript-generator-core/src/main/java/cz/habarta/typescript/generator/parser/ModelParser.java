@@ -177,18 +177,13 @@ public abstract class ModelParser {
         return false;
     }
 
-    protected void processAbstractMethods(SourceType<Class<?>> sourceClass, List<PropertyModel> properties,
-                                          List<MethodModel> methods) {
+    protected void processMethods(SourceType<Class<?>> sourceClass, List<PropertyModel> properties,
+                                  List<MethodModel> methods) {
         Set<String> propertyMethods = findMethodNamesForMethodProperties(properties);
 
         Method[] declaredMethods = sourceClass.type.getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {
             if (propertyMethods.contains(declaredMethod.getName())) {
-                continue;
-            }
-
-            // Only include abstract methods
-            if (!Modifier.isAbstract(declaredMethod.getModifiers())) {
                 continue;
             }
 
