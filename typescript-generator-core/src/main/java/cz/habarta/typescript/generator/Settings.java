@@ -90,6 +90,7 @@ public class Settings {
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
     public boolean emitAbstractMethodsInBeans = false;
+    public boolean emitSAMs = false;
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 

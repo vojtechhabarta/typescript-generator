@@ -613,6 +613,23 @@ public class GenerateMojo extends AbstractMojo {
     private boolean emitAbstractMethodsInBeans;
 
     /**
+     * If <code>true</code>, emit classes that contain a SAM (Single Abstract Method) as a typescript function signature for the abstract method.
+     * If <code>false</code>, this type processor is disabled, SAM classes will receive no special treatment.
+     *
+     * Note: Currently argument names are not preserved by this process.
+     *       Argument names are mapped to the string "arg" prepended by the arity index of the argument.
+     *
+     * e.g:
+     *
+     * Emit a field with type
+     *     Function<Number, String> itoa
+     * as
+     *     itoa: (arg0: number) => string
+     */
+    @Parameter
+    private boolean emitSAMs;
+
+    /**
      * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
      */
     @Parameter
@@ -723,6 +740,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
             settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
+            settings.emitSAMs = emitSAMs;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());

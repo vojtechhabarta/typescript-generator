@@ -125,6 +125,9 @@ public class TypeScriptGenerator {
                 processors.add(settings.customTypeProcessor);
             }
             processors.add(new CustomMappingTypeProcessor(settings.customTypeMappings));
+            if (settings.emitSAMs) {
+                processors.add(new SAMTypeProcessor());
+            }
             processors.add(new DefaultTypeProcessor());
             typeProcessor = new TypeProcessor.Chain(processors);
         }
