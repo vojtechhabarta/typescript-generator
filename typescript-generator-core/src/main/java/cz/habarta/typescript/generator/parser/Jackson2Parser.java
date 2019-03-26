@@ -273,7 +273,9 @@ public class Jackson2Parser extends ModelParser {
     private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
         final Class<?> cls = Utils.getRawClassOrNull(propertyType);
         if (cls != null) {
-            final JsonIdentityInfo identityInfo = cls.getAnnotation(JsonIdentityInfo.class);
+            final JsonIdentityInfo identityInfoC = cls.getAnnotation(JsonIdentityInfo.class);
+            final JsonIdentityInfo identityInfoP = propertyWriter.getAnnotation(JsonIdentityInfo.class);
+            final JsonIdentityInfo identityInfo = identityInfoP != null ? identityInfoP : identityInfoC;
             if (identityInfo == null) {
                 return null;
             }
@@ -286,7 +288,11 @@ public class Jackson2Parser extends ModelParser {
             if (identityInfo.generator() == ObjectIdGenerators.None.class) {
                 return null;
             } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
-                final BeanPropertyWriter[] properties = getBeanHelper(cls).getProperties();
+                final BeanHelper beanHelper = getBeanHelper(cls);
+                if (beanHelper == null) {
+                    return null;
+                }
+                final BeanPropertyWriter[] properties = beanHelper.getProperties();
                 final Optional<BeanPropertyWriter> idProperty = Stream.of(properties)
                         .filter(p -> p.getName().equals(identityInfo.property()))
                         .findFirst();

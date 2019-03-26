@@ -28,6 +28,7 @@ public class ObjectAsIdTest {
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
         final TestObjectD testObjectD = new TestObjectD();
+        final TestObjectE testObjectE = new TestObjectE();
         final Wrapper wrapper = new Wrapper();
         wrapper.testObjectA1 = testObjectA;
         wrapper.testObjectA2 = testObjectA;
@@ -37,6 +38,9 @@ public class ObjectAsIdTest {
         wrapper.testObjectC2 = testObjectC;
         wrapper.testObjectD1 = testObjectD;
         wrapper.testObjectD2 = testObjectD;
+        wrapper.testObjectE1 = testObjectE;
+        wrapper.testObjectE2 = testObjectE;
+        wrapper.testObjectE3 = testObjectE;
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         final String json = objectMapper.writeValueAsString(wrapper);
@@ -48,6 +52,9 @@ public class ObjectAsIdTest {
         Assert.assertTrue(json.contains("\"testObjectC2\": \"id3\""));
         Assert.assertTrue(json.contains("\"testObjectD1\": \"id4\""));
         Assert.assertTrue(json.contains("\"testObjectD2\": \"id4\""));
+        Assert.assertTrue(json.contains("\"testObjectE1\": \"id5\""));
+        Assert.assertTrue(json.contains("\"testObjectE2\": {"));
+        Assert.assertTrue(json.contains("\"testObjectE3\": {"));
     }
 
     @Test
@@ -56,11 +63,13 @@ public class ObjectAsIdTest {
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
         final TestObjectD testObjectD = new TestObjectD();
+        final TestObjectE testObjectE = new TestObjectE();
         final WrapperWithLists wrapper = new WrapperWithLists();
         wrapper.listOfTestObjectA = Arrays.asList(testObjectA, testObjectA);
         wrapper.listOfTestObjectB = Arrays.asList(testObjectB, testObjectB);
         wrapper.listOfTestObjectC = Arrays.asList(testObjectC, testObjectC);
         wrapper.listOfTestObjectD = Arrays.asList(testObjectD, testObjectD);
+        wrapper.listOfTestObjectE = Arrays.asList(testObjectE, testObjectE);
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.disable(SerializationFeature.INDENT_OUTPUT);
         final String json = objectMapper.writeValueAsString(wrapper);
@@ -68,6 +77,7 @@ public class ObjectAsIdTest {
         Assert.assertTrue(json.contains("\"listOfTestObjectB\":[{"));
         Assert.assertTrue(json.contains("\"listOfTestObjectC\":[{"));
         Assert.assertTrue(json.contains("\"listOfTestObjectD\":[\"id4\""));
+        Assert.assertTrue(json.contains("\"listOfTestObjectE\":[\"id5\""));
     }
 
     @Test
@@ -76,11 +86,13 @@ public class ObjectAsIdTest {
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
         final TestObjectD testObjectD = new TestObjectD();
+        final TestObjectE testObjectE = new TestObjectE();
         final WrapperWithNestedMaps wrapper = new WrapperWithNestedMaps();
         wrapper.listOfMapOfTestObjectA = Arrays.asList(generateMap(testObjectA, testObjectA));
         wrapper.listOfMapOfTestObjectB = Arrays.asList(generateMap(testObjectB, testObjectB));
         wrapper.listOfMapOfTestObjectC = Arrays.asList(generateMap(testObjectC, testObjectC));
         wrapper.listOfMapOfTestObjectD = Arrays.asList(generateMap(testObjectD, testObjectD));
+        wrapper.listOfMapOfTestObjectE = Arrays.asList(generateMap(testObjectE, testObjectE));
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.disable(SerializationFeature.INDENT_OUTPUT);
         final String json = objectMapper.writeValueAsString(wrapper);
@@ -88,6 +100,7 @@ public class ObjectAsIdTest {
         Assert.assertTrue(json.contains("\"listOfMapOfTestObjectB\":[{\"k1\":{"));
         Assert.assertTrue(json.contains("\"listOfMapOfTestObjectC\":[{\"k1\":{"));
         Assert.assertTrue(json.contains("\"listOfMapOfTestObjectD\":[{\"k1\":\"id4\""));
+        Assert.assertTrue(json.contains("\"listOfMapOfTestObjectE\":[{\"k1\":\"id5\""));
     }
 
     @SafeVarargs
@@ -109,10 +122,14 @@ public class ObjectAsIdTest {
         Assert.assertTrue(output.contains("testObjectB1: TestObjectB | string"));
         Assert.assertTrue(output.contains("testObjectC1: TestObjectC<string> | string"));
         Assert.assertTrue(output.contains("testObjectD1: string"));
+        Assert.assertTrue(output.contains("testObjectE1: string"));
+        Assert.assertTrue(output.contains("testObjectE2: TestObjectE | string"));
+        Assert.assertTrue(output.contains("testObjectE3: TestObjectE"));
         Assert.assertTrue(!output.contains("interface TestObjectA"));
         Assert.assertTrue(output.contains("interface TestObjectB"));
         Assert.assertTrue(output.contains("interface TestObjectC<T>"));
         Assert.assertTrue(!output.contains("interface TestObjectD"));
+        Assert.assertTrue(output.contains("interface TestObjectE"));
     }
 
     @Test
@@ -123,10 +140,12 @@ public class ObjectAsIdTest {
         Assert.assertTrue(output.contains("listOfTestObjectB: (TestObjectB | string)[]"));
         Assert.assertTrue(output.contains("listOfTestObjectC: (TestObjectC<string> | string)[]"));
         Assert.assertTrue(output.contains("listOfTestObjectD: string[]"));
+        Assert.assertTrue(output.contains("listOfTestObjectE: string[]"));
         Assert.assertTrue(!output.contains("interface TestObjectA"));
         Assert.assertTrue(output.contains("interface TestObjectB"));
         Assert.assertTrue(output.contains("interface TestObjectC<T>"));
         Assert.assertTrue(!output.contains("interface TestObjectD"));
+        Assert.assertTrue(!output.contains("interface TestObjectE"));
     }
 
     @Test
@@ -137,10 +156,12 @@ public class ObjectAsIdTest {
         Assert.assertTrue(output.contains("listOfMapOfTestObjectB: { [index: string]: TestObjectB | string }[]"));
         Assert.assertTrue(output.contains("listOfMapOfTestObjectC: { [index: string]: TestObjectC<string> | string }[]"));
         Assert.assertTrue(output.contains("listOfMapOfTestObjectD: { [index: string]: string }[]"));
+        Assert.assertTrue(output.contains("listOfMapOfTestObjectE: { [index: string]: string }[]"));
         Assert.assertTrue(!output.contains("interface TestObjectA"));
         Assert.assertTrue(output.contains("interface TestObjectB"));
         Assert.assertTrue(output.contains("interface TestObjectC<T>"));
         Assert.assertTrue(!output.contains("interface TestObjectD"));
+        Assert.assertTrue(!output.contains("interface TestObjectE"));
     }
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
@@ -184,6 +205,14 @@ public class ObjectAsIdTest {
         public String myProperty = "valueD";
     }
 
+    private static class TestObjectE {
+
+        @JsonProperty("@@@id")
+        public String myIdentification = "id5";
+
+        public String myProperty = "valueE";
+    }
+
     private static class Wrapper {
         public TestObjectA testObjectA1;
         public TestObjectA testObjectA2;
@@ -193,6 +222,9 @@ public class ObjectAsIdTest {
         public TestObjectC<String> testObjectC2;
         public @JsonIdentityReference(alwaysAsId = true) TestObjectD testObjectD1;
         public @JsonIdentityReference(alwaysAsId = true) TestObjectD testObjectD2;
+        public @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true) TestObjectE testObjectE1;
+        public @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") TestObjectE testObjectE2;
+        public TestObjectE testObjectE3;
     }
 
     private static class WrapperWithLists {
@@ -200,6 +232,7 @@ public class ObjectAsIdTest {
         public List<TestObjectB> listOfTestObjectB;
         public List<TestObjectC<String>> listOfTestObjectC;
         public @JsonIdentityReference(alwaysAsId = true) List<TestObjectD> listOfTestObjectD;
+        public @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true) List<TestObjectE> listOfTestObjectE;
     }
 
     private static class WrapperWithNestedMaps {
@@ -207,6 +240,7 @@ public class ObjectAsIdTest {
         public List<Map<String, TestObjectB>> listOfMapOfTestObjectB;
         public List<Map<String, TestObjectC<String>>> listOfMapOfTestObjectC;
         public @JsonIdentityReference(alwaysAsId = true) List<Map<String, TestObjectD>> listOfMapOfTestObjectD;
+        public @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true) List<Map<String, TestObjectE>> listOfMapOfTestObjectE;
     }
 
 }
