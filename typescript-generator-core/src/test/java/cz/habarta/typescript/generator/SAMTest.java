@@ -19,6 +19,8 @@ public class SAMTest {
         testOutput(MixedGenericFixedParamTest.class, "interface MixedGenericFixedParamTest {\n    convertToString: (arg0: number, arg1: string) => string;\n}");
         testOutput(NonParameterizedSAMTest.class, "interface NonParameterizedSAMTest {\n    convertToString: (arg0: number) => string;\n}");
         testOutput(FixedReturnSAMTest.class, "interface FixedReturnSAMTest {\n    convertToString: (arg0: number, arg1: string) => string;\n}");
+        testOutput(VoidReturnSAMTest.class, "interface VoidReturnSAMTest {\n    consumeInt: (arg0: number) => void;\n}");
+        testOutput(SupplierSAMTest.class, "interface SupplierSAMTest {\n    supplyInt: () => number;\n}");
     }
 
 
@@ -48,6 +50,22 @@ public class SAMTest {
 
     public abstract class NonParameterizedSAMTest {
        public NonParameterizedSAM convertToString;
+    }
+
+    public interface VoidReturnSAM<T> {
+        void apply(T arg);
+    }
+
+    public abstract class VoidReturnSAMTest {
+        public VoidReturnSAM<Integer> consumeInt;
+    }
+
+    public interface SupplierSAM<T> {
+        T get();
+    }
+
+    public abstract class SupplierSAMTest {
+        public SupplierSAM<Integer> supplyInt;
     }
 
     private static void testOutput(Class<?> inputClass, String expected) {
