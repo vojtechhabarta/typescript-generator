@@ -64,7 +64,8 @@ public class SAMTypeProcessor implements TypeProcessor {
 
     private static Method getSAMMaybe(Class<?> clazz) {
         List<Method> methods = Arrays.stream(clazz.getMethods())
-                .filter(m -> (Modifier.ABSTRACT & m.getModifiers()) == Modifier.ABSTRACT).collect(Collectors.toList());
+                .filter(m -> Modifier.isAbstract(m.getModifiers()))
+                .collect(Collectors.toList());
         return methods.size() == 1 ? methods.get(0) : null;
     }
 

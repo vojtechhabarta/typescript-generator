@@ -187,6 +187,11 @@ public abstract class ModelParser {
                 continue;
             }
 
+            // Only include public methods
+            if (!Modifier.isPublic(declaredMethod.getModifiers())) {
+                continue;
+            }
+
             List<MethodParameterModel> params = processTypedButUnnamedParameters(declaredMethod);
             methods.add(new MethodModel(sourceClass.type,
                                         declaredMethod.getName(),
