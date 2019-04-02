@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 export class PolymorphicClass implements SuperInterface {
-    class: "class-b";
+    discriminator: "class-b";
     field1: number;
 }
 
@@ -11,5 +11,5 @@ export class SimpleClass {
 }
 
 export interface SuperInterface {
-    class: "class-b";
+    discriminator: "class-b";
 }

@@ -1,11 +1,11 @@
 /* tslint:disable */
 
 export class PolymorphicClass implements SuperInterface {
-    readonly class: "class-b";
+    readonly discriminator: "class-b";
     readonly field1: number;
 
     constructor(field1: number) {
-        this.class = "class-b";
+        this.discriminator = "class-b";
         this.field1 = field1;
     }
 }
@@ -21,5 +21,5 @@ export class SimpleClass {
 }
 
 export interface SuperInterface {
-    readonly class: "class-b";
+    readonly discriminator: "class-b";
 }
