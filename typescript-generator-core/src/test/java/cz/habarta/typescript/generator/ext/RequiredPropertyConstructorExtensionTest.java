@@ -105,7 +105,8 @@ public class RequiredPropertyConstructorExtensionTest {
 
     private static String generateTypeScript(Settings settings, Type... types) {
         TypeScriptGenerator typeScriptGenerator = new TypeScriptGenerator(settings);
-        return typeScriptGenerator.generateTypeScript(Input.from(types));
+        String result = typeScriptGenerator.generateTypeScript(Input.from(types));
+        return Utils.normalizeLineEndings(result, "\n");
     }
 
     private static Settings createBaseSettings() {
