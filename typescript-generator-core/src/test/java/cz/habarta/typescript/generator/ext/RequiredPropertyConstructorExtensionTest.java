@@ -118,6 +118,7 @@ public class RequiredPropertyConstructorExtensionTest {
         settings.outputKind = TypeScriptOutputKind.module;
         settings.mapClasses = ClassMapping.asClasses;
         settings.noFileComment = true;
+        settings.noEslintDisable = true;
         return settings;
     }
 
