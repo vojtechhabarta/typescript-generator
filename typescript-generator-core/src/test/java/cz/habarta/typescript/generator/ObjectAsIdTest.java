@@ -164,6 +164,15 @@ public class ObjectAsIdTest {
         Assert.assertTrue(!output.contains("interface TestObjectE"));
     }
 
+
+    @Test
+    public void testGenerics() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TestObjectWithGeneric.class));
+        Assert.assertTrue(output.contains("objectReference: string"));
+    }
+
+
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
     @JsonIdentityReference(alwaysAsId = true)
     private static class TestObjectA {
@@ -204,6 +213,44 @@ public class ObjectAsIdTest {
 
         public String myProperty = "valueD";
     }
+
+
+    private static class ObjectWithID {
+        @JsonProperty("@@@id")
+        public String myIdentification;
+
+    }
+
+    private static class TestObjectWithID extends ObjectWithID {
+        public String myProperty = "valueE";
+
+        public TestObjectWithID(String myIdentification) {
+            this.myIdentification = myIdentification;
+        }
+    }
+
+
+    private static class GenericWrapper<M extends ObjectWithID> {
+        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true)
+        public M objectReference;
+
+
+        public GenericWrapper(M objectReference) {
+            this.objectReference = objectReference;
+        }
+    }
+
+
+    private static class TestObjectWithGeneric {
+        public GenericWrapper<ObjectWithID> genericTestObject;
+
+        public TestObjectWithGeneric(GenericWrapper<ObjectWithID> genericTestObject) {
+            this.genericTestObject = genericTestObject;
+        }
+    }
+
+
+
 
     private static class TestObjectE {
 

@@ -271,7 +271,11 @@ public class Jackson2Parser extends ModelParser {
 
     // @JsonIdentityInfo and @JsonIdentityReference
     private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
-        final Class<?> cls = Utils.getRawClassOrNull(propertyType);
+
+        final Class<?> clsT = Utils.getRawClassOrNull(propertyType);
+        final Class<?> clsW = propertyWriter.getType().getRawClass();
+        final Class<?> cls = clsT != null ? clsT : clsW;
+
         if (cls != null) {
             final JsonIdentityInfo identityInfoC = cls.getAnnotation(JsonIdentityInfo.class);
             final JsonIdentityInfo identityInfoP = propertyWriter.getAnnotation(JsonIdentityInfo.class);
