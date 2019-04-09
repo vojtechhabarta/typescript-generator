@@ -133,6 +133,10 @@ public class TsBeanModel extends TsDeclarationModel {
         return constructor;
     }
 
+    public TsBeanModel withConstructor(TsConstructorModel constructor) {
+        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+    }
+
     public List<TsMethodModel> getMethods() {
         return methods;
     }

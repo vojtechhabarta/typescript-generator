@@ -282,7 +282,7 @@ public class Utils {
         return normalizeLineEndings(readString(stream), lineEndings);
     }
 
-    private static String normalizeLineEndings(String text, String lineEndings) {
+    public static String normalizeLineEndings(String text, String lineEndings) {
         return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
     }
 

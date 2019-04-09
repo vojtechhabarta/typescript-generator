@@ -19,6 +19,7 @@ public class TestUtils {
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.noFileComment = true;
         settings.noTslintDisable = true;
+        settings.noEslintDisable = true;
         settings.newline = "\n";
         return settings;
     }

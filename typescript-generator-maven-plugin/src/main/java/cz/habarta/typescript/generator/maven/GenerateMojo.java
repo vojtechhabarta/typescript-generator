@@ -502,6 +502,14 @@ public class GenerateMojo extends AbstractMojo {
     private boolean noTslintDisable;
 
     /**
+     * If <code>true</code> generated file will not be prevented from linting by ESLint.
+     * By default there is a {@code eslint-disable} comment that will force ESLint to ignore the generated file.
+     * This can be enabled to suppress this comment so that the file can be linted by ESLint.
+     */
+    @Parameter
+    private boolean noEslintDisable;
+
+    /**
      * List of Javadoc XML files to search for documentation comments.
      * These files should be created using <code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from <code>com.github.markusbernhardt:xml-doclet</code> artifact.
      * Javadoc comments are added to output declarations as JSDoc comments.
@@ -728,6 +736,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.sortTypeDeclarations = sortTypeDeclarations;
             settings.noFileComment = noFileComment;
             settings.noTslintDisable = noTslintDisable;
+            settings.noEslintDisable = noEslintDisable;
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions, extensionsWithConfiguration);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
