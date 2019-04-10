@@ -462,27 +462,28 @@ public class Jackson2Parser extends ModelParser {
         final List<EnumMemberModel> enumMembers = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             final Class<?> enumClass = (Class<?>) sourceClass.type;
-
-            try {
-                final Field[] allEnumFields = enumClass.getDeclaredFields();
-                final List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
-                for (Field constant : constants) {
+            final Field[] allEnumFields = enumClass.getDeclaredFields();
+            final List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
+            for (Field constant : constants) {
+                Object value;
+                try {
                     constant.setAccessible(true);
                     final String enumJson = objectMapper.writeValueAsString(constant.get(null));
-                    final Object value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
-
-                    final List<String> constantComments = getComments(constant.getAnnotation(JsonPropertyDescription.class));
-                    if (value instanceof String) {
-                        enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, constantComments));
-                    } else if (value instanceof Number) {
-                        enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, constantComments));
-                    } else {
-                        TypeScriptGenerator.getLogger().warning(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
-                    }
+                    value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
+                } catch (Throwable e) {
+                    TypeScriptGenerator.getLogger().error(String.format("Cannot get enum value for constant '%s.%s'", enumClass.getName(), constant.getName()));
+                    TypeScriptGenerator.getLogger().verbose(Utils.exceptionToString(e));
+                    value = constant.getName();
                 }
-            } catch (Exception e) {
-                TypeScriptGenerator.getLogger().error(String.format("Cannot get enum values for '%s' enum", enumClass.getName()));
-                e.printStackTrace(System.out);
+
+                final List<String> constantComments = getComments(constant.getAnnotation(JsonPropertyDescription.class));
+                if (value instanceof String) {
+                    enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, constantComments));
+                } else if (value instanceof Number) {
+                    enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, constantComments));
+                } else {
+                    TypeScriptGenerator.getLogger().warning(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
+                }
             }
         }
 
