@@ -98,6 +98,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classes;
 
     /**
+     * Limit processing of classes only to specified base packages.
+     * This does not limit classes explicitly specified by name using "classes".
+     */
+    @Parameter
+    private List<String> whitelistPackages;
+
+    /**
      * Classes to process specified using glob patterns
      * so it is possible to specify package or class name suffix.
      * Glob patterns support two wildcards:
@@ -768,7 +775,7 @@ public class GenerateMojo extends AbstractMojo {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations,
+                    Input.fromClassNamesAndJaxrsApplication(classes, whitelistPackages, classPatterns, classesWithAnnotations,
                         classesImplementingInterfaces, classesExtendingClasses,
                         classesFromJaxrsApplication,
                         classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(),

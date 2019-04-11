@@ -22,6 +22,7 @@ public class GenerateTask extends DefaultTask {
     public String umdNamespace;
     public List<ModuleDependency> moduleDependencies;
     public List<String> classes;
+    public List<String> whitelistPackages;
     public List<String> classPatterns;
     public List<String> classesWithAnnotations;
     public List<String> classesImplementingInterfaces;
@@ -195,7 +196,7 @@ public class GenerateTask extends DefaultTask {
 
             // TypeScriptGenerator
             new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations,
+                    Input.fromClassNamesAndJaxrsApplication(classes, whitelistPackages, classPatterns, classesWithAnnotations,
                         classesImplementingInterfaces, classesExtendingClasses,
                         classesFromJaxrsApplication,
                         classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(),

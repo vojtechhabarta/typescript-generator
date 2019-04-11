@@ -39,14 +39,14 @@ public class Input {
         return new Input(sourceTypes);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> whitelistPackages, List<String> classNamePatterns, String jaxrsApplicationClassName,
             boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
-        return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, null, null,
+        return fromClassNamesAndJaxrsApplication(classNames, whitelistPackages, classNamePatterns, null, null, null,
             jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader,
             debug);
     }
 
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames,
+    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> whitelistPackages,
         List<String> classNamePatterns, List<String> classesWithAnnotations,
         List<String> classesImplementingInterfaces, List<String> classesExtendingClasses,
         String jaxrsApplicationClassName,
@@ -57,7 +57,7 @@ public class Input {
             if (classLoader != null) {
                 Thread.currentThread().setContextClassLoader(classLoader);
             }
-            try (final ClasspathScanner classpathScanner = new ClasspathScanner(classLoader, debug)) {
+            try (final ClasspathScanner classpathScanner = new ClasspathScanner(classLoader, whitelistPackages, debug)) {
                 final List<SourceType<Type>> types = new ArrayList<>();
                 if (classNames != null) {
                     types.addAll(fromClassNames(classNames));
@@ -116,11 +116,13 @@ public class Input {
     private static class ClasspathScanner implements AutoCloseable {
 
         private final URLClassLoader classLoader;
+        private List<String> whitelistPackages;
         private final boolean verbose;
         private ScanResult scanResult = null;
 
-        public ClasspathScanner(URLClassLoader classLoader, boolean verbose) {
+        public ClasspathScanner(URLClassLoader classLoader, List<String> whitelistPackages, boolean verbose) {
             this.classLoader = classLoader;
+            this.whitelistPackages = whitelistPackages;
             this.verbose = verbose;
         }
 
@@ -131,6 +133,9 @@ public class Input {
                 ClassGraph classGraph = new ClassGraph().enableAllInfo();
                 if (classLoader != null) {
                     classGraph = classGraph.overrideClasspath((Object[])classLoader.getURLs());
+                }
+                if (whitelistPackages != null) {
+                    classGraph = classGraph.whitelistPackages(whitelistPackages.toArray(new String[0]));
                 }
                 if (verbose) {
                     classGraph = classGraph.verbose();

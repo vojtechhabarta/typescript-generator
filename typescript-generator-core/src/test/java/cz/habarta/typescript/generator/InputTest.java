@@ -66,16 +66,27 @@ public class InputTest {
     }
 
     @Test
+    public void testWhitelistPackages() {
+        final List<String> whitelistedPackages = Arrays.asList("cz.habarta.typescript.generator.p1", "cz.habarta.typescript.generator.p2");
+        final List<String> classPatterns = Arrays.asList("**.A*", "**.B*", "**.InputTest");
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
+                null, whitelistedPackages, classPatterns, null, null, null, null, false, null, null, false));
+        Assert.assertEquals(3, output.split("interface").length);
+        Assert.assertTrue(output.contains("sa: string;"));
+        Assert.assertTrue(output.contains("sb: string;"));
+    }
+
+    @Test
     public void testClassesWithAnnotations() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, Arrays.asList(MyJsonClass.class.getName()), null, null, null, false, null, null, false));
+                null, null, null, Arrays.asList(MyJsonClass.class.getName()), null, null, null, false, null, null, false));
         Assert.assertTrue(output.contains("name: string;"));
     }
 
     @Test
     public void testClassesImplementingInterfaces() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, null, Arrays.asList(MyJsonInterface.class.getName()), null, null, false, null, null, false));
+                null, null, null, null, Arrays.asList(MyJsonInterface.class.getName()), null, null, false, null, null, false));
         Assert.assertTrue(output.contains("firstName: string;"));
         Assert.assertTrue(output.contains("lastName: string;"));
     }
@@ -83,7 +94,7 @@ public class InputTest {
     @Test
     public void testClassesExtendingClasses() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, null, null, Arrays.asList(MyJsonInterfaceImpl.class.getName()), null, false, null, null, false));
+                null, null, null, null, null, Arrays.asList(MyJsonInterfaceImpl.class.getName()), null, false, null, null, false));
         Assert.assertTrue(output.contains("lastName: string;"));
     }
 
