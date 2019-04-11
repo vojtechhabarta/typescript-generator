@@ -68,15 +68,23 @@ public class InputTest {
     @Test
     public void testClassesWithAnnotations() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, Arrays.asList(MyJsonClass.class.getName()), null, null, false, null, null, false));
+                null, null, Arrays.asList(MyJsonClass.class.getName()), null, null, null, false, null, null, false));
         Assert.assertTrue(output.contains("name: string;"));
     }
 
     @Test
     public void testClassesImplementingInterfaces() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, null, Arrays.asList(MyJsonInterface.class.getName()), null, false, null, null, false));
+                null, null, null, Arrays.asList(MyJsonInterface.class.getName()), null, null, false, null, null, false));
         Assert.assertTrue(output.contains("firstName: string;"));
+        Assert.assertTrue(output.contains("lastName: string;"));
+    }
+
+    @Test
+    public void testClassesExtendingClasses() {
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
+                null, null, null, null, Arrays.asList(MyJsonInterfaceImpl.class.getName()), null, false, null, null, false));
+        Assert.assertTrue(output.contains("lastName: string;"));
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -88,6 +96,10 @@ public class InputTest {
 
     private static class MyJsonInterfaceImpl implements MyJsonInterface {
         public String firstName;
+    }
+
+    private static class MyJsonInterfaceSubclass extends MyJsonInterfaceImpl {
+        public String lastName;
     }
 
     @MyJsonClass
