@@ -60,7 +60,7 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.4.12</version>
+            <version>4.8.24</version>
         </dependency>
         <!--test dependencies-->
         <dependency>

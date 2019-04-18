@@ -128,7 +128,10 @@ public class Input {
             if (scanResult == null) {
                 TypeScriptGenerator.getLogger().info("Scanning classpath");
                 final Date scanStart = new Date();
-                ClassGraph classGraph = new ClassGraph().enableAllInfo();
+                ClassGraph classGraph = new ClassGraph()
+                        .enableClassInfo()
+                        .enableAnnotationInfo()
+                        .ignoreClassVisibility();
                 if (classLoader != null) {
                     classGraph = classGraph.overrideClasspath((Object[])classLoader.getURLs());
                 }
