@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -48,25 +49,14 @@ public class SAMTypeProcessor implements TypeProcessor {
             }
         }
 
-        if (javaType instanceof Class<?>) {
-            Method sam = getSAMMaybe((Class<?>) javaType);
-            if (sam != null) {
-                List<TsParameter> parameters = new ArrayList<>();
-                for (Type type : sam.getParameterTypes()) {
-                    parameters.add(new TsParameter("arg" + parameters.size(), context.processType(type).getTsType()));
-                }
-                return new Result(new TsType.FunctionType(parameters, context.processType(sam.getReturnType()).getTsType()));
-            }
-        }
-
         return null;
     }
 
     private static Method getSAMMaybe(Class<?> clazz) {
-        List<Method> methods = Arrays.stream(clazz.getMethods())
+        return Arrays.stream(clazz.getMethods())
                 .filter(m -> Modifier.isAbstract(m.getModifiers()))
-                .collect(Collectors.toList());
-        return methods.size() == 1 ? methods.get(0) : null;
+                .findFirst()
+                .orElse(null);
     }
 
 }

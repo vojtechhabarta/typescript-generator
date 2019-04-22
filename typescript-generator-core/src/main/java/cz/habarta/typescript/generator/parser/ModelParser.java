@@ -187,8 +187,8 @@ public abstract class ModelParser {
                 continue;
             }
 
-            // Only include public methods
-            if (!Modifier.isPublic(declaredMethod.getModifiers())) {
+            // Only include abstract methods
+            if (!Modifier.isAbstract(declaredMethod.getModifiers())) {
                 continue;
             }
 

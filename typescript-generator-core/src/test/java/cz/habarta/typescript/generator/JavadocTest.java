@@ -21,7 +21,7 @@ public class JavadocTest {
     public void testJavadoc() {
         final Settings settings = TestUtils.settings();
         settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
-        settings.emitMethodsInBeans = true;
+        settings.emitAbstractMethodsInBeans = true;
         final TypeProcessor typeProcessor = new DefaultTypeProcessor();
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithJavadoc.class);

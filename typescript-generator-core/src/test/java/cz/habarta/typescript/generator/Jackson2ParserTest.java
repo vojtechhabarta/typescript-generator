@@ -73,12 +73,12 @@ public class Jackson2ParserTest {
 
     @Test
     public void testMethodsInInterface() {
-        final Jackson2Parser jacksonParser = getJackson2Parser(settings -> settings.emitMethodsInBeans = true);
+        final Jackson2Parser jacksonParser = getJackson2Parser(settings -> settings.emitAbstractMethodsInBeans = true);
         final Model model = jacksonParser.parseModel(InterfaceWithMethodsAndBeanProperties.class);
         assertMethodsInInterface(model);
 
         // Now let's test w/ the setting disabled
-        final Jackson2Parser parserNoMethods = getJackson2Parser(settings -> settings.emitMethodsInBeans = false);
+        final Jackson2Parser parserNoMethods = getJackson2Parser(settings -> settings.emitAbstractMethodsInBeans = false);
         final Model modelNoMethods = parserNoMethods.parseModel(InterfaceWithMethodsAndBeanProperties.class);
 
         Assert.assertEquals(0, modelNoMethods.getBeans().get(0).getMethods().size());

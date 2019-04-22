@@ -203,7 +203,7 @@ public class Jackson2Parser extends ModelParser {
 
         List<MethodModel> methods = new ArrayList<>();
 
-        if (settings.emitMethodsInBeans) {
+        if (settings.emitAbstractMethodsInBeans) {
             processMethods(sourceClass, properties, methods);
         }
 
