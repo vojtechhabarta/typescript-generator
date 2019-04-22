@@ -15,19 +15,24 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import java.util.Objects;
 import static java.util.stream.Collectors.toMap;
 
 public class SAMTypeProcessor implements TypeProcessor {
+
+
+    private EmitSAMStrictness emitSAMs;
+
+    public SAMTypeProcessor(EmitSAMStrictness emitSAMs) {
+        this.emitSAMs = emitSAMs;
+    }
 
     @Override
     public Result processType(Type javaType, Context context) {
 
         if (javaType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
-            if (parameterizedType.getRawType() instanceof Class) {
+            if (parameterizedType.getRawType() instanceof Class && isValid((Class<?>) parameterizedType.getRawType())) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
                 Method sam = getSAMMaybe(javaClass);
                 if (sam != null) {
@@ -49,7 +54,29 @@ public class SAMTypeProcessor implements TypeProcessor {
             }
         }
 
+        //Allow non-paramaterized SAM classes to be emitted if annotated properly
+        if (emitSAMs.equals(EmitSAMStrictness.byClassDefinitionAndAnnotation)) {
+            if (javaType instanceof Class<?> && isValid((Class<?>) javaType)) {
+                Method sam = getSAMMaybe((Class<?>) javaType);
+                if (sam != null) {
+                    List<TsParameter> parameters = new ArrayList<>();
+                    for (Type type : sam.getParameterTypes()) {
+                        parameters
+                                .add(new TsParameter("arg" + parameters.size(), context.processType(type).getTsType()));
+                    }
+                    return new Result(new TsType.FunctionType(parameters,
+                                                              context.processType(sam.getReturnType()).getTsType()));
+                }
+            }
+        }
+
         return null;
+    }
+
+    private boolean isValid(Class javaClass) {
+        return !emitSAMs.equals(EmitSAMStrictness.byClassDefinitionAndAnnotation) ||
+                Arrays.stream(javaClass.getAnnotations())
+                        .anyMatch(a -> Objects.equals(a.annotationType(), FunctionalInterface.class));
     }
 
     private static Method getSAMMaybe(Class<?> clazz) {

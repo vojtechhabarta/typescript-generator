@@ -83,7 +83,7 @@ public class GenerateTask extends DefaultTask {
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
     public boolean emitAbstractMethodsInBeans;
-    public boolean emitSAMSs;
+    public EmitSAMStrictness emitSAMSs;
     @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
 

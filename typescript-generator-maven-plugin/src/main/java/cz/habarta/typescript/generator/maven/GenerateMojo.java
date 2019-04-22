@@ -613,9 +613,13 @@ public class GenerateMojo extends AbstractMojo {
     private boolean emitAbstractMethodsInBeans;
 
     /**
-     * If <code>true</code>, emit classes that contain a SAM (Single Abstract Method) as a typescript function signature for the abstract method.
-     * Only parameterized types are considered.
-     * If <code>false</code>, this type processor is disabled, SAM classes will receive no special treatment.
+     * If <code>byClassDefinitionOnly</code>, emit all SAM (Single Abstract Method) classes as a typescript function signature for the abstract method.
+     *   Only parameterized types are considered.
+     *
+     * If <code>byClassDefinitionAndAnnotation</code>, emit SAM classes as a typescript function signature for the abstract method.
+     *   Classes must be annotated with @FunctionalInterface. Both parameterized and non-parameterized types are considered.
+     *
+     * If <code>noEmitSAM</code>, do not emit SAM classes as a typescript function signature.
      *
      * Note: Currently argument names are not preserved by this process.
      *       Argument names are mapped to the string "arg" prepended by the arity index of the argument.
@@ -628,7 +632,7 @@ public class GenerateMojo extends AbstractMojo {
      *     itoa: (arg0: number) => string
      */
     @Parameter
-    private boolean emitSAMs;
+    private EmitSAMStrictness emitSAMs;
 
     /**
      * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
@@ -657,6 +661,9 @@ public class GenerateMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private String projectBuildDirectory;
+
+    public GenerateMojo() {
+    }
 
     @Override
     public void execute() {

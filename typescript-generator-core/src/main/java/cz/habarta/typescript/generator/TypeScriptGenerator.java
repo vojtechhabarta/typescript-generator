@@ -9,7 +9,6 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-
 public class TypeScriptGenerator {
 
     public static final String Version = getVersion();
@@ -125,8 +124,8 @@ public class TypeScriptGenerator {
                 processors.add(settings.customTypeProcessor);
             }
             processors.add(new CustomMappingTypeProcessor(settings.customTypeMappings));
-            if (settings.emitSAMs) {
-                processors.add(new SAMTypeProcessor());
+            if (!settings.emitSAMs.equals(EmitSAMStrictness.noEmitSAM)) {
+                processors.add(new SAMTypeProcessor(settings.emitSAMs));
             }
             processors.add(new DefaultTypeProcessor());
             typeProcessor = new TypeProcessor.Chain(processors);
