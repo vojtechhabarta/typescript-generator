@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -97,6 +98,12 @@ public class Utils {
     public static List<Method> getAllMethods(Class<?> cls) {
         return getInheritanceChain(cls)
                 .flatMap(c -> Stream.of(c.getDeclaredMethods()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Field> getAllFields(Class<?> cls) {
+        return getInheritanceChain(cls)
+                .flatMap(c -> Stream.of(c.getDeclaredFields()))
                 .collect(Collectors.toList());
     }
 

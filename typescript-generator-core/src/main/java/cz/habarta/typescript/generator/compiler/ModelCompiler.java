@@ -74,10 +74,10 @@ public class ModelCompiler {
                     .filter(restApplication -> restApplication.getType().generateClient.apply(settings))
                     .collect(Collectors.toList());
             if (!restApplicationsWithInterface.isEmpty()) {
-                tsModel = createRestInterfaces(symbolTable, tsModel, restApplicationsWithInterface, responseSymbol, optionsGenericVariable, optionsType);
+                createRestInterfaces(tsModel, symbolTable, restApplicationsWithInterface, responseSymbol, optionsGenericVariable, optionsType);
             }
             if (!restApplicationsWithClient.isEmpty()) {
-                tsModel = createRestClients(symbolTable, tsModel, restApplicationsWithClient, responseSymbol, optionsGenericVariable, optionsType);
+                createRestClients(tsModel, symbolTable, restApplicationsWithClient, responseSymbol, optionsGenericVariable, optionsType);
             }
         }
 
@@ -209,7 +209,7 @@ public class ModelCompiler {
             extendsList.addAll(interfaces);
         }
 
-        final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean, "", "");
+        final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean);
 
         if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
             final List<BeanModel> selfAndDescendants = getSelfAndDescendants(bean, children);
@@ -252,6 +252,10 @@ public class ModelCompiler {
             typeParameters.add(new TsType.GenericVariableType(typeParameter.getName()));
         }
         return typeParameters;
+    }
+
+    private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean) {
+        return processProperties(symbolTable, model, bean, "", "");
     }
 
     private List<TsPropertyModel> processProperties(SymbolTable symbolTable, Model model, BeanModel bean, String prefix, String suffix) {
@@ -444,18 +448,17 @@ public class ModelCompiler {
         return responseSymbol;
     }
 
-    private TsModel createRestInterfaces(SymbolTable symbolTable, TsModel tsModel, List<RestApplicationModel> restApplications,
+    private void createRestInterfaces(TsModel tsModel, SymbolTable symbolTable, List<RestApplicationModel> restApplications,
             Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
-        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(restApplications, symbolTable, null, responseSymbol, optionsType, false);
+        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(tsModel, restApplications, symbolTable, null, responseSymbol, optionsType, false);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, null, entry.getValue(), null);
             tsModel.getBeans().add(interfaceModel);
         }
-        return tsModel;
     }
 
-    private TsModel createRestClients(SymbolTable symbolTable, TsModel tsModel, List<RestApplicationModel> restApplications,
+    private void createRestClients(TsModel tsModel, SymbolTable symbolTable, List<RestApplicationModel> restApplications,
             Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
         final Symbol httpClientSymbol = symbolTable.getSyntheticSymbol("HttpClient");
         final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
@@ -487,7 +490,7 @@ public class ModelCompiler {
         );
         final boolean bothInterfacesAndClients = settings.generateJaxrsApplicationInterface || settings.generateSpringApplicationInterface;
         final String groupingSuffix = bothInterfacesAndClients ? null : "Client";
-        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(restApplications, symbolTable, groupingSuffix, responseSymbol, optionsType, true);
+        final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(tsModel, restApplications, symbolTable, groupingSuffix, responseSymbol, optionsType, true);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final Symbol symbol = bothInterfacesAndClients ? symbolTable.addSuffixToSymbol(entry.getKey(), "Client") : entry.getKey();
             final TsType interfaceType = bothInterfacesAndClients ? new TsType.ReferenceType(entry.getKey()) : null;
@@ -497,26 +500,25 @@ public class ModelCompiler {
         }
         // helper
         tsModel.getHelpers().add(TsHelper.loadFromResource("/helpers/uriEncoding.ts"));
-        return tsModel;
     }
 
-    private Map<Symbol, List<TsMethodModel>> processRestMethods(List<RestApplicationModel> restApplications, SymbolTable symbolTable, String nameSuffix, Symbol responseSymbol, TsType optionsType, boolean implement) {
+    private Map<Symbol, List<TsMethodModel>> processRestMethods(TsModel tsModel, List<RestApplicationModel> restApplications, SymbolTable symbolTable, String nameSuffix, Symbol responseSymbol, TsType optionsType, boolean implement) {
         final Map<Symbol, List<TsMethodModel>> result = new LinkedHashMap<>();
         final Map<Symbol, List<Pair<RestApplicationModel, RestMethodModel>>> groupedMethods = groupingByMethodContainer(restApplications, symbolTable, nameSuffix);
         for (Map.Entry<Symbol, List<Pair<RestApplicationModel, RestMethodModel>>> entry : groupedMethods.entrySet()) {
-            result.put(entry.getKey(), processRestMethodGroup(entry.getValue(), symbolTable, responseSymbol, optionsType, implement));
+            result.put(entry.getKey(), processRestMethodGroup(tsModel, symbolTable, entry.getValue(), responseSymbol, optionsType, implement));
         }
         return result;
     }
 
-    private List<TsMethodModel> processRestMethodGroup(List<Pair<RestApplicationModel, RestMethodModel>> methods, SymbolTable symbolTable, Symbol responseSymbol, TsType optionsType, boolean implement) {
+    private List<TsMethodModel> processRestMethodGroup(TsModel tsModel, SymbolTable symbolTable, List<Pair<RestApplicationModel, RestMethodModel>> methods, Symbol responseSymbol, TsType optionsType, boolean implement) {
         final List<TsMethodModel> resultMethods = new ArrayList<>();
         final Map<String, Long> methodNamesCount = groupingByMethodName(methods);
         for (Pair<RestApplicationModel, RestMethodModel> pair : methods) {
             final RestApplicationModel restApplication = pair.getValue1();
             final RestMethodModel method = pair.getValue2();
             final boolean createLongName = methodNamesCount.get(method.getName()) > 1;
-            resultMethods.add(processRestMethod(symbolTable, restApplication.getApplicationPath(), responseSymbol, method, createLongName, optionsType, implement));
+            resultMethods.add(processRestMethod(tsModel, symbolTable, restApplication.getApplicationPath(), responseSymbol, method, createLongName, optionsType, implement));
         }
         return resultMethods;
     }
@@ -560,7 +562,7 @@ public class ModelCompiler {
                 .collect(Collectors.groupingBy(RestMethodModel::getName, Collectors.counting()));
     }
 
-    private TsMethodModel processRestMethod(SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, RestMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
+    private TsMethodModel processRestMethod(TsModel tsModel, SymbolTable symbolTable, String pathPrefix, Symbol responseSymbol, RestMethodModel method, boolean createLongName, TsType optionsType, boolean implement) {
         final String path = Utils.joinPath(pathPrefix, method.getPath());
         final PathTemplate pathTemplate = PathTemplate.parse(path);
         final List<String> comments = Utils.concat(method.getComments(), Arrays.asList(
@@ -577,15 +579,48 @@ public class ModelCompiler {
             parameters.add(processParameter(symbolTable, method, method.getEntityParam()));
         }
         // query params
-        final List<MethodParameterModel> queryParams = method.getQueryParams();
+        final List<RestQueryParam> queryParams = method.getQueryParams();
         final TsParameterModel queryParameter;
         if (queryParams != null && !queryParams.isEmpty()) {
-            final List<TsProperty> properties = new ArrayList<>();
-            for (MethodParameterModel queryParam : queryParams) {
-                final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                properties.add(new TsProperty(queryParam.getName(), new TsType.OptionalType(type)));
+            final List<TsType> types = new ArrayList<>();
+            final List<TsProperty> currentSingles = new ArrayList<>();
+            final Runnable flushSingles = () -> {
+                if (!currentSingles.isEmpty()) {
+                    types.add(new TsType.ObjectType(currentSingles));
+                    currentSingles.clear();
+                }
+            };
+            for (RestQueryParam restQueryParam : queryParams) {
+                if (restQueryParam instanceof RestQueryParam.Single) {
+                    final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
+                    final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
+                    currentSingles.add(new TsProperty(queryParam.getName(), new TsType.OptionalType(type)));
+                }
+                if (restQueryParam instanceof RestQueryParam.Bean) {
+                    final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
+                    flushSingles.run();
+                    final Symbol queryParamsSymbol = symbolTable.getSymbol(queryBean.getOrigin(), "QueryParams");
+                    if (tsModel.getBean(queryParamsSymbol) == null) {
+                        tsModel.getBeans().add(new TsBeanModel(
+                                queryBean.getOrigin(),
+                                TsBeanCategory.Data,
+                                /*isClass*/false,
+                                queryParamsSymbol,
+                                /*typeParameters*/null,
+                                /*parent*/null,
+                                /*extendsList*/null,
+                                /*implementsList*/null,
+                                processProperties(symbolTable, null, queryBean),
+                                /*constructor*/null,
+                                /*methods*/null,
+                                /*comments*/null
+                        ));
+                    }
+                    types.add(new TsType.ReferenceType(queryParamsSymbol));
+                }
             }
-            queryParameter = new TsParameterModel("queryParams", new TsType.OptionalType(new TsType.ObjectType(properties)));
+            flushSingles.run();
+            queryParameter = new TsParameterModel("queryParams", new TsType.OptionalType(new TsType.IntersectionType(types)));
             parameters.add(queryParameter);
         } else {
             queryParameter = null;

@@ -7,6 +7,10 @@ import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -163,12 +167,23 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 }
             }
             // query parameters
-            final List<MethodParameterModel> queryParams = new ArrayList<>();
+            final List<RestQueryParam> queryParams = new ArrayList<>();
             for (Parameter param : method.getParameters()) {
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
-                    queryParams.add(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType())));
                     foundType(result, param.getParameterizedType(), resourceClass, method.getName());
+                }
+                final BeanParam beanParamAnnotation = param.getAnnotation(BeanParam.class);
+                if (beanParamAnnotation != null) {
+                    final Class<?> beanParamClass = param.getType();
+                    final BeanModel paramBean = getQueryParameters(beanParamClass);
+                    if (paramBean != null) {
+                        queryParams.add(new RestQueryParam.Bean(paramBean));
+                        for (PropertyModel property : paramBean.getProperties()) {
+                            foundType(result, property.getType(), beanParamClass, property.getName());
+                        }
+                    }
                 }
             }
             // JAX-RS specification - 3.3.2.1 Entity Parameters
@@ -227,6 +242,36 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             }
         }
         return null;
+    }
+
+    private static BeanModel getQueryParameters(Class<?> paramBean) {
+        final List<PropertyModel> properties = new ArrayList<>();
+        final List<Field> fields = Utils.getAllFields(paramBean);
+        for (Field field : fields) {
+            final QueryParam annotation = field.getAnnotation(QueryParam.class);
+            if (annotation != null) {
+                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, field, null, null, null));
+            }
+        }
+        try {
+            final BeanInfo beanInfo = Introspector.getBeanInfo(paramBean);
+            for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+                final Method writeMethod = propertyDescriptor.getWriteMethod();
+                if (writeMethod != null) {
+                    final QueryParam annotation = writeMethod.getAnnotation(QueryParam.class);
+                    if (annotation != null) {
+                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, writeMethod, null, null, null));
+                    }
+                }
+            }
+        } catch (IntrospectionException e) {
+            TypeScriptGenerator.getLogger().warning(String.format("Cannot introspect '%s' class: " + e.getMessage(), paramBean));
+        }
+        if (properties.isEmpty()) {
+            return null;
+        } else {
+            return new BeanModel(paramBean, null, null, null, null, null, properties, null);
+        }
     }
 
     private static MethodParameterModel getEntityParameter(Method method) {

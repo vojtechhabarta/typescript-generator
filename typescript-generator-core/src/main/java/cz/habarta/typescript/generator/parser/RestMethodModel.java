@@ -11,11 +11,11 @@ public class RestMethodModel extends MethodModel {
     private final String httpMethod;
     private final String path;
     private final List<MethodParameterModel> pathParams;
-    private final List<MethodParameterModel> queryParams;
+    private final List<RestQueryParam> queryParams;
     private final MethodParameterModel entityParam;
 
     public RestMethodModel(Class<?> originClass, String name, Type returnType,
-            Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<MethodParameterModel> queryParams, MethodParameterModel entityParam,
+            Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<RestQueryParam> queryParams, MethodParameterModel entityParam,
             List<String> comments) {
         super(originClass, name, null, returnType, comments);
         this.rootResource = rootResource;
@@ -42,7 +42,7 @@ public class RestMethodModel extends MethodModel {
         return pathParams;
     }
 
-    public List<MethodParameterModel> getQueryParams() {
+    public List<RestQueryParam> getQueryParams() {
         return queryParams;
     }
 

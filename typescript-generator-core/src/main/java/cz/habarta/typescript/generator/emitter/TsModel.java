@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.compiler.EnumKind;
+import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.*;
 
@@ -37,6 +38,17 @@ public class TsModel {
         if (origin != null) {
             for (TsBeanModel bean : beans) {
                 if (Objects.equals(bean.getOrigin(), origin)) {
+                    return bean;
+                }
+            }
+        }
+        return null;
+    }
+
+    public TsBeanModel getBean(Symbol name) {
+        if (name != null) {
+            for (TsBeanModel bean : beans) {
+                if (Objects.equals(bean.getName(), name)) {
                     return bean;
                 }
             }

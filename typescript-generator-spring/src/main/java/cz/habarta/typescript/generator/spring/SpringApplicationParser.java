@@ -12,6 +12,7 @@ import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.parser.RestApplicationType;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
+import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Method;
@@ -192,11 +193,11 @@ public class SpringApplicationParser extends RestApplicationParser {
                     .collect(Collectors.toList());
 
             // query parameters
-            final List<MethodParameterModel> queryParams = new ArrayList<>();
+            final List<RestQueryParam> queryParams = new ArrayList<>();
             for (Parameter param : method.getParameters()) {
                 final RequestParam requestParamAnnotation = param.getAnnotation(RequestParam.class);
                 if (requestParamAnnotation != null) {
-                    queryParams.add(new MethodParameterModel(requestParamAnnotation.value(), param.getParameterizedType()));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(requestParamAnnotation.value(), param.getParameterizedType())));
                     foundType(result, param.getParameterizedType(), controllerClass, method.getName());
                 }
             }

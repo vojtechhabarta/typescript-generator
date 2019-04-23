@@ -528,8 +528,52 @@ public class JaxrsApplicationTest {
         Target1, Target2
     }
 
+    @Test
+    public void testBeanParam() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        settings.generateJaxrsApplicationClient = true;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanParamResource.class));
+        Assert.assertTrue(output.contains("interface SearchParams1QueryParams"));
+        Assert.assertTrue(output.contains("interface SearchParams2QueryParams"));
+        Assert.assertTrue(output.contains("queryParams?: SearchParams1QueryParams & SearchParams2QueryParams & { message?: string; }"));
+    }
+
+    public static class SearchParams1 {
+        @QueryParam("id")
+        private Integer id;
+
+        @QueryParam("name")
+        private String name;
+    }
+
+    public static class SearchParams2 {
+        private String description;
+        @QueryParam("description")
+        public void setDescription(String description) {
+            this.description = description;
+        }
+    }
+
+//    http://localhost:9998/bean-param?id=1&name=vh&description=desc&message=hello
+
+    @Path("bean-param")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static class BeanParamResource {
+
+        @GET
+        public List<String> getItems(
+                @BeanParam SearchParams1 params1,
+                @BeanParam SearchParams2 params2,
+                @QueryParam("message") String message
+        ) {
+            return Collections.emptyList();
+        }
+    }
+
     public static void main(String[] args) {
-        final ResourceConfig config = new ResourceConfig(NameConflictResource.class);
+        final ResourceConfig config = new ResourceConfig(BeanParamResource.class);
         JdkHttpServerFactory.createHttpServer(URI.create("http://localhost:9998/"), config);
         System.out.println("Jersey started.");
     }

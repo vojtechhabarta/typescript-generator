@@ -23,6 +23,7 @@ public abstract class TsType implements Emittable {
     public static final TsType Undefined = new BasicType("undefined");
     public static final TsType Null = new BasicType("null");
     public static final TsType Never = new BasicType("never");
+    public static final TsType Unknown = new BasicType("unknown");
 
     @Override
     public boolean equals(Object rhs) {
@@ -70,7 +71,7 @@ public abstract class TsType implements Emittable {
 
         public GenericBasicType(String name, List<? extends TsType> typeArguments) {
             super(name);
-            this.typeArguments = new ArrayList<TsType>(typeArguments);
+            this.typeArguments = new ArrayList<>(typeArguments);
         }
 
         @Override
@@ -121,7 +122,7 @@ public abstract class TsType implements Emittable {
 
         public GenericReferenceType(Symbol symbol, List<? extends TsType> typeArguments) {
             super(symbol);
-            this.typeArguments = new ArrayList<TsType>(typeArguments);
+            this.typeArguments = new ArrayList<>(typeArguments);
         }
 
         @Override
@@ -189,7 +190,7 @@ public abstract class TsType implements Emittable {
         }
 
         public UnionType(List<? extends TsType> types) {
-            this.types = new ArrayList<TsType>(new LinkedHashSet<TsType>(types));
+            this.types = new ArrayList<>(new LinkedHashSet<>(types));
         }
 
         @Override
@@ -197,6 +198,27 @@ public abstract class TsType implements Emittable {
             return types.isEmpty()
                     ? Never.format(settings)
                     : Emitter.formatList(settings, types, " | ");
+        }
+
+    }
+
+    public static class IntersectionType extends TsType {
+
+        public final List<TsType> types;
+
+        public IntersectionType(TsType... types) {
+            this(Arrays.asList(types));
+        }
+
+        public IntersectionType(List<? extends TsType> types) {
+            this.types = new ArrayList<>(new LinkedHashSet<>(types));
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return types.isEmpty()
+                    ? Unknown.format(settings)
+                    : Emitter.formatList(settings, types, " & ");
         }
 
     }
@@ -240,7 +262,7 @@ public abstract class TsType implements Emittable {
         }
 
         public ObjectType(List<TsProperty> properties) {
-            this.properties = properties;
+            this.properties = new ArrayList<>(properties);
         }
 
         @Override
@@ -264,7 +286,7 @@ public abstract class TsType implements Emittable {
         public final TsType type;
 
         public FunctionType(List<TsParameter> parameters, TsType type) {
-            this.parameters = parameters;
+            this.parameters = new ArrayList<>(parameters);
             this.type = type;
         }
 
@@ -306,6 +328,22 @@ public abstract class TsType implements Emittable {
             return new TsType.IndexedArrayType(
                     transformTsType(context, indexedArrayType.indexType, transformer),
                     transformTsType(context, indexedArrayType.elementType, transformer));
+        }
+        if (type instanceof TsType.UnionType) {
+            final TsType.UnionType unionType = (TsType.UnionType) type;
+            final List<TsType> types = new ArrayList<>();
+            for (TsType constituentType : unionType.types) {
+                types.add(transformTsType(context, constituentType, transformer));
+            }
+            return new TsType.UnionType(types);
+        }
+        if (type instanceof TsType.IntersectionType) {
+            final TsType.IntersectionType intersectionType = (TsType.IntersectionType) type;
+            final List<TsType> types = new ArrayList<>();
+            for (TsType constituent : intersectionType.types) {
+                types.add(transformTsType(context, constituent, transformer));
+            }
+            return new TsType.IntersectionType(types);
         }
         if (type instanceof TsType.ObjectType) {
             final TsType.ObjectType objectType = (TsType.ObjectType) type;
