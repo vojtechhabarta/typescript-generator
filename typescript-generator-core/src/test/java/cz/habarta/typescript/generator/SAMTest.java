@@ -5,7 +5,6 @@
 
 package cz.habarta.typescript.generator;
 
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -94,7 +93,7 @@ public class SAMTest {
 
     private static void testOutput(Class<?> inputClass, String expected) {
         final Settings settings = TestUtils.settings();
-        settings.emitSAMs = EmitSAMStrictness.byClassDefinitionAndAnnotation;
+        settings.emitSAMs = EmitSAMStrictness.byAnnotationOnly;
         settings.emitAbstractMethodsInBeans = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.mapClasses = ClassMapping.asInterfaces;

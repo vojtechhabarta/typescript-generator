@@ -613,10 +613,10 @@ public class GenerateMojo extends AbstractMojo {
     private boolean emitAbstractMethodsInBeans;
 
     /**
-     * If <code>byClassDefinitionOnly</code>, emit all SAM (Single Abstract Method) classes as a typescript function signature for the abstract method.
+     * If <code>anyValidSam</code>, emit all SAM (Single Abstract Method) classes as a typescript function signature for the abstract method.
      *   Only parameterized types are considered.
      *
-     * If <code>byClassDefinitionAndAnnotation</code>, emit SAM classes as a typescript function signature for the abstract method.
+     * If <code>byAnnotationOnly</code>, emit SAM classes as a typescript function signature for the abstract method.
      *   Classes must be annotated with @FunctionalInterface. Both parameterized and non-parameterized types are considered.
      *
      * If <code>noEmitSAM</code>, do not emit SAM classes as a typescript function signature.
