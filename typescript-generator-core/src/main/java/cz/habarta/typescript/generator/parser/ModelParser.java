@@ -177,8 +177,8 @@ public abstract class ModelParser {
         return false;
     }
 
-    protected void processAbstractMethods(SourceType<Class<?>> sourceClass, List<PropertyModel> properties,
-                                          List<MethodModel> methods) {
+    protected void processMethods(SourceType<Class<?>> sourceClass, List<PropertyModel> properties,
+                                  List<MethodModel> methods) {
         Set<String> propertyMethods = findMethodNamesForMethodProperties(properties);
 
         Method[] declaredMethods = sourceClass.type.getDeclaredMethods();

@@ -84,7 +84,7 @@ public class Jackson1Parser extends ModelParser {
         List<MethodModel> methods = new ArrayList<>();
 
         if (settings.emitAbstractMethodsInBeans) {
-            processAbstractMethods(sourceClass, properties, methods);
+            processMethods(sourceClass, properties, methods);
         }
 
         return new BeanModel(sourceClass.type, superclass, null, null, null, interfaces, properties, null, methods);

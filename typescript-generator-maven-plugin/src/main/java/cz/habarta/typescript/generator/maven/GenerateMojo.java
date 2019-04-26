@@ -605,6 +605,28 @@ public class GenerateMojo extends AbstractMojo {
     private boolean emitAbstractMethodsInBeans;
 
     /**
+     * If <code>anyValidSam</code>, emit all SAM (Single Abstract Method) classes as a typescript function signature for the abstract method.
+     *   Only parameterized types are considered.
+     *
+     * If <code>byAnnotationOnly</code>, emit SAM classes as a typescript function signature for the abstract method.
+     *   Classes must be annotated with @FunctionalInterface. Both parameterized and non-parameterized types are considered.
+     *
+     * If <code>noEmitSAM</code>, do not emit SAM classes as a typescript function signature.
+     *
+     * Note: Currently argument names are not preserved by this process.
+     *       Argument names are mapped to the string "arg" prepended by the arity index of the argument.
+     *
+     * e.g:
+     *
+     * Emit a field with type
+     *     Function<Number, String> itoa
+     * as
+     *     itoa: (arg0: number) => string
+     */
+    @Parameter
+    private EmitSAMStrictness emitSAMs;
+
+    /**
      * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
      */
     @Parameter
@@ -714,6 +736,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
             settings.emitAbstractMethodsInBeans = emitAbstractMethodsInBeans;
+            settings.emitSAMs = emitSAMs;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());
