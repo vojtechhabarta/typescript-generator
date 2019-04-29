@@ -10,6 +10,7 @@ import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
+import cz.habarta.typescript.generator.emitter.TsCallExpression;
 import cz.habarta.typescript.generator.emitter.TsConstructorModel;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
 import cz.habarta.typescript.generator.emitter.TsExpression;
@@ -22,10 +23,12 @@ import cz.habarta.typescript.generator.emitter.TsParameterModel;
 import cz.habarta.typescript.generator.emitter.TsPropertyModel;
 import cz.habarta.typescript.generator.emitter.TsStatement;
 import cz.habarta.typescript.generator.emitter.TsStringLiteral;
+import cz.habarta.typescript.generator.emitter.TsSuperExpression;
 import cz.habarta.typescript.generator.emitter.TsThisExpression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,12 +58,13 @@ public class RequiredPropertyConstructorExtension extends Extension {
 
     @Override
     public List<TransformerDefinition> getTransformers() {
-        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeSymbolResolution, new ModelTransformer() {
+        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.AfterDeclarationSorting, new ModelTransformer() {
             @Override
             public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
                 List<TsBeanModel> beans = new ArrayList<>();
+                Map<String, TsConstructorModel> generatedConstructors = new HashMap<>();
                 for (TsBeanModel bean : model.getBeans()) {
-                    TsBeanModel newBean = transformBean(bean, model);
+                    TsBeanModel newBean = transformBean(bean, model, generatedConstructors);
                     beans.add(newBean);
                 }
                 return model.withBeans(beans);
@@ -68,25 +72,46 @@ public class RequiredPropertyConstructorExtension extends Extension {
         }));
     }
 
-    private TsBeanModel transformBean(TsBeanModel bean, TsModel model) {
+    private TsBeanModel transformBean(TsBeanModel bean, TsModel model,
+                                             Map<String, TsConstructorModel> generatedConstructors) {
         if (!bean.isClass() || bean.getConstructor() != null) {
             return bean;
         }
-        Optional<TsConstructorModel> constructorOption = createConstructor(bean, model);
+        Optional<TsConstructorModel> constructorOption = createConstructor(bean, model, generatedConstructors);
         if (!constructorOption.isPresent()) {
             return bean;
         }
         if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
             return bean;
         }
-        return bean.withConstructor(constructorOption.get());
+        TsConstructorModel constructor = constructorOption.get();
+        generatedConstructors.put(bean.getName().getFullName(), constructor);
+        return bean.withConstructor(constructor);
     }
 
-    private static Optional<TsConstructorModel> createConstructor(TsBeanModel bean, TsModel model) {
+    private static Optional<TsConstructorModel> createConstructor(TsBeanModel bean, TsModel model,
+                                                                  Map<String, TsConstructorModel> generatedConstructors) {
         List<TsParameterModel> parameters = new ArrayList<>();
         List<TsStatement> body = new ArrayList<>();
-        if (bean.getParent() != null) {
-            throw new IllegalStateException("Creating constructors for inherited beans is not currently supported");
+        TsType parent = bean.getParent();
+        if (parent != null) {
+            if (!(parent instanceof TsType.ReferenceType)) {
+                throw new IllegalStateException("Generating constructor for non-reference parent types is not currently supported");
+            }
+            TsType.ReferenceType referenceParent = (TsType.ReferenceType) parent;
+            TsConstructorModel parentConstructor = generatedConstructors.get(referenceParent.symbol.getFullName());
+            if (parentConstructor == null) {
+                throw new IllegalStateException("Generating constructor for class with non-generated constructor is not currently supported");
+            }
+            List<TsParameterModel> parentParameters = parentConstructor.getParameters();
+            TsIdentifierReference[] callParameters = new TsIdentifierReference[parentParameters.size()];
+            int i = 0;
+            for (TsParameterModel parentParameter : parentParameters) {
+                parameters.add(parentParameter);
+                callParameters[i] = new TsIdentifierReference(parentParameter.name);
+                i++;
+            }
+            body.add(new TsExpressionStatement(new TsCallExpression(new TsSuperExpression(), callParameters)));
         }
         for (TsPropertyModel property : bean.getProperties()) {
             if (!property.modifiers.isReadonly) {

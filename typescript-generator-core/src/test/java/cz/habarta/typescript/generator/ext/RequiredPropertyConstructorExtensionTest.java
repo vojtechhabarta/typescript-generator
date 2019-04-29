@@ -58,9 +58,8 @@ public class RequiredPropertyConstructorExtensionTest {
         public int field1;
     }
 
-    @JsonTypeName("class-c")
-    static class SecondClass extends PolymorphicClass {
-        public int field2;
+    static class SecondClass extends SimpleClass {
+        public int field3;
     }
 
     @Test
@@ -118,13 +117,10 @@ public class RequiredPropertyConstructorExtensionTest {
         Settings settings = createBaseSettings();
         settings.declarePropertiesAsReadOnly = true;
 
-        try {
-            generateTypeScript(settings, SecondClass.class);
-            Assert.fail("Expected exception");
-        }
-        catch (IllegalStateException expected) {
-            Assert.assertEquals("Creating constructors for inherited beans is not currently supported", expected.getMessage());
-        }
+        String result = generateTypeScript(settings, SecondClass.class);
+
+        String expected = readResource("inheritance.ts");
+        Assert.assertEquals(expected, result);
     }
 
     private static String generateTypeScript(Settings settings, Type... types) {
