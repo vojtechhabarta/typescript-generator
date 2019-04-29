@@ -27,17 +27,30 @@ import cz.habarta.typescript.generator.emitter.TsThisExpression;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Adds constructor with each required property to every generated class.
  */
 public class RequiredPropertyConstructorExtension extends Extension {
+    static final String CFG_CLASSES = "classes";
+
+    private List<String> classes;
+
     @Override
     public EmitterExtensionFeatures getFeatures() {
         EmitterExtensionFeatures features = new EmitterExtensionFeatures();
         features.generatesRuntimeCode = true;
         return features;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, String> configuration) throws RuntimeException {
+        if (configuration.containsKey(CFG_CLASSES)) {
+            classes = Arrays.asList(Pattern.compile("\\s+").split(configuration.get(CFG_CLASSES)));
+        }
     }
 
     @Override
@@ -55,12 +68,15 @@ public class RequiredPropertyConstructorExtension extends Extension {
         }));
     }
 
-    private static TsBeanModel transformBean(TsBeanModel bean, TsModel model) {
+    private TsBeanModel transformBean(TsBeanModel bean, TsModel model) {
         if (!bean.isClass() || bean.getConstructor() != null) {
             return bean;
         }
         Optional<TsConstructorModel> constructorOption = createConstructor(bean, model);
         if (!constructorOption.isPresent()) {
+            return bean;
+        }
+        if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
             return bean;
         }
         return bean.withConstructor(constructorOption.get());

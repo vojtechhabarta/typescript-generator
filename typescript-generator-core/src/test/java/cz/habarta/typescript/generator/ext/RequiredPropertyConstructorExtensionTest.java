@@ -11,6 +11,9 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,6 +24,10 @@ public class RequiredPropertyConstructorExtensionTest {
     static class SimpleClass {
         public String field1;
         public PolymorphicClass field2;
+    }
+
+    static class OtherClass {
+        public String field2;
     }
 
     static class MultipleEnumContainerClass {
@@ -58,11 +65,28 @@ public class RequiredPropertyConstructorExtensionTest {
 
     @Test
     public void testBasicWithReadOnly() {
-        Settings settings = createBaseSettings();
+        Settings settings = createBaseSettings(new RequiredPropertyConstructorExtension());
         settings.declarePropertiesAsReadOnly = true;
         String result = generateTypeScript(settings, SimpleClass.class);
 
         String expected = readResource("basicWithReadOnly.ts");
+
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void testBasicWithConfiguration() {
+        RequiredPropertyConstructorExtension extension = new RequiredPropertyConstructorExtension();
+        Map<String, String> configuration = new HashMap<>();
+        String classes = SimpleClass.class.getCanonicalName() + " " + OtherClass.class.getCanonicalName();
+        configuration.put(RequiredPropertyConstructorExtension.CFG_CLASSES, classes);
+        extension.setConfiguration(configuration);
+
+        Settings settings = createBaseSettings(extension);
+        settings.declarePropertiesAsReadOnly = true;
+        String result = generateTypeScript(settings, SimpleClass.class, OtherClass.class);
+
+        String expected = readResource("basicWithConfiguration.ts");
 
         Assert.assertEquals(expected, result);
     }
@@ -110,9 +134,13 @@ public class RequiredPropertyConstructorExtensionTest {
     }
 
     private static Settings createBaseSettings() {
+        return createBaseSettings(new RequiredPropertyConstructorExtension());
+    }
+
+    private static Settings createBaseSettings(RequiredPropertyConstructorExtension extension) {
         Settings settings = new Settings();
         settings.sortDeclarations = true;
-        settings.extensions.add(new RequiredPropertyConstructorExtension());
+        settings.extensions.add(extension);
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
