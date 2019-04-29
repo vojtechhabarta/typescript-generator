@@ -48,6 +48,7 @@ public class ModelCompiler {
         BeforeTsModel,
         BeforeEnums,
         BeforeSymbolResolution,
+        AfterDeclarationSorting,
     }
 
     public TsModel javaToTypeScript(Model model) {
@@ -108,6 +109,7 @@ public class ModelCompiler {
         symbolTable.resolveSymbolNames();
         tsModel = removeDeclarationsImportedFromDependencies(symbolTable, tsModel);
         tsModel = sortDeclarations(symbolTable, tsModel);
+        tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.AfterDeclarationSorting, extensionTransformers);
         return tsModel;
     }
 
