@@ -19,25 +19,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
 
 
 public class SpringApplicationParser extends RestApplicationParser {
@@ -70,7 +65,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             return new SpringApplicationParser(settings, commonTypeProcessor);
         }
 
-    };
+    }
 
     public SpringApplicationParser(Settings settings, TypeProcessor commonTypeProcessor) {
         super(settings, commonTypeProcessor, new RestApplicationModel(RestApplicationType.Spring));
@@ -116,7 +111,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             parseController(result, context, cls);
             return result;
         }
-        
+
         return null;
     }
 
@@ -130,24 +125,28 @@ public class SpringApplicationParser extends RestApplicationParser {
         }
 
         public List<Class<?>> findRestControllers() {
-            try (ConfigurableApplicationContext context = createApplicationContext()) {
-                load(context, getAllSources().toArray());
-                context.refresh();
-                final List<Class<?>> classes = Stream.of(context.getBeanDefinitionNames())
-                        .map(beanName -> context.getBeanFactory().getBeanDefinition(beanName).getBeanClassName())
-                        .filter(Objects::nonNull)
-                        .filter(className -> isClassNameExcluded == null || !isClassNameExcluded.test(className))
-                        .map(className -> {
-                            try {
-                                return classLoader.loadClass(className);
-                            } catch (ClassNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .filter(instance -> instance.isAnnotationPresent(RestController.class))
-                        .collect(Collectors.toList());
-                return classes;
-            }
+            DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+            bf.setBeanClassLoader(this.classLoader);
+            ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(bf, false);
+            scanner.setResourceLoader(new DefaultResourceLoader(this.classLoader));
+            scanner.setIncludeAnnotationConfig(false);
+            scanner.addIncludeFilter(new AnnotationTypeFilter(Controller.class));
+            // TODO: Would be best to use the className/pattern includes here
+            scanner.scan("");
+
+            final List<Class<?>> classes = Stream.of(bf.getBeanDefinitionNames())
+                    .map(beanName -> bf.getBeanDefinition(beanName).getBeanClassName())
+                    .filter(Objects::nonNull)
+                    .filter(className -> isClassNameExcluded == null || !isClassNameExcluded.test(className))
+                    .map(className -> {
+                        try {
+                            return classLoader.loadClass(className);
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+            return classes;
         }
 
     }
