@@ -104,7 +104,7 @@ public class GenerateTask extends DefaultTask {
         TypeScriptGenerator.printVersion();
 
         // class loader
-        final List<URL> urls = new ArrayList<>();
+        final Set<URL> urls = new LinkedHashSet<>();
         for (Task task : getProject().getTasks()) {
             if (task.getName().startsWith("compile")) {
                 for (File file : task.getOutputs().getFiles()) {
@@ -112,9 +112,8 @@ public class GenerateTask extends DefaultTask {
                 }
             }
         }
-        for (File file : getProject().getConfigurations().getAt("compile").getFiles()) {
-            urls.add(file.toURI().toURL());
-        }
+        urls.addAll(getFilesFromConfiguration("compile"));
+        urls.addAll(getFilesFromConfiguration("compileClasspath"));
 
         try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
 
@@ -202,6 +201,19 @@ public class GenerateTask extends DefaultTask {
                         classLoader, loggingLevel == Logger.Level.Debug),
                     Output.to(output)
             );
+        }
+    }
+
+    private List<URL> getFilesFromConfiguration(String configuration) {
+        try {
+            final List<URL> urls = new ArrayList<>();
+            for (File file : getProject().getConfigurations().getAt(configuration).getFiles()) {
+                urls.add(file.toURI().toURL());
+            }
+            return urls;
+        } catch (Exception e) {
+            TypeScriptGenerator.getLogger().warning(String.format("Cannot get file names from configuration '%s': %s", configuration, e.getMessage()));
+            return Collections.emptyList();
         }
     }
 
