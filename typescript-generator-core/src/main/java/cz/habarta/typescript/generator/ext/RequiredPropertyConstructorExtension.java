@@ -74,14 +74,14 @@ public class RequiredPropertyConstructorExtension extends Extension {
 
     private TsBeanModel transformBean(TsBeanModel bean, TsModel model,
                                              Map<String, TsConstructorModel> generatedConstructors) {
+        if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
+            return bean;
+        }
         if (!bean.isClass() || bean.getConstructor() != null) {
             return bean;
         }
         Optional<TsConstructorModel> constructorOption = createConstructor(bean, model, generatedConstructors);
         if (!constructorOption.isPresent()) {
-            return bean;
-        }
-        if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
             return bean;
         }
         TsConstructorModel constructor = constructorOption.get();
