@@ -572,6 +572,27 @@ public class JaxrsApplicationTest {
         }
     }
 
+    @Test
+    public void testRegExpInPath() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationClient = true;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(RegExpResource.class));
+        System.out.println(output);
+        Assert.assertTrue(output.contains("getWithId(id: number)"));
+        Assert.assertTrue(output.contains("url: uriEncoding`objects/${id}`"));
+    }
+
+    @Path("objects")
+    public static class RegExpResource {
+        @GET
+        @Path("{id: [0-9]{1,99}}")
+//        @Path("{id: [0-9]+}")
+        public String getWithId(@PathParam("id") long id) {
+            return null;
+        }
+    }
+
     public static void main(String[] args) {
         final ResourceConfig config = new ResourceConfig(BeanParamResource.class);
         JdkHttpServerFactory.createHttpServer(URI.create("http://localhost:9998/"), config);
