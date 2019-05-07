@@ -49,7 +49,7 @@ public class SpringTest {
         settings.classLoader = Thread.currentThread().getContextClassLoader();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SpringTestApplication.class));
         Assert.assertTrue(output.contains("interface RestApplication"));
-        Assert.assertTrue(output.contains("greeting(queryParams?: { name?: string; }): RestResponse<Greeting>"));
+        Assert.assertTrue(output.contains("greeting(queryParams?: { name?: string; count?: number; }): RestResponse<Greeting>"));
         Assert.assertTrue(output.contains("interface Greeting"));
     }
 
@@ -70,7 +70,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
-        Assert.assertTrue(output.contains("echo(queryParams?: { message?: string; }): RestResponse<string>"));
+        Assert.assertTrue(output.contains("echo(queryParams?: { message?: string; count?: number; }): RestResponse<string>"));
     }
 
     @Test
@@ -97,7 +97,10 @@ public class SpringTest {
     @RequestMapping("/owners/{ownerId}")
     public static class Controller1 {
         @GetMapping("/pets/{petId}")
-        public Pet findPet(@PathVariable("ownerId") Long ownerId, @PathVariable("petId") Long petId) {
+        public Pet findPet(
+                @PathVariable("ownerId") Long ownerId,
+                @PathVariable(name = "petId") Long petId
+        ) {
             return null;
         }
     }
@@ -105,7 +108,10 @@ public class SpringTest {
     @RestController
     public static class Controller2 {
         @RequestMapping("/echo")
-        public String echo(@RequestParam("message") String message) {
+        public String echo(
+                @RequestParam("message") String message,
+                @RequestParam(name = "count", defaultValue = "1") Integer count
+        ) {
             return message;
         }
     }

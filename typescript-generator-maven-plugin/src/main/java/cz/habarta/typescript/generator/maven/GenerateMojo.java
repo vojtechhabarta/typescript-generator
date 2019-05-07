@@ -453,7 +453,7 @@ public class GenerateMojo extends AbstractMojo {
     private String restNamespacingAnnotation;
 
     /**
-     * Specifies HTTP response type in JAXRS application.
+     * Specifies HTTP response type in REST application.
      * Default value is <code>Promise&lt;R></code> which means data object returned asynchronously.
      * This parameter is useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>)
      * is returned instead of actual response data.
@@ -462,7 +462,7 @@ public class GenerateMojo extends AbstractMojo {
     private String restResponseType;
 
     /**
-     * Specifies HTTP request options type in JAXRS application.
+     * Specifies HTTP request options type in REST application.
      * By default no <code>options</code> parameter is generated.
      * Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>).
      * Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&lt;O></code>).

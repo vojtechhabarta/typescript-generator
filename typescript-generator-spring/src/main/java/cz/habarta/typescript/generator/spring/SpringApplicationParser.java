@@ -31,6 +31,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -84,10 +85,10 @@ public class SpringApplicationParser extends RestApplicationParser {
         final Class<?> cls = (Class<?>) sourceType.type;
 
         // application
-        final SpringBootApplication app = cls.getAnnotation(SpringBootApplication.class);
+        final SpringBootApplication app = AnnotationUtils.findAnnotation(cls, SpringBootApplication.class);
         if (app != null) {
-            TypeScriptGenerator.getLogger().verbose("Scanning Spring application: " + cls.getName());
             if (settings.scanSpringApplication) {
+                TypeScriptGenerator.getLogger().verbose("Scanning Spring application: " + cls.getName());
                 final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
                 try {
                     Thread.currentThread().setContextClassLoader(settings.classLoader);
@@ -106,7 +107,7 @@ public class SpringApplicationParser extends RestApplicationParser {
         }
 
         // controller
-        final RestController controller = cls.getAnnotation(RestController.class);
+        final RestController controller = AnnotationUtils.findAnnotation(cls, RestController.class);
         if (controller != null) {
             TypeScriptGenerator.getLogger().verbose("Parsing Spring RestController: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
@@ -144,7 +145,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                                 throw new RuntimeException(e);
                             }
                         })
-                        .filter(instance -> instance.isAnnotationPresent(RestController.class))
+                        .filter(instance -> AnnotationUtils.findAnnotation(instance, RestController.class) != null)
                         .collect(Collectors.toList());
                 return classes;
             }
@@ -170,7 +171,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             context = context.subPath(requestMapping.path().length == 0 ? "" : requestMapping.path()[0]);
             final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
             for (Parameter parameter : method.getParameters()) {
-                final PathVariable pathVariableAnnotation = parameter.getAnnotation(PathVariable.class);
+                final PathVariable pathVariableAnnotation = AnnotationUtils.findAnnotation(parameter, PathVariable.class);
                 if (pathVariableAnnotation != null) {
                     pathParamTypes.put(pathVariableAnnotation.value(), parameter.getParameterizedType());
                 }
@@ -195,7 +196,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             // query parameters
             final List<RestQueryParam> queryParams = new ArrayList<>();
             for (Parameter param : method.getParameters()) {
-                final RequestParam requestParamAnnotation = param.getAnnotation(RequestParam.class);
+                final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(param, RequestParam.class);
                 if (requestParamAnnotation != null) {
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel(requestParamAnnotation.value(), param.getParameterizedType())));
                     foundType(result, param.getParameterizedType(), controllerClass, method.getName());
@@ -228,7 +229,7 @@ public class SpringApplicationParser extends RestApplicationParser {
 
     private static MethodParameterModel getEntityParameter(Method method) {
         for (Parameter parameter : method.getParameters()) {
-            final RequestBody requestBodyAnnotation = parameter.getAnnotation(RequestBody.class);
+            final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(parameter, RequestBody.class);
             if (requestBodyAnnotation != null) {
                 return new MethodParameterModel(parameter.getName(), parameter.getParameterizedType());
             }

@@ -23,8 +23,11 @@ public class SpringTestApplication {
         private final AtomicLong counter = new AtomicLong();
 
         @RequestMapping("/greeting")
-        public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-            return new Greeting(counter.incrementAndGet(), String.format(template, name));
+        public Greeting greeting(
+                @RequestParam(value = "name", defaultValue = "World") String name,
+                @RequestParam(name = "count", defaultValue = "1") Integer count
+        ) {
+            return new Greeting(counter.addAndGet(count), String.format(template, name));
         }
 
     }
