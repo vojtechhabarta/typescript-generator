@@ -104,7 +104,7 @@ public class SpringTest {
             return null;
         }
     }
-    
+
     @RestController
     public static class Controller2 {
         @RequestMapping("/echo")
@@ -115,14 +115,14 @@ public class SpringTest {
             return message;
         }
     }
-    
+
     @RestController
     public static class Controller3 {
         @RequestMapping(path = "/data1", method = RequestMethod.PUT)
         public void setEntity(@RequestBody Data1 data) {
         }
     }
-    
+
     @RestController
     public static class Controller4 {
         @RequestMapping(path = "/data2", method = RequestMethod.GET)
@@ -138,6 +138,29 @@ public class SpringTest {
     }
 
     public static class Data2 {
+    }
+
+    @Test
+    public void testUnwrapping() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.customTypeMappings.put("cz.habarta.typescript.generator.spring.SpringTest$Wrapper", "Unwrap");
+        settings.importDeclarations.add("import { Unwrap } from './unwrap'");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithWrapper.class));
+        Assert.assertTrue(output.contains("getEntity(): RestResponse<Unwrap<string>>"));
+    }
+
+    @RestController
+    public static class ControllerWithWrapper {
+        @RequestMapping(path = "/data", method = RequestMethod.GET)
+        public Wrapper<String> getEntity() {
+            return null;
+        }
+    }
+
+    public static class Wrapper<T> {
+        public T value;
     }
 
 }
