@@ -5,14 +5,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class CustomTypeMappingTest {
 
