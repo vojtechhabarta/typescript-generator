@@ -245,7 +245,7 @@ public class ModelCompiler {
     }
 
     private boolean mappedToClass(Class<?> cls) {
-        return !cls.isInterface() && settings.getMapClassesAsClassesFilter().test(cls.getName());
+        return cls != null && !cls.isInterface() && settings.getMapClassesAsClassesFilter().test(cls.getName());
     }
 
     private static List<TsType.GenericVariableType> getTypeParameters(Class<?> cls) {
