@@ -265,7 +265,16 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies custom TypeScript names for Java classes.
      * Multiple mappings can be specified, each using this format: <code>javaClassName:typescriptName</code>.
-     * This takes precedence over other naming settings.
+     * This takes precedence over other naming settings.<br>
+     * Place this parameter inside the <code>configuration</code>.<br>
+     * For multiple mappings, use the <code>naming</code> inside <code>customTypeNaming</code>.
+     * For example:<br>
+     * <code>
+     * &lt;customTypeNaming&gt;<br>
+     * &nbsp;&nbsp;&lt;naming&gt;path.to.Class:TsClass&lt;/naming&gt;<br>
+     * &nbsp;&nbsp;&lt;naming&gt;path.to.OtherClass:TsOtherClass&lt;/naming&gt;<br>
+     * &lt;/customTypeNaming&gt;
+     * </code>
      */
     @Parameter
     private List<String> customTypeNaming;
