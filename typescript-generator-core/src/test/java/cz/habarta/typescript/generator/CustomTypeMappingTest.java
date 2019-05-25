@@ -44,7 +44,6 @@ public class CustomTypeMappingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$MyEnum", "{ code: string, definition: string }");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(MyInterfUsingEnum.class));
-        System.out.println(output);
         assertTrue(output.contains("someValue: { code: string, definition: string }"));
     }
 
@@ -56,7 +55,6 @@ public class CustomTypeMappingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$BaseCustomMapping", "string");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(InterfaceUsingSubCustomMapping.class));
-        System.out.println(output);
         assertTrue(output.contains("sub: SubCustomMapping;"));
     }
 

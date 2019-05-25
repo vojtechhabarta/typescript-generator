@@ -578,7 +578,6 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(RegExpResource.class));
-        System.out.println(output);
         Assert.assertTrue(output.contains("getWithId(id: number)"));
         Assert.assertTrue(output.contains("url: uriEncoding`objects/${id}`"));
     }
