@@ -12,7 +12,6 @@ import java.util.Date;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-
 public class CustomTypeMappingTest {
 
     @Test
@@ -48,6 +47,19 @@ public class CustomTypeMappingTest {
         System.out.println(output);
         assertTrue(output.contains("someValue: { code: string, definition: string }"));
     }
+
+    /**
+     * Tests that custom mapping a superclass to a primitive doesn't cause errors.
+     */
+    @Test
+    public void testSuperTypeString() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$BaseCustomMapping", "string");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(InterfaceUsingSubCustomMapping.class));
+        System.out.println(output);
+        assertTrue(output.contains("sub: SubCustomMapping;"));
+    }
+
 
     @JsonSerialize(using = CodedValueSerializer.class)
     public interface CodedValue {
@@ -103,4 +115,10 @@ public class CustomTypeMappingTest {
         }
     }
 
+
+    class BaseCustomMapping {}
+    class SubCustomMapping extends BaseCustomMapping {}
+    interface InterfaceUsingSubCustomMapping {
+        SubCustomMapping getSub();
+    }
 }
