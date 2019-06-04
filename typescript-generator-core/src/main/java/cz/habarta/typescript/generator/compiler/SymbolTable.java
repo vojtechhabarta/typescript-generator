@@ -132,9 +132,14 @@ public class SymbolTable {
         if (customName != null) {
             return customName;
         }
-        if (settings.customTypeNamingFunction != null) {
+        if (settings.customTypeNamingFunctionImpl != null || settings.customTypeNamingFunction != null) {
             try {
-                final CustomTypeNamingFunction function = getCustomTypeNamingFunction();
+                final CustomTypeNamingFunction function;
+                if (settings.customTypeNamingFunctionImpl != null)
+                    function = settings.customTypeNamingFunctionImpl;
+                else
+                    function = getCustomTypeNamingFunction();
+
                 final Object getNameResult = function.getName(cls.getName(), cls.getSimpleName());
                 if (getNameResult != null && !isUndefined(getNameResult)) {
                     return (String) getNameResult;
