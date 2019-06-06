@@ -617,6 +617,8 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Specifies indentation string.
+     * In Maven pom.xml file it is needed to set <code>xml:space</code> attribute to <code>preserve</code>.<br>
+     * Example: <code><![CDATA[<indentString xml:space="preserve">  </indentString>]]></code>.
      */
     @Parameter
     private String indentString;
