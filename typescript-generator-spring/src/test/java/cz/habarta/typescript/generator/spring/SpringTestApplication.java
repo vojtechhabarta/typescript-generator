@@ -19,15 +19,16 @@ public class SpringTestApplication {
     @RestController
     public static class GreetingController {
 
-        private static final String template = "Hello, %s!";
+        private static final String template = "Hello, %s! I come in %s!";
         private final AtomicLong counter = new AtomicLong();
 
         @RequestMapping("/greeting")
         public Greeting greeting(
                 @RequestParam(value = "name", defaultValue = "World") String name,
-                @RequestParam(name = "count", defaultValue = "1") Integer count
+                @RequestParam(name = "count", defaultValue = "1") Integer count,
+                @RequestParam(defaultValue = "peace") String unnamed
         ) {
-            return new Greeting(counter.addAndGet(count), String.format(template, name));
+            return new Greeting(counter.addAndGet(count), String.format(template, name, unnamed));
         }
 
     }
