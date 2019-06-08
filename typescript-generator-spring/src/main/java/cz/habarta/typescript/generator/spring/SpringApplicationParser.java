@@ -198,7 +198,10 @@ public class SpringApplicationParser extends RestApplicationParser {
             for (Parameter param : method.getParameters()) {
                 final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(param, RequestParam.class);
                 if (requestParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(requestParamAnnotation.value(), param.getParameterizedType())));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
+                        requestParamAnnotation.value(),
+                        param.getName()
+                    ), param.getParameterizedType())));
                     foundType(result, param.getParameterizedType(), controllerClass, method.getName());
                 }
             }
@@ -250,5 +253,9 @@ public class SpringApplicationParser extends RestApplicationParser {
     private static List<String> getDefaultExcludedClassNames() {
         return Arrays.asList(
         );
+    }
+
+    private static String firstOf(String... values) {
+        return Stream.of(values).filter(it -> it != null && !it.isEmpty()).findFirst().orElse("");
     }
 }
