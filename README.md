@@ -94,7 +94,7 @@ apply plugin: 'cz.habarta.typescript-generator'
 buildscript {
     repositories {
         mavenCentral()
-   		jcenter()
+   	    jcenter()
     }
     dependencies {
         classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: 'x.y.z'
