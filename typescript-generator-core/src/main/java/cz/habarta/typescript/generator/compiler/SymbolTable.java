@@ -135,10 +135,11 @@ public class SymbolTable {
         if (settings.customTypeNamingFunctionImpl != null || settings.customTypeNamingFunction != null) {
             try {
                 final CustomTypeNamingFunction function;
-                if (settings.customTypeNamingFunctionImpl != null)
+                if (settings.customTypeNamingFunctionImpl != null) {
                     function = settings.customTypeNamingFunctionImpl;
-                else
+                } else {
                     function = getCustomTypeNamingFunction();
+                }
 
                 final Object getNameResult = function.getName(cls.getName(), cls.getSimpleName());
                 if (getNameResult != null && !isUndefined(getNameResult)) {
@@ -224,6 +225,11 @@ public class SymbolTable {
         return customTypeNamingFunction;
     }
 
+    /**
+     * Function for getting custom TypeScript names for Java classes.
+     * If the function returns null, the default is used.
+     * Used by parameter {@link Settings#customTypeNamingFunction} (JavaScript) and {@link Settings#customTypeNamingFunctionImpl} (Java).
+     */
     public static interface CustomTypeNamingFunction {
         public Object getName(String className, String classSimpleName);
     }

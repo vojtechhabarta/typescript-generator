@@ -49,11 +49,6 @@ public class Settings {
     public String addTypeNameSuffix = null;
     public Map<String, String> customTypeNaming = new LinkedHashMap<>();
     public String customTypeNamingFunction = null;
-
-    /**
-     * Function for getting custom TypeScript names for Java classes. If the function returns null, the default is used
-     * Alternative to {@link #customTypeNamingFunction} when initializing the settings from Java.
-     */
     public CustomTypeNamingFunction customTypeNamingFunctionImpl = null;
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
