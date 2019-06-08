@@ -172,6 +172,8 @@ public class TypeScriptGenerator {
                 return new Jackson2Parser.Jackson2ParserFactory();
             case jaxb:
                 return new Jackson2Parser.JaxbParserFactory();
+            case gson:
+                return new GsonParser.Factory();
             default:
                 throw new RuntimeException();
         }
