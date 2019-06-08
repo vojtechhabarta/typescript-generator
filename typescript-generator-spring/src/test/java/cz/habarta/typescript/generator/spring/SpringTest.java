@@ -48,7 +48,6 @@ public class SpringTest {
         settings.scanSpringApplication = true;
         settings.classLoader = Thread.currentThread().getContextClassLoader();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SpringTestApplication.class));
-        System.out.println(output);
         Assert.assertTrue(output.contains("interface RestApplication"));
         Assert.assertTrue(output.contains("greeting(queryParams?: { name?: string; count?: number; unnamed?: string; }): RestResponse<Greeting>"));
         Assert.assertTrue(output.contains("interface Greeting"));
