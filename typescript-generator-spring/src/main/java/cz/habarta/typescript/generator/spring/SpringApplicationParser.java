@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -30,8 +31,11 @@ import java.util.stream.Stream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.GenericTypeResolver;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -195,46 +199,64 @@ public class SpringApplicationParser extends RestApplicationParser {
 
             // query parameters
             final List<RestQueryParam> queryParams = new ArrayList<>();
-            for (Parameter param : method.getParameters()) {
-                final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(param, RequestParam.class);
-                if (requestParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
-                        requestParamAnnotation.value(),
-                        param.getName()
-                    ), param.getParameterizedType())));
-                    foundType(result, param.getParameterizedType(), controllerClass, method.getName());
+            for (Parameter parameter : method.getParameters()) {
+                if(parameter.getType() == Pageable.class) {
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class)));
+                    foundType(result, Long.class, controllerClass, method.getName());
+
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class)));
+                    foundType(result, Long.class, controllerClass, method.getName());
+
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class)));
+                    foundType(result, String.class, controllerClass, method.getName());
+                } else {
+                    final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
+                    if (requestParamAnnotation != null) {
+                        queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
+                            requestParamAnnotation.value(),
+                            parameter.getName()
+                        ), parameter.getParameterizedType())));
+                        foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                    }
                 }
             }
 
             // entity parameter
-            final MethodParameterModel entityParameter = getEntityParameter(method);
+            final MethodParameterModel entityParameter = getEntityParameter(controllerClass, method);
             if (entityParameter != null) {
                 foundType(result, entityParameter.getType(), controllerClass, method.getName());
             }
 
-            // return Type
-            final Class<?> returnType = method.getReturnType();
-            final Type genericReturnType = method.getGenericReturnType();
-            final Type modelReturnType;
-            if (genericReturnType instanceof ParameterizedType && returnType == ResponseEntity.class) {
-                final ParameterizedType parameterizedReturnType = (ParameterizedType) genericReturnType;
-                modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];
-                foundType(result, modelReturnType, controllerClass, method.getName());
-            } else {
-                modelReturnType = genericReturnType;
-                foundType(result, modelReturnType, controllerClass, method.getName());
-            }
+            final Type modelReturnType = parseReturnType(controllerClass, method);
+            foundType(result, modelReturnType, controllerClass, method.getName());
 
             model.getMethods().add(new RestMethodModel(controllerClass, method.getName(), modelReturnType,
                     controllerClass, httpMethod.name(), context.path, pathParams, queryParams, entityParameter, null));
         }
     }
 
-    private static MethodParameterModel getEntityParameter(Method method) {
-        for (Parameter parameter : method.getParameters()) {
+    private Type parseReturnType(Class<?> controllerClass, Method method) {
+        Type modelReturnType = method.getGenericReturnType();
+        if(modelReturnType instanceof TypeVariable) {
+            return GenericTypeResolver.resolveReturnType(method, controllerClass);
+        } else if (modelReturnType instanceof  ParameterizedType && ((ParameterizedType) modelReturnType).getRawType() == ResponseEntity.class) {
+            return GenericTypeResolver.resolveReturnTypeArgument(method, ResponseEntity.class);
+        } else {
+            return modelReturnType;
+        }
+    }
+
+    private static MethodParameterModel getEntityParameter(Class<?> controller, Method method) {
+        for(int index = 0; index < method.getParameterCount(); ++index) {
+            Parameter parameter =  method.getParameters()[index];
             final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(parameter, RequestBody.class);
             if (requestBodyAnnotation != null) {
-                return new MethodParameterModel(parameter.getName(), parameter.getParameterizedType());
+                Type modelParameterType = parameter.getParameterizedType();
+                if(modelParameterType instanceof TypeVariable) {
+                    final MethodParameter methodParameter = new MethodParameter(method, index);
+                    modelParameterType = GenericTypeResolver.resolveParameterType(methodParameter, controller);
+                }
+                return new MethodParameterModel(parameter.getName(), modelParameterType);
             }
         }
         return null;

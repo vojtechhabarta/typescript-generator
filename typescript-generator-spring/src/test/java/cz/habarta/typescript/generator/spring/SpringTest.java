@@ -11,9 +11,12 @@ import java.lang.reflect.Method;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -163,4 +166,45 @@ public class SpringTest {
         public T value;
     }
 
+    @Test
+    public void testGenericController() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ConcreteGenerticController.class));
+        Assert.assertTrue(output.contains("post(input: string): RestResponse<number>"));
+    }
+
+    @RestController
+    public static abstract class AbstractGenerticController<T, R> {
+        @PostMapping("/generic")
+        public R post(@RequestBody T input) {
+            return map(input);
+        }
+
+        abstract protected R map(T input);
+    }
+
+    public static class ConcreteGenerticController extends AbstractGenerticController<String, Integer> {
+        protected Integer map(String input) {
+            return input.length();
+        }
+    }
+
+    @Test
+    public void testPageableController() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(PageableController.class));
+        Assert.assertTrue(output.contains(" post(queryParams?: { page?: number; size?: number; sort?: string; }): RestResponse<Page<string>>"));
+    }
+
+    @RestController
+    public static abstract class PageableController {
+        @GetMapping("/pageable")
+        public Page<String> post(Pageable page) {
+            return null;
+        }
+    }
 }
