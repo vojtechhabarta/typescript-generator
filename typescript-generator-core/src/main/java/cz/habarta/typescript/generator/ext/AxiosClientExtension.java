@@ -8,7 +8,10 @@ import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.util.Utils;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class AxiosClientExtension extends EmitterExtension {

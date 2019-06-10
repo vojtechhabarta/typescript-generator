@@ -1,8 +1,13 @@
 
 package cz.habarta.typescript.generator;
 
-import java.io.*;
-import java.nio.charset.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.Charset;
 
 
 public class Output {

@@ -1,7 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.parser.BeanModel;
+import cz.habarta.typescript.generator.parser.Jackson1Parser;
+import cz.habarta.typescript.generator.parser.Model;
 import org.junit.Assert;
 import org.junit.Test;
 

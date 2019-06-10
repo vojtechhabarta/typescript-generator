@@ -1,7 +1,8 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 
 public class TsIfStatement extends TsStatement {

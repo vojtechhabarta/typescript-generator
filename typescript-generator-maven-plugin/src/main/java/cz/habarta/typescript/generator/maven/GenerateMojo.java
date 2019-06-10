@@ -1,13 +1,35 @@
 
 package cz.habarta.typescript.generator.maven;
 
-import cz.habarta.typescript.generator.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.apache.maven.artifact.*;
+import cz.habarta.typescript.generator.ClassMapping;
+import cz.habarta.typescript.generator.DateMapping;
+import cz.habarta.typescript.generator.EnumMapping;
+import cz.habarta.typescript.generator.Input;
+import cz.habarta.typescript.generator.Jackson2Configuration;
+import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.Logger;
+import cz.habarta.typescript.generator.ModuleDependency;
+import cz.habarta.typescript.generator.OptionalProperties;
+import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
+import cz.habarta.typescript.generator.Output;
+import cz.habarta.typescript.generator.RestNamespacing;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.StringQuotes;
+import cz.habarta.typescript.generator.TypeScriptFileType;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.TypeScriptOutputKind;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 /**

@@ -1,7 +1,11 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.OptionalProperties;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.Utils;
@@ -10,7 +14,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

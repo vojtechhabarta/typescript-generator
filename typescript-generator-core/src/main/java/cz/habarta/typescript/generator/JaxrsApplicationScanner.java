@@ -1,13 +1,17 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.parser.SourceType;
 import io.github.classgraph.ScanResult;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 
 
 public class JaxrsApplicationScanner {

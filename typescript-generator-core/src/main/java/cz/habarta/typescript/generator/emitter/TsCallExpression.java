@@ -3,7 +3,9 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class TsCallExpression extends TsExpression {

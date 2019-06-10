@@ -4,7 +4,9 @@ package cz.habarta.typescript.generator.emitter;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.util.Utils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 public class TsModel {

@@ -2,7 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.compiler.Symbol;
-import java.util.*;
+import java.util.List;
 
 
 public class TsDeclarationModel implements Comparable<TsDeclarationModel> {

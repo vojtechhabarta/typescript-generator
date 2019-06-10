@@ -4,7 +4,9 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 public abstract class Extension extends EmitterExtension {

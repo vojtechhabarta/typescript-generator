@@ -1,13 +1,19 @@
 
 package cz.habarta.typescript.generator;
 
-import com.fasterxml.jackson.annotation.*;
-import cz.habarta.typescript.generator.compiler.*;
-import cz.habarta.typescript.generator.emitter.*;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
+import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension;
-import cz.habarta.typescript.generator.parser.*;
-import java.util.*;
-import org.junit.*;
+import cz.habarta.typescript.generator.parser.Jackson2Parser;
+import cz.habarta.typescript.generator.parser.Model;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TypeGuardsForJackson2PolymorphismExtensionTest {

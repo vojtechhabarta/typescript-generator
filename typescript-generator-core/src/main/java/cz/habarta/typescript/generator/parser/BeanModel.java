@@ -3,7 +3,8 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BeanModel extends DeclarationModel {

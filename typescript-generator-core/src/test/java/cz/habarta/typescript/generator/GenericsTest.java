@@ -3,7 +3,10 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 

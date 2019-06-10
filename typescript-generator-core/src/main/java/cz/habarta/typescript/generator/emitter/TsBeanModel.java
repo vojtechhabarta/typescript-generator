@@ -1,10 +1,11 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.util.Utils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TsBeanModel extends TsDeclarationModel {

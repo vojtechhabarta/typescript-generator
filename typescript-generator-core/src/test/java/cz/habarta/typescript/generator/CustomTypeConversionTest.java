@@ -1,7 +1,8 @@
 package cz.habarta.typescript.generator;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import static org.junit.Assert.assertEquals;

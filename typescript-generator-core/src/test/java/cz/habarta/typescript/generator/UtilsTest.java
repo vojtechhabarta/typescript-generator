@@ -3,7 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 

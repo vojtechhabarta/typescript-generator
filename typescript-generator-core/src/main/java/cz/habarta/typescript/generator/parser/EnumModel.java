@@ -3,7 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
-import java.util.*;
+import java.util.List;
 
 
 public class EnumModel extends DeclarationModel {

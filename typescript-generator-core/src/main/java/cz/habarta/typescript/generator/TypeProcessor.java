@@ -4,7 +4,10 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 public interface TypeProcessor {

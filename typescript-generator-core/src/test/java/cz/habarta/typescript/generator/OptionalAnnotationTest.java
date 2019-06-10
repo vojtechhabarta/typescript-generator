@@ -1,6 +1,11 @@
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.parser.BeanModel;
+import cz.habarta.typescript.generator.parser.Jackson1Parser;
+import cz.habarta.typescript.generator.parser.Jackson2Parser;
+import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.ModelParser;
+import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import org.junit.Assert;

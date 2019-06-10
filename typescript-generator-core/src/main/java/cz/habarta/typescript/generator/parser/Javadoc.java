@@ -15,7 +15,9 @@ import cz.habarta.typescript.generator.xmldoclet.Package;
 import cz.habarta.typescript.generator.xmldoclet.Root;
 import cz.habarta.typescript.generator.xmldoclet.TagInfo;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import javax.xml.bind.JAXB;
 
 

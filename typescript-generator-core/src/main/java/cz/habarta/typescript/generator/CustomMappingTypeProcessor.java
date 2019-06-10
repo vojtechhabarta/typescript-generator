@@ -3,7 +3,9 @@ package cz.habarta.typescript.generator;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class CustomMappingTypeProcessor implements TypeProcessor {

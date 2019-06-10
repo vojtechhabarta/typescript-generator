@@ -6,10 +6,14 @@ import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import org.hamcrest.CoreMatchers;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class ModelCompilerTest {

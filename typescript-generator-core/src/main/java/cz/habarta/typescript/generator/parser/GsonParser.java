@@ -1,10 +1,14 @@
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.*;
-
+import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeProcessor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class GsonParser extends ModelParser {
 

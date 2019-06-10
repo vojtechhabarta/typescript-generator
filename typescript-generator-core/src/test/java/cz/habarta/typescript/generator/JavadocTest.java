@@ -8,7 +8,7 @@ import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,7 +1,7 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import java.util.*;
+import java.util.Objects;
 
 
 public class TsExpressionStatement extends TsStatement {

@@ -1,12 +1,28 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.compiler.*;
-import cz.habarta.typescript.generator.emitter.*;
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
+import cz.habarta.typescript.generator.emitter.Emitter;
+import cz.habarta.typescript.generator.emitter.InfoJsonEmitter;
+import cz.habarta.typescript.generator.emitter.NpmPackageJson;
+import cz.habarta.typescript.generator.emitter.NpmPackageJsonEmitter;
+import cz.habarta.typescript.generator.emitter.TsModel;
+import cz.habarta.typescript.generator.parser.GsonParser;
+import cz.habarta.typescript.generator.parser.Jackson1Parser;
+import cz.habarta.typescript.generator.parser.Jackson2Parser;
+import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.ModelParser;
+import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.util.Utils;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

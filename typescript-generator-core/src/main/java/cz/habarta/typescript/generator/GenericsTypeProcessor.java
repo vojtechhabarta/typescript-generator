@@ -1,7 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Type;
 
 
 /**

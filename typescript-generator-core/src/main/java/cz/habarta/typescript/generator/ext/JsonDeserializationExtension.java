@@ -41,7 +41,11 @@ import cz.habarta.typescript.generator.emitter.TsUnaryOperator;
 import cz.habarta.typescript.generator.emitter.TsVariableDeclarationStatement;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 public class JsonDeserializationExtension extends Extension {

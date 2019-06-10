@@ -2,10 +2,15 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import cz.habarta.typescript.generator.parser.*;
+import cz.habarta.typescript.generator.parser.Jackson2Parser;
+import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.ModelParser;
 import java.lang.reflect.Type;
-import java.util.*;
-import org.junit.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class ModelParserTest {

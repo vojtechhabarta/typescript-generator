@@ -5,7 +5,10 @@ import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.emitter.Emittable;
 import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.util.Utils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 
 /**

@@ -1,8 +1,10 @@
 
 package cz.habarta.typescript.generator.gradle;
 
-import java.util.*;
-import org.gradle.api.*;
+import java.util.Collections;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
 
 
 public class TypeScriptGeneratorPlugin implements Plugin<Project> {

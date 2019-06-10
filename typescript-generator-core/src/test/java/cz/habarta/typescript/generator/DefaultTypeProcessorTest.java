@@ -2,7 +2,11 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 

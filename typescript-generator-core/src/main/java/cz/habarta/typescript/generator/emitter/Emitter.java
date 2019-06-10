@@ -1,13 +1,23 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.ModuleDependency;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TsParameter;
+import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.TypeScriptFileType;
+import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.util.Utils;
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 public class Emitter implements EmitterExtension.Writer {

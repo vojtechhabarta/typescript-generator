@@ -1,8 +1,8 @@
 package cz.habarta.typescript.generator;
 
-import java.io.*;
-import org.junit.*;
-import static org.junit.Assert.*;
+import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class StyleConfigurationTest {
 

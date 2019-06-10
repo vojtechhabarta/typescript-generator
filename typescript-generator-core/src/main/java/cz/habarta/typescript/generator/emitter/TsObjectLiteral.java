@@ -3,7 +3,9 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.util.Utils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class TsObjectLiteral extends TsExpression {

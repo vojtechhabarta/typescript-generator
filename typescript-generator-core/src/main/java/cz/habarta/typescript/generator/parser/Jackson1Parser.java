@@ -1,17 +1,28 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TypeProcessor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.introspect.NopAnnotationIntrospector;
-import org.codehaus.jackson.map.ser.*;
+import org.codehaus.jackson.map.ser.BeanPropertyWriter;
+import org.codehaus.jackson.map.ser.BeanSerializer;
+import org.codehaus.jackson.map.ser.BeanSerializerFactory;
 import org.codehaus.jackson.type.JavaType;
 
 

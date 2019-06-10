@@ -1,10 +1,16 @@
 package cz.habarta.typescript.generator;
 
-import static cz.habarta.typescript.generator.TsType.*;
+import cz.habarta.typescript.generator.TsType.BasicArrayType;
+import cz.habarta.typescript.generator.TsType.IndexedArrayType;
+import static cz.habarta.typescript.generator.TsType.Number;
+import cz.habarta.typescript.generator.TsType.ObjectType;
+import static cz.habarta.typescript.generator.TsType.String;
+import cz.habarta.typescript.generator.TsType.UnionType;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.Arrays;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import org.junit.Test;
 
 public class TsTypeTest {
 

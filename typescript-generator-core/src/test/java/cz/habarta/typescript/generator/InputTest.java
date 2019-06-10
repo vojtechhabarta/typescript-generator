@@ -5,7 +5,8 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 

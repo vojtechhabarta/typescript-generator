@@ -1,7 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Type;
 
 
 public class SourceType<T extends Type> {
