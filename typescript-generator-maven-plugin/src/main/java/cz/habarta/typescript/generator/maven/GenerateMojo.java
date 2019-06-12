@@ -326,6 +326,16 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> customTypeMappings;
 
     /**
+     * List of custom type aliases.
+     * Each item it this list specifies type alias name (possibly with generic parameters) and its definition.
+     * Item format is: <code>name:definition</code>.
+     * For example for <code>Unwrap&lt;T>:T</code> following type alias will be generated <code>type Unwrap&lt;T> = T</code>.
+     * Other examples: <code>SimpleName:VeryLongGeneratedName</code>, <code>StringID&lt;T>:string</code>.
+     */
+    @Parameter
+    private List<String> customTypeAliases;
+
+    /**
      * Specifies how {@link java.util.Date} will be mapped.
      * Supported values are:
      * <ul>
@@ -743,6 +753,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.referencedFiles = referencedFiles;
             settings.importDeclarations = importDeclarations;
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
+            settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
             settings.nonConstEnums = nonConstEnums;

@@ -111,6 +111,7 @@ public class ModelCompiler {
         final List<Extension.TransformerDefinition> extensionTransformers = getExtensionTransformers();
         model = applyExtensionModelTransformers(symbolTable, model, extensionTransformers);
         TsModel tsModel = processModel(symbolTable, model);
+        tsModel = addCustomTypeAliases(symbolTable, tsModel);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
 
@@ -418,6 +419,20 @@ public class ModelCompiler {
             }
             return TsType.Any;
         }
+    }
+
+    private TsModel addCustomTypeAliases(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsAliasModel> aliases = new ArrayList<>(tsModel.getTypeAliases());
+        for (Map.Entry<String, String> entry : settings.customTypeAliases.entrySet()) {
+            final Pair<String, List<String>> pair = Settings.parseGenericTypeName(entry.getKey());
+            final Symbol name = symbolTable.getSyntheticSymbol(pair.getValue1());
+            final List<TsType.GenericVariableType> typeParameters = pair.getValue2().stream()
+                    .map(TsType.GenericVariableType::new)
+                    .collect(Collectors.toList());
+            final TsType definition = new TsType.VerbatimType(entry.getValue());
+            aliases.add(new TsAliasModel(null, name, typeParameters, definition, null));
+        }
+        return tsModel.withTypeAliases(aliases);
     }
 
     private TsModel removeInheritedProperties(SymbolTable symbolTable, TsModel tsModel) {

@@ -68,6 +68,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> referencedFiles;
     public List<String> importDeclarations;
     public List<String> customTypeMappings;
+    public List<String> customTypeAliases;
     public DateMapping mapDate;
     public EnumMapping mapEnum;
     public boolean nonConstEnums;
@@ -165,6 +166,7 @@ public class GenerateTask extends DefaultTask {
             settings.referencedFiles = referencedFiles;
             settings.importDeclarations = importDeclarations;
             settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
+            settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
             settings.mapDate = mapDate;
             settings.mapEnum = mapEnum;
             settings.nonConstEnums = nonConstEnums;

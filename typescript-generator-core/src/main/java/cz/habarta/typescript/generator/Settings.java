@@ -15,6 +15,7 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -60,6 +62,7 @@ public class Settings {
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
+    public Map<String, String> customTypeAliases = new LinkedHashMap<>();
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public boolean nonConstEnums = false;
@@ -205,6 +208,30 @@ public class Settings {
         return result;
     }
 
+    public static Pair<String, List<String>> parseGenericTypeName(String type) {
+        final Matcher matcher = Pattern.compile("([^<]+)<([^>]+)>").matcher(type);
+        final String name;
+        final List<String> typeParameters;
+        if (matcher.matches()) {  // is generic?
+            name = matcher.group(1);
+            typeParameters = Arrays.asList(matcher.group(2).split(","));
+        } else {
+            name = type;
+            typeParameters = null;
+        }
+        if (!ModelCompiler.isValidIdentifierName(name)) {
+            throw new RuntimeException(String.format("Invalid identifier: '%s'", name));
+        }
+        if (typeParameters != null) {
+            for (String typeParameter : typeParameters) {
+                if (!ModelCompiler.isValidIdentifierName(typeParameter)) {
+                    throw new RuntimeException(String.format("Invalid generic type parameter: '%s'", typeParameter));
+                }
+            }
+        }
+        return Pair.of(name, typeParameters);
+    }
+
     public void validate() {
         if (outputKind == null) {
             throw new RuntimeException("Required 'outputKind' parameter is not configured. " + seeLink());
@@ -232,6 +259,9 @@ public class Settings {
         }
         if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
             throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
+        }
+        for (Map.Entry<String, String> entry : customTypeAliases.entrySet()) {
+            parseGenericTypeName(entry.getValue());
         }
         for (EmitterExtension extension : extensions) {
             final String extensionName = extension.getClass().getSimpleName();
