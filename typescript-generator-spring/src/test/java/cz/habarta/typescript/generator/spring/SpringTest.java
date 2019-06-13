@@ -8,6 +8,8 @@ import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -205,6 +207,23 @@ public class SpringTest {
         @GetMapping("/pageable")
         public Page<String> post(Pageable page) {
             return null;
+        }
+    }
+
+    @Test
+    public void testDoubleGenericController() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DoubleGenericController.class));
+        Assert.assertTrue(output.contains(" get(): RestResponse<string[]>"));
+    }
+
+    @RestController
+    public class DoubleGenericController  {
+        @GetMapping("/generic2")
+        public ResponseEntity<List<String>> get () {
+            return ResponseEntity.ok(Arrays.asList( "a" , "b" , "c" ));
         }
     }
 }
