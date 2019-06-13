@@ -236,11 +236,11 @@ public class SpringApplicationParser extends RestApplicationParser {
     }
 
     private Type parseReturnType(Class<?> controllerClass, Method method) {
-        Type modelReturnType = method.getGenericReturnType();
+        final Type modelReturnType = method.getGenericReturnType();
         if(modelReturnType instanceof TypeVariable) {
             return GenericTypeResolver.resolveReturnType(method, controllerClass);
         } else if (modelReturnType instanceof  ParameterizedType && ((ParameterizedType) modelReturnType).getRawType() == ResponseEntity.class) {
-            return GenericTypeResolver.resolveReturnTypeArgument(method, ResponseEntity.class);
+            return ((ParameterizedType) modelReturnType).getActualTypeArguments()[0];
         } else {
             return modelReturnType;
         }
