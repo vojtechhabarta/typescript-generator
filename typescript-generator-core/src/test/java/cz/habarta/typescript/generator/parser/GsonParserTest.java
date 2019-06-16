@@ -1,5 +1,6 @@
 package cz.habarta.typescript.generator.parser;
 
+import com.google.gson.annotations.SerializedName;
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
 import cz.habarta.typescript.generator.DummyBean;
 import cz.habarta.typescript.generator.Input;
@@ -8,14 +9,22 @@ import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import org.junit.Assert;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 
 public class GsonParserTest {
 
+    private Settings settings;
+
     private static class DummyBeanGson {
         @SuppressWarnings("unused")
         private int privateField;
+    }
+
+    @Before
+    public void before() {
+        settings = TestUtils.settings();
+        settings.jsonLibrary = JsonLibrary.gson;
     }
 
     @Test
@@ -32,13 +41,22 @@ public class GsonParserTest {
 
     @Test
     public void testPrivateFieldGenerated() {
-        final Settings settings = TestUtils.settings();
-        settings.jsonLibrary = JsonLibrary.gson;
         final String output = generate(settings, DummyBeanGson.class);
-        assertTrue(output, output.contains("privateField"));
+        Assert.assertTrue(output, output.contains("privateField"));
     }
 
-    private String generate(final Settings settings, Class<DummyBeanGson> cls) {
+    private static class DummyBeanSerializedName {
+        @SerializedName("bar")
+        int foo;
+    }
+
+    @Test
+    public void testSerializedName() {
+        final String output = generate(settings, DummyBeanSerializedName.class);
+        Assert.assertTrue(output, output.contains("bar"));
+    }
+
+    private String generate(final Settings settings, Class<?> cls) {
         return new TypeScriptGenerator(settings).generateTypeScript(Input.from(cls));
     }
 
