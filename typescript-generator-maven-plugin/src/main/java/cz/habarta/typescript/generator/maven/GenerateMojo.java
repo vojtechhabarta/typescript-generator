@@ -709,6 +709,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private String projectBuildDirectory;
 
+    /**
+     * Prefixes all generated rest client urls with this value.
+     * This parameter is useful when the typescript passes through a proxy that is not configured in the Java side.
+     */
+    @Parameter
+    private String prefixRestUrl;
+
     @Override
     public void execute() {
         TypeScriptGenerator.setLogger(new Logger(loggingLevel));
@@ -797,6 +804,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
+            settings.prefixRestUrl = prefixRestUrl;
             final File output = outputFile != null
                     ? outputFile
                     : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());

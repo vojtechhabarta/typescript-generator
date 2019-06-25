@@ -742,8 +742,12 @@ public class ModelCompiler {
         return new TsParameterModel(parameter.getName(), parameterType);
     }
 
-    private static TsTemplateLiteral processPathTemplate(PathTemplate pathTemplate) {
+    private TsTemplateLiteral processPathTemplate(PathTemplate pathTemplate) {
         final List<TsExpression> spans = new ArrayList<>();
+        if (settings.prefixRestUrl != null) {
+            spans.add(new TsStringLiteral(settings.prefixRestUrl));
+        }
+
         for (PathTemplate.Part part : pathTemplate.getParts()) {
             if (part instanceof PathTemplate.Literal) {
                 final PathTemplate.Literal literal = (PathTemplate.Literal) part;

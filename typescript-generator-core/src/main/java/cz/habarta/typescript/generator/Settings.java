@@ -111,6 +111,7 @@ public class Settings {
     public boolean jackson2ModuleDiscovery = false;
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
+    public String prefixRestUrl = null;
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
@@ -340,6 +341,9 @@ public class Settings {
         if (restOptionsType != null && !isGenerateRest()) {
             throw new RuntimeException("'restOptionsType' parameter can only be used when generating REST client or interface.");
         }
+        if (prefixRestUrl != null && !isGenerateRestClient()) {
+            throw new RuntimeException("'prefixRestUrl' parameter can only be used when generating REST client.");
+        }
         if (generateInfoJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateInfoJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
         }
@@ -525,6 +529,9 @@ public class Settings {
     public boolean isGenerateRest() {
         return isGenerateJaxrs() || isGenerateSpring();
     }
+
+    public boolean isGenerateRestClient() {
+        return generateJaxrsApplicationClient || generateSpringApplicationClient;}
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {
         return defaultStringEnumsOverriddenByExtension;

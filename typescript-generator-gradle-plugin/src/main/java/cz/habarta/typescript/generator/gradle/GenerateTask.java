@@ -112,6 +112,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> jackson2Modules;
     @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
+    public String prefixRestUrl;
 
     @TaskAction
     public void generate() throws Exception {
@@ -210,6 +211,7 @@ public class GenerateTask extends DefaultTask {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
+            settings.prefixRestUrl = prefixRestUrl;
             final File output = outputFile != null
                     ? getProject().file(outputFile)
                     : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());

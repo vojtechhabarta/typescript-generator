@@ -387,6 +387,18 @@ public class JaxrsApplicationTest {
     }
 
     @Test
+    public void basicClientWithPrefixTest() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationClient = true;
+        settings.prefixRestUrl = "proxy/";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        final String errorMessage = "Unexpected output: " + output;
+
+        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`proxy/api/people/${personId}` });"));
+    }
+
+    @Test
     public void clientCustomizationTest() {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;
