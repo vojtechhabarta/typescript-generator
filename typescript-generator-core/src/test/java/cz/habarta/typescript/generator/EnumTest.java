@@ -198,6 +198,33 @@ public class EnumTest {
         assertEquals(expected.trim(), output.trim());
     }
 
+    @Test
+    public void testJavaLangEnum1() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Child.NoEnumFactory.class));
+        assertTrue(output.contains("interface Enum<E>"));
+    }
+
+    private static @interface Child {
+        public static class NoEnumFactory implements IBaseEnumFactory<Enum<?>> {
+        }
+    }
+
+    private static interface IBaseEnumFactory<T> {
+    }
+
+    @Test
+    public void testJavaLangEnum2() {
+        final Settings settings = TestUtils.settings();
+        settings.setExcludeFilter(Arrays.asList(Enum.class.getName()), null);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithEnum.class));
+        assertTrue(output.contains("enumA: any"));
+    }
+
+    private static class ClassWithEnum {
+        public Enum<?> enumA;
+    }
+
     private static class AClass {
         public Direction direction;
     }

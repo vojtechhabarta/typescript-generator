@@ -414,6 +414,9 @@ public class Jackson2Parser extends ModelParser {
         if (beanClass == null) {
             return null;
         }
+        if (beanClass == Enum.class) {
+            return null;
+        }
         try {
             final DefaultSerializerProvider.Impl serializerProvider1 = (DefaultSerializerProvider.Impl) objectMapper.getSerializerProvider();
             final DefaultSerializerProvider.Impl serializerProvider2 = serializerProvider1.createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
