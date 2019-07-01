@@ -26,7 +26,7 @@ class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig> {
         }
 
         const config: Axios.AxiosRequestConfig = {};
-        config.method = requestConfig.method;
+        config.method = requestConfig.method as Axios.Method;
         config.url = requestConfig.url;
         config.params = requestConfig.queryParams;
         config.data = requestConfig.data;
