@@ -138,6 +138,55 @@ public class TaggedUnionsTest {
         public double batteryCapacityInKWh;
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(ElectricEngine.class),
+            @JsonSubTypes.Type(DieselEngine.class),
+    })
+    private static abstract class Engine {
+
+        public double horsePower;
+    }
+
+    @JsonTypeName("electric")
+    private static class ElectricEngine extends Engine {
+
+        public double consumptionInKWh;
+    }
+
+    @JsonTypeName("diesel")
+    private static class DieselEngine extends Engine {
+
+        public double consumptionInLiters;
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(Boat.class),
+            @JsonSubTypes.Type(Plane.class),
+    })
+    private static abstract class Vehicule<M extends Engine> {
+
+        public boolean canMove;
+    }
+
+    @JsonTypeName("boat")
+    private static class Boat<M extends Engine> extends Vehicule<M> {
+
+        public boolean isFloating;
+    }
+
+    @JsonTypeName("plane")
+    private static class Plane<M extends Engine> extends Vehicule<M> {
+
+        public double altitude;
+    }
+
+    private static class Earth {
+
+        public List<Vehicule<Engine>> vehicules;
+    }
+
     @Test
     public void testTaggedUnions() {
         final Settings settings = TestUtils.settings();
@@ -337,6 +386,52 @@ public class TaggedUnionsTest {
                 "type CarUnion = DieselCar | ElectricCar;\n" +
                 ""
                 ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Test
+    public void testWithTypeParameter() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Earth.class));
+        final String expected =
+                "\n" +
+                        "interface Earth {\n" +
+                        "    vehicules: Vehicule<EngineUnion>[];\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface Vehicule<M> {\n" +
+                        "    kind: \"boat\" | \"plane\";\n" +
+                        "    canMove: boolean;\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface Engine {\n" +
+                        "    kind: \"electric\" | \"diesel\";\n" +
+                        "    horsePower: number;\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface Boat<M> extends Vehicule<M> {\n" +
+                        "    kind: \"boat\";\n" +
+                        "    isFloating: boolean;\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface Plane<M> extends Vehicule<M> {\n" +
+                        "    kind: \"plane\";\n" +
+                        "    altitude: number;\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface ElectricEngine extends Engine {\n" +
+                        "    kind: \"electric\";\n" +
+                        "    consumptionInKWh: number;\n" +
+                        "}\n" +
+                        "\n" +
+                        "interface DieselEngine extends Engine {\n" +
+                        "    kind: \"diesel\";\n" +
+                        "    consumptionInLiters: number;\n" +
+                        "}\n" +
+                        "\n" +
+                        "type VehiculeUnion<M> = Boat<M> | Plane<M>;\n" +
+                        "\n" +
+                        "type EngineUnion = ElectricEngine | DieselEngine;\n";
         Assert.assertEquals(expected, output);
     }
 

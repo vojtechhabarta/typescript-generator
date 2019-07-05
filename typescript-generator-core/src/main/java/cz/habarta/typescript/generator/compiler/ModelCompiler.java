@@ -50,6 +50,7 @@ import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -58,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -834,15 +836,25 @@ public class ModelCompiler {
         final List<TsBeanModel> beans = new ArrayList<>();
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         for (TsBeanModel bean : tsModel.getBeans()) {
+            final Set<TsType.GenericVariableType> typeAliasTypeParameters = new HashSet<>();
             if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null) {
                 final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
-                    final TsType type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
-                    unionTypes.add(type);
+                    final List<TsType.GenericVariableType> typeParameters = getTypeParameters(cls);
+                    typeAliasTypeParameters.addAll(typeParameters);
+                    if (typeParameters.size() != typeAliasTypeParameters.size()) {
+                        throw new IllegalStateException("There is a different number of type parameters between to types in type alias '" + bean.getOrigin().getName() + "'");
+                    }
+                    if (typeParameters.size() > 0) {
+                        unionTypes.add(new TsType.GenericReferenceType(symbolTable.getSymbol(cls), typeParameters));
+                    }
+                    else {
+                        unionTypes.add(new TsType.ReferenceType(symbolTable.getSymbol(cls)));
+                    }
                 }
                 final TsType.UnionType union = new TsType.UnionType(unionTypes);
-                final TsAliasModel tsAliasModel = new TsAliasModel(bean.getOrigin(), unionName, null, union, null);
+                final TsAliasModel tsAliasModel = new TsAliasModel(bean.getOrigin(), unionName, new ArrayList<>(typeAliasTypeParameters), union, null);
                 beans.add(bean.withTaggedUnionAlias(tsAliasModel));
                 typeAliases.add(tsAliasModel);
             } else {
