@@ -423,13 +423,14 @@ public class ModelCompiler {
 
     private TsModel addCustomTypeAliases(SymbolTable symbolTable, TsModel tsModel) {
         final List<TsAliasModel> aliases = new ArrayList<>(tsModel.getTypeAliases());
-        for (Map.Entry<String, String> entry : settings.customTypeAliases.entrySet()) {
-            final Pair<String, List<String>> pair = Settings.parseGenericTypeName(entry.getKey());
-            final Symbol name = symbolTable.getSyntheticSymbol(pair.getValue1());
-            final List<TsType.GenericVariableType> typeParameters = pair.getValue2().stream()
-                    .map(TsType.GenericVariableType::new)
-                    .collect(Collectors.toList());
-            final TsType definition = new TsType.VerbatimType(entry.getValue());
+        for (Settings.CustomTypeAlias customTypeAlias : settings.getValidatedCustomTypeAliases()) {
+            final Symbol name = symbolTable.getSyntheticSymbol(customTypeAlias.tsType.rawName);
+            final List<TsType.GenericVariableType> typeParameters = customTypeAlias.tsType.typeParameters != null
+                    ? customTypeAlias.tsType.typeParameters.stream()
+                            .map(TsType.GenericVariableType::new)
+                            .collect(Collectors.toList())
+                    : null;
+            final TsType definition = new TsType.VerbatimType(customTypeAlias.tsDefinition);
             aliases.add(new TsAliasModel(null, name, typeParameters, definition, null));
         }
         return tsModel.withTypeAliases(aliases);

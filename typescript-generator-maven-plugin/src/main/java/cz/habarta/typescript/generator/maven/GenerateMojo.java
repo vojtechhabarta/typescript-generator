@@ -321,6 +321,8 @@ public class GenerateMojo extends AbstractMojo {
      * Each item specifies TypeScript type which will be used for particular Java class.
      * Item format is: <code>javaClassName:typescriptType</code>.
      * For example mapping Joda-Time {@link org.joda.time.LocalDateTime} to <code>string</code> would be added as <code>org.joda.time.LocalDateTime:string</code>.
+     * Mappings of generic classes must use syntax <code>com.package.MyGenericClass&lt;T1,T2&gt;:TsGenericType2&lt;T1,T2&gt;</code>.
+     * Instead of <code>&lt;T1,T2&gt;</code> it is also possible to use <code>[T1,T2]</code>.
      */
     @Parameter
     private List<String> customTypeMappings;

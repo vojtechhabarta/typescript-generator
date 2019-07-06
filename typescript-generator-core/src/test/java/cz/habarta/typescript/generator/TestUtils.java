@@ -21,6 +21,7 @@ public class TestUtils {
         settings.noTslintDisable = true;
         settings.noEslintDisable = true;
         settings.newline = "\n";
+        settings.classLoader = Thread.currentThread().getContextClassLoader();
         return settings;
     }
 

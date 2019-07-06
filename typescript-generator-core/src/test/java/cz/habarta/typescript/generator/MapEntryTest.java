@@ -117,7 +117,6 @@ public class MapEntryTest {
         Assert.assertEquals(expectedJson, json);
 
         final Settings settings = TestUtils.settings();
-        settings.classLoader = Thread.currentThread().getContextClassLoader();
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
         settings.jackson2Configuration.shapeConfigOverrides = new LinkedHashMap<>();
         settings.jackson2Configuration.shapeConfigOverrides.put(Entry1.class, JsonFormat.Shape.OBJECT);

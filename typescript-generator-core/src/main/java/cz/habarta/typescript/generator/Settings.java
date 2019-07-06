@@ -12,10 +12,10 @@ import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -62,7 +64,9 @@ public class Settings {
     public List<String> referencedFiles = new ArrayList<>();
     public List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
+    private List<CustomTypeMapping> validatedCustomTypeMappings = null;
     public Map<String, String> customTypeAliases = new LinkedHashMap<>();
+    private List<CustomTypeAlias> validatedCustomTypeAliases = null;
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public boolean nonConstEnums = false;
@@ -117,6 +121,36 @@ public class Settings {
     public static class ConfiguredExtension {
         public String className;
         public Map<String, String> configuration;
+    }
+
+    public static class CustomTypeMapping {
+        public final GenericName javaType;
+        public final GenericName tsType;
+
+        public CustomTypeMapping(GenericName javaType, GenericName tsType) {
+            this.javaType = javaType;
+            this.tsType = tsType;
+        }
+    }
+
+    public static class CustomTypeAlias {
+        public final GenericName tsType;
+        public final String tsDefinition;
+
+        public CustomTypeAlias(GenericName tsType, String tsDefinition) {
+            this.tsType = tsType;
+            this.tsDefinition = tsDefinition;
+        }
+    }
+
+    public static class GenericName {
+        public final String rawName;
+        public final List<String> typeParameters;
+
+        public GenericName(String rawName, List<String> typeParameters) {
+            this.rawName = Objects.requireNonNull(rawName);
+            this.typeParameters = typeParameters;
+        }
     }
 
     private static class TypeScriptGeneratorURLClassLoader extends URLClassLoader {
@@ -208,30 +242,6 @@ public class Settings {
         return result;
     }
 
-    public static Pair<String, List<String>> parseGenericTypeName(String type) {
-        final Matcher matcher = Pattern.compile("([^<]+)<([^>]+)>").matcher(type);
-        final String name;
-        final List<String> typeParameters;
-        if (matcher.matches()) {  // is generic?
-            name = matcher.group(1);
-            typeParameters = Arrays.asList(matcher.group(2).split(","));
-        } else {
-            name = type;
-            typeParameters = null;
-        }
-        if (!ModelCompiler.isValidIdentifierName(name)) {
-            throw new RuntimeException(String.format("Invalid identifier: '%s'", name));
-        }
-        if (typeParameters != null) {
-            for (String typeParameter : typeParameters) {
-                if (!ModelCompiler.isValidIdentifierName(typeParameter)) {
-                    throw new RuntimeException(String.format("Invalid generic type parameter: '%s'", typeParameter));
-                }
-            }
-        }
-        return Pair.of(name, typeParameters);
-    }
-
     public void validate() {
         if (outputKind == null) {
             throw new RuntimeException("Required 'outputKind' parameter is not configured. " + seeLink());
@@ -260,9 +270,8 @@ public class Settings {
         if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
             throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
         }
-        for (Map.Entry<String, String> entry : customTypeAliases.entrySet()) {
-            parseGenericTypeName(entry.getValue());
-        }
+        getValidatedCustomTypeMappings();
+        getValidatedCustomTypeAliases();
         for (EmitterExtension extension : extensions) {
             final String extensionName = extension.getClass().getSimpleName();
             final DeprecationText deprecation = extension.getClass().getAnnotation(DeprecationText.class);
@@ -378,6 +387,98 @@ public class Settings {
         }
         if (debug) {
             TypeScriptGenerator.getLogger().warning("Parameter 'debug' was removed. Please set 'loggingLevel' parameter to 'Debug'.");
+        }
+    }
+
+    public List<CustomTypeMapping> getValidatedCustomTypeMappings() {
+        if (validatedCustomTypeMappings == null) {
+            validatedCustomTypeMappings = new ArrayList<>();
+            for (Map.Entry<String, String> entry : customTypeMappings.entrySet()) {
+                final String javaName = entry.getKey();
+                final String tsName = entry.getValue();
+                try {
+                    final GenericName genericJavaName = parseGenericName(javaName);
+                    final GenericName genericTsName = parseGenericName(tsName);
+                    validateTypeParameters(genericJavaName.typeParameters);
+                    validateTypeParameters(genericTsName.typeParameters);
+                    final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, Object.class);
+                    final int required = cls.getTypeParameters().length;
+                    final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
+                    if (specified != required) {
+                        final String parameters = Stream.of(cls.getTypeParameters())
+                                .map(TypeVariable::getName)
+                                .collect(Collectors.joining(", "));
+                        final String signature = cls.getName() + (parameters.isEmpty() ? "" : "<" + parameters + ">");
+                        throw new RuntimeException(String.format(
+                                "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
+                                required, specified, signature));
+                    }
+                    if (genericTsName.typeParameters != null) {
+                        final Set<String> parameters = Stream.of(cls.getTypeParameters())
+                                .map(TypeVariable::getName)
+                                .collect(Collectors.toSet());
+                        for (String parameter : genericTsName.typeParameters) {
+                            if (!parameters.contains(parameter)) {
+                                throw new RuntimeException(String.format("Unknown generic type parameter '%s'", parameter));
+                            }
+                        }
+                    }
+                    validatedCustomTypeMappings.add(new CustomTypeMapping(genericJavaName, genericTsName));
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("Failed to parse configured custom type mapping '%s:%s': %s", javaName, tsName, e.getMessage()), e);
+                }
+            }
+        }
+        return validatedCustomTypeMappings;
+    }
+
+    public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
+        if (validatedCustomTypeAliases == null) {
+            validatedCustomTypeAliases = new ArrayList<>();
+            for (Map.Entry<String, String> entry : customTypeAliases.entrySet()) {
+                final String tsName = entry.getKey();
+                final String tsDefinition = entry.getValue();
+                try {
+                    final GenericName genericTsName = parseGenericName(tsName);
+                    if (!ModelCompiler.isValidIdentifierName(genericTsName.rawName)) {
+                        throw new RuntimeException(String.format("Invalid identifier: '%s'", genericTsName.rawName));
+                    }
+                    validateTypeParameters(genericTsName.typeParameters);
+                    validatedCustomTypeAliases.add(new CustomTypeAlias(genericTsName, tsDefinition));
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("Failed to parse configured custom type alias '%s:%s': %s", tsName, tsDefinition, e.getMessage()), e);
+                }
+            }
+        }
+        return validatedCustomTypeAliases;
+    }
+
+    private static GenericName parseGenericName(String name) {
+        // Class<T1, T2>
+        // Class[T1, T2]
+        final Matcher matcher = Pattern.compile("([^<\\[]+)(<|\\[)([^>\\]]+)(>|\\])").matcher(name);
+        final String rawName;
+        final List<String> typeParameters;
+        if (matcher.matches()) {  // is generic?
+            rawName = matcher.group(1);
+            typeParameters = Stream.of(matcher.group(3).split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+        } else {
+            rawName = name;
+            typeParameters = null;
+        }
+        return new GenericName(rawName, typeParameters);
+    }
+
+    private static void validateTypeParameters(List<String> typeParameters) {
+        if (typeParameters == null) {
+            return;
+        }
+        for (String typeParameter : typeParameters) {
+            if (!ModelCompiler.isValidIdentifierName(typeParameter)) {
+                throw new RuntimeException(String.format("Invalid generic type parameter: '%s'", typeParameter));
+            }
         }
     }
 
@@ -578,7 +679,7 @@ public class Settings {
     private static <T> T loadInstance(ClassLoader classLoader, String className, Class<T> requiredType) {
         try {
             TypeScriptGenerator.getLogger().verbose("Loading class " + className);
-            return requiredType.cast(classLoader.loadClass(className).newInstance());
+            return requiredType.cast(classLoader.loadClass(className).getConstructor().newInstance());
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
