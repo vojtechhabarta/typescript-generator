@@ -245,7 +245,7 @@ public class EnumTest {
     public void testJavaLangEnum1() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Child.NoEnumFactory.class));
-        assertTrue(output.contains("interface Enum<E>"));
+        assertTrue(output.contains("interface Enum<E extends Enum<E>>"));
     }
 
     private static @interface Child {

@@ -147,6 +147,21 @@ public class GenericsTest {
         assertEquals(expected, output.trim());
     }
 
+    @Test
+    public void testGenericBoundsParameter() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(G.class));
+        final String nl = settings.newline;
+        final String expected =
+                "interface G<T extends F> {" + nl +
+                "    x: T;" + nl +
+                "}" + nl +
+                "" + nl +
+                "interface F {" + nl +
+                "}";
+        assertEquals(expected, output.trim());
+    }
+
     class A<U,V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -168,6 +183,10 @@ public class GenericsTest {
     }
 
     class F {
+    }
+
+    class G<T extends F> {
+        public T x;
     }
 
     abstract class IA implements IB<String>, Comparable<IA> {
