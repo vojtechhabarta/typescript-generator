@@ -269,21 +269,27 @@ public class ModelCompiler {
 
         final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean);
 
-        boolean isDiscriminated = false;
+        boolean isTaggedUnion = false;
         if (bean.getDiscriminantProperty() != null && bean.getProperty(bean.getDiscriminantProperty()) == null) {
-            isDiscriminated = true;
+            isTaggedUnion = true;
+            boolean isDisciminantProperty = true;
             final List<BeanModel> selfAndDescendants = getSelfAndDescendants(bean, children);
             final List<TsType.StringLiteralType> literals = new ArrayList<>();
             for (BeanModel descendant : selfAndDescendants) {
                 if (descendant.getDiscriminantProperty() == null || descendant.getProperty(bean.getDiscriminantProperty()) != null) {
-                    // do not handle bean as discriminated if any descendant or it itself has duplicate discriminant property
-                    isDiscriminated = false;
+                    // do not handle bean as tagged union if any descendant or it itself has duplicate discriminant property
+                    isTaggedUnion = false;
+                    isDisciminantProperty = false;
+                }
+                if (descendant.getOrigin().getTypeParameters().length != 0) {
+                    // do not handle bean as tagged union if any descendant or it itself is a generic class
+                    isTaggedUnion = false;
                 }
                 if (descendant.getDiscriminantLiteral() != null) {
                     literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
                 }
             }
-            final TsType discriminantType = isDiscriminated && !literals.isEmpty()
+            final TsType discriminantType = isDisciminantProperty && !literals.isEmpty()
                     ? new TsType.UnionType(literals)
                     : TsType.String;
             final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
@@ -303,7 +309,7 @@ public class ModelCompiler {
                 /*constructor*/ null,
                 /*methods*/ null,
                 bean.getComments());
-        return isDiscriminated
+        return isTaggedUnion
                 ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral())
                 : tsBean;
     }
