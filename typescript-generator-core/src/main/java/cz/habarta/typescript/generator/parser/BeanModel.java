@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class BeanModel extends DeclarationModel {
@@ -57,6 +58,13 @@ public class BeanModel extends DeclarationModel {
 
     public List<PropertyModel> getProperties() {
         return properties;
+    }
+
+    public PropertyModel getProperty(String name) {
+        return properties.stream()
+                .filter(property -> Objects.equals(property.getName(), name))
+                .findFirst()
+                .orElse(null);
     }
 
     public BeanModel withProperties(List<PropertyModel> properties) {

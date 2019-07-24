@@ -269,22 +269,28 @@ public class ModelCompiler {
 
         final List<TsPropertyModel> properties = processProperties(symbolTable, model, bean);
 
-        if (bean.getDiscriminantProperty() != null && !containsProperty(properties, bean.getDiscriminantProperty())) {
+        boolean isDiscriminated = false;
+        if (bean.getDiscriminantProperty() != null && bean.getProperty(bean.getDiscriminantProperty()) == null) {
+            isDiscriminated = true;
             final List<BeanModel> selfAndDescendants = getSelfAndDescendants(bean, children);
             final List<TsType.StringLiteralType> literals = new ArrayList<>();
             for (BeanModel descendant : selfAndDescendants) {
+                if (descendant.getDiscriminantProperty() == null || descendant.getProperty(bean.getDiscriminantProperty()) != null) {
+                    // do not handle bean as discriminated if any descendant or it itself has duplicate discriminant property
+                    isDiscriminated = false;
+                }
                 if (descendant.getDiscriminantLiteral() != null) {
                     literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
                 }
             }
-            final TsType discriminantType = literals.isEmpty()
-                    ? TsType.String
-                    : new TsType.UnionType(literals);
+            final TsType discriminantType = isDiscriminated && !literals.isEmpty()
+                    ? new TsType.UnionType(literals)
+                    : TsType.String;
             final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
             properties.add(0, new TsPropertyModel(bean.getDiscriminantProperty(), discriminantType, modifiers, /*ownProperty*/ true, null));
         }
 
-        return new TsBeanModel(
+        final TsBeanModel tsBean = new TsBeanModel(
                 bean.getOrigin(),
                 TsBeanCategory.Data,
                 isClass,
@@ -296,8 +302,10 @@ public class ModelCompiler {
                 properties,
                 /*constructor*/ null,
                 /*methods*/ null,
-                bean.getComments())
-                .withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral());
+                bean.getComments());
+        return isDiscriminated
+                ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral())
+                : tsBean;
     }
 
     private boolean mappedToClass(Class<?> cls) {
@@ -358,15 +366,6 @@ public class ModelCompiler {
             }
         }
         return descendants;
-    }
-
-    private static boolean containsProperty(List<TsPropertyModel> properties, String propertyName) {
-        for (TsPropertyModel property : properties) {
-            if (property.getName().equals(propertyName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {

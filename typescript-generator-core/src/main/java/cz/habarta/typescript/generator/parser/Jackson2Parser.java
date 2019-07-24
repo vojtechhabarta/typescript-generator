@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -246,7 +247,14 @@ public class Jackson2Parser extends ModelParser {
             discriminantProperty = null;
             discriminantLiteral = null;
         }
-        
+
+        if (discriminantProperty != null && properties.stream().anyMatch(property -> Objects.equals(property.getName(), discriminantProperty))) {
+            TypeScriptGenerator.getLogger().warning(String.format(
+                    "Class '%s' has duplicate property '%s'. "
+                            + "For more information see 'https://github.com/vojtechhabarta/typescript-generator/issues/392'.",
+                    sourceClass.type.getName(), discriminantProperty));
+        }
+
         final List<Class<?>> taggedUnionClasses;
         final JsonSubTypes jsonSubTypes = sourceClass.type.getAnnotation(JsonSubTypes.class);
         if (jsonSubTypes != null) {
