@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * The extension marks all properties which type allows only one possible value (for instance, enum with only one value
  * or {@link cz.habarta.typescript.generator.TsType.UnionType} with only one option) as read only and sets their
- * value in the constructor.<br/>
+ * value in the constructor.
  * It may be useful while generating code for class hierarchy where each subclass has a discriminator property that can
  * only have one value. Hence, using the TypeScript code it will not be necessary to set this value manually.
  *
