@@ -114,7 +114,6 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2[T1, T2]", "Test[T2, T1]");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Usage.class));
-        System.out.println(output);
         Assert.assertTrue(output.contains("generic: Test<number, string>"));
     }
 

@@ -172,6 +172,18 @@ public class ObjectAsIdTest {
         Assert.assertTrue(output.contains("objectReference: string"));
     }
 
+    @Test
+    public void testDisableObjectIdentity() {
+        final Settings settings = TestUtils.settings();
+        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
+        settings.jackson2Configuration.disableObjectIdentityFeature = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Wrapper.class));
+        Assert.assertTrue(output.contains("testObjectA1: TestObjectA"));
+        Assert.assertTrue(output.contains("testObjectB1: TestObjectB"));
+        Assert.assertTrue(output.contains("testObjectC1: TestObjectC<string>"));
+        Assert.assertTrue(output.contains("testObjectD1: TestObjectD"));
+        Assert.assertTrue(output.contains("testObjectE1: TestObjectE"));
+    }
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
     @JsonIdentityReference(alwaysAsId = true)

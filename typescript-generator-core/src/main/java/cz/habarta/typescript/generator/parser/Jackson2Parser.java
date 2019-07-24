@@ -154,9 +154,11 @@ public class Jackson2Parser extends ModelParser {
                     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
                         if (context.getTypeContext() instanceof Jackson2TypeContext) {
                             final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
-                            final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanPropertyWriter);
-                            if (resultType != null) {
-                                return context.withTypeContext(null).processType(resultType);
+                            if (!jackson2TypeContext.disableObjectIdentityFeature) {
+                                final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanPropertyWriter);
+                                if (resultType != null) {
+                                    return context.withTypeContext(null).processType(resultType);
+                                }
                             }
                         }
                         return null;
@@ -168,10 +170,12 @@ public class Jackson2Parser extends ModelParser {
     private static class Jackson2TypeContext {
         public final Jackson2Parser parser;
         public final BeanPropertyWriter beanPropertyWriter;
+        public final boolean disableObjectIdentityFeature;
 
-        public Jackson2TypeContext(Jackson2Parser parser, BeanPropertyWriter beanPropertyWriter) {
+        public Jackson2TypeContext(Jackson2Parser parser, BeanPropertyWriter beanPropertyWriter, boolean disableObjectIdentityFeature) {
             this.parser = parser;
             this.beanPropertyWriter = beanPropertyWriter;
+            this.disableObjectIdentityFeature = disableObjectIdentityFeature;
         }
     }
 
@@ -208,7 +212,10 @@ public class Jackson2Parser extends ModelParser {
                     }
                 }
 
-                final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(this, beanPropertyWriter);
+                final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(
+                        this,
+                        beanPropertyWriter,
+                        settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
 
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;

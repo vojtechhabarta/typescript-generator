@@ -56,4 +56,10 @@ public class Jackson2Configuration {
      */
     public boolean enumsUsingToString;
 
+    /**
+     * Disables processing of <code>@JsonIdentityInfo</code> and <code>@JsonIdentityReference</code> annotations.
+     * Can be useful for example when using JSOG library which uses IDs to serialize and deserialize object graphs.
+     */
+    public boolean disableObjectIdentityFeature;
+
 }
