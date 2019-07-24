@@ -330,7 +330,7 @@ public class ModelCompiler {
                 TsBeanCategory.Data,
                 isClass,
                 symbolTable.getSymbol(bean.getOrigin()),
-                getTypeParameters(bean.getOrigin()),
+                getTypeParameters(symbolTable, bean.getOrigin()),
                 parentType,
                 extendsList,
                 implementsList,
@@ -347,13 +347,13 @@ public class ModelCompiler {
         return cls != null && !cls.isInterface() && settings.getMapClassesAsClassesFilter().test(cls.getName());
     }
 
-    private List<TsType.BoundedGenericVariableType> getTypeParameters(Class<?> cls) {
+    private List<TsType.BoundedGenericVariableType> getTypeParameters(SymbolTable symbolTable, Class<?> cls) {
         final List<TsType.BoundedGenericVariableType> typeParameters = new ArrayList<>();
         for (TypeVariable<?> typeParameter : cls.getTypeParameters()) {
             final List<TsType> bounds = new ArrayList<>();
             for (Type bound : typeParameter.getBounds()) {
                 if (!Object.class.equals(bound)) {
-                    bounds.add(javaToTypeScript(bound));
+                    bounds.add(typeFromJava(symbolTable, bound));
                 }
             }
             switch (bounds.size()) {
