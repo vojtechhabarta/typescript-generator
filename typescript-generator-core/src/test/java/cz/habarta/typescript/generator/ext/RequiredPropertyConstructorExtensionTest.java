@@ -11,9 +11,10 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
+import javax.annotation.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,6 +61,16 @@ public class RequiredPropertyConstructorExtensionTest {
 
     static class SecondClass extends SimpleClass {
         public int field3;
+    }
+
+    static class SimpleOptionalClass {
+        public String field1;
+        @Nullable
+        public Integer field2;
+    }
+
+    static class SecondOptionalClass extends SimpleOptionalClass {
+        public String field3;
     }
 
     @Test
@@ -120,6 +131,19 @@ public class RequiredPropertyConstructorExtensionTest {
         String result = generateTypeScript(settings, SecondClass.class);
 
         String expected = readResource("inheritance.ts");
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void testOptionalParameters() {
+        Settings settings = createBaseSettings();
+        settings.declarePropertiesAsReadOnly = true;
+        settings.optionalAnnotations = new ArrayList<>();
+        settings.optionalAnnotations.add(Nullable.class);
+
+        String result = generateTypeScript(settings, SecondOptionalClass.class);
+
+        String expected = readResource("optionalParameters.ts");
         Assert.assertEquals(expected, result);
     }
 
