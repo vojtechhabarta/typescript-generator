@@ -92,6 +92,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
     private static Optional<TsConstructorModel> createConstructor(TsBeanModel bean, TsModel model,
                                                                   Map<String, TsConstructorModel> generatedConstructors) {
         List<TsParameterModel> parameters = new ArrayList<>();
+        List<TsParameterModel> optionalParameters = new ArrayList<>();
         List<TsStatement> body = new ArrayList<>();
         TsType parent = bean.getParent();
         if (parent != null) {
@@ -107,7 +108,9 @@ public class RequiredPropertyConstructorExtension extends Extension {
             TsIdentifierReference[] callParameters = new TsIdentifierReference[parentParameters.size()];
             int i = 0;
             for (TsParameterModel parentParameter : parentParameters) {
-                parameters.add(parentParameter);
+                List<TsParameterModel> targetParameterList =
+                        parentParameter.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
+                targetParameterList.add(parentParameter);
                 callParameters[i] = new TsIdentifierReference(parentParameter.name);
                 i++;
             }
@@ -122,7 +125,10 @@ public class RequiredPropertyConstructorExtension extends Extension {
             if (predefinedValue.isPresent()) {
                 assignmentExpression = predefinedValue.get();
             } else {
-                parameters.add(new TsParameterModel(property.name, property.tsType));
+                TsParameterModel parameter = new TsParameterModel(property.name, property.tsType);
+                List<TsParameterModel> targetParameterList =
+                        property.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
+                targetParameterList.add(parameter);
                 assignmentExpression = new TsIdentifierReference(property.name);
             }
             TsMemberExpression leftHandSideExpression = new TsMemberExpression(new TsThisExpression(), property.name);
@@ -130,6 +136,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
             TsExpressionStatement assignmentStatement = new TsExpressionStatement(assignment);
             body.add(assignmentStatement);
         }
+        parameters.addAll(optionalParameters);
         if(parameters.isEmpty() && body.isEmpty()) {
             return Optional.empty();
         }
