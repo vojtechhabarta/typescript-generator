@@ -39,67 +39,93 @@ public class Input {
         return new Input(sourceTypes);
     }
 
+    @Deprecated
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
             boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
         return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, null, null,
-            jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader,
-            debug);
+                jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader,
+                debug);
     }
 
+    @Deprecated
     public static Input fromClassNamesAndJaxrsApplication(List<String> classNames,
-        List<String> classNamePatterns, List<String> classesWithAnnotations,
-        List<String> classesImplementingInterfaces, List<String> classesExtendingClasses,
-        String jaxrsApplicationClassName,
-        boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded,
-        URLClassLoader classLoader, boolean debug) {
+            List<String> classNamePatterns, List<String> classesWithAnnotations,
+            List<String> classesImplementingInterfaces, List<String> classesExtendingClasses,
+            String jaxrsApplicationClassName,
+            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded,
+            URLClassLoader classLoader, boolean debug) {
+        final Parameters parameters = new Parameters();
+        parameters.classNames = classNames;
+        parameters.classNamePatterns = classNamePatterns;
+        parameters.classesWithAnnotations = classesWithAnnotations;
+        parameters.classesImplementingInterfaces = classesImplementingInterfaces;
+        parameters.classesExtendingClasses = classesExtendingClasses;
+        parameters.jaxrsApplicationClassName = jaxrsApplicationClassName;
+        parameters.automaticJaxrsApplication = automaticJaxrsApplication;
+        parameters.isClassNameExcluded = isClassNameExcluded;
+        parameters.classLoader = classLoader;
+        parameters.debug = debug;
+        return from(parameters);
+    }
+
+    public static class Parameters {
+        public List<String> classNames;
+        public List<String> classNamePatterns;
+        public List<String> classesWithAnnotations;
+        public List<String> classesImplementingInterfaces;
+        public List<String> classesExtendingClasses;
+        public String jaxrsApplicationClassName;
+        public boolean automaticJaxrsApplication;
+        public Predicate<String> isClassNameExcluded;
+        public URLClassLoader classLoader;
+        public boolean debug;
+    }
+
+    public static Input from(Parameters parameters) {
         final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            if (classLoader != null) {
-                Thread.currentThread().setContextClassLoader(classLoader);
+            if (parameters.classLoader != null) {
+                Thread.currentThread().setContextClassLoader(parameters.classLoader);
             }
-            try (final ClasspathScanner classpathScanner = new ClasspathScanner(classLoader, debug)) {
+            try (final ClasspathScanner classpathScanner = new ClasspathScanner(parameters.classLoader, parameters.debug)) {
                 final List<SourceType<Type>> types = new ArrayList<>();
-                if (classNames != null) {
-                    types.addAll(fromClassNames(classNames));
+                if (parameters.classNames != null) {
+                    types.addAll(fromClassNames(parameters.classNames));
                 }
-                if (classNamePatterns != null) {
-                    types.addAll(fromClassNamePatterns(classpathScanner.getScanResult(), classNamePatterns));
+                if (parameters.classNamePatterns != null) {
+                    types.addAll(fromClassNamePatterns(classpathScanner.getScanResult(), parameters.classNamePatterns));
                 }
-                if (classesImplementingInterfaces != null) {
+                if (parameters.classesImplementingInterfaces != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
-                    final List<SourceType<Type>> c = fromClassNames(
-                        classesImplementingInterfaces.stream()
-                            .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames()
-                                .stream())
+                    final List<SourceType<Type>> c = fromClassNames(parameters.classesImplementingInterfaces.stream()
+                            .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames().stream())
                             .distinct()
                             .collect(Collectors.toList())
                     );
                     types.addAll(c);
                 }
-                if (classesExtendingClasses != null) {
+                if (parameters.classesExtendingClasses != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
-                    final List<SourceType<Type>> c = fromClassNames(
-                        classesExtendingClasses.stream()
-                            .flatMap(superclass -> scanResult.getSubclasses(superclass).getNames()
-                                .stream())
+                    final List<SourceType<Type>> c = fromClassNames(parameters.classesExtendingClasses.stream()
+                            .flatMap(superclass -> scanResult.getSubclasses(superclass).getNames().stream())
                             .distinct()
                             .collect(Collectors.toList())
                     );
                     types.addAll(c);
                 }
-                if (classesWithAnnotations != null) {
+                if (parameters.classesWithAnnotations != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
-                    types.addAll(fromClassNames(classesWithAnnotations.stream()
+                    types.addAll(fromClassNames(parameters.classesWithAnnotations.stream()
                             .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
                             .distinct()
                             .collect(Collectors.toList())
                     ));
                 }
-                if (jaxrsApplicationClassName != null) {
-                    types.addAll(fromClassNames(Arrays.asList(jaxrsApplicationClassName)));
+                if (parameters.jaxrsApplicationClassName != null) {
+                    types.addAll(fromClassNames(Arrays.asList(parameters.jaxrsApplicationClassName)));
                 }
-                if (automaticJaxrsApplication) {
-                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.getScanResult(), isClassNameExcluded));
+                if (parameters.automaticJaxrsApplication) {
+                    types.addAll(JaxrsApplicationScanner.scanAutomaticJaxrsApplication(classpathScanner.getScanResult(), parameters.isClassNameExcluded));
                 }
                 if (types.isEmpty()) {
                     final String errorMessage = "No input classes found.";
@@ -173,7 +199,7 @@ public class Input {
             // skip synthetic classes (as those generated by java compiler for switch with enum)
             // and anonymous classes (should not be processed and they do not have SimpleName)
             if (!cls.isSynthetic() && !cls.isAnonymousClass()) {
-                types.add(new SourceType<Type>(cls, null, null));
+                types.add(new SourceType<>(cls, null, null));
             }
         }
         return types;

@@ -210,20 +210,25 @@ public class GenerateTask extends DefaultTask {
             settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
             settings.loadJackson2Modules(classLoader, jackson2Modules);
             settings.classLoader = classLoader;
+
+            final Input.Parameters parameters = new Input.Parameters();
+            parameters.classNames = classes;
+            parameters.classNamePatterns = classPatterns;
+            parameters.classesWithAnnotations = classesWithAnnotations;
+            parameters.classesImplementingInterfaces = classesImplementingInterfaces;
+            parameters.classesExtendingClasses = classesExtendingClasses;
+            parameters.jaxrsApplicationClassName = classesFromJaxrsApplication;
+            parameters.automaticJaxrsApplication = classesFromAutomaticJaxrsApplication;
+            parameters.isClassNameExcluded = settings.getExcludeFilter();
+            parameters.classLoader = classLoader;
+            parameters.debug = loggingLevel == Logger.Level.Debug;
+
             final File output = outputFile != null
                     ? getProject().file(outputFile)
                     : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
             settings.validateFileName(output);
 
-            // TypeScriptGenerator
-            new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.fromClassNamesAndJaxrsApplication(classes, classPatterns, classesWithAnnotations,
-                        classesImplementingInterfaces, classesExtendingClasses,
-                        classesFromJaxrsApplication,
-                        classesFromAutomaticJaxrsApplication, settings.getExcludeFilter(),
-                        classLoader, loggingLevel == Logger.Level.Debug),
-                    Output.to(output)
-            );
+            new TypeScriptGenerator(settings).generateTypeScript(Input.from(parameters), Output.to(output));
         }
     }
 

@@ -68,23 +68,26 @@ public class InputTest {
 
     @Test
     public void testClassesWithAnnotations() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, Arrays.asList(MyJsonClass.class.getName()), null, null, null, false, null, null, false));
+        final Input.Parameters parameters = new Input.Parameters();
+        parameters.classesWithAnnotations = Arrays.asList(MyJsonClass.class.getName());
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
         Assert.assertTrue(output.contains("name: string;"));
     }
 
     @Test
     public void testClassesImplementingInterfaces() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, null, Arrays.asList(MyJsonInterface.class.getName()), null, null, false, null, null, false));
+        final Input.Parameters parameters = new Input.Parameters();
+        parameters.classesImplementingInterfaces = Arrays.asList(MyJsonInterface.class.getName());
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
         Assert.assertTrue(output.contains("firstName: string;"));
         Assert.assertTrue(output.contains("lastName: string;"));
     }
 
     @Test
     public void testClassesExtendingClasses() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
-                null, null, null, null, Arrays.asList(MyJsonInterfaceImpl.class.getName()), null, false, null, null, false));
+        final Input.Parameters parameters = new Input.Parameters();
+        parameters.classesExtendingClasses = Arrays.asList(MyJsonInterfaceImpl.class.getName());
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
         Assert.assertTrue(output.contains("lastName: string;"));
     }
 
