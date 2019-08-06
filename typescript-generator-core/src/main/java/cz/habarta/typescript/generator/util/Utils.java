@@ -81,13 +81,20 @@ public class Utils {
     }
 
     public static Class<?> getRawClassOrNull(Type type) {
-        if (type instanceof Class<?>) {
-            return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
+        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
+        return rawClassAndTypeArguments != null ? rawClassAndTypeArguments.getValue1() : null;
+    }
+
+    public static Pair<Class<?>, List<Type>> getRawClassAndTypeArguments(Type type) {
+        if (type instanceof Class) {
+            final Class<?> javaClass = (Class<?>) type;
+            return Pair.of(javaClass, Collections.emptyList());
+        }
+        if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
-            final Type rawType = parameterizedType.getRawType();
-            if (rawType instanceof Class<?>) {
-                return (Class<?>) rawType;
+            if (parameterizedType.getRawType() instanceof Class) {
+                final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
+                return Pair.of(javaClass, Arrays.asList(parameterizedType.getActualTypeArguments()));
             }
         }
         return null;

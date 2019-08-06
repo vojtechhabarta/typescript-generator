@@ -70,10 +70,8 @@ public class GenericCustomTypeMappingsTest {
     public void testInvalidGenerics() {
         testInvalid("NonExisting", "string");
         testInvalid(NonGeneric.class.getName() + "<T>", "string");
-        testInvalid(NonGeneric.class.getName(), "string<T>");
         testInvalid(Generic2.class.getName(), "string");
         testInvalid(Generic2.class.getName() + "<T>", "string");
-        testInvalid(Generic2.class.getName() + "<T1, T2>", "string<T>");
     }
 
     private static void testInvalid(String javaName, String tsName) {
@@ -103,7 +101,18 @@ public class GenericCustomTypeMappingsTest {
         Assert.assertTrue(output.contains("generic: number"));
     }
 
+    @Test
+    public void testMapStringString() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$NonGeneric", "Map<string, string>");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(NonGenericUsage.class));
+        Assert.assertTrue(output.contains("nonGeneric: Map<string, string>"));
+    }
+
     private static class NonGeneric {}
+    private static class NonGenericUsage {
+        public NonGeneric nonGeneric;
+    }
     private static class Generic2<T1, T2> {}
     private static class Usage {
         public Generic2<String, Integer> generic;

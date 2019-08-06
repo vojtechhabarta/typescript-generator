@@ -151,6 +151,10 @@ public class Settings {
             this.rawName = Objects.requireNonNull(rawName);
             this.typeParameters = typeParameters;
         }
+
+        public int indexOfTypeParameter(String typeParameter) {
+            return typeParameters != null ? typeParameters.indexOf(typeParameter) : -1;
+        }
     }
 
     private static class TypeScriptGeneratorURLClassLoader extends URLClassLoader {
@@ -412,16 +416,6 @@ public class Settings {
                         throw new RuntimeException(String.format(
                                 "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
                                 required, specified, signature));
-                    }
-                    if (genericTsName.typeParameters != null) {
-                        final Set<String> parameters = Stream.of(cls.getTypeParameters())
-                                .map(TypeVariable::getName)
-                                .collect(Collectors.toSet());
-                        for (String parameter : genericTsName.typeParameters) {
-                            if (!parameters.contains(parameter)) {
-                                throw new RuntimeException(String.format("Unknown generic type parameter '%s'", parameter));
-                            }
-                        }
                     }
                     validatedCustomTypeMappings.add(new CustomTypeMapping(genericJavaName, genericTsName));
                 } catch (Exception e) {

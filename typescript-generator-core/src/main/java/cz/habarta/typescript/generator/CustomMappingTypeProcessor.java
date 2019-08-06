@@ -1,7 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
-import java.lang.reflect.ParameterizedType;
+import cz.habarta.typescript.generator.util.Pair;
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,47 +23,46 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
-        if (javaType instanceof Class) {
-            final Class<?> javaClass = (Class<?>) javaType;
-            final Settings.CustomTypeMapping mapping = customMappings.get(javaClass.getName());
-            if (mapping != null) {
-                return new Result(new TsType.BasicType(mapping.tsType.rawName));
-            }
+        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(javaType);
+        if (rawClassAndTypeArguments == null) {
+            return null;
         }
-        if (javaType instanceof ParameterizedType) {
-            final ParameterizedType parameterizedType = (ParameterizedType) javaType;
-            if (parameterizedType.getRawType() instanceof Class) {
-                final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                final Settings.CustomTypeMapping mapping = customMappings.get(javaClass.getName());
-                if (mapping != null) {
-                    final List<Class<?>> discoveredClasses = new ArrayList<>();
-                    final Function<Integer, TsType> processGenericParameter = index -> {
-                        final Type typeArgument = parameterizedType.getActualTypeArguments()[index];
-                        final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
-                        discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
-                        return typeArgumentResult.getTsType();
-                    };
-                    if (mapping.tsType.typeParameters != null) {
-                        final List<TsType> tsTypeArguments = new ArrayList<>();
-                        for (String typeParameter : mapping.tsType.typeParameters) {
-                            final int index = mapping.javaType.typeParameters.indexOf(typeParameter);
-                            final TsType tsType = processGenericParameter.apply(index);
-                            tsTypeArguments.add(tsType);
-                        }
-                        return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), discoveredClasses);
-                    } else {
-                        final int index = mapping.javaType.typeParameters.indexOf(mapping.tsType.rawName);
-                        if (index != -1) {
-                            final TsType tsType = processGenericParameter.apply(index);
-                            return new Result(tsType, discoveredClasses);
-                        } else {
-                            return new Result(new TsType.BasicType(mapping.tsType.rawName), discoveredClasses);
-                        }
-                    }
+        final Class<?> rawClass = rawClassAndTypeArguments.getValue1();
+        final List<Type> typeArguments = rawClassAndTypeArguments.getValue2();
+        final Settings.CustomTypeMapping mapping = customMappings.get(rawClass.getName());
+        if (mapping == null) {
+            return null;
+        }
+
+        final List<Class<?>> discoveredClasses = new ArrayList<>();
+        final Function<Integer, TsType> processGenericParameter = index -> {
+            final Type typeArgument = typeArguments.get(index);
+            final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
+            discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
+            return typeArgumentResult.getTsType();
+        };
+        if (mapping.tsType.typeParameters != null) {
+            final List<TsType> tsTypeArguments = new ArrayList<>();
+            for (String typeParameter : mapping.tsType.typeParameters) {
+                final TsType tsType;
+                final int index = mapping.javaType.indexOfTypeParameter(typeParameter);
+                if (index != -1) {
+                    tsType = processGenericParameter.apply(index);
+                } else {
+                    tsType = new TsType.VerbatimType(typeParameter);
                 }
+                tsTypeArguments.add(tsType);
+            }
+            return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), discoveredClasses);
+        } else {
+            final int index = mapping.javaType.indexOfTypeParameter(mapping.tsType.rawName);
+            if (index != -1) {
+                final TsType tsType = processGenericParameter.apply(index);
+                return new Result(tsType, discoveredClasses);
+            } else {
+                return new Result(new TsType.BasicType(mapping.tsType.rawName), discoveredClasses);
             }
         }
-        return null;
     }
 
 }
