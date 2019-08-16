@@ -11,7 +11,6 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
-
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -22,7 +22,6 @@ import cz.habarta.typescript.generator.emitter.TsStatement;
 import cz.habarta.typescript.generator.emitter.TsStringLiteral;
 import cz.habarta.typescript.generator.emitter.TsSuperExpression;
 import cz.habarta.typescript.generator.emitter.TsThisExpression;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
