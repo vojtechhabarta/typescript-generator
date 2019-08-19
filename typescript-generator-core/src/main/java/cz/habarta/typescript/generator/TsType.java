@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -49,7 +50,7 @@ public abstract class TsType implements Emittable {
     public String toString() {
         return format(new Settings());
     }
-
+    
     public static class BasicType extends TsType {
 
         public final String name;
@@ -79,7 +80,7 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return name + "<" + Emitter.formatList(settings, typeArguments) + ">";
+            return super.format(settings) + "<" + Emitter.formatList(settings, typeArguments) + ">";
         }
     }
 
@@ -130,7 +131,7 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return symbol.getFullName() + "<" + Emitter.formatList(settings, typeArguments) + ">";
+            return super.format(settings) + "<" + Emitter.formatList(settings, typeArguments) + ">";
         }
     }
     

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class Emitter implements EmitterExtension.Writer {
@@ -129,24 +130,7 @@ public class Emitter implements EmitterExtension.Writer {
         emitTypeAliases(model, exportKeyword, declareKeyword);
         emitLiteralEnums(model, exportKeyword, declareKeyword);
         emitHelpers(model);
-        for (EmitterExtension emitterExtension : settings.extensions) {
-            final List<String> extensionLines = new ArrayList<>();
-            final EmitterExtension.Writer extensionWriter = new EmitterExtension.Writer() {
-                @Override
-                public void writeIndentedLine(String line) {
-                    extensionLines.add(line);
-                }
-            };
-            emitterExtension.emitElements(extensionWriter, settings, exportKeyword, model);
-            if (!extensionLines.isEmpty()) {
-                writeNewLine();
-                writeNewLine();
-                writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
-                for (String line : extensionLines) {
-                    this.writeIndentedLine(line);
-                }
-            }
-        }
+        emitExtensions(model, exportKeyword);
     }
 
     private void emitBeans(TsModel model, boolean exportKeyword, boolean declareKeyword) {
@@ -201,8 +185,8 @@ public class Emitter implements EmitterExtension.Writer {
         final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
         final List<TsType> extendsList = bean.getExtendsList();
         final List<TsType> implementsList = bean.getImplementsList();
-        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
-        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
+        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Emitter.formatList(settings, extendsList);
+        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Emitter.formatList(settings, implementsList);
         writeIndentedLine(exportKeyword, declarationType + " " + bean.getName().getSimpleName() + typeParameters + extendsClause + implementsClause + " {");
         indent++;
         for (TsPropertyModel property : bean.getProperties()) {
@@ -359,7 +343,7 @@ public class Emitter implements EmitterExtension.Writer {
         emitComments(alias.getComments());
         final String genericParameters = alias.getTypeParameters().isEmpty()
                 ? ""
-                : "<" + Utils.join(alias.getTypeParameters(), ", ") + ">";
+                : "<" + Emitter.formatList(settings, alias.getTypeParameters()) + ">";
         writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 
@@ -386,6 +370,27 @@ public class Emitter implements EmitterExtension.Writer {
         for (TsHelper helper : model.getHelpers()) {
             writeNewLine();
             writeTemplate(this, settings, helper.getLines(), null);
+        }
+    }
+
+    private void emitExtensions(TsModel model, boolean exportKeyword) {
+        for (EmitterExtension emitterExtension : settings.extensions) {
+            final List<String> extensionLines = new ArrayList<>();
+            final EmitterExtension.Writer extensionWriter = new EmitterExtension.Writer() {
+                @Override
+                public void writeIndentedLine(String line) {
+                    extensionLines.add(line);
+                }
+            };
+            emitterExtension.emitElements(extensionWriter, settings, exportKeyword, model);
+            if (!extensionLines.isEmpty()) {
+                writeNewLine();
+                writeNewLine();
+                writeIndentedLine(String.format("// Added by '%s' extension", emitterExtension.getClass().getSimpleName()));
+                for (String line : extensionLines) {
+                    this.writeIndentedLine(line);
+                }
+            }
         }
     }
 
