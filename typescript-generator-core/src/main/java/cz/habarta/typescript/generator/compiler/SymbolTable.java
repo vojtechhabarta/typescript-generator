@@ -177,7 +177,7 @@ public class SymbolTable {
                 safeParts.add(isReservedWord(part) ? "_" + part : part);
             }
             safeParts.add(simpleName);
-            return Utils.join(safeParts, ".");
+            return String.join(".", safeParts);
         } else {
             return simpleName;
         }

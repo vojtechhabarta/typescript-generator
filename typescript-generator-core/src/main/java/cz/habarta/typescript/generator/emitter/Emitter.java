@@ -182,11 +182,11 @@ public class Emitter implements EmitterExtension.Writer {
         writeNewLine();
         emitComments(bean.getComments());
         final String declarationType = bean.isClass() ? "class" : "interface";
-        final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
+        final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + formatList(settings, bean.getTypeParameters()) + ">";
         final List<TsType> extendsList = bean.getExtendsList();
         final List<TsType> implementsList = bean.getImplementsList();
-        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Emitter.formatList(settings, extendsList);
-        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Emitter.formatList(settings, implementsList);
+        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + formatList(settings, extendsList);
+        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + formatList(settings, implementsList);
         writeIndentedLine(exportKeyword, declarationType + " " + bean.getName().getSimpleName() + typeParameters + extendsClause + implementsClause + " {");
         indent++;
         for (TsPropertyModel property : bean.getProperties()) {
@@ -224,11 +224,9 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     public static String formatList(Settings settings, List<? extends Emittable> list, String delimiter) {
-        final List<String> result = new ArrayList<>();
-        for (Emittable item : list) {
-            result.add(item.format(settings));
-        }
-        return Utils.join(result, delimiter);
+        return list.stream()
+                .map(item -> item.format(settings))
+                .collect(Collectors.joining(delimiter));
     }
 
     private void emitCallable(TsCallableModel method) {
@@ -263,8 +261,8 @@ public class Emitter implements EmitterExtension.Writer {
         }
         boolean parentheses = alwaysEncloseInParentheses || (parameters.size() != 1 || parameters.get(0).tsType != null);
         return parentheses
-                ? "(" + Utils.join(params, ", ") + ")"
-                : Utils.join(params, ", ");
+                ? "(" + String.join(", ", params) + ")"
+                : String.join(", ", params);
     }
 
     private void emitStatements(List<TsStatement> statements) {
@@ -343,7 +341,7 @@ public class Emitter implements EmitterExtension.Writer {
         emitComments(alias.getComments());
         final String genericParameters = alias.getTypeParameters().isEmpty()
                 ? ""
-                : "<" + Emitter.formatList(settings, alias.getTypeParameters()) + ">";
+                : "<" + formatList(settings, alias.getTypeParameters()) + ">";
         writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 

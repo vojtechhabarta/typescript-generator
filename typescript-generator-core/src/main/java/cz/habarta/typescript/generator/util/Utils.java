@@ -44,25 +44,11 @@ public class Utils {
     private Utils() {
     }
 
-    public static String join(Iterable<? extends Object> values, String delimiter) {
-        final StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Object value : values) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(delimiter);
-            }
-            sb.append(value);
-        }
-        return sb.toString();
-    }
-
     public static String joinPath(String part1, String part2) {
         final List<String> parts = new ArrayList<>();
         addPathPart(parts, part1);
         addPathPart(parts, part2);
-        return join(parts, "/");
+        return String.join("/", parts);
     }
 
     private static void addPathPart(List<String> parts, String part) {
@@ -302,8 +288,10 @@ public class Utils {
     }
 
     public static String readString(InputStream stream) {
-        final Scanner s = new Scanner(stream, "UTF-8").useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        try (Scanner scanner = new Scanner(stream, "UTF-8")) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        }
     }
 
     public static String readString(InputStream stream, String lineEndings) {

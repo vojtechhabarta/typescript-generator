@@ -33,9 +33,8 @@ public class TsObjectLiteral extends TsExpression {
         if (props.isEmpty()) {
             return "{}";
         } else {
-            return "{ " + Utils.join(props, ", ") + " }";
+            return "{ " + String.join(", ", props) + " }";
         }
-        
     }
 
 }

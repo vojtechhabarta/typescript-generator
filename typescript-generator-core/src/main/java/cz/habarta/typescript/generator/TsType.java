@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -278,7 +277,7 @@ public abstract class TsType implements Emittable {
             if (props.isEmpty()) {
                 return "{}";
             } else {
-                return "{ " + Utils.join(props, " ") + " }";
+                return "{ " + java.lang.String.join(" ", props) + " }";
             }
         }
 
