@@ -105,11 +105,8 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <includeTestResources>true</includeTestResources>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <configLocation>../checkstyle.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
                 </configuration>
             </plugin>
             <plugin>
