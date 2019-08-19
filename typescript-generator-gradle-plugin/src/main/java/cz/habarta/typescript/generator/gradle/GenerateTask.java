@@ -128,7 +128,7 @@ public class GenerateTask extends DefaultTask {
         // class loader
         final Set<URL> urls = new LinkedHashSet<>();
         for (Task task : getProject().getTasks()) {
-            if (task.getName().startsWith("compile")) {
+            if (task.getName().startsWith("compile") && !task.getName().startsWith("compileTest")) {
                 for (File file : task.getOutputs().getFiles()) {
                     urls.add(file.toURI().toURL());
                 }

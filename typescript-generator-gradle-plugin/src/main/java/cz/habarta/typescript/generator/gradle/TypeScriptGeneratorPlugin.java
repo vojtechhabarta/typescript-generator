@@ -14,7 +14,7 @@ public class TypeScriptGeneratorPlugin implements Plugin<Project> {
         final Task generateTsTask = project.task(Collections.singletonMap(Task.TASK_TYPE, GenerateTask.class), "generateTypeScript");
 
         for (Task task : project.getTasks()) {
-            if (task.getName().startsWith("compile")) {
+            if (task.getName().startsWith("compile") && !task.getName().startsWith("compileTest")) {
                 generateTsTask.dependsOn(task.getName());
             }
         }
