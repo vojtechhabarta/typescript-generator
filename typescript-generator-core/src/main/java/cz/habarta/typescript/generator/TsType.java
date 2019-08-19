@@ -51,12 +51,6 @@ public abstract class TsType implements Emittable {
         return format(new Settings());
     }
     
-    public static List<String> strinfigyList(List<? extends TsType> types, Settings settings) {
-        return types.stream()
-                .map(t -> t.format(settings))
-                .collect(Collectors.toList());
-    }
-
     public static class BasicType extends TsType {
 
         public final String name;

@@ -183,10 +183,10 @@ public class Emitter implements EmitterExtension.Writer {
         emitComments(bean.getComments());
         final String declarationType = bean.isClass() ? "class" : "interface";
         final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + Utils.join(bean.getTypeParameters(), ", ")+ ">";
-        final List<String> extendsList = TsType.strinfigyList(bean.getExtendsList(), settings);
-        final List<String> implementsList = TsType.strinfigyList(bean.getImplementsList(), settings);
-        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Utils.join(extendsList, ", ");
-        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Utils.join(implementsList, ", ");
+        final List<TsType> extendsList = bean.getExtendsList();
+        final List<TsType> implementsList = bean.getImplementsList();
+        final String extendsClause = extendsList.isEmpty() ? "" : " extends " + Emitter.formatList(settings, extendsList);
+        final String implementsClause = implementsList.isEmpty() ? "" : " implements " + Emitter.formatList(settings, implementsList);
         writeIndentedLine(exportKeyword, declarationType + " " + bean.getName().getSimpleName() + typeParameters + extendsClause + implementsClause + " {");
         indent++;
         for (TsPropertyModel property : bean.getProperties()) {
@@ -343,7 +343,7 @@ public class Emitter implements EmitterExtension.Writer {
         emitComments(alias.getComments());
         final String genericParameters = alias.getTypeParameters().isEmpty()
                 ? ""
-                : "<" + Utils.join(TsType.strinfigyList(alias.getTypeParameters(), settings), ", ") + ">";
+                : "<" + Emitter.formatList(settings, alias.getTypeParameters()) + ">";
         writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 
