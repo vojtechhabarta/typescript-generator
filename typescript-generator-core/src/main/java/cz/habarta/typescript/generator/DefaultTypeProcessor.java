@@ -30,7 +30,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
-        if (KnownTypes.containsKey(javaType)) return new Result(KnownTypes.get(javaType));
+        if (KnownTypes.containsKey(javaType)) {
+            return new Result(KnownTypes.get(javaType));
+        }
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
             if (Temporal.class.isAssignableFrom(javaClass)) {

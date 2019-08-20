@@ -22,13 +22,10 @@ public class TsModel {
     }
 
     public TsModel(List<TsBeanModel> beans, List<TsEnumModel> enums, List<TsEnumModel> originalStringEnums, List<TsAliasModel> typeAliases, List<TsHelper> helpers) {
-        if (beans == null) throw new NullPointerException();
-        if (enums == null) throw new NullPointerException();
-        if (typeAliases == null) throw new NullPointerException();
-        this.beans = beans;
-        this.enums = enums;
+        this.beans = Objects.requireNonNull(beans);
+        this.enums = Objects.requireNonNull(enums);
         this.originalStringEnums = originalStringEnums;
-        this.typeAliases = typeAliases;
+        this.typeAliases = Objects.requireNonNull(typeAliases);
         this.helpers = helpers;
     }
 

@@ -9,7 +9,11 @@
 
     <module name="FileTabCharacter"/>
 
+    <module name="SuppressWarningsFilter"/>
+
     <module name="TreeWalker">
+
+        <module name="SuppressWarningsHolder"/>
 
         <module name="ImportOrder">
             <property name="option" value="inflow"/>
@@ -17,6 +21,10 @@
         </module>
 
         <module name="AvoidStarImport"/>
+
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true" />
+        </module>
 
     </module>
 </module>

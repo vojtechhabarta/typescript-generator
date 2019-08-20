@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class Model {
@@ -11,10 +12,8 @@ public class Model {
     private final List<RestApplicationModel> restApplications;
 
     public Model(List<BeanModel> beans, List<EnumModel> enums, List<RestApplicationModel> restApplications) {
-        if (beans == null) throw new NullPointerException();
-        if (enums == null) throw new NullPointerException();
-        this.beans = beans;
-        this.enums = enums;
+        this.beans = Objects.requireNonNull(beans);
+        this.enums = Objects.requireNonNull(enums);
         this.restApplications = restApplications;
     }
 

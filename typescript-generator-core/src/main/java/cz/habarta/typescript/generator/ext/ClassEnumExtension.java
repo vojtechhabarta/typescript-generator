@@ -44,8 +44,9 @@ public class ClassEnumExtension extends Extension {
                 List<TsBeanModel> beans = model.getBeans();
                 List<TsBeanModel> classEnums = new ArrayList<>();
                 for (TsBeanModel bean : beans) {
-                    if (bean.getName().getSimpleName().contains(classEnumPattern))
+                    if (bean.getName().getSimpleName().contains(classEnumPattern)) {
                         classEnums.add(bean);
+                    }
                 }
 
                 List<TsEnumModel> stringEnums = new ArrayList<>();

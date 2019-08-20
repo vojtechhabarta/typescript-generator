@@ -60,8 +60,9 @@ public class GsonParser extends ModelParser {
             for (Field field : cls.getDeclaredFields()) {
                 String name = field.getName();
                 SerializedName serializedName = field.getAnnotation(SerializedName.class);
-                if (serializedName != null)
+                if (serializedName != null) {
                     name = serializedName.value();
+                }
                 properties.add(new PropertyModel(name, field.getGenericType(), false, field, null, null, null));
                 addBeanToQueue(new SourceType<>(field.getGenericType(), sourceClass.type, name));
             }
