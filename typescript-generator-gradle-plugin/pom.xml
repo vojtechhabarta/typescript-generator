@@ -13,7 +13,7 @@
     <name>typescript-generator-gradle-plugin</name>
 
     <properties>
-        <gradle.version>2.1</gradle.version>
+        <gradle.version>3.0</gradle.version>
     </properties>
 
     <dependencies>
@@ -30,6 +30,11 @@
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-base-services-groovy</artifactId>
+            <version>${gradle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gradle</groupId>
+            <artifactId>gradle-logging</artifactId>
             <version>${gradle.version}</version>
         </dependency>
         <dependency>
