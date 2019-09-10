@@ -137,7 +137,9 @@ public class SpringApplicationParser extends RestApplicationParser {
         public List<Class<?>> findRestControllers() {
             try (ConfigurableApplicationContext context = createApplicationContext()) {
                 load(context, getAllSources().toArray());
-                context.refresh();
+                withSystemProperty("server.port", "0", () -> {
+                    context.refresh();
+                });
                 final List<Class<?>> classes = Stream.of(context.getBeanDefinitionNames())
                         .map(beanName -> context.getBeanFactory().getBeanDefinition(beanName).getBeanClassName())
                         .filter(Objects::nonNull)
@@ -155,6 +157,20 @@ public class SpringApplicationParser extends RestApplicationParser {
             }
         }
 
+    }
+
+    private static void withSystemProperty(String name, String value, Runnable runnable) {
+        final String original = System.getProperty(name);
+        try {
+            System.setProperty(name, value);
+            runnable.run();
+        } finally {
+            if (original != null) {
+                System.setProperty(name, original);
+            } else {
+                System.getProperties().remove(name);
+            }
+        }
     }
 
     private void parseController(JaxrsApplicationParser.Result result, JaxrsApplicationParser.ResourceContext context, Class<?> controllerClass) {
