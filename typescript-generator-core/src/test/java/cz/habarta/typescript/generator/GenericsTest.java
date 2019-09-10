@@ -2,11 +2,14 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -68,6 +71,7 @@ public class GenericsTest {
                 "}" + nl +
                 "" + nl +
                 "export interface E extends D<F> {" + nl +
+                "    x: F;" + nl +
                 "}" + nl +
                 "" + nl +
                 "export interface F {" + nl +
@@ -88,6 +92,7 @@ public class GenericsTest {
         final String expected =
                 "export interface IA extends IB<string> {" + nl +
                 "    type: string;" + nl +
+                "    x: string;" + nl +
                 "}" + nl +
                 "" + nl +
                 "export interface IB<T> {" + nl +
@@ -189,6 +194,31 @@ public class GenericsTest {
 
     interface ExecutionResult {
         public <T extends Number> T getData();
+    }
+
+    @Test
+    public void testSpecificTypeInGeneratedClass() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.outputKind = TypeScriptOutputKind.module;
+        settings.mapClasses = ClassMapping.asClasses;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Entity1View.class));
+        Assert.assertTrue(output.contains(""
+                + "export class Entity1View implements Entity1IdView {\n"
+                + "    id: string;\n"
+                + "    name: string;\n"
+                + "}"));
+    }
+
+    public interface IdView<T extends Serializable> {
+        T getId();
+    }
+
+    public interface Entity1IdView extends IdView<UUID> {
+    }
+
+    public static abstract class Entity1View implements Entity1IdView {
+        public String name;
     }
 
 }

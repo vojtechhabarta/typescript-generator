@@ -48,6 +48,7 @@ import cz.habarta.typescript.generator.parser.PropertyModel;
 import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
+import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
@@ -251,7 +252,7 @@ public class ModelCompiler {
                 implementsList.add(parentType);
             } else {
                 extendsList.add(parentType);
-        }
+            }
         }
 
         final List<TsType> interfaces = new ArrayList<>();
@@ -375,7 +376,10 @@ public class ModelCompiler {
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
-        final TsType type = typeFromJava(symbolTable, property.getType(), property.getContext(), property.getName(), bean.getOrigin());
+        final Type resolvedType = property.getOriginalMember() != null
+                ? GenericsResolver.resolveType(bean.getOrigin(), property.getType(), property.getOriginalMember().getDeclaringClass())
+                : property.getType();
+        final TsType type = typeFromJava(symbolTable, resolvedType, property.getContext(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
         return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, property.getComments());

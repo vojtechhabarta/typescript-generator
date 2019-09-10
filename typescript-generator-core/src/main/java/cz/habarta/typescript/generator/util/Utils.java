@@ -198,6 +198,10 @@ public class Utils {
         return newClass;
     }
 
+    public static ParameterizedType createParameterizedType(final Type rawType, final List<Type> actualTypeArguments) {
+        return createParameterizedType(rawType, actualTypeArguments.toArray(new Type[0]));
+    }
+
     public static ParameterizedType createParameterizedType(final Type rawType, final Type... actualTypeArguments) {
         final Type ownerType = null;
         return new ParameterizedType() {
@@ -235,6 +239,16 @@ public class Utils {
             @Override
             public int hashCode() {
                 return Objects.hash(ownerType, rawType, actualTypeArguments);
+            }
+
+            @Override
+            public String toString() {
+                return (rawType instanceof Class ? ((Class<?>)rawType).getName() : rawType.getTypeName())
+                        + "<"
+                        + Stream.of(actualTypeArguments)
+                                .map(type -> type.getTypeName())
+                                .collect(Collectors.joining(", "))
+                        + ">";
             }
         };
     }

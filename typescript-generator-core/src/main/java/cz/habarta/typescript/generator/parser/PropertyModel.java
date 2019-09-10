@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 
 public class PropertyModel {
@@ -27,8 +28,8 @@ public class PropertyModel {
     }
 
     public PropertyModel(String name, Type type, boolean optional, Member originalMember, PullProperties pullProperties, Object context, List<String> comments) {
-        this.name = name;
-        this.type = type;
+        this.name = Objects.requireNonNull(name);
+        this.type = Objects.requireNonNull(type);
         this.optional = optional;
         this.originalMember = originalMember;
         this.pullProperties = pullProperties;
