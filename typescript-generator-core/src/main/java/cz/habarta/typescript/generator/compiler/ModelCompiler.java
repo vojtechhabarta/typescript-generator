@@ -232,7 +232,7 @@ public class ModelCompiler {
                 Type processedAncestor = processTypeForDescendantLookup(ancestor);
 
                 if (!children.containsKey(processedAncestor)) {
-                    children.put(processedAncestor, new ArrayList<BeanModel>());
+                    children.put(processedAncestor, new ArrayList<>());
                 }
                 children.get(processedAncestor).add(bean);
             }
@@ -376,10 +376,7 @@ public class ModelCompiler {
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
-        final Type resolvedType = property.getOriginalMember() != null
-                ? GenericsResolver.resolveType(bean.getOrigin(), property.getType(), property.getOriginalMember().getDeclaringClass())
-                : property.getType();
-        final TsType type = typeFromJava(symbolTable, resolvedType, property.getContext(), property.getName(), bean.getOrigin());
+        final TsType type = typeFromJava(symbolTable, property.getType(), property.getContext(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
         return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, property.getComments());

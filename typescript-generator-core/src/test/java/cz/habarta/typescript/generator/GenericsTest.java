@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -205,16 +204,20 @@ public class GenericsTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Entity1View.class));
         Assert.assertTrue(output.contains(""
                 + "export class Entity1View implements Entity1IdView {\n"
-                + "    id: string;\n"
+                + "    id: MyId;\n"
                 + "    name: string;\n"
                 + "}"));
+        Assert.assertTrue(output.contains("export class MyId"));
+    }
+
+    public static class MyId implements Serializable {
     }
 
     public interface IdView<T extends Serializable> {
         T getId();
     }
 
-    public interface Entity1IdView extends IdView<UUID> {
+    public interface Entity1IdView extends IdView<MyId> {
     }
 
     public static abstract class Entity1View implements Entity1IdView {
