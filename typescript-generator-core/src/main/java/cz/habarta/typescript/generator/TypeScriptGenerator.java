@@ -125,7 +125,7 @@ public class TypeScriptGenerator {
                 npmPackageJson.devDependencies = Collections.singletonMap("typescript", settings.typescriptVersion);
                 final String npmBuildScript = settings.npmBuildScript != null
                         ? settings.npmBuildScript
-                        : "tsc --module umd --moduleResolution node --target es5 --lib es6 --declaration --sourceMap $outputFile";
+                        : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";
                 final String build = npmBuildScript.replaceAll(Pattern.quote("$outputFile"), outputFile.getName());
                 npmPackageJson.scripts = Collections.singletonMap("build", build);
             }

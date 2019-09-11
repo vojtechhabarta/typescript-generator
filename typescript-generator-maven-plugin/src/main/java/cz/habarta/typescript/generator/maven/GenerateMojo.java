@@ -632,7 +632,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies NPM "build" script.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
-     * Default value is <code>tsc --module umd --moduleResolution node --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.
+     * Default value is <code>tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.
      */
     @Parameter
     private String npmBuildScript;
