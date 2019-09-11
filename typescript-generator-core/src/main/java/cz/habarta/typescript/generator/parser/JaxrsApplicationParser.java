@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -162,8 +163,9 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
                     final Type type = context.pathParamTypes.get(parameter.getOriginalName());
                     final Type paramType = type != null ? type : String.class;
-                    pathParams.add(new MethodParameterModel(parameter.getValidName(), paramType));
-                    foundType(result, paramType, resourceClass, method.getName());
+                    final Type resolvedParamType = GenericsResolver.resolveType(resourceClass, paramType, method.getDeclaringClass());
+                    pathParams.add(new MethodParameterModel(parameter.getValidName(), resolvedParamType));
+                    foundType(result, resolvedParamType, resourceClass, method.getName());
                 }
             }
             // query parameters
@@ -187,7 +189,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 }
             }
             // JAX-RS specification - 3.3.2.1 Entity Parameters
-            final MethodParameterModel entityParameter = getEntityParameter(method);
+            final MethodParameterModel entityParameter = getEntityParameter(resourceClass, method);
             if (entityParameter != null) {
                 foundType(result, entityParameter.getType(), resourceClass, method.getName());
             }
@@ -200,7 +202,6 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 if (hasAnyAnnotation(method.getParameters(), Collections.singletonList(Suspended.class))) {
                     if (swaggerOperation.responseType != null) {
                         modelReturnType = swaggerOperation.responseType;
-                        foundType(result, modelReturnType, resourceClass, method.getName());
                     } else {
                         modelReturnType = Object.class;
                     }
@@ -210,22 +211,21 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             } else if (returnType == Response.class) {
                 if (swaggerOperation.responseType != null) {
                     modelReturnType = swaggerOperation.responseType;
-                    foundType(result, modelReturnType, resourceClass, method.getName());
                 } else {
                     modelReturnType = Object.class;
                 }
             } else if (genericReturnType instanceof ParameterizedType && returnType == GenericEntity.class) {
                 final ParameterizedType parameterizedReturnType = (ParameterizedType) genericReturnType;
                 modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];
-                foundType(result, modelReturnType, resourceClass, method.getName());
             } else {
                 modelReturnType = genericReturnType;
-                foundType(result, modelReturnType, resourceClass, method.getName());
             }
+            final Type resolvedModelReturnType = GenericsResolver.resolveType(resourceClass, modelReturnType, method.getDeclaringClass());
+            foundType(result, resolvedModelReturnType, resourceClass, method.getName());
             // comments
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
-            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), modelReturnType,
+            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType,
                     context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
@@ -274,7 +274,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
     }
 
-    private static MethodParameterModel getEntityParameter(Method method) {
+    private static MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method) {
         for (Parameter parameter : method.getParameters()) {
             if (!Utils.hasAnyAnnotation(parameter::getAnnotation, Arrays.asList(
                     MatrixParam.class,
@@ -287,7 +287,8 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     FormParam.class,
                     BeanParam.class
             ))) {
-                return new MethodParameterModel(parameter.getName(), parameter.getParameterizedType());
+                final Type resolvedType = GenericsResolver.resolveType(resourceClass, parameter.getParameterizedType(), method.getDeclaringClass());
+                return new MethodParameterModel(parameter.getName(), resolvedType);
             }
         }
         return null;

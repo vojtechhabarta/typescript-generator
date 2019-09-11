@@ -89,7 +89,7 @@ public class JaxrsApplicationTest {
                 I.class,
                 J[].class,
                 // types handled by DefaultTypeProcessor
-                String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class
+                String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class, void.class
         );
         assertHasSameItems(expectedTypes, types);
     }
@@ -622,6 +622,35 @@ public class JaxrsApplicationTest {
         public String getWithId(@PathParam("id") long id) {
             return null;
         }
+    }
+
+    @Test
+    public void testGenericResources() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationClient = true;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AccountResource.class));
+        Assert.assertTrue(!output.contains("get(id: ID): RestResponse<ENTITY>"));
+        Assert.assertTrue(output.contains("get(id: number): RestResponse<AccountDto>"));
+        Assert.assertTrue(output.contains("interface AccountDto"));
+    }
+
+    public static class AccountDto {
+        public Integer id;
+        public String name;
+    }
+
+    public static interface AbstractCrudResource<ENTITY, ID> {
+        @GET
+        @Path("{id}")
+        public ENTITY get(@PathParam("id") ID id);
+    }
+
+    @Path("/account")
+    public static interface AccountResource extends AbstractCrudResource<AccountDto, Integer> {
+        @GET
+        @Path("/test")
+        void test();
     }
 
     public static void main(String[] args) {
