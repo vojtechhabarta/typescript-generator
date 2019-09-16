@@ -52,7 +52,6 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -229,8 +228,7 @@ public class ModelCompiler {
         final Map<Type, List<BeanModel>> children = new LinkedHashMap<>();
         for (BeanModel bean : model.getBeans()) {
             for (Type ancestor : bean.getParentAndInterfaces()) {
-                Type processedAncestor = processTypeForDescendantLookup(ancestor);
-
+                final Type processedAncestor = Utils.getRawClassOrNull(ancestor);
                 if (!children.containsKey(processedAncestor)) {
                     children.put(processedAncestor, new ArrayList<>());
                 }
@@ -282,12 +280,16 @@ public class ModelCompiler {
                     isTaggedUnion = false;
                     isDisciminantProperty = false;
                 }
-                if (descendant.getOrigin().getTypeParameters().length != 0) {
-                    // do not handle bean as tagged union if any descendant or it itself is a generic class
-                    isTaggedUnion = false;
-                }
                 if (descendant.getDiscriminantLiteral() != null) {
                     literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
+                }
+            }
+            final List<BeanModel> descendants = selfAndDescendants.subList(1, selfAndDescendants.size());
+            for (BeanModel descendant : descendants) {
+                // do not handle bean as tagged union if any descendant has "non-related" generic parameter
+                final List<String> mappedGenericVariables = GenericsResolver.mapGenericVariablesToBase(descendant.getOrigin(), bean.getOrigin());
+                if (mappedGenericVariables.contains(null)) {
+                    isTaggedUnion = false;
                 }
             }
             final TsType discriminantType = isDisciminantProperty && !literals.isEmpty()
@@ -352,21 +354,10 @@ public class ModelCompiler {
         return properties;
     }
 
-    /**
-     * Given a type, returns the type that should be used for the purpose of looking up implementations of that type.
-     */
-    private static Type processTypeForDescendantLookup(Type type) {
-        if (type instanceof ParameterizedType) {
-            return ((ParameterizedType) type).getRawType();
-        } else {
-            return type;
-        }
-    }
-
     private static List<BeanModel> getSelfAndDescendants(BeanModel bean, Map<Type, List<BeanModel>> children) {
         final List<BeanModel> descendants = new ArrayList<>();
         descendants.add(bean);
-        final List<BeanModel> directDescendants = children.get(processTypeForDescendantLookup(bean.getOrigin()));
+        final List<BeanModel> directDescendants = children.get(bean.getOrigin());
         if (directDescendants != null) {
             for (BeanModel descendant : directDescendants) {
                 descendants.addAll(getSelfAndDescendants(descendant, children));
@@ -843,13 +834,24 @@ public class ModelCompiler {
         for (TsBeanModel bean : tsModel.getBeans()) {
             if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null) {
                 final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
+                final boolean isGeneric = !bean.getTypeParameters().isEmpty();
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
-                    final TsType type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
+                    final TsType type;
+                    if (isGeneric) {
+                        final List<String> mappedGenericVariables = GenericsResolver.mapGenericVariablesToBase(cls, bean.getOrigin());
+                        type = new TsType.GenericReferenceType(
+                                symbolTable.getSymbol(cls),
+                                mappedGenericVariables.stream()
+                                        .map(TsType.GenericVariableType::new)
+                                        .collect(Collectors.toList()));
+                    } else {
+                        type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
+                    }
                     unionTypes.add(type);
                 }
                 final TsType.UnionType union = new TsType.UnionType(unionTypes);
-                final TsAliasModel tsAliasModel = new TsAliasModel(bean.getOrigin(), unionName, null, union, null);
+                final TsAliasModel tsAliasModel = new TsAliasModel(bean.getOrigin(), unionName, bean.getTypeParameters(), union, null);
                 beans.add(bean.withTaggedUnionAlias(tsAliasModel));
                 typeAliases.add(tsAliasModel);
             } else {
@@ -862,10 +864,15 @@ public class ModelCompiler {
             @Override
             public TsType transform(TsType.Context context, TsType tsType) {
                 final Class<?> cls = getOriginClass(symbolTable, tsType);
-                if (cls != null && !(tsType instanceof TsType.GenericReferenceType)) {
+                if (cls != null) {
                     final Symbol unionSymbol = symbolTable.hasSymbol(cls, "Union");
                     if (unionSymbol != null) {
-                        return new TsType.ReferenceType(unionSymbol);
+                        if (tsType instanceof TsType.GenericReferenceType) {
+                            final TsType.GenericReferenceType genericReferenceType = (TsType.GenericReferenceType) tsType;
+                            return new TsType.GenericReferenceType(unionSymbol, genericReferenceType.typeArguments);
+                        } else {
+                            return new TsType.ReferenceType(unionSymbol);
+                        }
                     }
                 }
                 return tsType;

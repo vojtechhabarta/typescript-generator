@@ -14,7 +14,7 @@ public class TsAliasModel extends TsDeclarationModel {
 
     public TsAliasModel(Class<?> origin, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType definition, List<String> comments) {
         super(origin, null, name, comments);
-        this.typeParameters = typeParameters != null ? typeParameters : Collections.<TsType.GenericVariableType>emptyList();
+        this.typeParameters = typeParameters != null ? typeParameters : Collections.emptyList();
         this.definition = definition;
     }
 

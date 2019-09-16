@@ -387,7 +387,7 @@ public class TaggedUnionsTest {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Earth.class));
         Assert.assertTrue(output.contains("EngineUnion"));
-        Assert.assertTrue(!output.contains("VehiculeUnion"));
+        Assert.assertTrue(output.contains("VehiculeUnion<M>"));
     }
 
     public static void main(String[] args) throws Exception {
@@ -395,6 +395,69 @@ public class TaggedUnionsTest {
         electricCar.name = "Tesla";
         electricCar.batteryCapacityInKWh = 75;  // kWh
         System.out.println(new ObjectMapper().writeValueAsString(electricCar));
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = InProgressResult.class, name = "in-progress"),
+            @JsonSubTypes.Type(value = FinishedResult.class, name = "finished"),
+            @JsonSubTypes.Type(value = FailedResult.class, name = "error")
+    })
+    public static abstract class AsyncOperationResult<T> {
+    }
+
+    public static class InProgressResult<T> extends AsyncOperationResult<T> {
+        public double progress;
+    }
+
+    public static class FinishedResult<T> extends AsyncOperationResult<T> {
+        public T value;
+    }
+
+    public static class FailedResult<T> extends AsyncOperationResult<T> {
+        public String error;
+    }
+
+    public static class AsyncUsage {
+        public AsyncOperationResult<String> result;
+    }
+
+    @Test
+    public void testAsyncResultWithGenerics() {
+        final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AsyncUsage.class));
+        Assert.assertTrue(output.contains("result: AsyncOperationResultUnion<string>"));
+        Assert.assertTrue(output.contains("type AsyncOperationResultUnion<T> = InProgressResult<T> | FinishedResult<T> | FailedResult<T>"));
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = FlippedGenericParameters.class),
+    })
+    public static class Base<A, B> {
+    }
+
+    public static class ResultA<A, B> extends Base<A, B> {
+        public A a;
+    }
+
+    public static class FlippedGenericParameters<A, B> extends Base<B, A> {
+        public A aFlipped;
+        public B bFlipped;
+    }
+
+    public static class BaseUsage {
+        public Base<String, Number> result;
+    }
+
+    @Test
+    public void testBaseWithGenerics() {
+        final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BaseUsage.class));
+        Assert.assertTrue(output.contains("result: BaseUnion<string, number>"));
+        Assert.assertTrue(output.contains("type BaseUnion<A, B> = FlippedGenericParameters<B, A>"));
     }
 
 }

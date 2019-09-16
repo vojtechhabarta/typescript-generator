@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
@@ -83,6 +84,25 @@ public class GenericsResolverTest {
     static class P123<A, B, C> extends P12<C, List<B>> {
     }
     static class P123Number extends P123<String, Number, Boolean> {
+    }
+
+    @Test
+    public void testGenericVariableMappingToBase1() {
+        final List<String> mappedTypeParameters = GenericsResolver.mapGenericVariablesToBase(R123.class, R1.class);
+        Assert.assertEquals(Arrays.asList(null, null, "T"), mappedTypeParameters);
+    }
+
+    @Test
+    public void testGenericVariableMappingToBase2() {
+        final List<String> mappedTypeParameters = GenericsResolver.mapGenericVariablesToBase(R12.class, R1.class);
+        Assert.assertEquals(Arrays.asList("T", "S"), mappedTypeParameters);
+    }
+
+    static class R1<S, T> {
+    }
+    static class R12<U, V> extends R1<V, U> {
+    }
+    static class R123<A, B, C> extends R12<C, List<B>> {
     }
 
     private static <D extends GenericDeclaration> TypeVariable<D> createTypeVariable(D genericDeclaration, String name) {
