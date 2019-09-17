@@ -67,6 +67,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -143,6 +144,7 @@ public class ModelCompiler {
 
         // enums
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
+        tsModel = addEnumValuesToJavadoc(tsModel);
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
                 tsModel = transformEnumsToUnions(tsModel);
@@ -822,6 +824,37 @@ public class ModelCompiler {
             enums.add(enumModel.withMembers(members));
         }
         return tsModel.withoutEnums(stringEnums).withEnums(new ArrayList<>(enums));
+    }
+
+    private static TsModel addEnumValuesToJavadoc(TsModel tsModel) {
+        return tsModel.withEnums(tsModel.getEnums().stream()
+                .map(enumModel -> addEnumValuesToJavadoc(enumModel))
+                .collect(Collectors.toList())
+        );
+    }
+
+    private static TsEnumModel addEnumValuesToJavadoc(TsEnumModel enumModel) {
+        final boolean hasComments = enumModel.getComments() != null && !enumModel.getComments().isEmpty();
+        final boolean hasMemberComments = enumModel.getMembers().stream()
+                .anyMatch(enumMember -> enumMember.getComments() != null && !enumMember.getComments().isEmpty());
+        if (hasComments || hasMemberComments) {
+            return enumModel.withComments(Stream
+                    .of(
+                            Utils.listFromNullable(enumModel.getComments()).stream(),
+                            (hasComments ? Stream.of("") : Stream.<String>empty()),
+                            Stream.of("Values:"),
+                            enumModel.getMembers().stream()
+                                    .map(enumMember -> "- `" + enumMember.getEnumValue() + "`"
+                                            + (enumMember.getComments() != null
+                                            ? " - " + String.join(" ", enumMember.getComments())
+                                            : ""))
+                    )
+                    .flatMap(s -> s)
+                    .collect(Collectors.toList())
+            );
+        } else {
+            return enumModel;
+        }
     }
 
     private TsModel createAndUseTaggedUnions(final SymbolTable symbolTable, TsModel tsModel) {

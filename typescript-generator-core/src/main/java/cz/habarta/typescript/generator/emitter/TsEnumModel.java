@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import java.util.List;
+import java.util.Objects;
 
 
 public class TsEnumModel extends TsDeclarationModel {
@@ -14,15 +15,10 @@ public class TsEnumModel extends TsDeclarationModel {
     private final List<EnumMemberModel> members;
     private final boolean isNonConstEnum;
 
-    @Deprecated
-    public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
-        this(origin, name, kind, members, comments, false);
-    }
-
     public TsEnumModel(Class<?> origin, Symbol name, EnumKind kind, List<EnumMemberModel> members, List<String> comments, boolean isNonConstEnum) {
         super(origin, null, name, comments);
-        this.kind = kind;
-        this.members = members;
+        this.kind = Objects.requireNonNull(kind);
+        this.members = Objects.requireNonNull(members);
         this.isNonConstEnum = isNonConstEnum;
     }
 
@@ -43,6 +39,10 @@ public class TsEnumModel extends TsDeclarationModel {
     }
 
     public TsEnumModel withMembers(List<EnumMemberModel> members) {
+        return new TsEnumModel(origin, name, kind, members, comments, isNonConstEnum);
+    }
+
+    public TsEnumModel withComments(List<String> comments) {
         return new TsEnumModel(origin, name, kind, members, comments, isNonConstEnum);
     }
 

@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.List;
+import java.util.Objects;
 
 
 public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
@@ -15,7 +16,7 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
     public TsDeclarationModel(Class<?> origin, TsBeanCategory category, Symbol name, List<String> comments) {
         this.origin = origin;
         this.category = category;
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
         this.comments = comments;
     }
 
