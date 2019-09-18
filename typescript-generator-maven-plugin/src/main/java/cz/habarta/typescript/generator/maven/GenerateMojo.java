@@ -448,6 +448,13 @@ public class GenerateMojo extends AbstractMojo {
     private boolean scanSpringApplication;
 
     /**
+     * If defined Spring interface/client will be only generated for classes which possess this annotation.
+     * By default all classes with @RestController annotation are processed.
+     */
+    @Parameter
+    private String springControllerAnnotation;
+
+    /**
      * Deprecated, use {@link #restNamespacing}.
      */
     @Deprecated
@@ -769,6 +776,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
             settings.generateSpringApplicationClient = generateSpringApplicationClient;
             settings.scanSpringApplication = scanSpringApplication;
+            settings.springControllerAnnotation = springControllerAnnotation;
             settings.jaxrsNamespacing = jaxrsNamespacing;
             settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
             settings.restNamespacing = restNamespacing;

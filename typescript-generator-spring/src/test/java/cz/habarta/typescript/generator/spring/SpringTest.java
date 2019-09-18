@@ -188,7 +188,7 @@ public class SpringTest {
     }
 
     @RestController
-    public static abstract class AbstractGenerticController<T, R> {
+    public static abstract class AbstractGenericController<T, R> {
         @PostMapping("/generic")
         public R post(@RequestBody T input) {
             return map(input);
@@ -197,7 +197,7 @@ public class SpringTest {
         abstract protected R map(T input);
     }
 
-    public static class ConcreteGenerticController extends AbstractGenerticController<String, Integer> {
+    public static class ConcreteGenerticController extends AbstractGenericController<String, Integer> {
         protected Integer map(String input) {
             return input.length();
         }
@@ -236,4 +236,21 @@ public class SpringTest {
             return ResponseEntity.ok(Arrays.asList( "a" , "b" , "c" ));
         }
     }
+
+    @Test
+    public void testCustomControllerMarkerAnnotation() {
+        final Settings settings = TestUtils.settings();
+        settings.springControllerAnnotation = "cz.habarta.typescript.generator.spring.TestAnnotation";
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FilteredControllerInterface.class));
+        Assert.assertTrue(output.contains(" simple(): RestResponse<string>"));
+    }
+
+    @TestAnnotation
+    public interface FilteredControllerInterface {
+        @RequestMapping("/simple")
+        String simple();
+    }
+
 }

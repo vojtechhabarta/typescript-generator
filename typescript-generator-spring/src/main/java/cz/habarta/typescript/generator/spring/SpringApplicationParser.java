@@ -15,6 +15,7 @@ import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.util.Utils;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -81,6 +82,18 @@ public class SpringApplicationParser extends RestApplicationParser {
         super(settings, commonTypeProcessor, new RestApplicationModel(RestApplicationType.Spring));
     }
 
+    private Class<? extends Annotation> controllerAnnotation() {
+        Class<? extends Annotation> controllerAnnotation = RestController.class;
+        if (settings.springControllerAnnotation != null) {
+            try {
+                controllerAnnotation = (Class<? extends Annotation>) Class.forName(settings.springControllerAnnotation);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return controllerAnnotation;
+    }
+
     @Override
     public JaxrsApplicationParser.Result tryParse(SourceType<?> sourceType) {
         if (!(sourceType.type instanceof Class<?>)) {
@@ -111,7 +124,7 @@ public class SpringApplicationParser extends RestApplicationParser {
         }
 
         // controller
-        final RestController controller = AnnotationUtils.findAnnotation(cls, RestController.class);
+        final Annotation controller = AnnotationUtils.findAnnotation(cls, controllerAnnotation());
         if (controller != null) {
             TypeScriptGenerator.getLogger().verbose("Parsing Spring RestController: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
@@ -151,7 +164,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                                 throw new RuntimeException(e);
                             }
                         })
-                        .filter(instance -> AnnotationUtils.findAnnotation(instance, RestController.class) != null)
+                        .filter(instance -> AnnotationUtils.findAnnotation(instance, controllerAnnotation()) != null)
                         .collect(Collectors.toList());
                 return classes;
             }

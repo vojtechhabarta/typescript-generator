@@ -82,6 +82,7 @@ public class GenerateTask extends DefaultTask {
     public boolean generateSpringApplicationInterface;
     public boolean generateSpringApplicationClient;
     public boolean scanSpringApplication;
+    public String springControllerAnnotation;
     @Deprecated public RestNamespacing jaxrsNamespacing;
     @Deprecated public String jaxrsNamespacingAnnotation;
     public RestNamespacing restNamespacing;
@@ -179,6 +180,7 @@ public class GenerateTask extends DefaultTask {
             settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
             settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
             settings.generateSpringApplicationClient = generateSpringApplicationClient;
+            settings.springControllerAnnotation = springControllerAnnotation;
             settings.scanSpringApplication = scanSpringApplication;
             settings.jaxrsNamespacing = jaxrsNamespacing;
             settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);

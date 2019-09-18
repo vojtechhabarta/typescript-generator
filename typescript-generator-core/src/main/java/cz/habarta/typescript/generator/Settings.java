@@ -81,6 +81,7 @@ public class Settings {
     public boolean generateSpringApplicationInterface = false;
     public boolean generateSpringApplicationClient = false;
     public boolean scanSpringApplication;
+    public String springControllerAnnotation;
     @Deprecated public RestNamespacing jaxrsNamespacing;
     @Deprecated public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
     @Deprecated public String jaxrsNamespacingAnnotationElement;  // default is "value"
