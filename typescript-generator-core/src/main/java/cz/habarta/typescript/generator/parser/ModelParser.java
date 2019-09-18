@@ -9,6 +9,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.util.GenericsResolver;
+import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -117,14 +118,20 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static void checkMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
-        if (!(propertyMember instanceof Field) && !(propertyMember instanceof Method)) {
-            throw new RuntimeException(String.format(
-                    "Unexpected member type '%s' in property '%s' in class '%s'",
-                    propertyMember != null ? propertyMember.getClass().getName() : null,
-                    propertyName,
-                    sourceClass.getName()));
+    protected static PropertyMember wrapMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
+        if (propertyMember instanceof Field) {
+            final Field field = (Field) propertyMember;
+            return new PropertyMember.FieldPropertyMember(field);
         }
+        if (propertyMember instanceof Method) {
+            final Method method = (Method) propertyMember;
+            return new PropertyMember.MethodPropertyMember(method);
+        }
+        throw new RuntimeException(String.format(
+                "Unexpected member type '%s' in property '%s' in class '%s'",
+                propertyMember != null ? propertyMember.getClass().getName() : null,
+                propertyName,
+                sourceClass.getName()));
     }
 
     protected boolean isAnnotatedPropertyIncluded(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction, String propertyDescription) {
@@ -142,12 +149,12 @@ public abstract class ModelParser {
         return true;
     }
 
-    protected boolean isAnnotatedPropertyOptional(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction) {
+    protected boolean isPropertyOptional(PropertyMember propertyMember) {
         if (settings.optionalProperties == OptionalProperties.all) {
             return true;
         }
         if (settings.optionalProperties == null || settings.optionalProperties == OptionalProperties.useSpecifiedAnnotations) {
-            return Utils.hasAnyAnnotation(getAnnotationFunction, settings.optionalAnnotations);
+            return Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.optionalAnnotations);
         }
         return false;
     }

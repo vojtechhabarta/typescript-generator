@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.util.PropertyMember;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
@@ -81,14 +82,14 @@ public class Jackson1Parser extends ModelParser {
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                final Member propertyMember = beanPropertyWriter.getMember().getMember();
-                checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
+                final Member member = beanPropertyWriter.getMember().getMember();
+                final PropertyMember propertyMember = wrapMember(member, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = beanPropertyWriter.getGenericPropertyType();
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;
                 }
-                final boolean optional = isAnnotatedPropertyOptional(beanPropertyWriter::getAnnotation);
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, null, optional, sourceClass.type, propertyMember, null, null));
+                final boolean optional = isPropertyOptional(propertyMember);
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, null, optional, sourceClass.type, member, null, null));
             }
         }
 

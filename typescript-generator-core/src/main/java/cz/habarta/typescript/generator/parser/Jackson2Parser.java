@@ -38,12 +38,12 @@ import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -195,9 +195,9 @@ public class Jackson2Parser extends ModelParser {
         final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                final Member propertyMember = beanPropertyWriter.getMember().getMember();
-                checkMember(propertyMember, beanPropertyWriter.getName(), sourceClass.type);
-                Type propertyType = getGenericType(propertyMember);
+                final Member member = beanPropertyWriter.getMember().getMember();
+                final PropertyMember propertyMember = wrapMember(member, beanPropertyWriter.getName(), sourceClass.type);
+                Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
 
                 // Map.Entry
@@ -222,14 +222,14 @@ public class Jackson2Parser extends ModelParser {
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
                         ? !beanPropertyWriter.isRequired()
-                        : isAnnotatedPropertyOptional(beanPropertyWriter::getAnnotation);
+                        : isPropertyOptional(propertyMember);
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
                 final JsonUnwrapped annotation = beanPropertyWriter.getAnnotation(JsonUnwrapped.class);
                 if (annotation != null && annotation.enabled()) {
                     pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, propertyMember, pullProperties, propertyComments));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, member, pullProperties, propertyComments));
             }
         }
         if (sourceClass.type.isEnum()) {
@@ -317,9 +317,9 @@ public class Jackson2Parser extends ModelParser {
                         .findFirst();
                 if (idProperty.isPresent()) {
                     final BeanPropertyWriter idPropertyWriter = idProperty.get();
-                    final Member idPropertyMember = idPropertyWriter.getMember().getMember();
-                    checkMember(idPropertyMember, idPropertyWriter.getName(), cls);
-                    idType = getGenericType(idPropertyMember);
+                    final Member idMember = idPropertyWriter.getMember().getMember();
+                    final PropertyMember idPropertyMember = wrapMember(idMember, idPropertyWriter.getName(), cls);
+                    idType = idPropertyMember.getType();
                 } else {
                     return null;
                 }
@@ -335,16 +335,6 @@ public class Jackson2Parser extends ModelParser {
             return alwaysAsId
                     ? idType
                     : new UnionType(propertyType, idType);
-        }
-        return null;
-    }
-
-    private static Type getGenericType(Member member) {
-        if (member instanceof Method) {
-            return ((Method) member).getGenericReturnType();
-        }
-        if (member instanceof Field) {
-            return ((Field) member).getGenericType();
         }
         return null;
     }

@@ -6,8 +6,10 @@ import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.ModelParser;
 import cz.habarta.typescript.generator.parser.PropertyModel;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -104,6 +106,30 @@ public class OptionalAnnotationTest {
     static class BeanWithJavaxNullable {
         @javax.annotation.Nullable
         public String property1;
+    }
+
+    @Test
+    public void testNullableTypeAnnotation() {
+        Settings settings = TestUtils.settings();
+        settings.optionalAnnotations.add(NullableType.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanWithNullableType.class));
+        Assert.assertTrue(output.contains("property1?: string;"));
+        Assert.assertTrue(output.contains("property2?: string;"));
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
+    public @interface NullableType {
+    }
+
+    private static class BeanWithNullableType {
+        @NullableType
+        public String property1;
+
+        @NullableType
+        public String getProperty2() {
+            return null;
+        }
     }
 
 }
