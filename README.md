@@ -111,6 +111,45 @@ generateTypeScript {
 }
 ```
 
+For the Kotlin Gradle DSL you can alternatively use the `cz.habarta.typescript-generator` plugin like this:
+
+#### build.gradle.kts
+```kotlin
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.TypeScriptFileType
+
+plugins {
+    id("cz.habarta.typescript-generator") version "x.y.z"
+}
+
+tasks {
+    generateTypeScript {
+        jsonLibrary = JsonLibrary.jackson2
+        outputFileType = TypeScriptFileType.implementationFile
+        ...
+    }
+}
+```
+
+#### settings.gradle.kts
+We use this to resolve the plugin, as the plugin is not yet in the [Gradle Plugin Repository](https://plugins.gradle.org/)
+```kotlin
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        jcenter()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "cz.habarta.typescript-generator") {
+                useModule("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:${requested.version ?: "+"}")
+            }
+        }
+    }
+}
+```
+
 You can run typescript-generator on demand using `gradle generateTypeScript` command
 or you can invoke it as part of another task by adding dependency from that task to `generateTypeScript` task in Gradle build file.
 
