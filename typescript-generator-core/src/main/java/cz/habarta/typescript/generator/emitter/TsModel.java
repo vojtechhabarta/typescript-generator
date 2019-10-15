@@ -82,7 +82,11 @@ public class TsModel {
         return new TsModel(beans, enums, originalStringEnums, typeAliases, helpers);
     }
 
-    public TsModel withoutEnums(List<TsEnumModel> enums) {
+    public TsModel withAddedEnums(List<TsEnumModel> enums) {
+        return new TsModel(beans, Utils.concat(this.enums, enums), originalStringEnums, typeAliases, helpers);
+    }
+
+    public TsModel withRemovedEnums(List<TsEnumModel> enums) {
         return new TsModel(beans, Utils.removeAll(this.enums, enums), originalStringEnums, typeAliases, helpers);
     }
 

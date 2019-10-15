@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.ext.ClassEnumExtension;
 import java.util.Arrays;
 import java.util.Collections;
@@ -326,6 +327,108 @@ public class EnumTest {
         public String getLabel() {
             return label;
         }
+    }
+
+    @Test
+    public void testEnumMapKeys_asUnion() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asUnion;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMapWithEnumKeys.class));
+        assertTrue(output.contains("labels: { [P in Direction]?: string }"));
+        assertTrue(output.contains("type Direction ="));
+    }
+
+    @Test
+    public void testEnumMapKeys_asInlineUnion() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asInlineUnion;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMapWithEnumKeys.class));
+        assertTrue(output.contains("labels: { [P in 'North' | 'East' | 'South' | 'West']?: string }".replace('\'', '"')));
+        assertTrue(!output.contains("Direction"));
+    }
+
+    @Test
+    public void testEnumMapKeys_asEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asEnum;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMapWithEnumKeys.class));
+        assertTrue(output.contains("labels: { [P in Direction]?: string }"));
+        assertTrue(output.contains("enum Direction {"));
+    }
+
+    @Test
+    public void testEnumMapKeys_asNumberBasedEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asNumberBasedEnum;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMapWithEnumKeys.class));
+        assertTrue(output.contains("labels: { [index: string]: string }"));
+    }
+
+    static class ClassWithMapWithEnumKeys {
+        public Map<Direction, String> labels;
+    }
+
+    @Test
+    public void testEnumMapKeys_MixedEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asUnion;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMixedEnum.class));
+        assertTrue(output.contains("mixedEnumMap: { [P in MixedEnum]?: string }"));
+        assertTrue(output.contains("MixedEnum"));
+    }
+
+    public static enum MixedEnum {
+
+        NUMBER(42),
+        STRING("foo");
+
+        private final Object jsonValue;
+
+        private MixedEnum(Object jsonValue) {
+            this.jsonValue = jsonValue;
+        }
+
+        @JsonValue
+        public Object getJsonValue() {
+            return this.jsonValue;
+        }
+    }
+
+    static class ClassWithMixedEnum {
+        public MixedEnum mixedEnum;
+        public Map<MixedEnum, String> mixedEnumMap;
+    }
+
+    @Test
+    public void testEnumMapKeys_NumberEnum() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asNumberBasedEnum;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithNumberEnum.class));
+        assertTrue(output.contains("numberEnumMap: { [index: string]: string }"));
+        assertTrue(output.contains("NumberEnum"));
+    }
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    public static enum NumberEnum {
+        VALUE0,
+        VALUE1;
+    }
+
+    static class ClassWithNumberEnum {
+        public NumberEnum numberEnum;
+        public Map<NumberEnum, String> numberEnumMap;
+    }
+
+    public static void main(String[] args) throws Exception {
+        final ClassWithMixedEnum classWithMixedEnum = new ClassWithMixedEnum();
+        classWithMixedEnum.mixedEnum = MixedEnum.NUMBER;
+        classWithMixedEnum.mixedEnumMap = Collections.singletonMap(MixedEnum.NUMBER, "bar");
+        System.out.println(new ObjectMapper().writeValueAsString(classWithMixedEnum));
+
+        final ClassWithNumberEnum classWithNumberEnum = new ClassWithNumberEnum();
+        classWithNumberEnum.numberEnum = NumberEnum.VALUE0;
+        classWithNumberEnum.numberEnumMap = Collections.singletonMap(NumberEnum.VALUE0, "bar");
+        System.out.println(new ObjectMapper().writeValueAsString(classWithNumberEnum));
     }
 
 }

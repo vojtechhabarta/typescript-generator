@@ -184,6 +184,48 @@ public abstract class TsType implements Emittable {
 
     }
 
+    public static class MappedType extends TsType {
+
+        public final TsType parameterType;
+        public final QuestionToken questionToken;
+        public final TsType type;
+
+        public MappedType(TsType parameterType, QuestionToken questionToken, TsType type) {
+            this.parameterType = parameterType;
+            this.questionToken = questionToken;
+            this.type = type;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return "{ " +
+                    "[P in " + parameterType.format(settings) + "]" +
+                    (questionToken != null ? questionToken : "") +
+                    ": " +
+                    type.format(settings) +
+                    " }";
+        }
+
+        public enum QuestionToken {
+            Question("?"),
+            Plus("+?"),
+            Minus("-?");
+
+            private final String token;
+
+            private QuestionToken(String token) {
+                this.token = token;
+            }
+
+            @Override
+            public String toString() {
+                return token;
+            }
+            
+        }
+
+    }
+
     public static class UnionType extends TsType {
 
         public final List<TsType> types;
@@ -237,6 +279,21 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return settings.quotes + literal + settings.quotes;
+        }
+
+    }
+
+    public static class NumberLiteralType extends TsType {
+
+        public final Number literal;
+
+        public NumberLiteralType(Number literal) {
+            this.literal = literal;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return "" + literal;
         }
 
     }
@@ -331,6 +388,13 @@ public abstract class TsType implements Emittable {
             return new TsType.IndexedArrayType(
                     transformTsType(context, indexedArrayType.indexType, transformer),
                     transformTsType(context, indexedArrayType.elementType, transformer));
+        }
+        if (type instanceof TsType.MappedType) {
+            final TsType.MappedType mappedType = (TsType.MappedType) type;
+            return new TsType.MappedType(
+                    transformTsType(context, mappedType.parameterType, transformer),
+                    mappedType.questionToken,
+                    transformTsType(context, mappedType.type, transformer));
         }
         if (type instanceof TsType.UnionType) {
             final TsType.UnionType unionType = (TsType.UnionType) type;

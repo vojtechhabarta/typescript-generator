@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.UnionType;
+import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -82,8 +83,19 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[1]);
-                    return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
+                    final Result keyResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result valueResult = context.processType(parameterizedType.getActualTypeArguments()[1]);
+                    if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
+                        return new Result(
+                                new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueResult.getTsType()),
+                                Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
+                        );
+                    } else {
+                        return new Result(
+                                new TsType.IndexedArrayType(TsType.String, valueResult.getTsType()),
+                                valueResult.getDiscoveredClasses()
+                        );
+                    }
                 }
                 if (Optional.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);

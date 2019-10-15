@@ -157,6 +157,9 @@ public class ModelCompiler {
             }
         }
 
+        // after enum transformations transform Maps with rest of the enums (not unions) used in keys
+        tsModel = transformNonStringEnumKeyMaps(symbolTable, tsModel);
+
         // tagged unions
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
@@ -787,12 +790,15 @@ public class ModelCompiler {
         for (TsEnumModel enumModel : stringEnums) {
             final List<TsType> values = new ArrayList<>();
             for (EnumMemberModel member : enumModel.getMembers()) {
-                values.add(new TsType.StringLiteralType((String) member.getEnumValue()));
+                values.add(member.getEnumValue() instanceof Number
+                        ? new TsType.NumberLiteralType((Number) member.getEnumValue())
+                        : new TsType.StringLiteralType(String.valueOf(member.getEnumValue()))
+                );
             }
             final TsType union = new TsType.UnionType(values);
             typeAliases.add(new TsAliasModel(enumModel.getOrigin(), enumModel.getName(), null, union, enumModel.getComments()));
         }
-        return tsModel.withoutEnums(stringEnums).withTypeAliases(new ArrayList<>(typeAliases));
+        return tsModel.withRemovedEnums(stringEnums).withTypeAliases(new ArrayList<>(typeAliases));
     }
 
     private TsModel inlineEnums(final TsModel tsModel, final SymbolTable symbolTable) {
@@ -823,7 +829,32 @@ public class ModelCompiler {
             }
             enums.add(enumModel.withMembers(members));
         }
-        return tsModel.withoutEnums(stringEnums).withEnums(new ArrayList<>(enums));
+        return tsModel.withRemovedEnums(stringEnums).withAddedEnums(new ArrayList<>(enums));
+    }
+
+    private TsModel transformNonStringEnumKeyMaps(SymbolTable symbolTable, TsModel tsModel) {
+        return transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
+            @Override
+            public TsType transform(TsType.Context context, TsType tsType) {
+                if (tsType instanceof TsType.MappedType) {
+                    final TsType.MappedType mappedType = (TsType.MappedType) tsType;
+                    if (mappedType.parameterType instanceof TsType.EnumReferenceType) {
+                        final TsType.EnumReferenceType enumType = (TsType.EnumReferenceType) mappedType.parameterType;
+                        final Class<?> enumClass = symbolTable.getSymbolClass(enumType.symbol);
+                        final TsEnumModel enumModel = tsModel.getEnums().stream()
+                                .filter(model -> Objects.equals(model.getOrigin(), enumClass))
+                                .findFirst()
+                                .orElse(null);
+                        if (settings.mapEnum == EnumMapping.asNumberBasedEnum
+                                || enumModel != null && enumModel.getKind() == EnumKind.NumberBased
+                                || enumModel != null && enumModel.getMembers().stream().anyMatch(member -> !(member.getEnumValue() instanceof String))) {
+                            return new TsType.IndexedArrayType(TsType.String, mappedType.type);
+                        }
+                    }
+                }
+                return tsType;
+            }
+        });
     }
 
     private static TsModel addEnumValuesToJavadoc(TsModel tsModel) {
