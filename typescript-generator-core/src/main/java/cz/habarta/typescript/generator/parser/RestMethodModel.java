@@ -50,4 +50,9 @@ public class RestMethodModel extends MethodModel {
         return entityParam;
     }
 
+    @Override
+    public RestMethodModel withComments(List<String> comments) {
+        return new RestMethodModel(originClass, name, returnType, rootResource, httpMethod, path, pathParams, queryParams, entityParam, comments);
+    }
+
 }

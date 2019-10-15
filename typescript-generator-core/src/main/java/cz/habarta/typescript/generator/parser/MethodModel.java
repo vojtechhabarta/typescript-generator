@@ -8,11 +8,11 @@ import java.util.List;
 
 public class MethodModel {
 
-    private final Class<?> originClass;
-    private final String name;
-    private final List<MethodParameterModel> parameters;
-    private final Type returnType;
-    private final List<String> comments;
+    protected final Class<?> originClass;
+    protected final String name;
+    protected final List<MethodParameterModel> parameters;
+    protected final Type returnType;
+    protected final List<String> comments;
 
     public MethodModel(Class<?> originClass, String name, List<MethodParameterModel> parameters, Type returnType, List<String> comments) {
         this.originClass = originClass;
@@ -40,6 +40,10 @@ public class MethodModel {
 
     public List<String> getComments() {
         return comments;
+    }
+
+    public MethodModel withComments(List<String> comments) {
+        return new MethodModel(originClass, name, parameters, returnType, comments);
     }
 
 }

@@ -48,16 +48,21 @@ public class Javadoc {
 
     public Model enrichModel(Model model) {
         final List<BeanModel> dBeans = new ArrayList<>();
-        final List<EnumModel> dEnums = new ArrayList<>();
         for (BeanModel bean : model.getBeans()) {
             final BeanModel dBean = enrichBean(bean);
             dBeans.add(dBean);
         }
+        final List<EnumModel> dEnums = new ArrayList<>();
         for (EnumModel enumModel : model.getEnums()) {
             final EnumModel dEnumModel = enrichEnum(enumModel);
             dEnums.add(dEnumModel);
         }
-        return new Model(dBeans, dEnums, model.getRestApplications());
+        final List<RestApplicationModel> dRestApplications = new ArrayList<>();
+        for (RestApplicationModel restApplication : model.getRestApplications()) {
+            final RestApplicationModel dRestApplication = enrichRestApplication(restApplication);
+            dRestApplications.add(dRestApplication);
+        }
+        return new Model(dBeans, dEnums, dRestApplications);
     }
 
     private BeanModel enrichBean(BeanModel bean) {
@@ -122,7 +127,35 @@ public class Javadoc {
         return enumMember.withComments(Utils.concat(getComments(memberComment, tags), enumMember.getComments()));
     }
 
+    private RestApplicationModel enrichRestApplication(RestApplicationModel restApplicationModel) {
+        final List<RestMethodModel> enrichedRestMethods = new ArrayList<>();
+        for (RestMethodModel restMethod : restApplicationModel.getMethods()) {
+            final RestMethodModel enrichedRestMethod = enrichRestMethod(restMethod);
+            enrichedRestMethods.add(enrichedRestMethod);
+        }
+        return restApplicationModel.withMethods(enrichedRestMethods);
+    }
+
+    private RestMethodModel enrichRestMethod(RestMethodModel method) {
+        final Method dMethod = findJavadocMethod(method.getOriginClass(), method.getName(), dRoots);
+        return dMethod != null
+                ? method.withComments(getComments(dMethod.getComment(), dMethod.getTag()))
+                : method;
+    }
+
     // finders
+
+    private static Method findJavadocMethod(java.lang.Class<?> cls, String name, List<Root> dRoots) {
+        final Class dClass = findJavadocClass(cls, dRoots);
+        final Interface dInterface = findJavadocInterface(cls, dRoots);
+        if (dClass != null) {
+            return findJavadocMethod(name, dClass.getMethod());
+        } else if (dInterface != null) {
+            return findJavadocMethod(name, dInterface.getMethod());
+        } else {
+            return null;
+        }
+    }
 
     private static Class findJavadocClass(java.lang.Class<?> cls, List<Root> dRoots) {
         final String name = cls.getName().replace('$', '.');
