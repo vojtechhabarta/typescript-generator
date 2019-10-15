@@ -197,6 +197,7 @@ public class GenerateMojo extends AbstractMojo {
      * <li><code>jackson1</code> - annotations from `org.codehaus.jackson.annotate` package</li>
      * <li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
      * <li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package<li>
+     * <li><code>gson</code> - annotations from `com.google.gson.annotations` package<li>
      * </ul>
      * Required parameter, recommended value is <code>jackson2</code>.
      */
