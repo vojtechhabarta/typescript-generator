@@ -460,4 +460,36 @@ public class TaggedUnionsTest {
         Assert.assertTrue(output.contains("type BaseUnion<A, B> = FlippedGenericParameters<B, A>"));
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Foo.class, name = "Foo"),
+        @JsonSubTypes.Type(value = Bar.class, name = "Bar")
+    })
+    public static abstract class Entity<T> {
+        public T id;
+    }
+
+    public static class Foo extends Entity<String> {
+    }
+
+    public static class Bar extends Entity<Integer> {
+    }
+
+    public class EntityCollection {
+        public List<Entity<?>> entities;
+    }
+
+    @Test
+    public void testGenericBaseWithNonGenericSubType() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.outputKind = TypeScriptOutputKind.module;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.mapEnum = EnumMapping.asEnum;
+        settings.nonConstEnums = true;
+        settings.mapPackagesToNamespaces = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EntityCollection.class));
+        Assert.assertTrue(output.contains("type EntityUnion<T> = cz.habarta.typescript.generator.TaggedUnionsTest.Foo | cz.habarta.typescript.generator.TaggedUnionsTest.Bar"));
+    }
+
 }

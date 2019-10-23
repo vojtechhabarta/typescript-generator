@@ -902,7 +902,7 @@ public class ModelCompiler {
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
                     final TsType type;
-                    if (isGeneric) {
+                    if (isGeneric && cls.getTypeParameters().length != 0) {
                         final List<String> mappedGenericVariables = GenericsResolver.mapGenericVariablesToBase(cls, bean.getOrigin());
                         type = new TsType.GenericReferenceType(
                                 symbolTable.getSymbol(cls),
