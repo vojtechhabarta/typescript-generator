@@ -116,6 +116,8 @@ public class Settings {
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
 
+    private static final String JAVA_NAME_REGEX_GROUP = "javaName";
+    private static final Pattern SUPERTYPE_NAME_PATTERN = Pattern.compile("(^\\? extends )(?<" + JAVA_NAME_REGEX_GROUP + ">.+$)");
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
     public static class ConfiguredExtension {
@@ -126,10 +128,12 @@ public class Settings {
     public static class CustomTypeMapping {
         public final GenericName javaType;
         public final GenericName tsType;
+        public final CustomMappingScope customMappingScope;
 
-        public CustomTypeMapping(GenericName javaType, GenericName tsType) {
-            this.javaType = javaType;
-            this.tsType = tsType;
+        public CustomTypeMapping(GenericName javaType, GenericName tsType, CustomMappingScope customMappingScope) {
+            this.javaType = Objects.requireNonNull(javaType);
+            this.tsType = Objects.requireNonNull(tsType);
+            this.customMappingScope = Objects.requireNonNull(customMappingScope);
         }
     }
 
@@ -417,13 +421,22 @@ public class Settings {
                                 "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
                                 required, specified, signature));
                     }
-                    validatedCustomTypeMappings.add(new CustomTypeMapping(genericJavaName, genericTsName));
+                    CustomMappingScope customMappingScope = getCustomMappingScope(javaName);
+                    validatedCustomTypeMappings.add(new CustomTypeMapping(genericJavaName, genericTsName, customMappingScope));
                 } catch (Exception e) {
                     throw new RuntimeException(String.format("Failed to parse configured custom type mapping '%s:%s': %s", javaName, tsName, e.getMessage()), e);
                 }
             }
         }
         return validatedCustomTypeMappings;
+    }
+
+    private static CustomMappingScope getCustomMappingScope(String javaName) {
+        final Matcher superTypeMatcher = SUPERTYPE_NAME_PATTERN.matcher(javaName);
+        if (superTypeMatcher.matches()) {
+            return CustomMappingScope.SUPERTYPE;
+        }
+        return CustomMappingScope.CLASS;
     }
 
     public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
@@ -448,6 +461,10 @@ public class Settings {
     }
 
     private static GenericName parseGenericName(String name) {
+        final Matcher superTypeMatcher = SUPERTYPE_NAME_PATTERN.matcher(name);
+        if (superTypeMatcher.find()) { // is supertype?
+            name = superTypeMatcher.group(JAVA_NAME_REGEX_GROUP);
+        }
         // Class<T1, T2>
         // Class[T1, T2]
         final Matcher matcher = Pattern.compile("([^<\\[]+)(<|\\[)([^>\\]]+)(>|\\])").matcher(name);

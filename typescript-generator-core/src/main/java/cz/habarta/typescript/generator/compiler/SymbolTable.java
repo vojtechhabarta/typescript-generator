@@ -231,6 +231,15 @@ public class SymbolTable {
         return customTypeNamingFunction;
     }
 
+    public Class<?> loadClass(String className) {
+        try {
+            return this.settings.classLoader.loadClass(className);
+        } catch (ClassNotFoundException e) {
+            TypeScriptGenerator.getLogger().error(String.format("Cannot load class name '%s'", className, e));
+            return null;
+        }
+    }
+
     /**
      * Function for getting custom TypeScript names for Java classes.
      * If the function returns null, the default is used.

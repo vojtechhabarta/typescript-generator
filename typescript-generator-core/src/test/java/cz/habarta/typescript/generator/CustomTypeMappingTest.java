@@ -58,6 +58,16 @@ public class CustomTypeMappingTest {
         assertTrue(output.contains("sub: SubCustomMapping;"));
     }
 
+    /**
+     * Tests that custom mapping a superclass maps child classes.
+     */
+    @Test
+    public void testSuperTypeCustomMapping() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("? extends cz.habarta.typescript.generator.CustomTypeMappingTest$BaseCustomMapping", "string");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(InterfaceUsingSubCustomMapping.class));
+        assertTrue(output.contains("sub: string;"));
+    }
 
     @JsonSerialize(using = CodedValueSerializer.class)
     public interface CodedValue {

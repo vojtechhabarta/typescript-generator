@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,6 +29,16 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
             return null;
         }
         final Class<?> rawClass = rawClassAndTypeArguments.getValue1();
+        for (Map.Entry<String, Settings.CustomTypeMapping> mappingEntry : customMappings.entrySet()) {
+            Settings.CustomTypeMapping mapping = mappingEntry.getValue();
+            if (mapping.customMappingScope == CustomMappingScope.SUPERTYPE) {
+                String superTypeRawName = mapping.javaType.rawName;
+                Class<?> superType = context.loadClass(superTypeRawName);
+                if (superType != null && superType.isAssignableFrom(rawClass)) {
+                    return new Result(new TsType.BasicType(mapping.tsType.rawName), Collections.emptyList());
+                }
+            }
+        }
         final List<Type> typeArguments = rawClassAndTypeArguments.getValue2();
         final Settings.CustomTypeMapping mapping = customMappings.get(rawClass.getName());
         if (mapping == null) {

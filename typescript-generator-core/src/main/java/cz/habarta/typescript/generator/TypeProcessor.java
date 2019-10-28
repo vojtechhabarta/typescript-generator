@@ -47,6 +47,10 @@ public interface TypeProcessor {
             return symbolTable.getSymbol(cls);
         }
 
+        public Class<?> loadClass(String className) {
+            return symbolTable.loadClass(className);
+        }
+
         public Result processType(Type javaType) {
             return typeProcessor.processType(javaType, this);
         }
