@@ -23,12 +23,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
@@ -160,6 +162,21 @@ public class Jackson2Parser extends ModelParser {
                                     return context.withTypeContext(null).processType(resultType);
                                 }
                             }
+                            // Map.Entry
+                            final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+                            if (rawClass != null && Map.Entry.class.isAssignableFrom(rawClass)) {
+                                final ObjectMapper objectMapper = jackson2TypeContext.parser.objectMapper;
+                                final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
+                                final BeanDescription beanDescription = serializationConfig
+                                        .introspect(TypeFactory.defaultInstance().constructType(rawClass));
+                                final JsonFormat.Value formatOverride = serializationConfig.getDefaultPropertyFormat(Map.Entry.class);
+                                final JsonFormat.Value formatFromAnnotation = beanDescription.findExpectedFormat(null);
+                                final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
+                                if (format.getShape() != JsonFormat.Shape.OBJECT) {
+                                    final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
+                                    return context.processType(mapType);
+                                }
+                            }
                         }
                         return null;
                     }
@@ -199,18 +216,6 @@ public class Jackson2Parser extends ModelParser {
                 final PropertyMember propertyMember = wrapMember(member, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
-
-                // Map.Entry
-                final Class<?> propertyRawClass = Utils.getRawClassOrNull(propertyType);
-                if (propertyRawClass != null && Map.Entry.class.isAssignableFrom(propertyRawClass)) {
-                    final BeanDescription propertyDescription = objectMapper.getSerializationConfig().introspect(beanPropertyWriter.getType());
-                    final JsonFormat.Value formatOverride = objectMapper.getSerializationConfig().getDefaultPropertyFormat(Map.Entry.class);
-                    final JsonFormat.Value formatFromAnnotation = propertyDescription.findExpectedFormat(null);
-                    final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
-                    if (format.getShape() != JsonFormat.Shape.OBJECT) {
-                        propertyType = Utils.replaceRawClassInType(propertyType, Map.class);
-                    }
-                }
 
                 final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(
                         this,
@@ -433,10 +438,6 @@ public class Jackson2Parser extends ModelParser {
             if (jsonSerializer instanceof BeanSerializer) {
                 return new BeanHelper((BeanSerializer) jsonSerializer);
             } else {
-                final String jsonSerializerName = jsonSerializer.getClass().getName();
-                if (settings.displaySerializerWarning) {
-                    TypeScriptGenerator.getLogger().verbose(String.format("Unknown serializer '%s' for class '%s'", jsonSerializerName, beanClass));
-                }
                 return null;
             }
         } catch (JsonMappingException e) {

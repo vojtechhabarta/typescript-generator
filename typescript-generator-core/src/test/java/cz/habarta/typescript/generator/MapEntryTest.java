@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -133,6 +134,50 @@ public class MapEntryTest {
                 + "    value: V;\n"
                 + "}"));
         Assert.assertTrue(output.contains("entry3: { [index: string]: string }"));
+    }
+
+    public static class ClassWithListOfEntries {
+        public List<Entry1<String, String>> entries1 = Arrays.asList(
+                new Entry1<>("key1", "value1"),
+                new Entry1<>("key2", "value2"));
+        public List<Entry2<String, String>> entries2 = Arrays.asList(
+                new Entry2<>("key1", "value1"),
+                new Entry2<>("key2", "value2"));
+    }
+
+    @Test
+    public void testListOfMapEntry() throws Exception {
+        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        final ClassWithListOfEntries classWithListOfEntries = new ClassWithListOfEntries();
+        final String json = objectMapper.writeValueAsString(classWithListOfEntries);
+        final String expectedJson = (""
+                + "{\n"
+                + "  'entries1': [\n"
+                + "    {\n"
+                + "      'key1': 'value1'\n"
+                + "    },\n"
+                + "    {\n"
+                + "      'key2': 'value2'\n"
+                + "    }\n"
+                + "  ],\n"
+                + "  'entries2': [\n"
+                + "    {\n"
+                + "      'key': 'key1',\n"
+                + "      'value': 'value1'\n"
+                + "    },\n"
+                + "    {\n"
+                + "      'key': 'key2',\n"
+                + "      'value': 'value2'\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}")
+                .replace("'", "\"");
+        Assert.assertEquals(expectedJson, json);
+
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithListOfEntries.class));
+        Assert.assertTrue(output.contains("entries1: { [index: string]: string }[]"));
+        Assert.assertTrue(output.contains("entries2: Entry2<string, string>[]"));
     }
 
 }

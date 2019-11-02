@@ -659,7 +659,7 @@ public class GenerateMojo extends AbstractMojo {
     private String indentString;
 
     /**
-     * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
+     * <b>Deprecated</b>.
      */
     @Parameter
     @Deprecated
