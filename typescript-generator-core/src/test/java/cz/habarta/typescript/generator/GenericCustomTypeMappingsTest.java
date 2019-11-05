@@ -114,7 +114,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$SubClass<A, B>", "Test<A, B>");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SubClassUsage.class));
-        Assert.assertTrue(output.contains("nonGeneric: Map<string, string>"));
+        Assert.assertTrue(output.contains("genericSubClass: Test<string, number>"));
     }
 
     @Test
