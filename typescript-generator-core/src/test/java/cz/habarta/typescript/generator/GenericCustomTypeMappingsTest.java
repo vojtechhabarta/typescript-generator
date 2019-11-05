@@ -109,6 +109,31 @@ public class GenericCustomTypeMappingsTest {
         Assert.assertTrue(output.contains("nonGeneric: Map<string, string>"));
     }
 
+    @Test
+    public void testGenericSubclassMapping() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$SubClass<A, B>", "Test<A, B>");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SubClassUsage.class));
+        Assert.assertTrue(output.contains("nonGeneric: Map<string, string>"));
+    }
+
+    @Test
+    public void testSubclassWithGenericSuperclassMapping() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("? extends cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2<A, B>", "Test<A, B>");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SubClassUsage.class));
+        Assert.assertTrue(output.contains("genericSubClass: Test<string, number>"));
+        System.out.println(output);
+    }
+
+    @Test
+    public void testSubclassWithMixedGenericSuperclassMapping() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("? extends cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2<A, B>", "Test<A, string>");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SubClassUsage.class));
+        Assert.assertTrue(output.contains("genericSubClass: Test<string, string>"));
+    }
+
     private static class NonGeneric {}
     private static class NonGenericUsage {
         public NonGeneric nonGeneric;
@@ -118,7 +143,14 @@ public class GenericCustomTypeMappingsTest {
         public Generic2<String, Integer> generic;
     }
 
-    @Test
+    private static class SubClass<A, B> extends Generic2<A, B> {
+        public double number;
+    }
+    private static class SubClassUsage {
+        public SubClass<String, Integer> genericSubClass;
+    }
+
+   @Test
     public void testAlternativeSyntax() {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2[T1, T2]", "Test[T2, T1]");
