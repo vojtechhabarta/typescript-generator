@@ -9,10 +9,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -129,6 +127,9 @@ public class SpringTest {
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
         Assert.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
+        Assert.assertTrue(output.contains("doSomethingElseAgain(): RestResponse<number>"));
+        Assert.assertTrue(output.contains("uriEncoding`test/c`"));
+        Assert.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
     @RestController
@@ -193,6 +194,12 @@ public class SpringTest {
         int doSomethingElse(@PathVariable long id) {
             return 3;
         }
+
+        @GetMapping("/c")
+        @Override
+        int doSomethingElseAgain() {
+            return super.doSomethingElseAgain();
+        }
     }
 
     static abstract class Controller6Super<A extends Enum<A>, B> {
@@ -204,6 +211,11 @@ public class SpringTest {
 
         @GetMapping("/{id}")
         int doSomethingElse(@PathVariable long id) {
+            return 1;
+        }
+
+        @GetMapping("/b")
+        int doSomethingElseAgain() {
             return 1;
         }
     }
