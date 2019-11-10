@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
@@ -202,18 +203,35 @@ public class SpringApplicationParser extends RestApplicationParser {
     }
 
     private void addOrReplaceMethod(List<Method> resolvedMethods, Method newMethod) {
+
+        int methodIndex = getMethodIndex(resolvedMethods, newMethod);
+        if (methodIndex == -1) {
+            resolvedMethods.add(newMethod);
+            return;
+        }
+
+        final Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(newMethod);
+
+        int bridgedMethodIndex = getMethodIndex(resolvedMethods, bridgedMethod);
+        if (bridgedMethodIndex == -1 || bridgedMethodIndex == methodIndex) {
+            resolvedMethods.set(methodIndex, bridgedMethod);
+        } else {
+            resolvedMethods.set(bridgedMethodIndex, bridgedMethod);
+            resolvedMethods.remove(methodIndex);
+        }
+    }
+
+    private int getMethodIndex(List<Method> resolvedMethods, Method newMethod) {
         for (int i = 0; i < resolvedMethods.size(); i++) {
             Method currMethod = resolvedMethods.get(i);
 
             if (!currMethod.getName().equals(newMethod.getName())) continue;
             if (!Arrays.equals(currMethod.getParameterTypes(), newMethod.getParameterTypes())) continue;
 
-            resolvedMethods.set(i, newMethod);
-
-            return;
+            return i;
         }
 
-        resolvedMethods.add(newMethod);
+        return -1;
     }
 
     // https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-methods
