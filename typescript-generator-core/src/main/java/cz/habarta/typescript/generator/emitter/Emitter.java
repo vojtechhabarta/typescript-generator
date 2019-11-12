@@ -10,7 +10,6 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.util.Utils;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -181,6 +180,7 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitBean(TsBeanModel bean, boolean exportKeyword) {
         writeNewLine();
         emitComments(bean.getComments());
+        emitDecorators(bean.getDecorators());
         final String declarationType = bean.isClass() ? "class" : "interface";
         final String typeParameters = bean.getTypeParameters().isEmpty() ? "" : "<" + formatList(settings, bean.getTypeParameters()) + ">";
         final List<TsType> extendsList = bean.getExtendsList();
@@ -204,11 +204,22 @@ public class Emitter implements EmitterExtension.Writer {
 
     private void emitProperty(TsPropertyModel property) {
         emitComments(property.getComments());
+        emitDecorators(property.getDecorators());
         final TsType tsType = property.getTsType();
         final String staticString = property.modifiers.isStatic ? "static " : "";
         final String readonlyString = property.modifiers.isReadonly ? "readonly " : "";
         final String questionMark = tsType instanceof TsType.OptionalType ? "?" : "";
         writeIndentedLine(staticString + readonlyString + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
+    }
+
+    private void emitDecorators(List<TsDecorator> decorators) {
+        for (TsDecorator decorator : decorators) {
+            final String at = decorator.getIdentifierReference().getIdentifier().startsWith("@") ? "" : "@";
+            final String parameters = decorator.getArguments() != null
+                    ? ("(" + formatList(settings, decorator.getArguments()) + ")")
+                    : "";
+            writeIndentedLine(at + decorator.getIdentifierReference().format(settings) + parameters);
+        }
     }
 
     public static String quoteIfNeeded(String name, Settings settings) {

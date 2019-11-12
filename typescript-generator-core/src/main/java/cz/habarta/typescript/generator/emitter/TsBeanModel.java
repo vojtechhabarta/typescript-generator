@@ -11,6 +11,7 @@ import java.util.List;
 public class TsBeanModel extends TsDeclarationModel {
 
     private final boolean isClass;
+    private final List<TsDecorator> decorators;
     private final List<TsType.GenericVariableType> typeParameters;
     private final TsType parent;
     private final List<TsType> extendsList;
@@ -36,13 +37,14 @@ public class TsBeanModel extends TsDeclarationModel {
             TsConstructorModel constructor,
             List<TsMethodModel> methods,
             List<String> comments) {
-        this(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, null, null, null, null, properties, constructor, methods, comments);
+        this(origin, category, isClass, null, name, typeParameters, parent, extendsList, implementsList, null, null, null, null, properties, constructor, methods, comments);
     }
 
     private TsBeanModel(
             Class<?> origin,
             TsBeanCategory category,
             boolean isClass,
+            List<TsDecorator> decorators,
             Symbol name,
             List<TsType.GenericVariableType> typeParameters,
             TsType parent,
@@ -58,6 +60,7 @@ public class TsBeanModel extends TsDeclarationModel {
             List<String> comments) {
         super(origin, category, name, comments);
         this.isClass = isClass;
+        this.decorators = Utils.listFromNullable(decorators);
         this.typeParameters = Utils.listFromNullable(typeParameters);
         this.parent = parent;
         this.extendsList = Utils.listFromNullable(extendsList);
@@ -73,6 +76,14 @@ public class TsBeanModel extends TsDeclarationModel {
 
     public boolean isClass() {
         return isClass;
+    }
+
+    public List<TsDecorator> getDecorators() {
+        return decorators;
+    }
+
+    public TsBeanModel withDecorators(List<TsDecorator> decorators) {
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public List<TsType.GenericVariableType> getTypeParameters() {
@@ -111,7 +122,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withTaggedUnion(List<Class<?>> taggedUnionClasses, String discriminantProperty, String discriminantLiteral) {
-        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public TsAliasModel getTaggedUnionAlias() {
@@ -119,7 +130,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withTaggedUnionAlias(TsAliasModel taggedUnionAlias) {
-        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public List<TsPropertyModel> getProperties() {
@@ -127,7 +138,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withProperties(List<TsPropertyModel> properties) {
-        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public TsConstructorModel getConstructor() {
@@ -135,7 +146,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withConstructor(TsConstructorModel constructor) {
-        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public List<TsMethodModel> getMethods() {
@@ -143,7 +154,7 @@ public class TsBeanModel extends TsDeclarationModel {
     }
 
     public TsBeanModel withMethods(List<TsMethodModel> methods) {
-        return new TsBeanModel(origin, category, isClass, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
     public boolean isJaxrsApplicationClientBean() {
