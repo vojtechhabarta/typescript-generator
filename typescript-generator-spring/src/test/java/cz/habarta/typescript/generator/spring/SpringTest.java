@@ -10,6 +10,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -70,6 +71,17 @@ public class SpringTest {
     }
 
     @Test
+    public void testPathParametersWithoutValue() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller5.class));
+        Assert.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
+        Assert.assertTrue(output.contains("uriEncoding`owners2/${ownerId}/pets2/${petId}`"));
+        Assert.assertTrue(output.contains("interface Pet"));
+    }
+
+    @Test
     public void testQueryParameters() {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;
@@ -96,6 +108,28 @@ public class SpringTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller4.class));
         Assert.assertTrue(output.contains("getEntity(): RestResponse<Data2>"));
         Assert.assertTrue(output.contains("interface Data2"));
+    }
+
+    @Test
+    public void testGenerics() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
+        Assert.assertTrue(output.contains("doSomething(input: number[]): RestResponse<{ [P in Controller6Enum]?: any }[]>"));
+        Assert.assertTrue(output.contains("type Controller6Enum"));
+    }
+
+    @Test
+    public void testInheritance() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
+        Assert.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
+        Assert.assertTrue(output.contains("doSomethingElseAgain(): RestResponse<number>"));
+        Assert.assertTrue(output.contains("uriEncoding`test/c`"));
+        Assert.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
     @RestController
@@ -133,6 +167,56 @@ public class SpringTest {
         @RequestMapping(path = "/data2", method = RequestMethod.GET)
         public ResponseEntity<Data2> getEntity() {
             return null;
+        }
+    }
+
+    @RestController
+    @RequestMapping("/owners2/{ownerId}")
+    public static class Controller5 {
+        @GetMapping("/pets2/{petId}")
+        public Pet findPet(
+                @PathVariable Long ownerId,
+                @PathVariable Long petId
+        ) {
+            return null;
+        }
+    }
+
+    private enum Controller6Enum {
+        A,
+        B
+    }
+
+    @RestController
+    @RequestMapping("/test")
+    public static class Controller6 extends Controller6Super<Controller6Enum, Integer> {
+        @Override
+        int doSomethingElse(@PathVariable long id) {
+            return 3;
+        }
+
+        @GetMapping("/c")
+        @Override
+        int doSomethingElseAgain() {
+            return super.doSomethingElseAgain();
+        }
+    }
+
+    static abstract class Controller6Super<A extends Enum<A>, B> {
+
+        @PostMapping("a")
+        List<Map<A, ?>> doSomething(@RequestBody List<B> input) {
+            return null;
+        }
+
+        @GetMapping("/{id}")
+        int doSomethingElse(@PathVariable long id) {
+            return 1;
+        }
+
+        @GetMapping("/b")
+        int doSomethingElseAgain() {
+            return 1;
         }
     }
 

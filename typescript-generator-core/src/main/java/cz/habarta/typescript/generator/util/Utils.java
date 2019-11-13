@@ -112,7 +112,7 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
-    private static Stream<Class<?>> getInheritanceChain(Class<?> cls) {
+    public static Stream<Class<?>> getInheritanceChain(Class<?> cls) {
         return generateStream(cls, c -> c != null, (Class<?> c) -> c.getSuperclass())
                 .collect(toReversedCollection())
                 .stream();
