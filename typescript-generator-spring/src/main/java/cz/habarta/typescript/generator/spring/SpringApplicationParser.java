@@ -76,8 +76,6 @@ public class SpringApplicationParser extends RestApplicationParser {
 
     }
 
-    ;
-
     public SpringApplicationParser(Settings settings, TypeProcessor commonTypeProcessor) {
         super(settings, commonTypeProcessor, new RestApplicationModel(RestApplicationType.Spring));
     }
