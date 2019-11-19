@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import org.junit.Assert;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -119,4 +120,17 @@ public class CustomTypeMappingTest {
     interface InterfaceUsingSubCustomMapping {
         SubCustomMapping getSub();
     }
+
+    @Test
+    public void testGenericClassWithCustomMapping() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$GenericClass<D>", "CustomGenericClass<D>");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(GenericClass.class));
+        Assert.assertEquals("", output);
+    }
+
+    static class GenericClass<D> {
+        public D type;
+    }
+
 }

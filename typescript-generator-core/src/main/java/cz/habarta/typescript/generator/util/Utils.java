@@ -74,7 +74,7 @@ public class Utils {
     public static Pair<Class<?>, List<Type>> getRawClassAndTypeArguments(Type type) {
         if (type instanceof Class) {
             final Class<?> javaClass = (Class<?>) type;
-            return Pair.of(javaClass, Collections.emptyList());
+            return Pair.of(javaClass, Arrays.asList(javaClass.getTypeParameters()));
         }
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
