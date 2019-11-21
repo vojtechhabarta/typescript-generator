@@ -55,7 +55,7 @@ public class SpringTest {
         settings.classLoader = Thread.currentThread().getContextClassLoader();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SpringTestApplication.class));
         Assert.assertTrue(output.contains("interface RestApplication"));
-        Assert.assertTrue(output.contains("greeting(queryParams: { name: string; count: number; unnamed: string; }): RestResponse<Greeting>"));
+        Assert.assertTrue(output.contains("greeting(queryParams?: { name?: string; count?: number; unnamed?: string; }): RestResponse<Greeting>"));
         Assert.assertTrue(output.contains("interface Greeting"));
     }
 
@@ -87,7 +87,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
-        Assert.assertTrue(output.contains("echo(queryParams: { message: string; count: number; optionalRequestParam?: number; }): RestResponse<string>"));
+        Assert.assertTrue(output.contains("echo(queryParams: { message: string; count?: number; optionalRequestParam?: number; }): RestResponse<string>"));
     }
 
     @Test

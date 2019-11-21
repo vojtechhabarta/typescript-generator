@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ValueConstants;
 
 public class SpringApplicationParser extends RestApplicationParser {
 
@@ -285,7 +286,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
                     if (requestParamAnnotation != null) {
 
-                        final boolean isRequired = requestParamAnnotation.required();
+                        final boolean isRequired = requestParamAnnotation.required() && requestParamAnnotation.defaultValue().equals(ValueConstants.DEFAULT_NONE);
 
                         queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
                             requestParamAnnotation.value(),
