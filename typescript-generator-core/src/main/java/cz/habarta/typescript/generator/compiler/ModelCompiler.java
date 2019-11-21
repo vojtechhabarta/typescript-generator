@@ -669,7 +669,7 @@ public class ModelCompiler {
                 if (restQueryParam instanceof RestQueryParam.Single) {
                     final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
                     final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                    currentSingles.add(new TsProperty(queryParam.getName(), new TsType.OptionalType(type)));
+                    currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
                 }
                 if (restQueryParam instanceof RestQueryParam.Bean) {
                     final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
@@ -695,7 +695,9 @@ public class ModelCompiler {
                 }
             }
             flushSingles.run();
-            queryParameter = new TsParameterModel("queryParams", new TsType.OptionalType(new TsType.IntersectionType(types)));
+            boolean allQueryParamsOptional = queryParams.stream().noneMatch(queryParam -> queryParam.required);
+            TsType.IntersectionType queryParamType = new TsType.IntersectionType(types);
+            queryParameter = new TsParameterModel("queryParams", allQueryParamsOptional ? new TsType.OptionalType(queryParamType) : queryParamType);
             parameters.add(queryParameter);
         } else {
             queryParameter = null;

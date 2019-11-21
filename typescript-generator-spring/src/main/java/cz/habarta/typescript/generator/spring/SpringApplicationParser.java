@@ -273,21 +273,24 @@ public class SpringApplicationParser extends RestApplicationParser {
             final List<RestQueryParam> queryParams = new ArrayList<>();
             for (Parameter parameter : method.getParameters()) {
                 if (parameter.getType() == Pageable.class) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class), false));
                     foundType(result, Long.class, controllerClass, method.getName());
 
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class), false));
                     foundType(result, Long.class, controllerClass, method.getName());
 
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class), false));
                     foundType(result, String.class, controllerClass, method.getName());
                 } else {
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
                     if (requestParamAnnotation != null) {
+
+                        final boolean isRequired = requestParamAnnotation.required();
+
                         queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
                             requestParamAnnotation.value(),
                             parameter.getName()
-                        ), parameter.getParameterizedType())));
+                        ), parameter.getParameterizedType()), isRequired));
                         foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
                     }
                 }
