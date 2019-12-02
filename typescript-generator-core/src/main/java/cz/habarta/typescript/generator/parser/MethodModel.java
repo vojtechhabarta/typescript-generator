@@ -11,10 +11,10 @@ public class MethodModel {
     protected final Class<?> originClass;
     protected final String name;
     protected final List<MethodParameterModel> parameters;
-    protected final Type returnType;
+    protected final ReturnTypeModel returnType;
     protected final List<String> comments;
 
-    public MethodModel(Class<?> originClass, String name, List<MethodParameterModel> parameters, Type returnType, List<String> comments) {
+    public MethodModel(Class<?> originClass, String name, List<MethodParameterModel> parameters, ReturnTypeModel returnType, List<String> comments) {
         this.originClass = originClass;
         this.name = name;
         this.parameters = parameters != null ? parameters : Collections.<MethodParameterModel>emptyList();
@@ -34,7 +34,7 @@ public class MethodModel {
         return parameters;
     }
 
-    public Type getReturnType() {
+    public ReturnTypeModel getReturnType() {
         return returnType;
     }
 

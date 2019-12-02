@@ -14,7 +14,7 @@ public class RestMethodModel extends MethodModel {
     private final List<RestQueryParam> queryParams;
     private final MethodParameterModel entityParam;
 
-    public RestMethodModel(Class<?> originClass, String name, Type returnType,
+    public RestMethodModel(Class<?> originClass, String name, ReturnTypeModel returnType,
             Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<RestQueryParam> queryParams, MethodParameterModel entityParam,
             List<String> comments) {
         super(originClass, name, null, returnType, comments);

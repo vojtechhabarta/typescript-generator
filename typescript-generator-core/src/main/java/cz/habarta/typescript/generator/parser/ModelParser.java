@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.KotlinUtils;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
@@ -121,11 +122,11 @@ public abstract class ModelParser {
     protected static PropertyMember wrapMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
-            return new PropertyMember.FieldPropertyMember(field);
+            return new PropertyMember.FieldPropertyMember(field, KotlinUtils.isFieldNullable(field));
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            return new PropertyMember.MethodPropertyMember(method);
+            return new PropertyMember.MethodPropertyMember(method, KotlinUtils.isReturnTypeNullable(method, propertyName));
         }
         throw new RuntimeException(String.format(
                 "Unexpected member type '%s' in property '%s' in class '%s'",
@@ -150,12 +151,16 @@ public abstract class ModelParser {
     }
 
     protected boolean isPropertyOptional(PropertyMember propertyMember) {
+        if (propertyMember.isOptional()) {
+            return true;
+        }
         if (settings.optionalProperties == OptionalProperties.all) {
             return true;
         }
         if (settings.optionalProperties == null || settings.optionalProperties == OptionalProperties.useSpecifiedAnnotations) {
             return Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.optionalAnnotations);
         }
+
         return false;
     }
 

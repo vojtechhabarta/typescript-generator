@@ -216,8 +216,7 @@ public class JsonDeserializationExtension extends Extension {
         for (TsType.GenericVariableType typeParameter : typeParameters) {
             parameters.add(new TsParameterModel(
                     "constructorFnOf" + typeParameter.name,
-                    new TsType.FunctionType(Arrays.asList(new TsParameter("data", typeParameter)), typeParameter)
-            ));
+                    new TsType.FunctionType(Arrays.asList(new TsParameter("data", typeParameter)), typeParameter)));
         }
         return parameters;
     }

@@ -2,11 +2,13 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.JaxrsApplicationScanner;
+import cz.habarta.typescript.generator.KotlinUtils;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.GenericsResolver;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -110,11 +112,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
 
     private void parseResource(Result result, ResourceContext context, Class<?> resourceClass) {
         // subContext
-        final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
+        final Map<String, Pair<Type, Boolean>> pathParamTypes = new LinkedHashMap<>();
         for (Field field : resourceClass.getDeclaredFields()) {
             final PathParam pathParamAnnotation = field.getAnnotation(PathParam.class);
             if (pathParamAnnotation != null) {
-                pathParamTypes.put(pathParamAnnotation.value(), field.getType());
+                pathParamTypes.put(pathParamAnnotation.value(), Pair.of(field.getType(), false));
             }
         }
         final ResourceContext subContext = context.subPathParamTypes(pathParamTypes);
@@ -130,11 +132,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         final Path pathAnnotation = method.getAnnotation(Path.class);
         // subContext
         context = context.subPath(pathAnnotation != null ? pathAnnotation.value() : null);
-        final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
+        final Map<String, Pair<Type, Boolean>> pathParamTypes = new LinkedHashMap<>();
         for (Parameter parameter : method.getParameters()) {
             final PathParam pathParamAnnotation = parameter.getAnnotation(PathParam.class);
             if (pathParamAnnotation != null) {
-                pathParamTypes.put(pathParamAnnotation.value(), parameter.getParameterizedType());
+                pathParamTypes.put(pathParamAnnotation.value(), Pair.of(parameter.getParameterizedType(), false));
             }
         }
         context = context.subPathParamTypes(pathParamTypes);
@@ -161,10 +163,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             for (PathTemplate.Part part : pathTemplate.getParts()) {
                 if (part instanceof PathTemplate.Parameter) {
                     final PathTemplate.Parameter parameter = (PathTemplate.Parameter) part;
-                    final Type type = context.pathParamTypes.get(parameter.getOriginalName());
+                    final Pair<Type, Boolean> typeBooleanPair = context.pathParamTypes.get(parameter.getOriginalName());
+                    final Type type = typeBooleanPair != null ? typeBooleanPair.getValue1() : null;
                     final Type paramType = type != null ? type : String.class;
                     final Type resolvedParamType = GenericsResolver.resolveType(resourceClass, paramType, method.getDeclaringClass());
-                    pathParams.add(new MethodParameterModel(parameter.getValidName(), resolvedParamType));
+                    pathParams.add(new MethodParameterModel(parameter.getValidName(), resolvedParamType, false));
                     foundType(result, resolvedParamType, resourceClass, method.getName());
                 }
             }
@@ -173,7 +176,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             for (Parameter param : method.getParameters()) {
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()), false));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType(), false)));
                     foundType(result, param.getParameterizedType(), resourceClass, method.getName());
                 }
                 final BeanParam beanParamAnnotation = param.getAnnotation(BeanParam.class);
@@ -220,12 +223,16 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             } else {
                 modelReturnType = genericReturnType;
             }
+
             final Type resolvedModelReturnType = GenericsResolver.resolveType(resourceClass, modelReturnType, method.getDeclaringClass());
             foundType(result, resolvedModelReturnType, resourceClass, method.getName());
+            final boolean isOptional = KotlinUtils.isReturnTypeNullable(method, null);
+            final ReturnTypeModel returnTypeModel = new ReturnTypeModel(resolvedModelReturnType, isOptional);
+
             // comments
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
-            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType,
+            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), returnTypeModel,
                     context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
@@ -275,7 +282,9 @@ public class JaxrsApplicationParser extends RestApplicationParser {
     }
 
     private static MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method) {
-        for (Parameter parameter : method.getParameters()) {
+        final Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter parameter = parameters[i];
             if (!Utils.hasAnyAnnotation(parameter::getAnnotation, Arrays.asList(
                     MatrixParam.class,
                     QueryParam.class,
@@ -288,9 +297,12 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     BeanParam.class
             ))) {
                 final Type resolvedType = GenericsResolver.resolveType(resourceClass, parameter.getParameterizedType(), method.getDeclaringClass());
-                return new MethodParameterModel(parameter.getName(), resolvedType);
+                final boolean isOptional = KotlinUtils.isParameterNullable(i, method);
+                return new MethodParameterModel(parameter.getName(), resolvedType, isOptional);
             }
+
         }
+
         return null;
     }
     

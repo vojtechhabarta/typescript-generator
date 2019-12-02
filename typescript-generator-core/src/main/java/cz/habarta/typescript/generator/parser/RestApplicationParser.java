@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -60,13 +61,13 @@ public abstract class RestApplicationParser {
     protected static class ResourceContext {
         public final Class<?> rootResource;
         public final String path;
-        public final Map<String, Type> pathParamTypes;
+        public final Map<String, Pair<Type, Boolean>> pathParamTypes;
 
         public ResourceContext(Class<?> rootResource, String path) {
-            this(rootResource, path, new LinkedHashMap<String, Type>());
+            this(rootResource, path, new LinkedHashMap<>());
         }
 
-        private ResourceContext(Class<?> rootResource, String path, Map<String, Type> pathParamTypes) {
+        private ResourceContext(Class<?> rootResource, String path, Map<String, Pair<Type, Boolean>> pathParamTypes) {
             this.rootResource = rootResource;
             this.path = path;
             this.pathParamTypes = pathParamTypes;
@@ -76,9 +77,9 @@ public abstract class RestApplicationParser {
             return new ResourceContext(rootResource, Utils.joinPath(path, subPath), pathParamTypes);
         }
 
-        public ResourceContext subPathParamTypes(Map<String, Type> subPathParamTypes) {
-            final Map<String, Type> newPathParamTypes = new LinkedHashMap<>();
-            newPathParamTypes.putAll(pathParamTypes);
+        // Pair<Type, isOptional>
+        public ResourceContext subPathParamTypes(Map<String, Pair<Type, Boolean>> subPathParamTypes) {
+            final Map<String, Pair<Type, Boolean>> newPathParamTypes = new LinkedHashMap<>(pathParamTypes);
             if (subPathParamTypes != null) {
                 newPathParamTypes.putAll(subPathParamTypes);
             }

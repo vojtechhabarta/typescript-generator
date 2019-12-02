@@ -13,6 +13,8 @@ public abstract class PropertyMember {
 
     public abstract Type getType();
 
+    public abstract boolean isOptional();
+
     public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
         final A annotation = getAnnotatedElement().getAnnotation(annotationClass);
         return annotation != null
@@ -28,14 +30,21 @@ public abstract class PropertyMember {
     public static class FieldPropertyMember extends PropertyMember {
 
         private final Field field;
+        private final boolean isOptional;
 
-        public FieldPropertyMember(Field field) {
+        public FieldPropertyMember(Field field, boolean isOptional) {
             this.field = field;
+            this.isOptional = isOptional;
         }
 
         @Override
         public Type getType() {
             return field.getGenericType();
+        }
+
+        @Override
+        public boolean isOptional() {
+            return isOptional;
         }
 
         @Override
@@ -53,14 +62,21 @@ public abstract class PropertyMember {
     public static class MethodPropertyMember extends PropertyMember {
 
         private final Method method;
+        private final boolean isOptional;
 
-        public MethodPropertyMember(Method method) {
+        public MethodPropertyMember(Method method, boolean isOptional) {
             this.method = method;
+            this.isOptional = isOptional;
         }
 
         @Override
         public Type getType() {
             return method.getGenericReturnType();
+        }
+
+        @Override
+        public boolean isOptional() {
+            return isOptional;
         }
 
         @Override

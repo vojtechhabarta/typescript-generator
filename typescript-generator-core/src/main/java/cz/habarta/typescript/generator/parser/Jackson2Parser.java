@@ -228,7 +228,7 @@ public class Jackson2Parser extends ModelParser {
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
                         ? !beanPropertyWriter.isRequired()
                         : isPropertyOptional(propertyMember);
-                // @JsonUnwrapped
+                // @JsonUnwrappedn
                 PropertyModel.PullProperties pullProperties = null;
                 final JsonUnwrapped annotation = beanPropertyWriter.getAnnotation(JsonUnwrapped.class);
                 if (annotation != null && annotation.enabled()) {

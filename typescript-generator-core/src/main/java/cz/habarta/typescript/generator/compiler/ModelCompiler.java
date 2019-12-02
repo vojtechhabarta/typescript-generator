@@ -669,7 +669,7 @@ public class ModelCompiler {
                 if (restQueryParam instanceof RestQueryParam.Single) {
                     final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
                     final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                    currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
+                    currentSingles.add(new TsProperty(queryParam.getName(), queryParam.isOptional() ? type : new TsType.OptionalType(type)));
                 }
                 if (restQueryParam instanceof RestQueryParam.Bean) {
                     final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
@@ -695,7 +695,14 @@ public class ModelCompiler {
                 }
             }
             flushSingles.run();
-            boolean allQueryParamsOptional = queryParams.stream().noneMatch(queryParam -> queryParam.required);
+            boolean allQueryParamsOptional = queryParams.stream().noneMatch(restQueryParam -> {
+                if (restQueryParam instanceof RestQueryParam.Single) {
+                    final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
+                    return queryParam.isOptional();
+                }
+                return false;
+            });
+
             TsType.IntersectionType queryParamType = new TsType.IntersectionType(types);
             queryParameter = new TsParameterModel("queryParams", allQueryParamsOptional ? new TsType.OptionalType(queryParamType) : queryParamType);
             parameters.add(queryParameter);
@@ -706,9 +713,14 @@ public class ModelCompiler {
             final TsParameterModel optionsParameter = new TsParameterModel("options", new TsType.OptionalType(optionsType));
             parameters.add(optionsParameter);
         }
+
         // return type
-        final TsType returnType = typeFromJava(symbolTable, method.getReturnType(), method.getName(), method.getOriginClass());
-        final TsType wrappedReturnType = new TsType.GenericReferenceType(responseSymbol, returnType);
+        final TsType returnType = typeFromJava(symbolTable, method.getReturnType().getType(), method.getName(), method.getOriginClass());
+        TsType wrappedReturnType = new TsType.GenericReferenceType(responseSymbol, returnType);
+        if (method.getReturnType().isOptional()) {
+            wrappedReturnType = new TsType.OptionalType(wrappedReturnType);
+        }
+
         // method name
         final String nameSuffix;
         if (createLongName) {
@@ -744,7 +756,7 @@ public class ModelCompiler {
 
     private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {
         final TsType parameterType = typeFromJava(symbolTable, parameter.getType(), method.getName(), method.getOriginClass());
-        return new TsParameterModel(parameter.getName(), parameterType);
+        return new TsParameterModel(parameter.getName(), parameter.isOptional() ? new TsType.OptionalType(parameterType) : parameterType);
     }
 
     private static TsTemplateLiteral processPathTemplate(PathTemplate pathTemplate) {
