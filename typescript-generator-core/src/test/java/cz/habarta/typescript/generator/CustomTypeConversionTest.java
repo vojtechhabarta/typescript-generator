@@ -5,10 +5,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
+import kotlin.reflect.KType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import kotlin.reflect.KType;
 import org.junit.Test;
 
 public class CustomTypeConversionTest {

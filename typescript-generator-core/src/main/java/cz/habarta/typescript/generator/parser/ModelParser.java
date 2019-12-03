@@ -152,9 +152,6 @@ public abstract class ModelParser {
     }
 
     protected boolean isPropertyOptional(PropertyMember propertyMember) {
-        if (propertyMember.getKType() != null && propertyMember.getKType().isMarkedNullable()) {
-            return true;
-        }
         if (settings.optionalProperties == OptionalProperties.all) {
             return true;
         }

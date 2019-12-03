@@ -13,7 +13,7 @@ class KotlinTest {
         settings.generateJaxrsApplicationInterface = true
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("doSomething(body?: (A | null)[]>): RestResponse<(string | null)[]>;"))
+        Assert.assertTrue(errorMessage, output.contains("doSomething(arg0?: (A | undefined)[]): RestResponse<(string | undefined)[] | undefined>;"))
     }
 
     @Test
@@ -22,7 +22,7 @@ class KotlinTest {
                         "class A {\n" +
                         "    nullableString?: string;\n" +
                         "    nonNullableString: string;\n" +
-                        "    nullableList?: (string | null)[];\n" +
+                        "    nullableList?: (string | undefined)[];\n" +
                         "    test: string;\n" +
                         "    testNullable?: string;\n" +
                         "}"

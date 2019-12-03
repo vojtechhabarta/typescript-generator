@@ -1004,7 +1004,7 @@ public class ModelCompiler {
 
         return TsType.transformTsType(new TsType.Context(), tsType, (context, currTsType, parentTypes) -> {
             if (currTsType instanceof TsType.OptionalType) {
-                final TsType.OptionalType optionalType = (TsType.OptionalType) tsType;
+                final TsType.OptionalType optionalType = (TsType.OptionalType) currTsType;
                 if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableType) {
                     return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null));
                 }
