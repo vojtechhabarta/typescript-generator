@@ -7,14 +7,14 @@ import javax.ws.rs.Path
 
 class KotlinTest {
 
-//    @Test
-//    fun testJaxRS() {
-//        val settings = TestUtils.settings()
-//        settings.generateJaxrsApplicationInterface = true
-//        val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
-//        val errorMessage = "Unexpected output: $output"
-//        Assert.assertTrue(errorMessage, output.contains("doSomething(body?: (A | null)[]>): RestResponse<(string | null)[]>;"))
-//    }
+    @Test
+    fun testJaxRS() {
+        val settings = TestUtils.settings()
+        settings.generateJaxrsApplicationInterface = true
+        val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
+        val errorMessage = "Unexpected output: $output"
+        Assert.assertTrue(errorMessage, output.contains("doSomething(body?: (A | null)[]>): RestResponse<(string | null)[]>;"))
+    }
 
     @Test
     fun testClassBody() {

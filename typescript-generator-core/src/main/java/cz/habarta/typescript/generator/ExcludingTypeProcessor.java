@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import kotlin.reflect.KType;
 
 
 public class ExcludingTypeProcessor implements TypeProcessor {
@@ -30,6 +31,11 @@ public class ExcludingTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
+        return processType(javaType, null, context);
+    }
+
+    @Override
+    public Result processType(Type javaType, KType kType, Context context) {
         final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
         if (rawClass != null && excludeFilter.test(rawClass.getName())) {
             return new Result(TsType.Any);

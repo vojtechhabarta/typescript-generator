@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import kotlin.reflect.KType;
 
 
 public class CustomMappingTypeProcessor implements TypeProcessor {
@@ -23,6 +24,11 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
+        return processType(javaType, null, context);
+    }
+
+    @Override
+    public Result processType(Type javaType, KType kType, Context context) {
         final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(javaType);
         if (rawClassAndTypeArguments == null) {
             return null;

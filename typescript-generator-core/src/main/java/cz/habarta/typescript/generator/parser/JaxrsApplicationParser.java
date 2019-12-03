@@ -52,21 +52,29 @@ public class JaxrsApplicationParser extends RestApplicationParser {
 
         @Override
         public TypeProcessor getSpecificTypeProcessor() {
-            return (javaType, context) -> {
-                final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
-                if (rawClass != null) {
-                    for (Map.Entry<Class<?>, TsType> entry : getStandardEntityClassesMapping().entrySet()) {
-                        final Class<?> cls = entry.getKey();
-                        final TsType type = entry.getValue();
-                        if (cls.isAssignableFrom(rawClass)) {
-                            return type != null ? new TypeProcessor.Result(type) : null;
+            return new TypeProcessor() {
+                @Override
+                public Result processType(Type javaType, Context context) {
+                    return processType(javaType, null, context);
+                }
+
+                @Override
+                public Result processType(Type javaType, KType kType, Context context) {
+                    final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+                    if (rawClass != null) {
+                        for (Map.Entry<Class<?>, TsType> entry : getStandardEntityClassesMapping().entrySet()) {
+                            final Class<?> cls = entry.getKey();
+                            final TsType type = entry.getValue();
+                            if (cls.isAssignableFrom(rawClass)) {
+                                return type != null ? new TypeProcessor.Result(type) : null;
+                            }
+                        }
+                        if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
+                            return new TypeProcessor.Result(TsType.Any);
                         }
                     }
-                    if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
-                        return new TypeProcessor.Result(TsType.Any);
-                    }
+                    return null;
                 }
-                return null;
             };
         }
 
@@ -157,7 +165,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             if (swaggerOperation.possibleResponses != null) {
                 for (SwaggerResponse response : swaggerOperation.possibleResponses) {
                     if (response.responseType != null) {
-                        foundType(result, response.responseType, resourceClass, method.getName());
+                        foundType(result, response.responseType, null, resourceClass, method.getName());
                     }
                 }
             }
@@ -176,7 +184,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     final Type paramType = type != null ? type : String.class;
                     final Type resolvedParamType = GenericsResolver.resolveType(resourceClass, paramType, method.getDeclaringClass());
                     pathParams.add(new MethodParameterModel(parameter.getValidName(), resolvedParamType, ktype, true));
-                    foundType(result, resolvedParamType, resourceClass, method.getName());
+                    foundType(result, resolvedParamType, ktype, resourceClass, method.getName());
                 }
             }
             // query parameters
@@ -186,17 +194,19 @@ public class JaxrsApplicationParser extends RestApplicationParser {
 
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType(), KotlinUtils.getParameterKType(i, method), false)));
-                    foundType(result, param.getParameterizedType(), resourceClass, method.getName());
+                    final KType parameterKType = KotlinUtils.getParameterKType(i, method);
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType(), parameterKType, false)));
+                    foundType(result, param.getParameterizedType(), parameterKType, resourceClass, method.getName());
                 }
                 final BeanParam beanParamAnnotation = param.getAnnotation(BeanParam.class);
                 if (beanParamAnnotation != null) {
                     final Class<?> beanParamClass = param.getType();
                     final BeanModel paramBean = getQueryParameters(beanParamClass);
                     if (paramBean != null) {
+                        final KType parameterKType = KotlinUtils.getParameterKType(i, method);
                         queryParams.add(new RestQueryParam.Bean(paramBean));
                         for (PropertyModel property : paramBean.getProperties()) {
-                            foundType(result, property.getType(), beanParamClass, property.getName());
+                            foundType(result, property.getType(), parameterKType, beanParamClass, property.getName());
                         }
                     }
                 }
@@ -206,7 +216,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             // JAX-RS specification - 3.3.2.1 Entity Parameters
             final MethodParameterModel entityParameter = getEntityParameter(resourceClass, method);
             if (entityParameter != null) {
-                foundType(result, entityParameter.getType(), resourceClass, method.getName());
+                foundType(result, entityParameter.getType(), entityParameter.getkType(), resourceClass, method.getName());
             }
             // JAX-RS specification - 3.3.3 Return Type
             final Class<?> returnType = method.getReturnType();
@@ -237,8 +247,8 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             }
 
             final Type resolvedModelReturnType = GenericsResolver.resolveType(resourceClass, modelReturnType, method.getDeclaringClass());
-            foundType(result, resolvedModelReturnType, resourceClass, method.getName());
             final KType kType = KotlinUtils.getReturnKType(method, null);
+            foundType(result, resolvedModelReturnType, kType, resourceClass, method.getName());
             final ReturnTypeModel returnTypeModel = new ReturnTypeModel(resolvedModelReturnType, kType);
 
             // comments

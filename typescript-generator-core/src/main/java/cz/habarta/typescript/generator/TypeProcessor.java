@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import kotlin.reflect.KType;
 
 
 public interface TypeProcessor {
@@ -17,17 +18,19 @@ public interface TypeProcessor {
      */
     public Result processType(Type javaType, Context context);
 
-    public default Result processTypeInTemporaryContext(Type type, Object typeContext, Settings settings) {
-        return processType(type, new Context(new SymbolTable(settings), this, typeContext));
+    public Result processType(Type javaType, KType kType, Context context);
+
+    public default Result processTypeInTemporaryContext(Type type, KType kType, Object typeContext, Settings settings) {
+        return processType(type, kType, new Context(new SymbolTable(settings), this, typeContext));
     }
 
-    public default List<Class<?>> discoverClassesUsedInType(Type type, Object typeContext, Settings settings) {
-        final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
+    public default List<Class<?>> discoverClassesUsedInType(Type type, KType kType, Object typeContext, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, kType, typeContext, settings);
         return result != null ? result.getDiscoveredClasses() : Collections.emptyList();
     }
 
-    public default boolean isTypeExcluded(Type type, Object typeContext, Settings settings) {
-        final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
+    public default boolean isTypeExcluded(Type type, KType kType, Object typeContext, Settings settings) {
+        final TypeProcessor.Result result = processTypeInTemporaryContext(type, kType, typeContext, settings);
         return result != null && result.tsType == TsType.Any;
     }
 
@@ -49,6 +52,10 @@ public interface TypeProcessor {
 
         public Result processType(Type javaType) {
             return typeProcessor.processType(javaType, this);
+        }
+
+        public Result processType(Type javaType, KType kType) {
+            return typeProcessor.processType(javaType, kType,this);
         }
 
         public Object getTypeContext() {
@@ -100,15 +107,19 @@ public interface TypeProcessor {
 
         @Override
         public Result processType(Type javaType, Context context) {
+            return processType(javaType, null, context);
+        }
+
+        @Override
+        public Result processType(Type javaType, KType kType, Context context) {
             for (TypeProcessor processor : processors) {
-                final Result result = processor.processType(javaType, context);
+                final Result result = processor.processType(javaType, kType, context);
                 if (result != null) {
                     return result;
                 }
             }
             return null;
         }
-
     }
 
 }

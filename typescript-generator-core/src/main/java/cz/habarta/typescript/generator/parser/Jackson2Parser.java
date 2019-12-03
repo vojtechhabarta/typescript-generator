@@ -58,6 +58,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import kotlin.reflect.KType;
 
 
 public class Jackson2Parser extends ModelParser {
@@ -154,6 +155,11 @@ public class Jackson2Parser extends ModelParser {
                 new TypeProcessor() {
                     @Override
                     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+                        return processType(javaType, null, context);
+                    }
+
+                    @Override
+                    public TypeProcessor.Result processType(Type javaType, KType kType, TypeProcessor.Context context) {
                         if (context.getTypeContext() instanceof Jackson2TypeContext) {
                             final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
                             if (!jackson2TypeContext.disableObjectIdentityFeature) {

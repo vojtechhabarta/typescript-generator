@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import kotlin.reflect.KType;
 import org.junit.Test;
 
 public class CustomTypeConversionTest {
@@ -17,7 +19,12 @@ public class CustomTypeConversionTest {
         // suppose we want to override how A is parsed
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
-            public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+            public Result processType(Type javaType, Context context) {
+                return processType(javaType, null, context);
+            }
+
+            @Override
+            public Result processType(Type javaType, KType kType, Context context) {
                 if (javaType.equals(B.class)) {
                     return new Result(TsType.Number.optional());
                 }
@@ -49,7 +56,12 @@ public class CustomTypeConversionTest {
         settings.mapDate = DateMapping.asString;
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
-            public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+            public Result processType(Type javaType, Context context) {
+                return processType(javaType, null, context);
+            }
+
+            @Override
+            public Result processType(Type javaType, KType kType, Context context) {
                 final Type[] typeArguments = tryGetParameterizedTypeArguments(javaType, CustomOptional.class);
                 if (typeArguments != null) {
                     final TypeProcessor.Result result = context.processType(typeArguments[0]);

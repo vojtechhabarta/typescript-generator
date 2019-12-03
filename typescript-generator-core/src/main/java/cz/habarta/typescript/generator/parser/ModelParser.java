@@ -91,7 +91,7 @@ public abstract class ModelParser {
                 continue;
             }
 
-            final TypeProcessor.Result result = commonTypeProcessor.processTypeInTemporaryContext(sourceType.type, null, settings);
+            final TypeProcessor.Result result = commonTypeProcessor.processTypeInTemporaryContext(sourceType.type, sourceType.kType, null, settings);
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
@@ -182,7 +182,7 @@ public abstract class ModelParser {
 
     protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
         final Type resolvedType = GenericsResolver.resolveType(usedInClass, type, originalMember.getDeclaringClass());
-        final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, typeContext, settings);
+        final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, null, typeContext, settings);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }

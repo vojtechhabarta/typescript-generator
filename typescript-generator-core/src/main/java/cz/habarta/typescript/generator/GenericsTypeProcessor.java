@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import java.lang.reflect.Type;
+import kotlin.reflect.KType;
 
 
 /**
@@ -11,7 +12,12 @@ import java.lang.reflect.Type;
 public class GenericsTypeProcessor implements TypeProcessor {
 
     @Override
-    public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+    public Result processType(Type javaType, Context context) {
+        return processType(javaType, null, context);
+    }
+
+    @Override
+    public Result processType(Type javaType, KType kType, Context context) {
         return null;
     }
 

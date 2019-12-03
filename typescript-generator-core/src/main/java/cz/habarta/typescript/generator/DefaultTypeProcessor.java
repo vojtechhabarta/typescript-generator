@@ -25,12 +25,18 @@ import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
+import kotlin.reflect.KType;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
+        return processType(javaType, null, context);
+    }
+
+    @Override
+    public Result processType(Type javaType, KType kType,  Context context) {
         if (KnownTypes.containsKey(javaType)) {
             return new Result(KnownTypes.get(javaType));
         }
@@ -69,7 +75,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 for (int i = 0; i < javaClass.getTypeParameters().length; i++) {
                     tsTypeArguments.add(TsType.Any);
                 }
-                return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments));
+                return new Result(boxIfNullable(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments), kType));
             }
             // structural type
             return new Result(new TsType.ReferenceType(context.getSymbol(javaClass)), javaClass);
@@ -79,7 +85,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
                 if (Collection.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0], ifNotNull(kType, (kTypeNotNull -> kTypeNotNull.getArguments().get(0).getType())));
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
@@ -152,6 +158,31 @@ public class DefaultTypeProcessor implements TypeProcessor {
             );
         }
         return null;
+    }
+
+
+    private interface Executor<T> {
+        T execute(KType kType);
+    }
+
+    private <T> T ifNotNull(KType kType, Executor<T> executor) {
+        if (kType == null) {
+            return null;
+        }
+
+        return executor.execute(kType);
+    }
+
+    private TsType boxIfNullable(TsType tsType, KType kType) {
+        if (kType == null) {
+            return tsType;
+        }
+
+        if (kType.isMarkedNullable()) {
+            return new TsType.OptionalType(tsType);
+        }
+
+        return tsType;
     }
 
     private static Map<Type, TsType> getKnownTypes() {

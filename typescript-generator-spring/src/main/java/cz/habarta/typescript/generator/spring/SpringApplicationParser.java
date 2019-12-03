@@ -57,21 +57,29 @@ public class SpringApplicationParser extends RestApplicationParser {
 
         @Override
         public TypeProcessor getSpecificTypeProcessor() {
-            return (javaType, context) -> {
-                final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
-                if (rawClass != null) {
-                    for (Map.Entry<Class<?>, TsType> entry : getStandardEntityClassesMapping().entrySet()) {
-                        final Class<?> cls = entry.getKey();
-                        final TsType type = entry.getValue();
-                        if (cls.isAssignableFrom(rawClass) && type != null) {
-                            return new TypeProcessor.Result(type);
+            return new TypeProcessor() {
+                @Override
+                public Result processType(Type javaType, Context context) {
+                    return processType(javaType, null, context);
+                }
+
+                @Override
+                public Result processType(Type javaType, KType kType, Context context) {
+                    final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+                    if (rawClass != null) {
+                        for (Map.Entry<Class<?>, TsType> entry : getStandardEntityClassesMapping().entrySet()) {
+                            final Class<?> cls = entry.getKey();
+                            final TsType type = entry.getValue();
+                            if (cls.isAssignableFrom(rawClass) && type != null) {
+                                return new TypeProcessor.Result(type);
+                            }
+                        }
+                        if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
+                            return new TypeProcessor.Result(TsType.Any);
                         }
                     }
-                    if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
-                        return new TypeProcessor.Result(TsType.Any);
-                    }
+                    return null;
                 }
-                return null;
             };
         }
 
@@ -284,8 +292,9 @@ public class SpringApplicationParser extends RestApplicationParser {
                     final MethodParameterModel methodParameterModel = contextPathParamTypes.get(parameter.getOriginalName());
                     final Type type = methodParameterModel.getType();
                     final Type paramType = type != null ? type : String.class;
-                    foundType(result, paramType, controllerClass, method.getName());
-                    return new MethodParameterModel(parameter.getValidName(), paramType, methodParameterModel.getkType(), methodParameterModel.isRequired);
+                    final KType kType = methodParameterModel.getkType();
+                    foundType(result, paramType, kType, controllerClass, method.getName());
+                    return new MethodParameterModel(parameter.getValidName(), paramType, kType, methodParameterModel.isRequired);
                 })
                 .collect(Collectors.toList());
 
@@ -297,24 +306,25 @@ public class SpringApplicationParser extends RestApplicationParser {
 
                 if (parameter.getType() == Pageable.class) {
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class, null, false)));
-                    foundType(result, Long.class, controllerClass, method.getName());
+                    foundType(result, Long.class, null, controllerClass, method.getName());
 
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class, null, false)));
-                    foundType(result, Long.class, controllerClass, method.getName());
+                    foundType(result, Long.class, null, controllerClass, method.getName());
 
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class, null, false)));
-                    foundType(result, String.class, controllerClass, method.getName());
+                    foundType(result, String.class, null, controllerClass, method.getName());
                 } else {
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
                     if (requestParamAnnotation != null) {
 
                         final boolean isRequired = requestParamAnnotation.required() && requestParamAnnotation.defaultValue().equals(ValueConstants.DEFAULT_NONE);
 
+                        final KType parameterKType = KotlinUtils.getParameterKType(i, method);
                         queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
                                 requestParamAnnotation.value(),
                                 parameter.getName()
-                        ), parameter.getParameterizedType(), KotlinUtils.getParameterKType(i, method), isRequired)));
-                        foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                        ), parameter.getParameterizedType(), parameterKType, isRequired)));
+                        foundType(result, parameter.getParameterizedType(), parameterKType, controllerClass, method.getName());
                     }
                 }
 
@@ -323,12 +333,13 @@ public class SpringApplicationParser extends RestApplicationParser {
             // entity parameter
             final MethodParameterModel entityParameter = getEntityParameter(controllerClass, method);
             if (entityParameter != null) {
-                foundType(result, entityParameter.getType(), controllerClass, method.getName());
+                foundType(result, entityParameter.getType(), entityParameter.getkType(), controllerClass, method.getName());
             }
 
             final Type modelReturnType = parseReturnType(controllerClass, method);
-            foundType(result, modelReturnType, controllerClass, method.getName());
-            final ReturnTypeModel returnTypeModel = new ReturnTypeModel(modelReturnType, KotlinUtils.getReturnKType(method, null));
+            final KType returnKType = KotlinUtils.getReturnKType(method, null);
+            foundType(result, modelReturnType, returnKType, controllerClass, method.getName());
+            final ReturnTypeModel returnTypeModel = new ReturnTypeModel(modelReturnType, returnKType);
 
             model.getMethods().add(new RestMethodModel(controllerClass, method.getName(), returnTypeModel,
                 controllerClass, httpMethod.name(), context.path, pathParams, queryParams, entityParameter, null));
