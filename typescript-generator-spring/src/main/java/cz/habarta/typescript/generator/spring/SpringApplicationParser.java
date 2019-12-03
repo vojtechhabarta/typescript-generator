@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import kotlin.Triple;
+import kotlin.reflect.KType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -245,8 +247,10 @@ public class SpringApplicationParser extends RestApplicationParser {
             context = context.subPath(requestMapping.path().length == 0 ? "" : requestMapping.path()[0]);
 
             // Pair<Type, isOptional>
-            final Map<String, Pair<Type, Boolean>> pathParamTypes = new LinkedHashMap<>();
-            for (Parameter parameter : method.getParameters()) {
+            final Map<String, MethodParameterModel> pathParamTypes = new LinkedHashMap<>();
+            final Parameter[] parameters = method.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
                 final PathVariable pathVariableAnnotation = AnnotationUtils.findAnnotation(parameter, PathVariable.class);
                 if (pathVariableAnnotation != null) {
                     String pathVariableName = pathVariableAnnotation.value();
@@ -255,38 +259,50 @@ public class SpringApplicationParser extends RestApplicationParser {
                     if (pathVariableName.isEmpty()) {
                         pathVariableName = parameter.getName();
                     }
-                    pathParamTypes.put(pathVariableName, Pair.of(parameter.getParameterizedType(), !pathVariableAnnotation.required()));
+
+                    pathParamTypes.put(pathVariableName,
+                        new MethodParameterModel(
+                            pathVariableName,
+                            parameter.getParameterizedType(),
+                            KotlinUtils.getParameterKType(i, method),
+                            pathVariableAnnotation.required()
+                        )
+                    );
                 }
             }
+
             context = context.subPathParamTypes(pathParamTypes);
             final RequestMethod httpMethod = requestMapping.method().length == 0 ? RequestMethod.GET : requestMapping.method()[0];
 
             // path parameters
             final PathTemplate pathTemplate = PathTemplate.parse(context.path);
-            final Map<String, Pair<Type, Boolean>> contextPathParamTypes = context.pathParamTypes;
+            final Map<String, MethodParameterModel> contextPathParamTypes = context.pathParamTypes;
             final List<MethodParameterModel> pathParams = pathTemplate.getParts().stream()
                 .filter(PathTemplate.Parameter.class::isInstance)
                 .map(PathTemplate.Parameter.class::cast)
                 .map(parameter -> {
-                    final Pair<Type, Boolean> typeBooleanPair = contextPathParamTypes.get(parameter.getOriginalName());
-                    final Type type = typeBooleanPair.getValue1();
+                    final MethodParameterModel methodParameterModel = contextPathParamTypes.get(parameter.getOriginalName());
+                    final Type type = methodParameterModel.getType();
                     final Type paramType = type != null ? type : String.class;
                     foundType(result, paramType, controllerClass, method.getName());
-                    return new MethodParameterModel(parameter.getValidName(), paramType, typeBooleanPair.getValue2());
+                    return new MethodParameterModel(parameter.getValidName(), paramType, methodParameterModel.getkType(), methodParameterModel.isRequired);
                 })
                 .collect(Collectors.toList());
 
             // query parameters
             final List<RestQueryParam> queryParams = new ArrayList<>();
-            for (Parameter parameter : method.getParameters()) {
+
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+
                 if (parameter.getType() == Pageable.class) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class, false)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class, null, false)));
                     foundType(result, Long.class, controllerClass, method.getName());
 
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class, false)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class, null, false)));
                     foundType(result, Long.class, controllerClass, method.getName());
 
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class, false)));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class, null, false)));
                     foundType(result, String.class, controllerClass, method.getName());
                 } else {
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
@@ -295,12 +311,13 @@ public class SpringApplicationParser extends RestApplicationParser {
                         final boolean isRequired = requestParamAnnotation.required() && requestParamAnnotation.defaultValue().equals(ValueConstants.DEFAULT_NONE);
 
                         queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
-                            requestParamAnnotation.value(),
-                            parameter.getName()
-                        ), parameter.getParameterizedType(), isRequired)));
+                                requestParamAnnotation.value(),
+                                parameter.getName()
+                        ), parameter.getParameterizedType(), KotlinUtils.getParameterKType(i, method), isRequired)));
                         foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
                     }
                 }
+
             }
 
             // entity parameter
@@ -311,8 +328,7 @@ public class SpringApplicationParser extends RestApplicationParser {
 
             final Type modelReturnType = parseReturnType(controllerClass, method);
             foundType(result, modelReturnType, controllerClass, method.getName());
-            final boolean isOptional = KotlinUtils.isReturnTypeNullable(method, null);
-            final ReturnTypeModel returnTypeModel = new ReturnTypeModel(modelReturnType, isOptional);
+            final ReturnTypeModel returnTypeModel = new ReturnTypeModel(modelReturnType, KotlinUtils.getReturnKType(method, null));
 
             model.getMethods().add(new RestMethodModel(controllerClass, method.getName(), returnTypeModel,
                 controllerClass, httpMethod.name(), context.path, pathParams, queryParams, entityParameter, null));
@@ -340,8 +356,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(parameter, RequestBody.class);
             if (requestBodyAnnotation != null) {
                 final Type resolvedType = GenericsResolver.resolveType(controller, parameter.getParameterizedType(), method.getDeclaringClass());
-                final boolean isOptional = KotlinUtils.isParameterNullable(index, method);
-                return new MethodParameterModel(parameter.getName(), resolvedType, isOptional);
+                return new MethodParameterModel(parameter.getName(), resolvedType, KotlinUtils.getParameterKType(index, method), requestBodyAnnotation.required());
             }
         }
         return null;

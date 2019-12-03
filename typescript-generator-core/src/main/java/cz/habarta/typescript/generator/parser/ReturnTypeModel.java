@@ -1,22 +1,28 @@
 package cz.habarta.typescript.generator.parser;
 
 import java.lang.reflect.Type;
+import kotlin.reflect.KType;
 
 public class ReturnTypeModel {
 
     private final Type type;
-    private final boolean optional;
+    private final KType ktype;
 
-    public ReturnTypeModel(Type type, boolean optional) {
+    public ReturnTypeModel(Type type) {
         this.type = type;
-        this.optional = optional;
+        this.ktype = null;
+    }
+
+    public ReturnTypeModel(Type type, KType ktype) {
+        this.ktype = ktype;
+        this.type = type;
+    }
+
+    public KType getKType() {
+        return ktype;
     }
 
     public Type getType() {
         return type;
-    }
-
-    public boolean isOptional() {
-        return optional;
     }
 }

@@ -2,18 +2,21 @@
 package cz.habarta.typescript.generator.parser;
 
 import java.lang.reflect.Type;
+import kotlin.reflect.KType;
 
 
 public class MethodParameterModel {
 
     private final String name;
     private final Type type;
-    private final boolean optional;
+    private final KType kType;
+    public final boolean isRequired;
 
-    public MethodParameterModel(String name, Type type, boolean optional) {
+    public MethodParameterModel(String name, Type type, KType kType, boolean isRequired) {
         this.name = name;
         this.type = type;
-        this.optional = optional;
+        this.kType = kType;
+        this.isRequired = isRequired;
     }
 
     public String getName() {
@@ -24,7 +27,11 @@ public class MethodParameterModel {
         return type;
     }
 
-    public boolean isOptional() {
-        return optional;
+    public KType getkType() {
+        return kType;
+    }
+
+    public boolean isNullable() {
+        return !isRequired || (kType != null && kType.isMarkedNullable());
     }
 }

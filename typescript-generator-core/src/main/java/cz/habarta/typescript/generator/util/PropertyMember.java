@@ -7,13 +7,14 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import kotlin.reflect.KType;
 
 
 public abstract class PropertyMember {
 
     public abstract Type getType();
 
-    public abstract boolean isOptional();
+    public abstract KType getKType();
 
     public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
         final A annotation = getAnnotatedElement().getAnnotation(annotationClass);
@@ -30,11 +31,11 @@ public abstract class PropertyMember {
     public static class FieldPropertyMember extends PropertyMember {
 
         private final Field field;
-        private final boolean isOptional;
+        private KType ktype;
 
-        public FieldPropertyMember(Field field, boolean isOptional) {
+        public FieldPropertyMember(Field field, KType ktype) {
             this.field = field;
-            this.isOptional = isOptional;
+            this.ktype = ktype;
         }
 
         @Override
@@ -43,8 +44,8 @@ public abstract class PropertyMember {
         }
 
         @Override
-        public boolean isOptional() {
-            return isOptional;
+        public KType getKType() {
+            return ktype;
         }
 
         @Override
@@ -62,11 +63,11 @@ public abstract class PropertyMember {
     public static class MethodPropertyMember extends PropertyMember {
 
         private final Method method;
-        private final boolean isOptional;
+        private KType ktype;
 
-        public MethodPropertyMember(Method method, boolean isOptional) {
+        public MethodPropertyMember(Method method, KType ktype) {
             this.method = method;
-            this.isOptional = isOptional;
+            this.ktype = ktype;
         }
 
         @Override
@@ -75,9 +76,10 @@ public abstract class PropertyMember {
         }
 
         @Override
-        public boolean isOptional() {
-            return isOptional;
+        public KType getKType() {
+            return ktype;
         }
+
 
         @Override
         public AnnotatedElement getAnnotatedElement() {

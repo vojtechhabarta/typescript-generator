@@ -122,11 +122,11 @@ public abstract class ModelParser {
     protected static PropertyMember wrapMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
-            return new PropertyMember.FieldPropertyMember(field, KotlinUtils.isFieldNullable(field));
+            return new PropertyMember.FieldPropertyMember(field, KotlinUtils.getFieldKType(field));
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            return new PropertyMember.MethodPropertyMember(method, KotlinUtils.isReturnTypeNullable(method, propertyName));
+            return new PropertyMember.MethodPropertyMember(method, KotlinUtils.getReturnKType(method, propertyName));
         }
         throw new RuntimeException(String.format(
                 "Unexpected member type '%s' in property '%s' in class '%s'",
@@ -151,7 +151,7 @@ public abstract class ModelParser {
     }
 
     protected boolean isPropertyOptional(PropertyMember propertyMember) {
-        if (propertyMember.isOptional()) {
+        if (propertyMember.getKType() != null && propertyMember.getKType().isMarkedNullable()) {
             return true;
         }
         if (settings.optionalProperties == OptionalProperties.all) {

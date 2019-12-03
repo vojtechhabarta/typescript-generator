@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import kotlin.reflect.KType;
 
 public abstract class RestApplicationParser {
 
@@ -61,13 +62,13 @@ public abstract class RestApplicationParser {
     protected static class ResourceContext {
         public final Class<?> rootResource;
         public final String path;
-        public final Map<String, Pair<Type, Boolean>> pathParamTypes;
+        public final Map<String, MethodParameterModel> pathParamTypes;
 
         public ResourceContext(Class<?> rootResource, String path) {
             this(rootResource, path, new LinkedHashMap<>());
         }
 
-        private ResourceContext(Class<?> rootResource, String path, Map<String, Pair<Type, Boolean>> pathParamTypes) {
+        private ResourceContext(Class<?> rootResource, String path, Map<String, MethodParameterModel> pathParamTypes) {
             this.rootResource = rootResource;
             this.path = path;
             this.pathParamTypes = pathParamTypes;
@@ -78,8 +79,8 @@ public abstract class RestApplicationParser {
         }
 
         // Pair<Type, isOptional>
-        public ResourceContext subPathParamTypes(Map<String, Pair<Type, Boolean>> subPathParamTypes) {
-            final Map<String, Pair<Type, Boolean>> newPathParamTypes = new LinkedHashMap<>(pathParamTypes);
+        public ResourceContext subPathParamTypes(Map<String, MethodParameterModel> subPathParamTypes) {
+            final Map<String, MethodParameterModel> newPathParamTypes = new LinkedHashMap<>(pathParamTypes);
             if (subPathParamTypes != null) {
                 newPathParamTypes.putAll(subPathParamTypes);
             }

@@ -13,7 +13,7 @@ class KotlinTest {
 //        settings.generateJaxrsApplicationInterface = true
 //        val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
 //        val errorMessage = "Unexpected output: $output"
-//        Assert.assertTrue(errorMessage, output.contains("doSomething(body?: A): RestResponse<string?>;"))
+//        Assert.assertTrue(errorMessage, output.contains("doSomething(body?: (A | null)[]>): RestResponse<(string | null)[]>;"))
 //    }
 
     @Test
@@ -45,7 +45,7 @@ class KotlinTest {
     private class B {
 
         @POST
-        fun doSomething(body: A?): List<String?>? {
+        fun doSomething(body: List<A?>?): List<String?>? {
             return null
         }
     }

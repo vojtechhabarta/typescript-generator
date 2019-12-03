@@ -9,12 +9,13 @@ import kotlin.Metadata;
 import kotlin.reflect.KFunction;
 import kotlin.reflect.KParameter;
 import kotlin.reflect.KProperty;
+import kotlin.reflect.KType;
 import kotlin.reflect.jvm.ReflectJvmMapping;
 
 public abstract class KotlinUtils {
 
     /**
-     * States whether the return type of the given method is nullable.
+     * Gets the Kotlin return type of the given method.
      *
      * The fallbackName gives the name of the underlying field if this function is a getter function:
      * Kotlin generates getters, which can be picked up by the serializer, but then it's not a Kotlin function.
@@ -22,9 +23,9 @@ public abstract class KotlinUtils {
      *
      * @param method the Java method
      * @param fallbackName the name of the field which _could_ be underlying
-     * @return whether the return type of the function is nullable
+     * @return the kotlin return type of the function
      */
-    public static boolean isReturnTypeNullable(Method method, String fallbackName) {
+    public static KType getReturnKType(Method method, String fallbackName) {
         if (method != null && KotlinUtils.isKotlinClass(method.getDeclaringClass())) {
             KFunction<?> function = ReflectJvmMapping.getKotlinFunction(method);
 
@@ -33,48 +34,50 @@ public abstract class KotlinUtils {
             if (function == null && fallbackName != null) {
                 try {
                     final Field field = method.getDeclaringClass().getDeclaredField(fallbackName);
-                    return isFieldNullable(field);
+                    final KProperty<?> kotlinProperty = ReflectJvmMapping.getKotlinProperty(field);
+                    if (kotlinProperty == null) return null;
+                    return kotlinProperty.getReturnType();
                 } catch (NoSuchFieldException e) {
-                    return false;
+                    return null;
                 }
 
             } else if (function != null) {
-                return function.getReturnType().isMarkedNullable();
+                return function.getReturnType();
             }
         }
-        return false;
+        return null;
     }
 
-    public static boolean isParameterNullable(int parameterIndex, Method method) {
+    public static KType getParameterKType(int parameterIndex, Method method) {
         if (method != null && KotlinUtils.isKotlinClass(method.getDeclaringClass())) {
             KFunction<?> function = ReflectJvmMapping.getKotlinFunction(method);
-            return isParameterNullable(parameterIndex, function);
+            return getParameterKType(parameterIndex, function);
         }
-        return false;
+        return null;
     }
 
-    public static boolean isParameterNullable(int parameterIndex, Constructor<?> constructor) {
+    public static KType getParameterKType(int parameterIndex, Constructor<?> constructor) {
         if (constructor != null && KotlinUtils.isKotlinClass(constructor.getDeclaringClass())) {
             KFunction<?> function = ReflectJvmMapping.getKotlinFunction(constructor);
-            return isParameterNullable(parameterIndex, function);
+            return getParameterKType(parameterIndex, function);
         }
-        return false;
+        return null;
     }
 
-    public static boolean isFieldNullable(Field field) {
+    public static KType getFieldKType(Field field) {
         if (field != null && KotlinUtils.isKotlinClass(field.getDeclaringClass())) {
             final KProperty<?> kotlinProperty = ReflectJvmMapping.getKotlinProperty(field);
-            if (kotlinProperty == null) return false;
-            return kotlinProperty.getReturnType().isMarkedNullable();
+            if (kotlinProperty == null) return null;
+            return kotlinProperty.getReturnType();
         }
-        return false;
+        return null;
     }
 
     private static boolean isKotlinClass(Class<?> type) {
         return type != null && type.getDeclaredAnnotation(Metadata.class) != null;
     }
 
-    private static boolean isParameterNullable(int parameterIndex, KFunction<?> function) {
+    private static KType getParameterKType(int parameterIndex, KFunction<?> function) {
         if (function != null) {
             List<KParameter> parameters = function.getParameters();
             return parameters
@@ -82,11 +85,10 @@ public abstract class KotlinUtils {
                     .filter(p -> KParameter.Kind.VALUE.equals(p.getKind()))
                     .collect(Collectors.toList())
                     .get(parameterIndex)
-                    .getType()
-                    .isMarkedNullable();
+                    .getType();
         }
 
-        return false;
+        return null;
     }
 
 

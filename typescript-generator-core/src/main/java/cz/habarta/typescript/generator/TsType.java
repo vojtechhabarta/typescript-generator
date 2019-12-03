@@ -158,13 +158,10 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            // https://github.com/Microsoft/TypeScript/pull/914
-            // TypeScript Specification A.1
             return elementType instanceof UnionType
                     ? "(" + elementType.format(settings) + ")" + "[]"
                     : elementType.format(settings) + "[]";
         }
-
     }
 
     public static class IndexedArrayType extends TsType {
