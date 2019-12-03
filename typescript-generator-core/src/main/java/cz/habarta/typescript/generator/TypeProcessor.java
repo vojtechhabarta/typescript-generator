@@ -91,7 +91,7 @@ public interface TypeProcessor {
             return discoveredClasses;
         }
 
-        protected TsType boxIfNullable(KType kType, TsType tsType) {
+        private TsType boxIfNullable(KType kType, TsType tsType) {
             if (kType == null) {
                 return tsType;
             }

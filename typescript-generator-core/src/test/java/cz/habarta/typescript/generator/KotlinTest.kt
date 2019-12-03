@@ -13,26 +13,37 @@ class KotlinTest {
         settings.generateJaxrsApplicationInterface = true
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("doSomething(arg0?: (A | undefined)[]): RestResponse<(string | undefined)[] | undefined>;"))
+        Assert.assertTrue(errorMessage, output.contains("doSomething(arg0?: (A<string> | undefined)[]): RestResponse<(string | undefined)[] | undefined>;"))
     }
 
     @Test
     fun testClassBody() {
         testOutput(A::class.java,
-                        "class A {\n" +
+                        "class A<T> {\n" +
                         "    nullableString?: string;\n" +
                         "    nonNullableString: string;\n" +
                         "    nullableList?: (string | undefined)[];\n" +
+                        "    nullableArray?: (string | undefined)[];\n" +
+                        "    nullableGenericArray?: (T | undefined)[];\n" +
+                        "    nullableGenericType?: T;\n" +
+                        "    data?: T;\n" +
                         "    test: string;\n" +
                         "    testNullable?: string;\n" +
                         "}"
         )
     }
 
-    private class A {
+    private class A<T> {
         val nullableString: String? = null
         val nonNullableString: String = ""
         val nullableList: List<String?>? = null
+        val nullableArray: Array<String?>? = null
+        val nullableGenericArray: Array<T?>? = null
+        val nullableGenericType: T? = null
+
+        fun <B: T> getData(): B? {
+            return null;
+        }
 
         fun getTest(): String {
             return ""
@@ -47,7 +58,7 @@ class KotlinTest {
     private class B {
 
         @POST
-        fun doSomething(body: List<A?>?): List<String?>? {
+        fun doSomething(body: List<A<String>?>?): List<String?>? {
             return null
         }
     }

@@ -26,6 +26,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
 import kotlin.reflect.KType;
+import kotlin.reflect.KTypeParameter;
+import kotlin.reflect.jvm.ReflectJvmMapping;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
@@ -49,7 +51,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
             if (javaClass.isArray()) {
-                final Result result = context.processType(javaClass.getComponentType());
+                final Result result = context.processType(javaClass.getComponentType(), getArgument(kType, 0));
                 return new Result(new TsType.BasicArrayType(result.getTsType()), kType, result.getDiscoveredClasses());
             }
             if (javaClass.isEnum()) {
@@ -84,13 +86,14 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
+                final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
                 if (Collection.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0], ifNotNull(kType, (kTypeNotNull -> kTypeNotNull.getArguments().get(0).getType())));
+                    final Result result = context.processType(actualTypeArguments[0], getArgument(kType, 0));
                     return new Result(new TsType.BasicArrayType(result.getTsType()), kType, result.getDiscoveredClasses());
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
-                    final Result keyResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
-                    final Result valueResult = context.processType(parameterizedType.getActualTypeArguments()[1]);
+                    final Result keyResult = context.processType(actualTypeArguments[0], getArgument(kType, 0));
+                    final Result valueResult = context.processType(actualTypeArguments[1],getArgument(kType, 1));
                     if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
                         return new Result(
                                 new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueResult.getTsType()), kType,
@@ -104,19 +107,20 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     }
                 }
                 if (Optional.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result result = context.processType(actualTypeArguments[0], getArgument(kType, 0));
                     return new Result(result.getTsType().optional(), kType, result.getDiscoveredClasses());
                 }
                 if (JAXBElement.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result result = context.processType(actualTypeArguments[0], getArgument(kType, 0));
                     return new Result(result.getTsType(), kType, result.getDiscoveredClasses());
                 }
                 // generic structural type
                 final List<Class<?>> discoveredClasses = new ArrayList<>();
                 discoveredClasses.add(javaClass);
                 final List<TsType> tsTypeArguments = new ArrayList<>();
-                for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
-                    final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
+                for (int i = 0; i < actualTypeArguments.length; i++) {
+                    Type typeArgument = actualTypeArguments[i];
+                    final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument, getArgument(kType, i));
                     tsTypeArguments.add(typeArgumentResult.getTsType());
                     discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
                 }
@@ -125,13 +129,23 @@ public class DefaultTypeProcessor implements TypeProcessor {
         }
         if (javaType instanceof GenericArrayType) {
             final GenericArrayType genericArrayType = (GenericArrayType) javaType;
-            final Result result = context.processType(genericArrayType.getGenericComponentType());
+            final Result result = context.processType(genericArrayType.getGenericComponentType(), getArgument(kType, 0));
             return new Result(new TsType.BasicArrayType(result.getTsType()), kType, result.getDiscoveredClasses());
         }
         if (javaType instanceof TypeVariable) {
             final TypeVariable<?> typeVariable = (TypeVariable<?>) javaType;
             if (typeVariable.getGenericDeclaration() instanceof Method) {
                 // example method: public <T extends Number> T getData();
+                if (kType != null) {
+                    KTypeParameter typeParameter = (KTypeParameter) kType.getClassifier();
+                    if (typeParameter != null) {
+                        final Result result = context.processType(typeVariable.getBounds()[0], typeParameter.getUpperBounds().get(0));
+                        if (kType.isMarkedNullable()) {
+                            return new Result(new TsType.OptionalType(result.getTsType()), null, result.getDiscoveredClasses());
+                        }
+                        return result;
+                    }
+                }
                 return context.processType(typeVariable.getBounds()[0]);
             }
             return new Result(new TsType.GenericVariableType(typeVariable.getName()), kType);
@@ -139,8 +153,17 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (javaType instanceof WildcardType) {
             final WildcardType wildcardType = (WildcardType) javaType;
             final Type[] upperBounds = wildcardType.getUpperBounds();
+
+            KType upperBound = null;
+            if (kType != null) {
+                KTypeParameter typeParameter = (KTypeParameter) kType.getClassifier();
+                if (typeParameter != null) {
+                    upperBound = typeParameter.getUpperBounds().get(0);
+                }
+            }
+
             return upperBounds.length > 0
-                    ? context.processType(upperBounds[0])
+                    ? context.processType(upperBounds[0], upperBound)
                     : new Result(TsType.Any, kType);
         }
         if (javaType instanceof UnionType) {
@@ -160,17 +183,12 @@ public class DefaultTypeProcessor implements TypeProcessor {
         return null;
     }
 
-
-    private interface Executor<T> {
-        T execute(KType kType);
-    }
-
-    private <T> T ifNotNull(KType kType, Executor<T> executor) {
+    private KType getArgument(KType kType, int index) {
         if (kType == null) {
             return null;
         }
 
-        return executor.execute(kType);
+        return kType.getArguments().get(index).getType();
     }
 
 
