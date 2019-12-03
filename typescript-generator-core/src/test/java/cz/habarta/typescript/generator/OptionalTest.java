@@ -103,10 +103,62 @@ public class OptionalTest {
         );
     }
 
+    @Test
+    public void testGenericDeclarationQuestionMark() {
+        testGenericDeclaration(OptionalPropertiesDeclaration.questionMark,
+                "interface GenericFieldTest {\n" +
+                        "    email: (string | undefined)[];\n" +
+                        "}"
+        );
+    }
+
+    @Test
+    public void testGenericDeclarationNullableType() {
+        testGenericDeclaration(OptionalPropertiesDeclaration.nullableType,
+                "interface GenericFieldTest {\n" +
+                        "    email: (string | null)[];\n" +
+                        "}"
+        );
+    }
+
+    @Test
+    public void testGenericDeclarationQuestionMarkAndNullableType() {
+        testGenericDeclaration(OptionalPropertiesDeclaration.questionMarkAndNullableType,
+                "interface GenericFieldTest {\n" +
+                        "    email: (string | null | undefined)[];\n" +
+                        "}"
+        );
+    }
+
+    @Test
+    public void testGenericDeclarationNullableAndUndefinableType() {
+        testGenericDeclaration(OptionalPropertiesDeclaration.nullableAndUndefinableType,
+                "interface GenericFieldTest {\n" +
+                        "    email: (string | null | undefined)[];\n" +
+                        "}"
+        );
+    }
+
+    @Test
+    public void testGenericDeclarationUndefinableType() {
+        testGenericDeclaration(OptionalPropertiesDeclaration.undefinableType,
+                "interface GenericFieldTest {\n" +
+                        "    email: (string | undefined)[];\n" +
+                        "}"
+        );
+    }
+
     private static void testDeclaration(OptionalPropertiesDeclaration declaration, String expected) {
         final Settings settings = TestUtils.settings();
         settings.optionalPropertiesDeclaration = declaration;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Person.class));
+        Assert.assertEquals(expected.trim(), output.trim());
+    }
+
+    private static void testGenericDeclaration(OptionalPropertiesDeclaration declaration, String expected) {
+        final Settings settings = TestUtils.settings();
+        settings.optionalPropertiesDeclaration = declaration;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(GenericFieldTest.class));
         Assert.assertEquals(expected.trim(), output.trim());
     }
 
@@ -155,6 +207,17 @@ public class OptionalTest {
         @Override
         public String toString() {
             return "Person{" + "name=" + name + ", email=" + email + '}';
+        }
+    }
+
+    private static class GenericFieldTest {
+        public Optional<String>[] email;
+
+        public GenericFieldTest() {
+        }
+
+        public GenericFieldTest(Optional<String>[] email) {
+            this.email = email;
         }
     }
 
