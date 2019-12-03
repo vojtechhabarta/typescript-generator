@@ -22,6 +22,7 @@ class KotlinTest {
                         "class A {\n" +
                         "    nullableString?: string;\n" +
                         "    nonNullableString: string;\n" +
+                        "    nullableList?: (string | null)[];\n" +
                         "    test: string;\n" +
                         "    testNullable?: string;\n" +
                         "}"
@@ -31,6 +32,7 @@ class KotlinTest {
     private class A {
         val nullableString: String? = null
         val nonNullableString: String = ""
+        val nullableList: List<String?>? = null
 
         fun getTest(): String {
             return ""
@@ -56,6 +58,7 @@ class KotlinTest {
         settings.outputFileType = TypeScriptFileType.implementationFile
         settings.mapClasses = ClassMapping.asClasses
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(inputClass))
+        println(output)
         Assert.assertEquals(expected.replace('\'', '"'), output.trim { it <= ' ' })
     }
 }

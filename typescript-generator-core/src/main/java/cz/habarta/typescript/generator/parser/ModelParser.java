@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import kotlin.reflect.KType;
 
 
 public abstract class ModelParser {
@@ -180,13 +181,13 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, KType kType, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
         final Type resolvedType = GenericsResolver.resolveType(usedInClass, type, originalMember.getDeclaringClass());
         final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, null, typeContext, settings);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, resolvedType, optional, originalMember, pullProperties, typeContext, comments);
+        return new PropertyModel(name, resolvedType, kType, optional, originalMember, pullProperties, typeContext, comments);
     }
 
     public static boolean containsProperty(List<PropertyModel> properties, String propertyName) {

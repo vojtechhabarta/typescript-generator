@@ -26,7 +26,7 @@ public class CustomTypeConversionTest {
             @Override
             public Result processType(Type javaType, KType kType, Context context) {
                 if (javaType.equals(B.class)) {
-                    return new Result(TsType.Number.optional());
+                    return new Result(TsType.Number.optional(), kType);
                 }
                 return null;
             }
@@ -65,7 +65,7 @@ public class CustomTypeConversionTest {
                 final Type[] typeArguments = tryGetParameterizedTypeArguments(javaType, CustomOptional.class);
                 if (typeArguments != null) {
                     final TypeProcessor.Result result = context.processType(typeArguments[0]);
-                    return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
+                    return new Result(result.getTsType().optional(), kType, result.getDiscoveredClasses());
                 }
                 return null;
             }

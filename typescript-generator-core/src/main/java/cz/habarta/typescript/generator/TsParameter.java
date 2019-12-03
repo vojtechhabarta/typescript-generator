@@ -5,7 +5,7 @@ package cz.habarta.typescript.generator;
 public class TsParameter {
 
     public final String name;
-    public final TsType tsType;
+    public TsType tsType;
 
     public TsParameter(String name, TsType tsType) {
         this.name = name;

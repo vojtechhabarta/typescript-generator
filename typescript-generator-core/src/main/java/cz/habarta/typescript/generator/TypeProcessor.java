@@ -73,13 +73,13 @@ public interface TypeProcessor {
         private final TsType tsType;
         private final List<Class<?>> discoveredClasses;
 
-        public Result(TsType tsType, List<Class<?>> discoveredClasses) {
-            this.tsType = tsType;
+        public Result(TsType tsType, KType kType, List<Class<?>> discoveredClasses) {
+            this.tsType = boxIfNullable(kType, tsType);
             this.discoveredClasses = discoveredClasses;
         }
 
-        public Result(TsType tsType, Class<?>... discoveredClasses) {
-            this.tsType = tsType;
+        public Result(TsType tsType, KType kType, Class<?>... discoveredClasses) {
+            this.tsType = boxIfNullable(kType, tsType);
             this.discoveredClasses = Arrays.asList(discoveredClasses);
         }
 
@@ -89,6 +89,18 @@ public interface TypeProcessor {
 
         public List<Class<?>> getDiscoveredClasses() {
             return discoveredClasses;
+        }
+
+        protected TsType boxIfNullable(KType kType, TsType tsType) {
+            if (kType == null) {
+                return tsType;
+            }
+
+            if (kType.isMarkedNullable()) {
+                return new TsType.OptionalType(tsType);
+            }
+
+            return tsType;
         }
 
     }

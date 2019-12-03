@@ -59,14 +59,14 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
                 }
                 tsTypeArguments.add(tsType);
             }
-            return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), discoveredClasses);
+            return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), kType, discoveredClasses);
         } else {
             final int index = mapping.javaType.indexOfTypeParameter(mapping.tsType.rawName);
             if (index != -1) {
                 final TsType tsType = processGenericParameter.apply(index);
-                return new Result(tsType, discoveredClasses);
+                return new Result(tsType, kType, discoveredClasses);
             } else {
-                return new Result(new TsType.BasicType(mapping.tsType.rawName), discoveredClasses);
+                return new Result(new TsType.BasicType(mapping.tsType.rawName), kType, discoveredClasses);
             }
         }
     }

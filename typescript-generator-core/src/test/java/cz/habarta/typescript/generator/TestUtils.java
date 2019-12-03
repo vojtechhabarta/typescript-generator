@@ -27,7 +27,7 @@ public class TestUtils {
 
     public static TsType compileType(Settings settings, Type type) {
         final ModelCompiler modelCompiler = new TypeScriptGenerator(settings).getModelCompiler();
-        return modelCompiler.javaToTypeScript(type);
+        return modelCompiler.javaToTypeScript(type, null);
     }
 
     public static String readFile(String file) {

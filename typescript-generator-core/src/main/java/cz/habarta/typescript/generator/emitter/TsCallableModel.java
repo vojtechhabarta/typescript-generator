@@ -12,7 +12,7 @@ public class TsCallableModel {
     private final TsModifierFlags modifiers;
     private final List<TsType.GenericVariableType> typeParameters;
     private final List<TsParameterModel> parameters;
-    private final TsType returnType;
+    private TsType returnType;
     private final List<TsStatement> body;
     private final List<String> comments;
 
@@ -55,4 +55,7 @@ public class TsCallableModel {
         return comments;
     }
 
+    public void setReturnType(TsType returnType) {
+        this.returnType = returnType;
+    }
 }

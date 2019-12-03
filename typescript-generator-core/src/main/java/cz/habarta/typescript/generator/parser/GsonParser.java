@@ -2,6 +2,7 @@ package cz.habarta.typescript.generator.parser;
 
 import com.google.gson.annotations.SerializedName;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.KotlinUtils;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
 import java.lang.reflect.Field;
@@ -63,7 +64,7 @@ public class GsonParser extends ModelParser {
                 if (serializedName != null) {
                     name = serializedName.value();
                 }
-                properties.add(new PropertyModel(name, field.getGenericType(), false, field, null, null, null));
+                properties.add(new PropertyModel(name, field.getGenericType(), KotlinUtils.getFieldKType(field), false, field, null, null, null));
                 addBeanToQueue(new SourceType<>(field.getGenericType(), sourceClass.type, name));
             }
             cls = cls.getSuperclass();

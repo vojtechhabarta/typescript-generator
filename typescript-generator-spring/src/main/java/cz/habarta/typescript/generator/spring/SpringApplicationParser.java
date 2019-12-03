@@ -71,11 +71,11 @@ public class SpringApplicationParser extends RestApplicationParser {
                             final Class<?> cls = entry.getKey();
                             final TsType type = entry.getValue();
                             if (cls.isAssignableFrom(rawClass) && type != null) {
-                                return new TypeProcessor.Result(type);
+                                return new TypeProcessor.Result(type, kType);
                             }
                         }
                         if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
-                            return new TypeProcessor.Result(TsType.Any);
+                            return new TypeProcessor.Result(TsType.Any, kType);
                         }
                     }
                     return null;

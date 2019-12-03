@@ -8,7 +8,6 @@ import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.GenericsResolver;
-import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -66,11 +65,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                             final Class<?> cls = entry.getKey();
                             final TsType type = entry.getValue();
                             if (cls.isAssignableFrom(rawClass)) {
-                                return type != null ? new TypeProcessor.Result(type) : null;
+                                return type != null ? new TypeProcessor.Result(type, kType) : null;
                             }
                         }
                         if (getDefaultExcludedClassNames().contains(rawClass.getName())) {
-                            return new TypeProcessor.Result(TsType.Any);
+                            return new TypeProcessor.Result(TsType.Any, kType);
                         }
                     }
                     return null;
@@ -279,7 +278,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         for (Field field : fields) {
             final QueryParam annotation = field.getAnnotation(QueryParam.class);
             if (annotation != null) {
-                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, field, null, null, null));
+                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), KotlinUtils.getFieldKType(field), true, field, null, null, null));
             }
         }
         try {
@@ -289,7 +288,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 if (writeMethod != null) {
                     final QueryParam annotation = writeMethod.getAnnotation(QueryParam.class);
                     if (annotation != null) {
-                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, writeMethod, null, null, null));
+                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), null, true, writeMethod, null, null, null));
                     }
                 }
             }

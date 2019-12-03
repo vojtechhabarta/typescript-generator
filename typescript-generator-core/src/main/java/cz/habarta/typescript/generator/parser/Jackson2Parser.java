@@ -221,6 +221,7 @@ public class Jackson2Parser extends ModelParser {
                 final Member member = beanPropertyWriter.getMember().getMember();
                 final PropertyMember propertyMember = wrapMember(member, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = propertyMember.getType();
+                KType kType = propertyMember.getKType();
                 final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
 
                 final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(
@@ -240,7 +241,7 @@ public class Jackson2Parser extends ModelParser {
                 if (annotation != null && annotation.enabled()) {
                     pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, member, pullProperties, propertyComments));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, kType, jackson2TypeContext, optional, sourceClass.type, member, pullProperties, propertyComments));
             }
         }
         if (sourceClass.type.isEnum()) {

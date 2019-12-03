@@ -63,7 +63,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -205,9 +204,9 @@ public class ModelCompiler {
         return model;
     }
 
-    public TsType javaToTypeScript(Type type) {
+    public TsType javaToTypeScript(Type type, KType kType) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
-                Collections.singletonList(new PropertyModel("property", type, false, null, null, null, null)), null);
+                Collections.singletonList(new PropertyModel("property", type, kType, false, null, null, null, null)), null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -374,7 +373,7 @@ public class ModelCompiler {
     }
 
     private TsPropertyModel processProperty(SymbolTable symbolTable, BeanModel bean, PropertyModel property, String prefix, String suffix) {
-        final TsType type = typeFromJava(symbolTable, property.getType(), null, property.getContext(), property.getName(), bean.getOrigin());
+        final TsType type = typeFromJava(symbolTable, property.getType(), property.getkType(), property.getContext(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
         return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, property.getComments());
@@ -416,7 +415,7 @@ public class ModelCompiler {
             return null;
         }
         final TypeProcessor.Context context = new TypeProcessor.Context(symbolTable, typeProcessor, typeContext);
-        final TypeProcessor.Result result = context.processType(javaType);
+        final TypeProcessor.Result result = context.processType(javaType, ktype);
         if (result != null) {
             return result.getTsType();
         } else {
@@ -759,7 +758,7 @@ public class ModelCompiler {
     }
 
     private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {
-        final TsType parameterType = typeFromJava(symbolTable, parameter.getType(), method.getName(), method.getOriginClass());
+        final TsType parameterType = typeFromJava(symbolTable, parameter.getType(), parameter.getkType(), method.getName(), method.getOriginClass());
         return new TsParameterModel(parameter.getName(), parameter.isNullable() ? new TsType.OptionalType(parameterType) : parameterType);
     }
 
@@ -784,7 +783,7 @@ public class ModelCompiler {
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
         final TsModel model = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
-            public TsType transform(TsType.Context context, TsType type) {
+            public TsType transform(TsType.Context context, TsType type, List<TsType> parentTypes) {
                 if (type == TsType.Date) {
                     if (settings.mapDate == DateMapping.asNumber) {
                         typeAliases.add(dateAsNumber);
@@ -823,7 +822,7 @@ public class ModelCompiler {
         final Set<TsAliasModel> inlinedAliases = new LinkedHashSet<>();
         final TsModel newTsModel = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
-            public TsType transform(TsType.Context context, TsType tsType) {
+            public TsType transform(TsType.Context context, TsType tsType, List<TsType> parentTypes) {
                 if (tsType instanceof TsType.EnumReferenceType) {
                     final TsAliasModel alias = tsModel.getTypeAlias(getOriginClass(symbolTable, tsType));
                     if (alias != null) {
@@ -853,7 +852,7 @@ public class ModelCompiler {
     private TsModel transformNonStringEnumKeyMaps(SymbolTable symbolTable, TsModel tsModel) {
         return transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
             @Override
-            public TsType transform(TsType.Context context, TsType tsType) {
+            public TsType transform(TsType.Context context, TsType tsType, List<TsType> parentTypes) {
                 if (tsType instanceof TsType.MappedType) {
                     final TsType.MappedType mappedType = (TsType.MappedType) tsType;
                     if (mappedType.parameterType instanceof TsType.EnumReferenceType) {
@@ -944,7 +943,7 @@ public class ModelCompiler {
         // use tagged unions
         final TsModel modelWithUsedTaggedUnions = transformBeanPropertyTypes(modelWithTaggedUnions, new TsType.Transformer() {
             @Override
-            public TsType transform(TsType.Context context, TsType tsType) {
+            public TsType transform(TsType.Context context, TsType tsType, List<TsType> parentTypes) {
                 final Class<?> cls = getOriginClass(symbolTable, tsType);
                 if (cls != null) {
                     final Symbol unionSymbol = symbolTable.hasSymbol(cls, "Union");
@@ -966,38 +965,75 @@ public class ModelCompiler {
     private TsModel transformOptionalProperties(final SymbolTable symbolTable, TsModel tsModel) {
         return tsModel.withBeans(tsModel.getBeans().stream()
                 .map(bean -> {
-                    if (bean.getCategory() != TsBeanCategory.Data) {
+                    if (bean.getCategory() == TsBeanCategory.ServicePrerequisite) {
                         return bean;
+                    } else if (bean.getCategory() == TsBeanCategory.Service) {
+                        return bean.withMethods(bean.getMethods().stream()
+                                .peek(method -> {
+                                    for (TsParameterModel parameter : method.getParameters()) {
+                                        parameter.tsType = getUnionTsTypeIfNullable(parameter.tsType);
+                                    }
+
+                                    method.setReturnType(getUnionTsTypeIfNullable(method.getReturnType()));
+                                })
+                                .collect(Collectors.toList())
+                        );
+                    } else {
+                        return bean.withProperties(bean.getProperties().stream()
+                                .map(property -> {
+                                    final TsType newTsType = getUnionTsTypeIfNullable(property.getTsType());
+                                    return property.setTsType(newTsType);
+                                })
+                                .collect(Collectors.toList())
+                        );
                     }
-                    return bean.withProperties(bean.getProperties().stream()
-                            .map(property -> {
-                                if (property.getTsType() instanceof TsType.OptionalType) {
-                                    final TsType.OptionalType optionalType = (TsType.OptionalType) property.getTsType();
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null)));
-                                    }
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.questionMarkAndNullableType) {
-                                        return property.setTsType(
-                                                new TsType.OptionalType(
-                                                        new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null))));
-                                    }
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableAndUndefinableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined)));
-                                    }
-                                    if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.undefinableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined)));
-                                    }
-                                }
-                                return property;
-                            })
-                            .collect(Collectors.toList())
-                    );
                 })
                 .collect(Collectors.toList())
         );
+    }
+
+    private boolean hasGenericParent(List<TsType> parentTypes) {
+        return parentTypes.stream().anyMatch(parentType -> parentType instanceof TsType.GenericBasicType ||
+                parentType instanceof TsType.GenericReferenceType ||
+                parentType instanceof TsType.BasicArrayType ||
+                parentType instanceof TsType.IndexedArrayType ||
+                parentType instanceof TsType.MappedType);
+    }
+
+    private TsType getUnionTsTypeIfNullable(TsType tsType) {
+
+        return TsType.transformTsType(new TsType.Context(), tsType, (context, currTsType, parentTypes) -> {
+            if (currTsType instanceof TsType.OptionalType) {
+                final TsType.OptionalType optionalType = (TsType.OptionalType) tsType;
+                if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableType) {
+                    return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null));
+                }
+                if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.questionMarkAndNullableType) {
+                    if (hasGenericParent(parentTypes)) {
+                        return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined));
+                    } else {
+                        return new TsType.OptionalType(new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null)));
+                    }
+                }
+                if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableAndUndefinableType) {
+                    return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined));
+                }
+                if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.undefinableType) {
+                    return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined));
+                }
+                if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.questionMark) {
+                    if (hasGenericParent(parentTypes)) {
+                        return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined));
+                    } else {
+                        return currTsType;
+                    }
+                }
+                if (settings.optionalPropertiesDeclaration == null && hasGenericParent(parentTypes)) {
+                    return new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined));
+                }
+            }
+            return currTsType;
+        });
     }
 
     private static TsModel removeDeclarationsImportedFromDependencies(SymbolTable symbolTable, TsModel tsModel) {

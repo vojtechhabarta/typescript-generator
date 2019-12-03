@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -355,12 +356,19 @@ public abstract class TsType implements Emittable {
     }
 
     public static TsType transformTsType(Context context, TsType tsType, Transformer transformer) {
-        final TsType type = transformer.transform(context, tsType);
+        return transformTsType(context, tsType, transformer, Collections.emptyList());
+    }
+
+    private static TsType transformTsType(Context context, TsType tsType, Transformer transformer, List<TsType> parentTypes) {
+        List<TsType> newParents = new ArrayList<>(parentTypes);
+        final TsType type = transformer.transform(context, tsType, parentTypes);
+        newParents.add(type);
+
         if (type instanceof TsType.GenericBasicType) {
             final GenericBasicType genericBasicType = (TsType.GenericBasicType) type;
             final List<TsType> typeArguments = new ArrayList<>();
             for (TsType typeArgument : genericBasicType.typeArguments) {
-                typeArguments.add(transformTsType(context, typeArgument, transformer));
+                typeArguments.add(transformTsType(context, typeArgument, transformer, newParents));
             }
             return new TsType.GenericBasicType(genericBasicType.name, typeArguments);
         }
@@ -368,36 +376,36 @@ public abstract class TsType implements Emittable {
             final GenericReferenceType genericReferenceType = (TsType.GenericReferenceType) type;
             final List<TsType> typeArguments = new ArrayList<>();
             for (TsType typeArgument : genericReferenceType.typeArguments) {
-                typeArguments.add(transformTsType(context, typeArgument, transformer));
+                typeArguments.add(transformTsType(context, typeArgument, transformer, newParents));
             }
             return new TsType.GenericReferenceType(genericReferenceType.symbol, typeArguments);
         }
         if (type instanceof TsType.OptionalType) {
             final TsType.OptionalType optionalType = (TsType.OptionalType) type;
-            return new TsType.OptionalType(transformTsType(context, optionalType.type, transformer));
+            return new TsType.OptionalType(transformTsType(context, optionalType.type, transformer, newParents));
         }
         if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
-            return new TsType.BasicArrayType(transformTsType(context, basicArrayType.elementType, transformer));
+            return new TsType.BasicArrayType(transformTsType(context, basicArrayType.elementType, transformer, newParents));
         }
         if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
             return new TsType.IndexedArrayType(
-                    transformTsType(context, indexedArrayType.indexType, transformer),
-                    transformTsType(context, indexedArrayType.elementType, transformer));
+                    transformTsType(context, indexedArrayType.indexType, transformer, newParents),
+                    transformTsType(context, indexedArrayType.elementType, transformer, newParents));
         }
         if (type instanceof TsType.MappedType) {
             final TsType.MappedType mappedType = (TsType.MappedType) type;
             return new TsType.MappedType(
-                    transformTsType(context, mappedType.parameterType, transformer),
+                    transformTsType(context, mappedType.parameterType, transformer, newParents),
                     mappedType.questionToken,
-                    transformTsType(context, mappedType.type, transformer));
+                    transformTsType(context, mappedType.type, transformer, newParents));
         }
         if (type instanceof TsType.UnionType) {
             final TsType.UnionType unionType = (TsType.UnionType) type;
             final List<TsType> types = new ArrayList<>();
             for (TsType constituentType : unionType.types) {
-                types.add(transformTsType(context, constituentType, transformer));
+                types.add(transformTsType(context, constituentType, transformer, newParents));
             }
             return new TsType.UnionType(types);
         }
@@ -405,7 +413,7 @@ public abstract class TsType implements Emittable {
             final TsType.IntersectionType intersectionType = (TsType.IntersectionType) type;
             final List<TsType> types = new ArrayList<>();
             for (TsType constituent : intersectionType.types) {
-                types.add(transformTsType(context, constituent, transformer));
+                types.add(transformTsType(context, constituent, transformer, newParents));
             }
             return new TsType.IntersectionType(types);
         }
@@ -413,7 +421,7 @@ public abstract class TsType implements Emittable {
             final TsType.ObjectType objectType = (TsType.ObjectType) type;
             final List<TsProperty> properties = new ArrayList<>();
             for (TsProperty property : objectType.properties) {
-                properties.add(new TsProperty(property.name, transformTsType(context, property.tsType, transformer)));
+                properties.add(new TsProperty(property.name, transformTsType(context, property.tsType, transformer, newParents)));
             }
             return new TsType.ObjectType(properties);
         }
@@ -421,9 +429,9 @@ public abstract class TsType implements Emittable {
             final TsType.FunctionType functionType = (TsType.FunctionType) type;
             final List<TsParameter> parameters = new ArrayList<>();
             for (TsParameter parameter : functionType.parameters) {
-                parameters.add(new TsParameter(parameter.name, transformTsType(context, parameter.tsType, transformer)));
+                parameters.add(new TsParameter(parameter.name, transformTsType(context, parameter.tsType, transformer, newParents)));
             }
-            return new TsType.FunctionType(parameters, transformTsType(context, functionType.type, transformer));
+            return new TsType.FunctionType(parameters, transformTsType(context, functionType.type, transformer, newParents));
         }
         return type;
     }
@@ -433,7 +441,7 @@ public abstract class TsType implements Emittable {
     }
 
     public static interface Transformer {
-        public TsType transform(Context context, TsType tsType);
+        TsType transform(Context context, TsType tsType, List<TsType> parentTypes);
     }
 
 }

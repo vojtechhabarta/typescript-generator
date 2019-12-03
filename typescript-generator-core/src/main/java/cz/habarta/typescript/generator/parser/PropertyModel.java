@@ -5,12 +5,14 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
+import kotlin.reflect.KType;
 
 
 public class PropertyModel {
 
     private final String name;
     private final Type type;
+    private final KType kType;
     private final boolean optional;
     private final Member originalMember;
     private final PullProperties pullProperties;
@@ -27,9 +29,10 @@ public class PropertyModel {
         }
     }
 
-    public PropertyModel(String name, Type type, boolean optional, Member originalMember, PullProperties pullProperties, Object context, List<String> comments) {
+    public PropertyModel(String name, Type type, KType kType, boolean optional, Member originalMember, PullProperties pullProperties, Object context, List<String> comments) {
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
+        this.kType = kType;
         this.optional = optional;
         this.originalMember = originalMember;
         this.pullProperties = pullProperties;
@@ -45,6 +48,10 @@ public class PropertyModel {
         return type;
     }
 
+    public KType getkType() {
+        return kType;
+    }
+
     public boolean isOptional() {
         return optional;
     }
@@ -54,7 +61,7 @@ public class PropertyModel {
     }
 
     public PropertyModel originalMember(Member originalMember) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
+        return new PropertyModel(name, type, kType, optional, originalMember, pullProperties, context, comments);
     }
 
     public PullProperties getPullProperties() {
@@ -70,15 +77,15 @@ public class PropertyModel {
     }
 
     public PropertyModel withComments(List<String> comments) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
+        return new PropertyModel(name, type, kType, optional, originalMember, pullProperties, context, comments);
     }
 
     public PropertyModel withType(Type type) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
+        return new PropertyModel(name, type, kType, optional, originalMember, pullProperties, context, comments);
     }
 
     public PropertyModel withOptional(boolean optional) {
-        return new PropertyModel(name, type, optional, originalMember, pullProperties, context, comments);
+        return new PropertyModel(name, type, kType, optional, originalMember, pullProperties, context, comments);
     }
 
     @Override

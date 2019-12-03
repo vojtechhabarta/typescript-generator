@@ -89,14 +89,14 @@ public class Jackson1Parser extends ModelParser {
                     continue;
                 }
                 final boolean optional = isPropertyOptional(propertyMember);
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, null, optional, sourceClass.type, member, null, null));
+                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, propertyMember.getKType(), null, optional, sourceClass.type, member, null, null));
             }
         }
 
         final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
         if (jsonTypeInfo != null && jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY) {
             if (!containsProperty(properties, jsonTypeInfo.property())) {
-                properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, false, null, null, null, null));
+                properties.add(new PropertyModel(jsonTypeInfo.property(), String.class, null, false, null, null, null, null));
             }
         }
 
