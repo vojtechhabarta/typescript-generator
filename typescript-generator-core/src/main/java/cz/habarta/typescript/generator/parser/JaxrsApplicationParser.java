@@ -173,7 +173,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             for (Parameter param : method.getParameters()) {
                 final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
                 if (queryParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType())));
+                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()), false));
                     foundType(result, param.getParameterizedType(), resourceClass, method.getName());
                 }
                 final BeanParam beanParamAnnotation = param.getAnnotation(BeanParam.class);

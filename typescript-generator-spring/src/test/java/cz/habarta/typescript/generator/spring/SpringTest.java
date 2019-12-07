@@ -87,7 +87,16 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
-        Assert.assertTrue(output.contains("echo(queryParams?: { message?: string; count?: number; }): RestResponse<string>"));
+        Assert.assertTrue(output.contains("echo(queryParams: { message: string; count?: number; optionalRequestParam?: number; }): RestResponse<string>"));
+    }
+
+    @Test
+    public void testAllOptionalQueryParameters() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller7.class));
+        Assert.assertTrue(output.contains("echo(queryParams?: { message?: string; }): RestResponse<string>"));
     }
 
     @Test
@@ -149,7 +158,18 @@ public class SpringTest {
         @RequestMapping("/echo")
         public String echo(
                 @RequestParam("message") String message,
-                @RequestParam(name = "count", defaultValue = "1") Integer count
+                @RequestParam(name = "count", defaultValue = "1") Integer count,
+                @RequestParam(required = false) Integer optionalRequestParam
+        ) {
+            return message;
+        }
+    }
+
+    @RestController
+    public static class Controller7 {
+        @RequestMapping("/echo2")
+        public String echo(
+                @RequestParam(required = false) String message
         ) {
             return message;
         }
