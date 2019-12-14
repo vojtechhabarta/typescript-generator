@@ -3,15 +3,17 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 
 public class GenericsResolverTest {
@@ -105,8 +107,79 @@ public class GenericsResolverTest {
     static class R123<A, B, C> extends R12<C, List<B>> {
     }
 
+    // this returns incomplete implementation just for tests
     private static <D extends GenericDeclaration> TypeVariable<D> createTypeVariable(D genericDeclaration, String name) {
-        return TypeVariableImpl.make(genericDeclaration, name, null, null);
+        final Type[] bounds = new Type[0];
+        final AnnotatedType[] annotatedBounds = new AnnotatedType[0];
+        final Annotation[] annotations = new Annotation[0];
+        return new TypeVariable<D>() {
+            @Override
+            public Type[] getBounds() {
+                return bounds;
+            }
+
+            @Override
+            public D getGenericDeclaration() {
+                return genericDeclaration;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public AnnotatedType[] getAnnotatedBounds() {
+                return annotatedBounds;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+                for (Annotation annotation : getAnnotations()) {
+                    if (annotationClass.isInstance(annotation)) {
+                        return (T) annotation;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public Annotation[] getAnnotations() {
+                return annotations;
+            }
+
+            @Override
+            public Annotation[] getDeclaredAnnotations() {
+                return getAnnotations();
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj) {
+                    return true;
+                }
+                if (obj instanceof TypeVariable) {
+                    final TypeVariable<?> that = (TypeVariable<?>) obj;
+                    return
+                        Objects.equals(genericDeclaration, that.getGenericDeclaration()) &&
+                        Objects.equals(name, that.getName());
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public int hashCode() {
+                return genericDeclaration.hashCode() ^ name.hashCode();
+            }
+
+            @Override
+            public String toString() {
+                return getName();
+            }
+
+        };
     }
 
 }
