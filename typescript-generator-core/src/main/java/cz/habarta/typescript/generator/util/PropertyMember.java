@@ -7,6 +7,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 
 public abstract class PropertyMember {
@@ -28,14 +29,16 @@ public abstract class PropertyMember {
     public static class FieldPropertyMember extends PropertyMember {
 
         private final Field field;
+        private final Type type;
 
-        public FieldPropertyMember(Field field) {
-            this.field = field;
+        public FieldPropertyMember(Field field, Type type) {
+            this.field = Objects.requireNonNull(field);
+            this.type = Objects.requireNonNull(type);
         }
 
         @Override
         public Type getType() {
-            return field.getGenericType();
+            return type;
         }
 
         @Override
@@ -53,14 +56,16 @@ public abstract class PropertyMember {
     public static class MethodPropertyMember extends PropertyMember {
 
         private final Method method;
+        private final Type type;
 
-        public MethodPropertyMember(Method method) {
-            this.method = method;
+        public MethodPropertyMember(Method method, Type type) {
+            this.method = Objects.requireNonNull(method);
+            this.type = Objects.requireNonNull(type);
         }
 
         @Override
         public Type getType() {
-            return method.getGenericReturnType();
+            return type;
         }
 
         @Override

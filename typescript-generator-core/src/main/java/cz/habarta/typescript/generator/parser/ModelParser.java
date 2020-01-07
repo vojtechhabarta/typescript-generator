@@ -118,14 +118,14 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(Member propertyMember, String propertyName, Class<?> sourceClass) {
+    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, String propertyName, Class<?> sourceClass) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
-            return new PropertyMember.FieldPropertyMember(field);
+            return new PropertyMember.FieldPropertyMember(field, typeParser.getFieldType(field));
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            return new PropertyMember.MethodPropertyMember(method);
+            return new PropertyMember.MethodPropertyMember(method, typeParser.getMethodReturnType(method));
         }
         throw new RuntimeException(String.format(
                 "Unexpected member type '%s' in property '%s' in class '%s'",

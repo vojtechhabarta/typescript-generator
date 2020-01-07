@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import cz.habarta.typescript.generator.type.JGenericArrayType;
+import cz.habarta.typescript.generator.type.JParameterizedType;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
+import cz.habarta.typescript.generator.type.JUnionType;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -12,6 +16,7 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,7 +44,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-public class Utils {
+public final class Utils {
 
     private Utils() {
     }
@@ -203,54 +208,50 @@ public class Utils {
     }
 
     public static ParameterizedType createParameterizedType(final Type rawType, final Type... actualTypeArguments) {
-        final Type ownerType = null;
-        return new ParameterizedType() {
-            @Override
-            public Type[] getActualTypeArguments() {
-                return actualTypeArguments;
-            }
+        return new JParameterizedType(rawType, actualTypeArguments, null);
+    }
 
-            @Override
-            public Type getRawType() {
-                return rawType;
-            }
+    public static Type transformContainedTypes(Type type, Function<Type, Type> transformer) {
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
+            return new JParameterizedType(
+                    parameterizedType.getRawType(),
+                    transformTypes(parameterizedType.getActualTypeArguments(), transformer),
+                    parameterizedType.getOwnerType()
+            );
+        }
+        if (type instanceof GenericArrayType) {
+            final GenericArrayType genericArrayType = (GenericArrayType) type;
+            return new JGenericArrayType(
+                    transformer.apply(genericArrayType.getGenericComponentType())
+            );
+        }
+        if (type instanceof JUnionType) {
+            final JUnionType unionType = (JUnionType) type;
+            return new JUnionType(
+                    transformTypes(unionType.getTypes(), transformer)
+            );
+        }
+        if (type instanceof JTypeWithNullability) {
+            final JTypeWithNullability typeWithNullability = (JTypeWithNullability) type;
+            return new JTypeWithNullability(
+                    transformer.apply(typeWithNullability.getType()),
+                    typeWithNullability.isNullable()
+            );
+        }
+        return type;
+    }
 
-            @Override
-            public Type getOwnerType() {
-                return ownerType;
-            }
+    private static List<Type> transformTypes(List<Type> types, Function<Type, Type> transformer) {
+        return types.stream()
+                .map(transformer)
+                .collect(Collectors.toList());
+    }
 
-            @Override
-            public boolean equals(Object obj) {
-                if (this == obj) {
-                    return true;
-                }
-                if (obj instanceof ParameterizedType) {
-                    final ParameterizedType that = (ParameterizedType) obj;
-                    return
-                        Objects.equals(ownerType, that.getOwnerType()) &&
-                        Objects.equals(rawType, that.getRawType()) &&
-                        Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
-                } else {
-                    return false;
-                }
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(ownerType, rawType, actualTypeArguments);
-            }
-
-            @Override
-            public String toString() {
-                return (rawType instanceof Class ? ((Class<?>)rawType).getName() : rawType.getTypeName())
-                        + "<"
-                        + Stream.of(actualTypeArguments)
-                                .map(type -> type.getTypeName())
-                                .collect(Collectors.joining(", "))
-                        + ">";
-            }
-        };
+    private static Type[] transformTypes(Type[] types, Function<Type, Type> transformer) {
+        return Stream.of(types)
+                .map(transformer)
+                .toArray(Type[]::new);
     }
 
     public static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
@@ -295,6 +296,15 @@ public class Utils {
                     return list;
                 }
         );
+    }
+
+    public static <T1, T2> List<Pair<T1, T2>> zip(List<T1> list1, List<T2> list2) {
+        final List<Pair<T1, T2>> result = new ArrayList<>();
+        final int size = Math.min(list1.size(), list2.size());
+        for (int i = 0; i < size; i++) {
+            result.add(Pair.of(list1.get(i), list2.get(i)));
+        }
+        return result;
     }
 
     public static List<String> readLines(InputStream stream) {

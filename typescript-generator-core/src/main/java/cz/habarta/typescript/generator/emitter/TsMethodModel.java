@@ -11,4 +11,8 @@ public class TsMethodModel extends TsCallableModel {
         super(name, modifiers, typeParameters, parameters, returnType, body, comments);
     }
 
+    public TsMethodModel withParameters(List<TsParameterModel> parameters) {
+        return new TsMethodModel(name, modifiers, typeParameters, parameters, returnType, body, comments);
+    }
+
 }

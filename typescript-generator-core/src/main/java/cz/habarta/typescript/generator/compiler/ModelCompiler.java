@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.Extension;
+import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.RestNamespacing;
 import cz.habarta.typescript.generator.Settings;
@@ -48,6 +49,7 @@ import cz.habarta.typescript.generator.parser.PropertyModel;
 import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
@@ -64,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -163,7 +166,10 @@ public class ModelCompiler {
         // tagged unions
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
 
-        // optional properties
+        // nullable types and optional properties
+        tsModel = makeUndefinablePropertiesAndParametersOptional(symbolTable, tsModel);
+        tsModel = transformNullableTypes(symbolTable, tsModel);
+        tsModel = eliminateUndefinedFromOptionalPropertiesAndParameters(symbolTable, tsModel);
         tsModel = transformOptionalProperties(symbolTable, tsModel);
 
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
@@ -344,8 +350,9 @@ public class ModelCompiler {
             boolean pulled = false;
             final PropertyModel.PullProperties pullProperties = property.getPullProperties();
             if (pullProperties != null) {
-                if (property.getType() instanceof Class<?>) {
-                    final BeanModel pullBean = model.getBean((Class<?>) property.getType());
+                final Type type = JTypeWithNullability.getPlainType(property.getType());
+                if (type instanceof Class<?>) {
+                    final BeanModel pullBean = model.getBean((Class<?>) type);
                     if (pullBean != null) {
                         properties.addAll(processProperties(symbolTable, model, pullBean, prefix + pullProperties.prefix, pullProperties.suffix + suffix));
                         pulled = true;
@@ -818,7 +825,7 @@ public class ModelCompiler {
                 return tsType;
             }
         });
-        return newTsModel.withoutTypeAliases(new ArrayList<>(inlinedAliases));
+        return newTsModel.withRemovedTypeAliases(new ArrayList<>(inlinedAliases));
     }
 
     private TsModel transformEnumsToNumberBasedEnum(TsModel tsModel) {
@@ -947,6 +954,102 @@ public class ModelCompiler {
         return modelWithUsedTaggedUnions;
     }
 
+    // example: transforms property `text: string | undefined` to `text?: string | undefined`
+    private TsModel makeUndefinablePropertiesAndParametersOptional(final SymbolTable symbolTable, TsModel tsModel) {
+        final NullabilityDefinition nullabilityDefinition = settings.getNullabilityDefinition();
+        if (!nullabilityDefinition.containsUndefined()) {
+            return tsModel;
+        }
+        return tsModel.withBeans(tsModel.getBeans().stream()
+                .map(bean -> {
+                    bean = bean.withProperties(bean.getProperties().stream()
+                            .map(property -> property.withTsType(makeNullableTypeOptional(property.getTsType())))
+                            .collect(Collectors.toList())
+                    );
+                    bean = bean.withMethods(bean.getMethods().stream()
+                            .map(method -> method.withParameters(method.getParameters().stream()
+                                    .map(parameter -> parameter.withTsType(makeNullableTypeOptional(parameter.getTsType())))
+                                    .collect(Collectors.toList())
+                            ))
+                            .collect(Collectors.toList())
+                    );
+                    return bean;
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    private static TsType makeNullableTypeOptional(TsType type) {
+        return type instanceof TsType.NullableType
+                ? new TsType.OptionalType(type)
+                : type;
+    }
+
+    private TsModel transformNullableTypes(final SymbolTable symbolTable, TsModel tsModel) {
+        final AtomicBoolean declareNullableType = new AtomicBoolean(false);
+        final NullabilityDefinition nullabilityDefinition = settings.getNullabilityDefinition();
+        TsModel transformedModel = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
+            @Override
+            public TsType transform(TsType.Context context, TsType tsType) {
+                if (tsType instanceof TsType.NullableType) {
+                    final TsType.NullableType nullableType = (TsType.NullableType) tsType;
+                    if (nullabilityDefinition.isInline()) {
+                        return new TsType.UnionType(nullableType.type).add(nullabilityDefinition.getTypes());
+                    } else {
+                        declareNullableType.set(true);
+                    }
+                }
+                return tsType;
+            }
+        });
+        // type Nullable<T> = T | ...
+        if (declareNullableType.get()) {
+            final TsType.GenericVariableType tVar = new TsType.GenericVariableType("T");
+            transformedModel = transformedModel.withAddedTypeAliases(Arrays.asList(new TsAliasModel(
+                    /*origin*/ null,
+                    symbolTable.getSyntheticSymbol(TsType.NullableType.AliasName),
+                    Arrays.asList(tVar),
+                    new TsType.UnionType(tVar).add(nullabilityDefinition.getTypes()),
+                    /*comments*/ null
+            )));
+        }
+        return transformedModel;
+    }
+
+    // example: transforms property `text?: string | null | undefined` to `text?: string | null`
+    private TsModel eliminateUndefinedFromOptionalPropertiesAndParameters(final SymbolTable symbolTable, TsModel tsModel) {
+        return tsModel.withBeans(tsModel.getBeans().stream()
+                .map(bean -> {
+                    bean = bean.withProperties(bean.getProperties().stream()
+                            .map(property -> property.withTsType(eliminateUndefinedFromOptionalType(property.getTsType())))
+                            .collect(Collectors.toList())
+                    );
+                    bean = bean.withMethods(bean.getMethods().stream()
+                            .map(method -> method.withParameters(method.getParameters().stream()
+                                    .map(parameter -> parameter.withTsType(eliminateUndefinedFromOptionalType(parameter.getTsType())))
+                                    .collect(Collectors.toList())
+                            ))
+                            .collect(Collectors.toList())
+                    );
+                    return bean;
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    private static TsType eliminateUndefinedFromOptionalType(TsType type) {
+        if (type instanceof TsType.OptionalType) {
+            final TsType.OptionalType optionalType = (TsType.OptionalType) type;
+            if (optionalType.type instanceof TsType.UnionType) {
+                final TsType.UnionType unionType = (TsType.UnionType) optionalType.type;
+                if (unionType.types.contains(TsType.Undefined)) {
+                    return new TsType.OptionalType(unionType.remove(Arrays.asList(TsType.Undefined)));
+                }
+            }
+        }
+        return type;
+    }
+
     private TsModel transformOptionalProperties(final SymbolTable symbolTable, TsModel tsModel) {
         return tsModel.withBeans(tsModel.getBeans().stream()
                 .map(bean -> {
@@ -958,21 +1061,21 @@ public class ModelCompiler {
                                 if (property.getTsType() instanceof TsType.OptionalType) {
                                     final TsType.OptionalType optionalType = (TsType.OptionalType) property.getTsType();
                                     if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null)));
+                                        return property.withTsType(
+                                                TsType.UnionType.combine(Arrays.asList(optionalType.type, TsType.Null)));
                                     }
                                     if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.questionMarkAndNullableType) {
-                                        return property.setTsType(
+                                        return property.withTsType(
                                                 new TsType.OptionalType(
-                                                        new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null))));
+                                                        TsType.UnionType.combine(Arrays.asList(optionalType.type, TsType.Null))));
                                     }
                                     if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.nullableAndUndefinableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined)));
+                                        return property.withTsType(
+                                                TsType.UnionType.combine(Arrays.asList(optionalType.type, TsType.Null, TsType.Undefined)));
                                     }
                                     if (settings.optionalPropertiesDeclaration == OptionalPropertiesDeclaration.undefinableType) {
-                                        return property.setTsType(
-                                                new TsType.UnionType(Arrays.asList(optionalType.type, TsType.Undefined)));
+                                        return property.withTsType(
+                                                TsType.UnionType.combine(Arrays.asList(optionalType.type, TsType.Undefined)));
                                     }
                                 }
                                 return property;
@@ -1040,7 +1143,7 @@ public class ModelCompiler {
             final List<TsPropertyModel> newProperties = new ArrayList<>();
             for (TsPropertyModel property : bean.getProperties()) {
                 final TsType newType = TsType.transformTsType(context, property.getTsType(), transformer);
-                newProperties.add(property.setTsType(newType));
+                newProperties.add(property.withTsType(newType));
             }
             final List<TsMethodModel> newMethods = new ArrayList<>();
             for (TsMethodModel method : bean.getMethods()) {

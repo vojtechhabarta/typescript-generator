@@ -117,7 +117,11 @@ public class TsModel {
         return new TsModel(beans, enums, originalStringEnums, typeAliases, helpers);
     }
 
-    public TsModel withoutTypeAliases(List<TsAliasModel> typeAliases) {
+    public TsModel withAddedTypeAliases(List<TsAliasModel> typeAliases) {
+        return new TsModel(beans, enums, originalStringEnums, Utils.concat(this.typeAliases, typeAliases), helpers);
+    }
+
+    public TsModel withRemovedTypeAliases(List<TsAliasModel> typeAliases) {
         return new TsModel(beans, enums, originalStringEnums, Utils.removeAll(this.typeAliases, typeAliases), helpers);
     }
 

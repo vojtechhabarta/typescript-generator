@@ -8,14 +8,18 @@ import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
 import cz.habarta.typescript.generator.parser.RestApplicationParser;
+import cz.habarta.typescript.generator.parser.TypeParser;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,6 +57,8 @@ public class Settings {
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration; // default is OptionalPropertiesDeclaration.questionMark
+    public NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullAndUndefinedUnion
+    private TypeParser typeParser = null;
     public boolean declarePropertiesAsReadOnly = false;
     public String removeTypeNamePrefix = null;
     public String removeTypeNameSuffix = null;
@@ -102,6 +108,7 @@ public class Settings {
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> excludePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+    public List<Class<? extends Annotation>> nullableAnnotations = new ArrayList<>();
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
     public String npmName = null;
@@ -228,6 +235,10 @@ public class Settings {
         this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
     }
 
+    public void loadNullableAnnotations(ClassLoader classLoader, List<String> nullableAnnotations) {
+        this.nullableAnnotations = loadClasses(classLoader, nullableAnnotations, Annotation.class);
+    }
+
     public void loadJackson2Modules(ClassLoader classLoader, List<String> jackson2Modules) {
         this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
     }
@@ -320,6 +331,24 @@ public class Settings {
         if (mapClassesAsClassesPatterns != null && mapClasses != ClassMapping.asClasses) {
             throw new RuntimeException("'mapClassesAsClassesPatterns' parameter can only be used when 'mapClasses' parameter is set to 'asClasses'.");
         }
+        for (Class<? extends Annotation> annotation : optionalAnnotations) {
+            final Target target = annotation.getAnnotation(Target.class);
+            final List<ElementType> elementTypes = target != null ? Arrays.asList(target.value()) : Arrays.asList();
+            if (elementTypes.contains(ElementType.TYPE_PARAMETER) || elementTypes.contains(ElementType.TYPE_USE)) {
+                TypeScriptGenerator.getLogger().info(String.format(
+                        "Suggestion: annotation '%s' supports 'TYPE_PARAMETER' or 'TYPE_USE' target. Consider using 'nullableAnnotations' parameter instead of 'optionalAnnotations'.",
+                        annotation.getName()));
+            }
+        }
+        for (Class<? extends Annotation> annotation : nullableAnnotations) {
+            final Target target = annotation.getAnnotation(Target.class);
+            final List<ElementType> elementTypes = target != null ? Arrays.asList(target.value()) : Arrays.asList();
+            if (!elementTypes.contains(ElementType.TYPE_PARAMETER) && !elementTypes.contains(ElementType.TYPE_USE)) {
+                throw new RuntimeException(String.format(
+                        "'%s' annotation cannot be used as nullable annotation because it doesn't have 'TYPE_PARAMETER' or 'TYPE_USE' target.",
+                        annotation.getName()));
+            }
+        }
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
@@ -392,6 +421,17 @@ public class Settings {
         if (debug) {
             TypeScriptGenerator.getLogger().warning("Parameter 'debug' was removed. Please set 'loggingLevel' parameter to 'Debug'.");
         }
+    }
+
+    public NullabilityDefinition getNullabilityDefinition() {
+        return nullabilityDefinition != null ? nullabilityDefinition : NullabilityDefinition.nullAndUndefinedUnion;
+    }
+
+    public TypeParser getTypeParser() {
+        if (typeParser == null) {
+            typeParser = new TypeParser(nullableAnnotations);
+        }
+        return typeParser;
     }
 
     public List<CustomTypeMapping> getValidatedCustomTypeMappings() {

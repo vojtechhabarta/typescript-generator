@@ -9,6 +9,7 @@ import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.ModuleDependency;
+import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.Output;
@@ -58,6 +59,7 @@ public class GenerateTask extends DefaultTask {
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
+    public NullabilityDefinition nullabilityDefinition;
     public boolean declarePropertiesAsReadOnly;
     public String removeTypeNamePrefix;
     public String removeTypeNameSuffix;
@@ -99,6 +101,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> extensions;
     public List<Settings.ConfiguredExtension> extensionsWithConfiguration;
     public List<String> optionalAnnotations;
+    public List<String> nullableAnnotations;
     public boolean generateInfoJson;
     public boolean generateNpmPackageJson;
     public String npmName;
@@ -156,6 +159,7 @@ public class GenerateTask extends DefaultTask {
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
+            settings.nullabilityDefinition = nullabilityDefinition;
             settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
@@ -197,6 +201,7 @@ public class GenerateTask extends DefaultTask {
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.loadNullableAnnotations(classLoader, nullableAnnotations);
             settings.generateInfoJson = generateInfoJson;
             settings.generateNpmPackageJson = generateNpmPackageJson;
             settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;

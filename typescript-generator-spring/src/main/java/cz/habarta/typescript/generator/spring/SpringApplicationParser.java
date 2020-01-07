@@ -14,7 +14,9 @@ import cz.habarta.typescript.generator.parser.RestApplicationType;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.parser.SourceType;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import static cz.habarta.typescript.generator.util.Utils.getInheritanceChain;
 import java.lang.reflect.Method;
@@ -313,26 +315,28 @@ public class SpringApplicationParser extends RestApplicationParser {
 
     private Type parseReturnType(Class<?> controllerClass, Method method) {
         final Class<?> returnType = method.getReturnType();
-        final Type genericReturnType = method.getGenericReturnType();
+        final Type parsedReturnType = settings.getTypeParser().getMethodReturnType(method);
+        final Type plainReturnType = JTypeWithNullability.getPlainType(parsedReturnType);
         final Type modelReturnType;
         if (returnType == void.class) {
             modelReturnType = returnType;
-        } else if (genericReturnType instanceof ParameterizedType && returnType == ResponseEntity.class) {
-            final ParameterizedType parameterizedReturnType = (ParameterizedType) genericReturnType;
+        } else if (plainReturnType instanceof ParameterizedType && returnType == ResponseEntity.class) {
+            final ParameterizedType parameterizedReturnType = (ParameterizedType) plainReturnType;
             modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];
         } else {
-            modelReturnType = genericReturnType;
+            modelReturnType = parsedReturnType;
         }
         return GenericsResolver.resolveType(controllerClass, modelReturnType, method.getDeclaringClass());
     }
 
-    private static MethodParameterModel getEntityParameter(Class<?> controller, Method method) {
-        for (int index = 0; index < method.getParameterCount(); ++index) {
-            Parameter parameter = method.getParameters()[index];
-            final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(parameter, RequestBody.class);
+    private MethodParameterModel getEntityParameter(Class<?> controller, Method method) {
+        final List<Type> parameterTypes = settings.getTypeParser().getMethodParameterTypes(method);
+        final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(method.getParameters()), parameterTypes);
+        for (Pair<Parameter, Type> pair : parameters) {
+            final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(pair.getValue1(), RequestBody.class);
             if (requestBodyAnnotation != null) {
-                final Type resolvedType = GenericsResolver.resolveType(controller, parameter.getParameterizedType(), method.getDeclaringClass());
-                return new MethodParameterModel(parameter.getName(), resolvedType);
+                final Type resolvedType = GenericsResolver.resolveType(controller, pair.getValue2(), method.getDeclaringClass());
+                return new MethodParameterModel(pair.getValue1().getName(), resolvedType);
             }
         }
         return null;

@@ -8,13 +8,13 @@ import java.util.List;
 
 public class TsCallableModel {
     
-    private final String name;
-    private final TsModifierFlags modifiers;
-    private final List<TsType.GenericVariableType> typeParameters;
-    private final List<TsParameterModel> parameters;
-    private final TsType returnType;
-    private final List<TsStatement> body;
-    private final List<String> comments;
+    protected final String name;
+    protected final TsModifierFlags modifiers;
+    protected final List<TsType.GenericVariableType> typeParameters;
+    protected final List<TsParameterModel> parameters;
+    protected final TsType returnType;
+    protected final List<TsStatement> body;
+    protected final List<String> comments;
 
     public TsCallableModel(String name, TsModifierFlags modifiers, List<TsType.GenericVariableType> typeParameters,
             List<TsParameterModel> parameters, TsType returnType, List<TsStatement> body, List<String> comments) {
