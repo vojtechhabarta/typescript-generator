@@ -9,6 +9,7 @@ import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.ModuleDependency;
+import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.Output;
@@ -250,6 +251,24 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private OptionalPropertiesDeclaration optionalPropertiesDeclaration;
+
+    /**
+     * Specifies how nullable types will be created in generated file.
+     * Nullable types are marked in Java by annotations specified using {@link #nullableAnnotations} parameter like <code>List&lt;@Nullable String&gt;</code>.
+     * In Kotlin nullable types are marked using <code>?</code> character like <code>List&lt;String?&gt;</code>.
+     * Value of this parameter specifies how nullable type is created from regular type <code>T</code>:
+     * <ul>
+     * <li><code>nullAndUndefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null | undefined</code></li>
+     * <li><code>nullUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null</code></li>
+     * <li><code>undefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | undefined</code></li>
+     * <li><code>nullAndUndefinedInlineUnion</code> - union of <code>T | null | undefined</code> without type alias</li>
+     * <li><code>nullInlineUnion</code> - union of <code>T | null</code> without type alias</li>
+     * <li><code>undefinedInlineUnion</code> - union of <code>T | undefined</code> without type alias</li>
+     * </ul>
+     * Default value is <code>nullInlineUnion</code>.
+     */
+    @Parameter
+    private NullabilityDefinition nullabilityDefinition;
 
     /**
      * If <code>true</code> declared properties will be <code>readonly</code>.
@@ -597,6 +616,18 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> optionalAnnotations;
 
     /**
+     * When any of specified annotations is used on a Java type typescript-generator treats this type as nullable.
+     * For example Java type <code>List&lt;@Nullable String&gt;</code>
+     * can be transformed to TypeScript as <code>(string | null)[]</code> (instead of just <code>string[]</code>).
+     * Exact nullability form depends on {@link #nullabilityDefinition} parameter.
+     * Unlike optional properties nullable types can also be used "inside" other types like in previous example.
+     * Specified annotations must have target set to <code>TYPE_PARAMETER</code> or <code>TYPE_USE</code>.
+     * Example optional annotation: <code>org.checkerframework.checker.nullness.qual.Nullable</code>
+     */
+    @Parameter
+    private List<String> nullableAnnotations;
+
+    /**
      * If <code>true</code> JSON file describing generated module will be generated.
      * In following typescript-generator run this allows to generate another module which could depend on currently generated module.
      * Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs 
@@ -746,6 +777,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
+            settings.nullabilityDefinition = nullabilityDefinition;
             settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
             settings.removeTypeNamePrefix = removeTypeNamePrefix;
             settings.removeTypeNameSuffix = removeTypeNameSuffix;
@@ -787,6 +819,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.loadNullableAnnotations(classLoader, nullableAnnotations);
             settings.generateInfoJson = generateInfoJson;
             settings.generateNpmPackageJson = generateNpmPackageJson;
             settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;

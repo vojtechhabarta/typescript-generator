@@ -7,6 +7,8 @@ import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.SourceType;
+import cz.habarta.typescript.generator.type.JGenericArrayType;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -87,7 +89,7 @@ public class JaxrsApplicationTest {
                 G.class,
                 new TypeReference<Map<String, H>>(){}.getType(),
                 I.class,
-                J[].class,
+                JGenericArrayType.of(J[].class),
                 // types handled by DefaultTypeProcessor
                 String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class, void.class
         );
@@ -153,7 +155,7 @@ public class JaxrsApplicationTest {
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
         Assert.assertNotNull(result);
         Assert.assertTrue(!getTypes(result.discoveredTypes).contains(A.class));
-        Assert.assertTrue(getTypes(result.discoveredTypes).contains(J[].class));
+        Assert.assertTrue(getTypes(result.discoveredTypes).contains(JGenericArrayType.of(J[].class)));
     }
 
     private static JaxrsApplicationParser createJaxrsApplicationParser(Settings settings) {
@@ -165,7 +167,7 @@ public class JaxrsApplicationTest {
     private List<Type> getTypes(final List<? extends SourceType<? extends Type>> sourceTypes) {
         final List<Type> types = new ArrayList<>();
         for (SourceType<? extends Type> sourceType : sourceTypes) {
-            types.add(sourceType.type);
+            types.add(JTypeWithNullability.removeNullability(sourceType.type));
         }
         return types;
     }
@@ -246,7 +248,6 @@ public class JaxrsApplicationTest {
                 @FormParam("") String formParam,
                 I entityI) {
         }
-    
         @POST
         @ApiOperation(value = "async", response = String.class)
         public void setAsync(

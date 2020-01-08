@@ -40,8 +40,8 @@ import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.type.JUnionType;
 import cz.habarta.typescript.generator.util.PropertyMember;
-import cz.habarta.typescript.generator.util.UnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -213,7 +213,7 @@ public class Jackson2Parser extends ModelParser {
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member member = beanPropertyWriter.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(member, beanPropertyWriter.getName(), sourceClass.type);
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
 
@@ -323,7 +323,7 @@ public class Jackson2Parser extends ModelParser {
                 if (idProperty.isPresent()) {
                     final BeanPropertyWriter idPropertyWriter = idProperty.get();
                     final Member idMember = idPropertyWriter.getMember().getMember();
-                    final PropertyMember idPropertyMember = wrapMember(idMember, idPropertyWriter.getName(), cls);
+                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idPropertyWriter.getName(), cls);
                     idType = idPropertyMember.getType();
                 } else {
                     return null;
@@ -339,7 +339,7 @@ public class Jackson2Parser extends ModelParser {
             }
             return alwaysAsId
                     ? idType
-                    : new UnionType(propertyType, idType);
+                    : new JUnionType(propertyType, idType);
         }
         return null;
     }

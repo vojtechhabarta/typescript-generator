@@ -42,8 +42,8 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
         return comments;
     }
 
-    public TsPropertyModel setTsType(TsType tsType) {
-        return new TsPropertyModel(getName(), tsType, decorators, modifiers, ownProperty, getComments());
+    public TsPropertyModel withTsType(TsType tsType) {
+        return new TsPropertyModel(name, tsType, decorators, modifiers, ownProperty, comments);
     }
 
     @Override

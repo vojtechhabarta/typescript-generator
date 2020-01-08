@@ -6,7 +6,9 @@ import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -189,13 +191,16 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 }
             }
             // JAX-RS specification - 3.3.2.1 Entity Parameters
-            final MethodParameterModel entityParameter = getEntityParameter(resourceClass, method);
+            final List<Type> parameterTypes = settings.getTypeParser().getMethodParameterTypes(method);
+            final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(method.getParameters()), parameterTypes);
+            final MethodParameterModel entityParameter = getEntityParameter(resourceClass, method, parameters);
             if (entityParameter != null) {
                 foundType(result, entityParameter.getType(), resourceClass, method.getName());
             }
             // JAX-RS specification - 3.3.3 Return Type
             final Class<?> returnType = method.getReturnType();
-            final Type genericReturnType = method.getGenericReturnType();
+            final Type parsedReturnType = settings.getTypeParser().getMethodReturnType(method);
+            final Type plainReturnType = JTypeWithNullability.getPlainType(parsedReturnType);
             final Type modelReturnType;
             if (returnType == void.class) {
                 //for async response also use swagger
@@ -214,11 +219,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 } else {
                     modelReturnType = Object.class;
                 }
-            } else if (genericReturnType instanceof ParameterizedType && returnType == GenericEntity.class) {
-                final ParameterizedType parameterizedReturnType = (ParameterizedType) genericReturnType;
+            } else if (plainReturnType instanceof ParameterizedType && returnType == GenericEntity.class) {
+                final ParameterizedType parameterizedReturnType = (ParameterizedType) plainReturnType;
                 modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];
             } else {
-                modelReturnType = genericReturnType;
+                modelReturnType = parsedReturnType;
             }
             final Type resolvedModelReturnType = GenericsResolver.resolveType(resourceClass, modelReturnType, method.getDeclaringClass());
             foundType(result, resolvedModelReturnType, resourceClass, method.getName());
@@ -274,9 +279,9 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
     }
 
-    private static MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method) {
-        for (Parameter parameter : method.getParameters()) {
-            if (!Utils.hasAnyAnnotation(parameter::getAnnotation, Arrays.asList(
+    private MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method, List<Pair<Parameter, Type>> parameters) {
+        for (Pair<Parameter, Type> pair : parameters) {
+            if (!Utils.hasAnyAnnotation(annotationClass -> pair.getValue1().getAnnotation(annotationClass), Arrays.asList(
                     MatrixParam.class,
                     QueryParam.class,
                     PathParam.class,
@@ -287,8 +292,8 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     FormParam.class,
                     BeanParam.class
             ))) {
-                final Type resolvedType = GenericsResolver.resolveType(resourceClass, parameter.getParameterizedType(), method.getDeclaringClass());
-                return new MethodParameterModel(parameter.getName(), resolvedType);
+                final Type resolvedType = GenericsResolver.resolveType(resourceClass, pair.getValue2(), method.getDeclaringClass());
+                return new MethodParameterModel(pair.getValue1().getName(), resolvedType);
             }
         }
         return null;

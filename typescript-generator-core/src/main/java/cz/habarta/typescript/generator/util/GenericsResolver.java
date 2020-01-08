@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator.util;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class GenericsResolver {
@@ -122,16 +120,7 @@ public class GenericsResolver {
                 final TypeVariable<?> typeVariable = (TypeVariable<?>) type;
                 return resolvedTypeParameters.getOrDefault(typeVariable.getName(), typeVariable);
             }
-            if (type instanceof ParameterizedType) {
-                final ParameterizedType parameterizedType = (ParameterizedType) type;
-                return Utils.createParameterizedType(
-                        parameterizedType.getRawType(),
-                        Stream.of(parameterizedType.getActualTypeArguments())
-                                .map(typeArgument -> resolveType(typeArgument))
-                                .collect(Collectors.toList())
-                );
-            }
-            return type;
+            return Utils.transformContainedTypes(type, this::resolveType);
         }
 
         @Override

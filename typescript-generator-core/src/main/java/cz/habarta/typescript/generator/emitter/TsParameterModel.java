@@ -22,4 +22,8 @@ public class TsParameterModel extends TsParameter {
         return accessibilityModifier;
     }
 
+    public TsParameterModel withTsType(TsType tsType) {
+        return new TsParameterModel(accessibilityModifier, name, tsType);
+    }
+
 }

@@ -1,7 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
-import cz.habarta.typescript.generator.util.UnionType;
+import cz.habarta.typescript.generator.type.JTypeWithNullability;
+import cz.habarta.typescript.generator.type.JUnionType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -137,9 +138,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     ? context.processType(upperBounds[0])
                     : new Result(TsType.Any);
         }
-        if (javaType instanceof UnionType) {
-            final UnionType unionType = (UnionType) javaType;
-            final List<Result> results = unionType.types.stream()
+        if (javaType instanceof JUnionType) {
+            final JUnionType unionType = (JUnionType) javaType;
+            final List<Result> results = unionType.getTypes().stream()
                     .map(type -> context.processType(type))
                     .collect(Collectors.toList());
             return new Result(
@@ -149,6 +150,14 @@ public class DefaultTypeProcessor implements TypeProcessor {
                     results.stream()
                             .flatMap(result -> result.getDiscoveredClasses().stream())
                             .collect(Collectors.toList())
+            );
+        }
+        if (javaType instanceof JTypeWithNullability) {
+            final JTypeWithNullability typeWithNullability = (JTypeWithNullability) javaType;
+            final Result result = context.processType(typeWithNullability.getType());
+            return new Result(
+                    typeWithNullability.isNullable() ? new TsType.NullableType(result.getTsType()) : result.getTsType(),
+                    result.getDiscoveredClasses()
             );
         }
         return null;

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -238,6 +240,28 @@ public abstract class TsType implements Emittable {
             this.types = new ArrayList<>(new LinkedHashSet<>(types));
         }
 
+        public static UnionType combine(List<? extends TsType> types) {
+            return new UnionType(types.stream()
+                    .flatMap(type -> {
+                        if (type instanceof UnionType) {
+                            final UnionType unionType = (UnionType) type;
+                            return unionType.types.stream();
+                        } else {
+                            return Stream.of(type);
+                        }
+                    })
+                    .collect(Collectors.toList())
+            );
+        }
+
+        public UnionType add(List<TsType> types) {
+            return new UnionType(Utils.concat(this.types, types));
+        }
+
+        public UnionType remove(List<TsType> types) {
+            return new UnionType(Utils.removeAll(this.types, types));
+        }
+
         @Override
         public String format(Settings settings) {
             return types.isEmpty()
@@ -298,6 +322,7 @@ public abstract class TsType implements Emittable {
 
     }
 
+    // optionality should have been represented as attribute of properties and parameters
     public static class OptionalType extends TsType {
 
         public final TsType type;
@@ -309,6 +334,23 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return type.format(settings);
+        }
+
+    }
+
+    public static class NullableType extends TsType {
+
+        public static final String AliasName = "Nullable";
+
+        public final TsType type;
+
+        public NullableType(TsType type) {
+            this.type = type;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return AliasName + "<" + type.format(settings) + ">";
         }
 
     }

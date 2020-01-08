@@ -191,7 +191,7 @@ public class PropertyPolymorphismExtension extends Extension {
                                     TsBeanModel referencedBean = model.getBean(type.symbol);
                                     if (isPolymorphicBase.test(referencedBean.getOrigin())) {
                                         Symbol refSymbol = symbolTable.addSuffixToSymbol(type.symbol, "Ref");
-                                        newProperties.add(property.setTsType(new TsType.ReferenceType(refSymbol)));
+                                        newProperties.add(property.withTsType(new TsType.ReferenceType(refSymbol)));
                                         continue;
                                     }
                                 }
