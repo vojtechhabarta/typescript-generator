@@ -259,13 +259,13 @@ public class GenerateMojo extends AbstractMojo {
      * Value of this parameter specifies how nullable type is created from regular type <code>T</code>:
      * <ul>
      * <li><code>nullAndUndefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null | undefined</code></li>
-     * <li><code>undefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | undefined</code></li>
      * <li><code>nullUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null</code></li>
+     * <li><code>undefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | undefined</code></li>
      * <li><code>nullAndUndefinedInlineUnion</code> - union of <code>T | null | undefined</code> without type alias</li>
-     * <li><code>undefinedInlineUnion</code> - union of <code>T | undefined</code> without type alias</li>
      * <li><code>nullInlineUnion</code> - union of <code>T | null</code> without type alias</li>
+     * <li><code>undefinedInlineUnion</code> - union of <code>T | undefined</code> without type alias</li>
      * </ul>
-     * Default value is <code>nullAndUndefinedUnion</code>.
+     * Default value is <code>nullInlineUnion</code>.
      */
     @Parameter
     private NullabilityDefinition nullabilityDefinition;

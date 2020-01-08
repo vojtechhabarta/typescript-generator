@@ -57,7 +57,7 @@ public class Settings {
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration; // default is OptionalPropertiesDeclaration.questionMark
-    public NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullAndUndefinedUnion
+    public NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullInlineUnion
     private TypeParser typeParser = null;
     public boolean declarePropertiesAsReadOnly = false;
     public String removeTypeNamePrefix = null;
@@ -424,7 +424,7 @@ public class Settings {
     }
 
     public NullabilityDefinition getNullabilityDefinition() {
-        return nullabilityDefinition != null ? nullabilityDefinition : NullabilityDefinition.nullAndUndefinedUnion;
+        return nullabilityDefinition != null ? nullabilityDefinition : NullabilityDefinition.nullInlineUnion;
     }
 
     public TypeParser getTypeParser() {
