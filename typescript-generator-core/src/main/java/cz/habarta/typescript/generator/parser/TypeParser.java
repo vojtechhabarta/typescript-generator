@@ -17,7 +17,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -155,7 +157,7 @@ public class TypeParser {
         public Type getFieldType(Field field) {
             final KProperty<?> kProperty = ReflectJvmMapping.getKotlinProperty(field);
             if (kProperty != null) {
-                return getType(kProperty.getReturnType());
+                return getType(kProperty.getReturnType(), new LinkedHashMap<>());
             }
             return javaTypeParser.getFieldType(field);
         }
@@ -164,7 +166,7 @@ public class TypeParser {
         public Type getMethodReturnType(Method method) {
             final KFunction<?> kFunction = ReflectJvmMapping.getKotlinFunction(method);
             if (kFunction != null) {
-                return getType(kFunction.getReturnType());
+                return getType(kFunction.getReturnType(), new LinkedHashMap<>());
             } else {
                 // `method` might be a getter so try to find a corresponding field and pass it to Kotlin reflection
                 final KClass<?> kClass = JvmClassMappingKt.getKotlinClass(method.getDeclaringClass());
@@ -187,23 +189,25 @@ public class TypeParser {
                 final List<KParameter> kParameters = kFunction.getParameters().stream()
                         .filter(kParameter -> kParameter.getKind() == KParameter.Kind.VALUE)
                         .collect(Collectors.toList());
-                return getTypes(kParameters.stream()
-                        .map(parameter -> parameter.getType())
-                        .collect(Collectors.toList())
+                return getTypes(
+                        kParameters.stream()
+                                .map(parameter -> parameter.getType())
+                                .collect(Collectors.toList()),
+                        new LinkedHashMap<>()
                 );
             }
             return javaTypeParser.getMethodParameterTypes(method);
         }
 
-        private Type getType(KType kType) {
+        private Type getType(KType kType, Map<String, JTypeVariable<?>> typeParameters) {
             if (kType == null) {
                 return new JWildcardType();
             }
-            final Type type = getBareType(kType);
+            final Type type = getBareType(kType, typeParameters);
             return new JTypeWithNullability(type, kType.isMarkedNullable());
         }
 
-        private Type getBareType(KType kType) {
+        private Type getBareType(KType kType, Map<String, JTypeVariable<?>> typeParameters) {
             final KClassifier kClassifier = kType.getClassifier();
             if (kClassifier instanceof KClass) {
                 final KClass<?> kClass = (KClass<?>) kClassifier;
@@ -215,33 +219,41 @@ public class TypeParser {
                 if (arguments.isEmpty()) {
                     return javaClass;
                 } else if (javaClass.isArray()) {
-                    return new JGenericArrayType(getType(arguments.get(0).getType()));
+                    return new JGenericArrayType(getType(arguments.get(0).getType(), typeParameters));
                 } else {
                     final List<Type> javaArguments = arguments.stream()
-                            .map(argument -> getType(argument.getType()))
+                            .map(argument -> getType(argument.getType(), typeParameters))
                             .collect(Collectors.toList());
                     return Utils.createParameterizedType(javaClass, javaArguments);
                 }
             }
             if (kClassifier instanceof KTypeParameter) {
                 final KTypeParameter kTypeParameter = (KTypeParameter) kClassifier;
-                final TypeVariable<?> typeVariable = getJavaTypeVariable(kType);
-                final Type[] bounds = getTypes(kTypeParameter.getUpperBounds()).toArray(new Type[0]);
-                return new JTypeVariable<>(
-                        typeVariable != null ? typeVariable.getGenericDeclaration() : null,
-                        kTypeParameter.getName(),
-                        bounds,
-                        typeVariable != null ? typeVariable.getAnnotatedBounds() : null,
-                        typeVariable != null ? typeVariable.getAnnotations() : null,
-                        typeVariable != null ? typeVariable.getDeclaredAnnotations() : null
-                );
+                final JTypeVariable<?> typeVariableFromMap = typeParameters.get(kTypeParameter.getName());
+                if (typeVariableFromMap != null) {
+                    return typeVariableFromMap;
+                } else {
+                    final TypeVariable<?> typeVariable = getJavaTypeVariable(kType);
+                    final JTypeVariable<?> newTypeVariable = new JTypeVariable<>(
+                            typeVariable != null ? typeVariable.getGenericDeclaration() : null,
+                            kTypeParameter.getName(),
+                            /*bounds*/ null,
+                            typeVariable != null ? typeVariable.getAnnotatedBounds() : null,
+                            typeVariable != null ? typeVariable.getAnnotations() : null,
+                            typeVariable != null ? typeVariable.getDeclaredAnnotations() : null
+                    );
+                    typeParameters.put(kTypeParameter.getName(), newTypeVariable);
+                    final Type[] bounds = getTypes(kTypeParameter.getUpperBounds(), typeParameters).toArray(new Type[0]);
+                    newTypeVariable.setBounds(bounds);
+                    return newTypeVariable;
+                }
             }
             throw new RuntimeException("Unexpected type: " + kType.toString());
         }
 
-        private List<Type> getTypes(List<KType> kTypes) {
+        private List<Type> getTypes(List<KType> kTypes, Map<String, JTypeVariable<?>> typeParameters) {
             return kTypes.stream()
-                    .map(kType -> getType(kType))
+                    .map(kType -> getType(kType, typeParameters))
                     .collect(Collectors.toList());
         }
 

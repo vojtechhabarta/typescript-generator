@@ -13,7 +13,7 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
 
     private final D genericDeclaration;  // should not be null but for Kotlin KTypeParameter we don't have it
     private final String name;
-    private final Type[] bounds;
+    private Type[] bounds;
     private final AnnotatedType[] annotatedBounds;
     private final Annotation[] annotations;
     private final Annotation[] declaredAnnotations;
@@ -34,6 +34,10 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
     @Override
     public Type[] getBounds() {
         return bounds;
+    }
+
+    public void setBounds(Type[] bounds) {
+        this.bounds = bounds;
     }
 
     @Override

@@ -82,4 +82,19 @@ class KotlinTest {
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(inputClass))
         Assert.assertEquals(expected.replace('\'', '"'), output.trim { it <= ' ' })
     }
+
+    @Test
+    fun testEnumTypeVariableBound() {
+        val settings = TestUtils.settings()
+        val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(A2::class.java))
+        val errorMessage = "Unexpected output: $output"
+        Assert.assertTrue(errorMessage, output.contains("interface A2<S>"))
+    }
+
+    private class A2<S> where S : Enum<S> {
+        fun getData2(): S? {
+            return null
+        }
+    }
+
 }
