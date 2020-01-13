@@ -2,14 +2,14 @@
 $ErrorActionPreference = "Stop"
 
 # download
-$zipFile = .\build\download-appveyor-artifacts.ps1
+$zipFile = ./build/download-appveyor-artifacts.ps1
 
 # unzip
 Write-Host -ForegroundColor DarkCyan "Unzipping..."
-$unzipDirectoryPath = "target\gpg-sign"
-rm -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
-rm -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
-$unzipDirectory = mkdir $unzipDirectoryPath -Force
+$unzipDirectoryPath = "target/gpg-sign"
+Remove-Item -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force $unzipDirectoryPath -ErrorAction SilentlyContinue
+$unzipDirectory = New-Item -ItemType directory -Path $unzipDirectoryPath -Force
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFile, $unzipDirectory.FullName)
 $basePath = (Resolve-Path $unzipDirectory).Path
@@ -18,7 +18,8 @@ $basePath = (Resolve-Path $unzipDirectory).Path
 $securePassphrase = Read-Host -Prompt "Enter signing key passphrase" -AsSecureString
 $passphraseCredential = New-Object System.Management.Automation.PSCredential -ArgumentList "Domain\User", $securePassphrase
 $passphrase = $passphraseCredential.GetNetworkCredential().Password
-"test" | gpg --detach-sign --armor --passphrase $passphrase | Out-Null
+# test passphrase
+gpg --detach-sign --armor --passphrase $passphrase $zipFile
 if (! $?) {
     exit
 }
