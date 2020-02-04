@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -262,6 +263,43 @@ public class ClassesTest {
     }
 
     private static abstract class Derived2 extends Derived1 {
+    }
+
+    @Test
+    public void testConstructor() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalAnnotations = Arrays.asList(Nullable.class);
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
+        Assert.assertTrue(output.contains("constructor(data: FooBar)"));
+    }
+
+    private static class FooBar {
+        @Nullable
+        public String foo;
+        public int bar;
+    }
+
+    @Test
+    public void testConstructorWithGenericsAndInheritance() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassB.class));
+        Assert.assertTrue(output.contains("constructor(data: ClassA<T>)"));
+        Assert.assertTrue(output.contains("constructor(data: ClassB)"));
+        Assert.assertTrue(output.contains("super(data);"));
+    }
+
+    private static class ClassA<T> {
+        public String a;
+    }
+
+    private static class ClassB extends ClassA<String> {
+        public String b;
     }
 
 }

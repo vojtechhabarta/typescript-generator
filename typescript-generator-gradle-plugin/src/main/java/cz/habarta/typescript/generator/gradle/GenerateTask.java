@@ -77,6 +77,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> nonConstEnumAnnotations;
     public ClassMapping mapClasses;
     public List<String> mapClassesAsClassesPatterns;
+    public boolean generateConstructors;
     public boolean disableTaggedUnions;
     public boolean ignoreSwaggerAnnotations;
     public boolean generateJaxrsApplicationInterface;
@@ -177,6 +178,7 @@ public class GenerateTask extends DefaultTask {
             settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
             settings.mapClasses = mapClasses;
             settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
+            settings.generateConstructors = generateConstructors;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
             settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
