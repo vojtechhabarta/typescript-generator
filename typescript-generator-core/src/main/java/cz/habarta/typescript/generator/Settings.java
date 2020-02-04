@@ -80,6 +80,7 @@ public class Settings {
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
     public List<String> mapClassesAsClassesPatterns;
     private Predicate<String> mapClassesAsClassesFilter = null;
+    public boolean generateConstructors = false;
     public boolean disableTaggedUnions = false;
     public boolean ignoreSwaggerAnnotations = false;
     public boolean generateJaxrsApplicationInterface = false;
@@ -330,6 +331,9 @@ public class Settings {
         }
         if (mapClassesAsClassesPatterns != null && mapClasses != ClassMapping.asClasses) {
             throw new RuntimeException("'mapClassesAsClassesPatterns' parameter can only be used when 'mapClasses' parameter is set to 'asClasses'.");
+        }
+        if (generateConstructors && mapClasses != ClassMapping.asClasses) {
+            throw new RuntimeException("'generateConstructors' parameter can only be used when 'mapClasses' parameter is set to 'asClasses'.");
         }
         for (Class<? extends Annotation> annotation : optionalAnnotations) {
             final Target target = annotation.getAnnotation(Target.class);

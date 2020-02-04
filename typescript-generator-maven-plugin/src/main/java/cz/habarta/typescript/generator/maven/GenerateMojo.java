@@ -410,7 +410,8 @@ public class GenerateMojo extends AbstractMojo {
      * </ul>
      * Default value is <code>asInterfaces</code>.<br>
      * Value <code>asClasses</code> can only be used in implementation files (.ts).
-     * It is also possible to generate mix of classes and interfaces by setting this parameter to <code>asClasses</code> value
+     * In this case it is also possible to generate constructors by setting <code>generateConstructors</code> parameter to <code>true</code>.
+     * It is also possible to generate mix of classes and interfaces by setting <code>mapClasses</code> parameter to <code>asClasses</code> value
      * and specifying which classes should be mapped as classes using <code>mapClassesAsClassesPatterns</code> parameter.
      */
     @Parameter
@@ -423,6 +424,14 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> mapClassesAsClassesPatterns;
+
+    /**
+     * If <code>true</code> generated classes will also have constructors.
+     * Generated constructors use "named parameters" pattern so when calling such constructor parameters need to be wrapped in "options" object.
+     * This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.
+     */
+    @Parameter
+    private boolean generateConstructors;
 
     /**
      * If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types.
@@ -795,6 +804,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
             settings.mapClasses = mapClasses;
             settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
+            settings.generateConstructors = generateConstructors;
             settings.disableTaggedUnions = disableTaggedUnions;
             settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
             settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;

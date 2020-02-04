@@ -16,6 +16,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.TsAccessibilityModifier;
 import cz.habarta.typescript.generator.emitter.TsAliasModel;
+import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
 import cz.habarta.typescript.generator.emitter.TsBeanCategory;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsCallExpression;
@@ -23,6 +24,7 @@ import cz.habarta.typescript.generator.emitter.TsConstructorModel;
 import cz.habarta.typescript.generator.emitter.TsDeclarationModel;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
 import cz.habarta.typescript.generator.emitter.TsExpression;
+import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
 import cz.habarta.typescript.generator.emitter.TsHelper;
 import cz.habarta.typescript.generator.emitter.TsIdentifierReference;
 import cz.habarta.typescript.generator.emitter.TsMemberExpression;
@@ -36,6 +38,7 @@ import cz.habarta.typescript.generator.emitter.TsPropertyModel;
 import cz.habarta.typescript.generator.emitter.TsReturnStatement;
 import cz.habarta.typescript.generator.emitter.TsStatement;
 import cz.habarta.typescript.generator.emitter.TsStringLiteral;
+import cz.habarta.typescript.generator.emitter.TsSuperExpression;
 import cz.habarta.typescript.generator.emitter.TsTaggedTemplateLiteral;
 import cz.habarta.typescript.generator.emitter.TsTemplateLiteral;
 import cz.habarta.typescript.generator.emitter.TsThisExpression;
@@ -118,6 +121,9 @@ public class ModelCompiler {
         tsModel = addCustomTypeAliases(symbolTable, tsModel);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
+        if (settings.generateConstructors) {
+            tsModel = addConstructors(symbolTable, tsModel);
+        }
 
         // REST
         if (settings.isGenerateRest()) {
@@ -485,6 +491,43 @@ public class ModelCompiler {
             } else {
                 beans.add(bean);
             }
+        }
+        return tsModel.withBeans(beans);
+    }
+
+    private TsModel addConstructors(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsBeanModel> beans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
+            final List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+            final TsType.ReferenceType dataType = typeParameters.isEmpty()
+                    ? new TsType.ReferenceType(beanIdentifier)
+                    : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
+            final List<TsStatement> body = new ArrayList<>();
+            if (bean.getParent() != null) {
+                body.add(new TsExpressionStatement(
+                        new TsCallExpression(
+                                new TsSuperExpression(),
+                                new TsIdentifierReference("data")
+                        )
+                ));
+            }
+            for (TsPropertyModel property : bean.getProperties()) {
+                final Map<String, TsType> inheritedProperties = ModelCompiler.getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
+                if (!inheritedProperties.containsKey(property.getName())) {
+                    body.add(new TsExpressionStatement(new TsAssignmentExpression(
+                            new TsMemberExpression(new TsThisExpression(), property.name),
+                            new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+                    )));
+                }
+            }
+            final TsConstructorModel constructor = new TsConstructorModel(
+                    TsModifierFlags.None,
+                    Arrays.asList(new TsParameterModel("data", dataType)),
+                    body,
+                    /*comments*/ null
+            );
+            beans.add(bean.withConstructor(constructor));
         }
         return tsModel.withBeans(beans);
     }
