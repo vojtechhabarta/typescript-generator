@@ -421,6 +421,10 @@ public abstract class TsType implements Emittable {
             final TsType.OptionalType optionalType = (TsType.OptionalType) type;
             return new TsType.OptionalType(transformTsType(context, optionalType.type, transformer));
         }
+        if (type instanceof TsType.NullableType) {
+            final TsType.NullableType nullableType = (TsType.NullableType) type;
+            return new TsType.NullableType(transformTsType(context, nullableType.type, transformer));
+        }
         if (type instanceof TsType.BasicArrayType) {
             final TsType.BasicArrayType basicArrayType = (TsType.BasicArrayType) type;
             return new TsType.BasicArrayType(transformTsType(context, basicArrayType.elementType, transformer));

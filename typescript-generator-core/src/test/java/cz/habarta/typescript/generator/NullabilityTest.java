@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import java.util.Date;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
@@ -125,6 +126,20 @@ public class NullabilityTest {
         final Settings settings = TestUtils.settings();
         settings.nullableAnnotations.add(javax.annotation.Nullable.class);
         new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class));
+    }
+
+    @Test
+    public void testDate() {
+        final Settings settings = TestUtils.settings();
+        settings.nullableAnnotations.add(Nullable.class);
+        settings.nullabilityDefinition = NullabilityDefinition.nullAndUndefinedUnion;
+        settings.mapDate = DateMapping.asString;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDate.class));
+        Assert.assertTrue(output.contains("date?: Nullable<DateAsString>"));
+    }
+
+    private static class ClassWithDate {
+        public @Nullable Date date;
     }
 
 }
