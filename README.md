@@ -188,6 +188,29 @@ Output is configured using several parameters:
 For more details see [Modules and Namespaces](http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html) page.
 
 
+REST frameworks
+---------------
+Typescript-generator can generate not only TypeScript declarations for JSON Java classes but it can also generate client classes for REST services. Suppported REST frameworks are JAXR-RS and Spring. Client for JAX-RS service can be generated using `generateJaxrsApplicationClient` parameter, client for Spring service can be generated using `generateSpringApplicationClient`. Since Spring support is in separate module it is needed to add this module to typescript-generator dependencies. Here is example for Maven:
+``` xml
+<plugin>
+    <groupId>cz.habarta.typescript-generator</groupId>
+    <artifactId>typescript-generator-maven-plugin</artifactId>
+    <version>${typescript-generator.version}</version>
+    <configuration>
+        <generateSpringApplicationClient>true</generateSpringApplicationClient>
+        ...
+    </configuration>
+    <dependencies>
+        <dependency>
+            <groupId>cz.habarta.typescript-generator</groupId>
+            <artifactId>typescript-generator-spring</artifactId>
+            <version>${typescript-generator.version}</version>
+        </dependency>
+    </dependencies>
+</plugin>
+```
+
+
 Download
 --------
 Releases are available from Maven Central Repository.
