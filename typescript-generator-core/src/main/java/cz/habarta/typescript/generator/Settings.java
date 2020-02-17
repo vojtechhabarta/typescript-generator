@@ -104,6 +104,7 @@ public class Settings {
     public boolean noFileComment = false;
     public boolean noTslintDisable = false;
     public boolean noEslintDisable = false;
+    public boolean tsNoCheck = false;
     public List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();

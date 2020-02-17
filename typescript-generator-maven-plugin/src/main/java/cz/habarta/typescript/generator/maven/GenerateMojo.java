@@ -580,6 +580,12 @@ public class GenerateMojo extends AbstractMojo {
     private boolean noEslintDisable;
 
     /**
+     * If <code>true</code> generated file will have disabled TypeScript semantic checks using <code>@ts-nocheck</code> comment.
+     */
+    @Parameter
+    private boolean tsNoCheck;
+
+    /**
      * List of Javadoc XML files to search for documentation comments.
      * These files should be created using <code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from <code>com.github.markusbernhardt:xml-doclet</code> artifact.
      * Javadoc comments are added to output declarations as JSDoc comments.
@@ -824,6 +830,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.noFileComment = noFileComment;
             settings.noTslintDisable = noTslintDisable;
             settings.noEslintDisable = noEslintDisable;
+            settings.tsNoCheck = tsNoCheck;
             settings.javadocXmlFiles = javadocXmlFiles;
             settings.loadExtensions(classLoader, extensions, extensionsWithConfiguration);
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);

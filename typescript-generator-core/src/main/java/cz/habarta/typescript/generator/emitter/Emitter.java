@@ -55,6 +55,9 @@ public class Emitter implements EmitterExtension.Writer {
         if (!settings.noEslintDisable) {
             writeIndentedLine("/* eslint-disable */");
         }
+        if (settings.tsNoCheck) {
+            writeIndentedLine("// @ts-nocheck");
+        }
         if (!settings.noFileComment) {
             final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             writeIndentedLine("// Generated using typescript-generator version " + TypeScriptGenerator.Version + " on " + timestamp + ".");
