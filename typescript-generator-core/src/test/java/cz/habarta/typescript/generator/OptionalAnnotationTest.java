@@ -132,4 +132,33 @@ public class OptionalAnnotationTest {
         }
     }
 
+    @Test
+    public void testAnnotatedPrivateField() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalAnnotations.add(TypescriptOptional.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SearchDTO.class));
+        Assert.assertTrue(output.contains("selectedId?: number;"));
+    }
+
+    public class SearchDTO {
+
+        private Integer year;
+
+        @TypescriptOptional
+        private Long selectedId;
+
+        public Integer getYear() {
+            return year;
+        }
+
+        public Long getSelectedId() {
+            return selectedId;
+        }
+
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TypescriptOptional {
+    }
+
 }

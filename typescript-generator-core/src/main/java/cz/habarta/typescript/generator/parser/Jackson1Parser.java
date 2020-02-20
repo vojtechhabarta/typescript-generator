@@ -83,7 +83,7 @@ public class Jackson1Parser extends ModelParser {
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member member = beanPropertyWriter.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter.getName(), sourceClass.type);
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter::getAnnotation, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = beanPropertyWriter.getGenericPropertyType();
                 if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
                     continue;

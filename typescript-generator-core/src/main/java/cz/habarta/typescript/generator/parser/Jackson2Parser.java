@@ -213,7 +213,7 @@ public class Jackson2Parser extends ModelParser {
         if (beanHelper != null) {
             for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
                 final Member member = beanPropertyWriter.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter.getName(), sourceClass.type);
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter::getAnnotation, beanPropertyWriter.getName(), sourceClass.type);
                 Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
 
@@ -323,7 +323,7 @@ public class Jackson2Parser extends ModelParser {
                 if (idProperty.isPresent()) {
                     final BeanPropertyWriter idPropertyWriter = idProperty.get();
                     final Member idMember = idPropertyWriter.getMember().getMember();
-                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idPropertyWriter.getName(), cls);
+                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idPropertyWriter::getAnnotation, idPropertyWriter.getName(), cls);
                     idType = idPropertyMember.getType();
                 } else {
                     return null;

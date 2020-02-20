@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.util.AnnotationGetter;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
@@ -118,14 +119,15 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, String propertyName, Class<?> sourceClass) {
+    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, AnnotationGetter annotationGetter,
+            String propertyName, Class<?> sourceClass) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
-            return new PropertyMember.FieldPropertyMember(field, typeParser.getFieldType(field));
+            return new PropertyMember(field, typeParser.getFieldType(field), field.getAnnotatedType(), annotationGetter);
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            return new PropertyMember.MethodPropertyMember(method, typeParser.getMethodReturnType(method));
+            return new PropertyMember(method, typeParser.getMethodReturnType(method), method.getAnnotatedReturnType(), annotationGetter);
         }
         throw new RuntimeException(String.format(
                 "Unexpected member type '%s' in property '%s' in class '%s'",
