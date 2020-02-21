@@ -40,6 +40,7 @@ public class GenerateTask extends DefaultTask {
 
     public String outputFile;
     public TypeScriptFileType outputFileType;
+    public boolean outputMultipleFiles;
     public TypeScriptOutputKind outputKind;
     public String module;
     public String namespace;
@@ -137,6 +138,7 @@ public class GenerateTask extends DefaultTask {
         if (outputFileType != null) {
             settings.outputFileType = outputFileType;
         }
+        settings.outputMultipleFiles = outputMultipleFiles;
         settings.outputKind = outputKind;
         settings.module = module;
         settings.namespace = namespace;

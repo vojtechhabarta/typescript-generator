@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.ModuleDependency;
+import cz.habarta.typescript.generator.Output;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsParameter;
 import cz.habarta.typescript.generator.TsType;
@@ -22,19 +23,20 @@ import java.util.stream.Collectors;
 
 public class Emitter implements EmitterExtension.Writer {
 
-    private final Settings settings;
-    private Writer writer;
-    private boolean forceExportKeyword;
-    private int indent;
+    protected final Settings settings;
+    protected Writer writer;
+    protected boolean forceExportKeyword;
+    protected int indent;
+
+    protected Output output;
 
     public Emitter(Settings settings) {
         this.settings = settings;
     }
 
     public void emit(TsModel model, Writer output, String outputName, boolean closeOutput, boolean forceExportKeyword, int initialIndentationLevel) {
-        this.writer = output;
-        this.forceExportKeyword = forceExportKeyword;
-        this.indent = initialIndentationLevel;
+        initSettings(output, forceExportKeyword, initialIndentationLevel);
+
         if (outputName != null) {
             TypeScriptGenerator.getLogger().info("Writing declarations to: " + outputName);
         }
@@ -48,7 +50,13 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitFileComment() {
+    protected void initSettings(Writer output, boolean forceExportKeyword, int initialIndentationLevel) {
+        this.writer = output;
+        this.forceExportKeyword = forceExportKeyword;
+        this.indent = initialIndentationLevel;
+    }
+
+    protected void emitFileComment() {
         if (!settings.noTslintDisable) {
             writeIndentedLine("/* tslint:disable */");
         }
@@ -64,7 +72,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitReferences() {
+    protected void emitReferences() {
         if (settings.referencedFiles != null && !settings.referencedFiles.isEmpty()) {
             writeNewLine();
             for (String reference : settings.referencedFiles) {
@@ -73,7 +81,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitImports() {
+    protected void emitImports() {
         if (settings.moduleDependencies != null && !settings.moduleDependencies.isEmpty()) {
             writeNewLine();
             for (ModuleDependency dependency : settings.moduleDependencies) {
@@ -126,7 +134,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
+    protected void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
         exportKeyword = exportKeyword || forceExportKeyword;
         emitBeans(model, exportKeyword, declareKeyword);
         emitTypeAliases(model, exportKeyword, declareKeyword);
@@ -153,7 +161,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitFullyQualifiedDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
+    protected void emitFullyQualifiedDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
         if (declaration.getName().getNamespace() != null) {
             writeNewLine();
             final String prefix = declareKeyword ? "declare " : "";
@@ -168,7 +176,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
+    protected void emitDeclaration(TsDeclarationModel declaration, boolean exportKeyword, boolean declareKeyword) {
         if (declaration instanceof TsBeanModel) {
             emitBean((TsBeanModel) declaration, exportKeyword);
         } else if (declaration instanceof TsAliasModel) {
@@ -418,12 +426,7 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitExtensions(TsModel model, boolean exportKeyword) {
         for (EmitterExtension emitterExtension : settings.extensions) {
             final List<String> extensionLines = new ArrayList<>();
-            final EmitterExtension.Writer extensionWriter = new EmitterExtension.Writer() {
-                @Override
-                public void writeIndentedLine(String line) {
-                    extensionLines.add(line);
-                }
-            };
+            final EmitterExtension.Writer extensionWriter = line -> extensionLines.add(line);
             emitterExtension.emitElements(extensionWriter, settings, exportKeyword, model);
             if (!extensionLines.isEmpty()) {
                 writeNewLine();
@@ -436,7 +439,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitUmdNamespace() {
+    protected void emitUmdNamespace() {
         if (settings.umdNamespace != null) {
             writeNewLine();
             writeIndentedLine("export as namespace " + settings.umdNamespace + ";");
@@ -486,7 +489,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void writeNewLine() {
+    protected void writeNewLine() {
         try {
             writer.write(settings.newline);
             writer.flush();
@@ -495,7 +498,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void close() {
+    protected void close() {
         try {
             writer.close();
         } catch (IOException e) {
@@ -503,4 +506,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
+    public void setOutput(Output output) {
+        this.output = output;
+    }
 }

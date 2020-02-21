@@ -48,6 +48,7 @@ public class Settings {
     public String quotes = "\"";
     public String indentString = "    ";
     public TypeScriptFileType outputFileType = TypeScriptFileType.declarationFile;
+    public boolean outputMultipleFiles = false;
     public TypeScriptOutputKind outputKind = null;
     public String module = null;
     public String namespace = null;

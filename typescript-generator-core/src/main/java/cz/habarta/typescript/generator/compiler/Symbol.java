@@ -52,9 +52,14 @@ public class Symbol {
         }
         this.isResolved = true;
     }
-
+    
     void addSuffix(String suffix) {
         simpleName = simpleName + suffix;
+    }
+
+    @Override
+    public String toString() {
+        return getFullName();
     }
 
 }

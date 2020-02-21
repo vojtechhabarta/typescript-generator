@@ -62,6 +62,12 @@ public class GenerateMojo extends AbstractMojo {
     private TypeScriptFileType outputFileType;
 
     /**
+     * Output multiple files instead of generating all output in a single file.
+     */
+    @Parameter
+    private boolean outputMultipleFiles;
+
+    /**
      * Kind of generated TypeScript output. Allowed values are:
      * <ul>
      * <li><code>global</code> - means that declarations will be in global scope or namespace (no module)</li>
@@ -871,6 +877,7 @@ public class GenerateMojo extends AbstractMojo {
         if (outputFileType != null) {
             settings.outputFileType = outputFileType;
         }
+        settings.outputMultipleFiles = outputMultipleFiles;
         settings.outputKind = outputKind;
         settings.module = module;
         settings.namespace = namespace;
