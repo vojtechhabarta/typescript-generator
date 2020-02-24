@@ -8,6 +8,8 @@ import cz.habarta.typescript.generator.TsType.BasicArrayType;
 import cz.habarta.typescript.generator.TsType.FunctionType;
 import cz.habarta.typescript.generator.TsType.GenericReferenceType;
 import cz.habarta.typescript.generator.TsType.IndexedArrayType;
+import cz.habarta.typescript.generator.TsType.IntersectionType;
+import cz.habarta.typescript.generator.TsType.MappedType;
 import cz.habarta.typescript.generator.TsType.ObjectType;
 import cz.habarta.typescript.generator.TsType.OptionalType;
 import cz.habarta.typescript.generator.TsType.ReferenceType;
@@ -176,6 +178,9 @@ public class DirectoryEmitter extends Emitter {
         } else if (type instanceof IndexedArrayType) {
             collectType(list, ((IndexedArrayType) type).elementType);
             collectType(list, ((IndexedArrayType) type).indexType);
+        } else if (type instanceof MappedType) {
+            collectType(list, ((MappedType) type).parameterType);
+            collectType(list, ((MappedType) type).type);
         } else if (type instanceof ObjectType) {
             List<TsProperty> properties = ((ObjectType) type).properties;
             for (TsProperty tsProperty : properties) {
@@ -196,6 +201,10 @@ public class DirectoryEmitter extends Emitter {
             for (TsType tsType2 : types2) {
                 collectType(list, tsType2);
             }
+        } else if (type instanceof IntersectionType) {
+             for (TsType tsType : ((IntersectionType) type).types) {
+                 collectType(list, tsType);
+             }
         } else {
             list.add(type);
         }
