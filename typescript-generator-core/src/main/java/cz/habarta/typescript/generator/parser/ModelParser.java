@@ -95,15 +95,18 @@ public abstract class ModelParser {
             if (result != null) {
                 if (sourceType.type instanceof Class<?> && result.getTsType() instanceof TsType.ReferenceType) {
                     final Class<?> cls = (Class<?>) sourceType.type;
-                    TypeScriptGenerator.getLogger().verbose("Parsing '" + cls.getName() + "'" +
-                            (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
-                    final DeclarationModel model = parseClass(sourceType.asSourceClass());
-                    if (model instanceof EnumModel) {
-                        enums.add((EnumModel) model);
-                    } else if (model instanceof BeanModel) {
-                        beans.add((BeanModel) model);
-                    } else {
-                        throw new RuntimeException();
+                    final TsType.ReferenceType referenceType = (TsType.ReferenceType) result.getTsType();
+                    if (!referenceType.symbol.isResolved()) {
+                        TypeScriptGenerator.getLogger().verbose("Parsing '" + cls.getName() + "'" +
+                                (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
+                        final DeclarationModel model = parseClass(sourceType.asSourceClass());
+                        if (model instanceof EnumModel) {
+                            enums.add((EnumModel) model);
+                        } else if (model instanceof BeanModel) {
+                            beans.add((BeanModel) model);
+                        } else {
+                            throw new RuntimeException();
+                        }
                     }
                 }
                 for (Class<?> cls : result.getDiscoveredClasses()) {

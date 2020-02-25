@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import cz.habarta.typescript.generator.util.Utils;
@@ -39,6 +40,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final Class<?> javaClass = (Class<?>) javaType;
             if (Temporal.class.isAssignableFrom(javaClass)) {
                 return new Result(TsType.Date);
+            }
+        }
+        if (javaType instanceof Class) {
+            final Class<?> javaClass = (Class<?>) javaType;
+            final Symbol importedSymbol = context.getSymbolIfImported(javaClass);
+            if (importedSymbol != null) {
+                return new Result(new TsType.ReferenceType(importedSymbol));
             }
         }
         if (javaType instanceof Class) {

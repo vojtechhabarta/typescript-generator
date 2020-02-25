@@ -7,6 +7,7 @@ public class Symbol {
     private String module;
     private String namespace;
     private String simpleName;
+    private boolean isResolved = false;
 
     public Symbol(String temporaryName) {
         this.simpleName = temporaryName;
@@ -22,6 +23,10 @@ public class Symbol {
 
     public String getSimpleName() {
         return simpleName;
+    }
+
+    public boolean isResolved() {
+        return isResolved;
     }
 
     public String getFullName() {
@@ -45,6 +50,7 @@ public class Symbol {
             namespace = namespacedName.substring(0, index);
             simpleName = namespacedName.substring(index + 1);
         }
+        this.isResolved = true;
     }
 
     void addSuffix(String suffix) {

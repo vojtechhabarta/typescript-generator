@@ -4,7 +4,6 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Pair;
-import cz.habarta.typescript.generator.util.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -90,10 +89,12 @@ public class SymbolTable {
             final Class<?> cls = entry.getKey().getValue1();
             final String suffix = entry.getKey().getValue2();
             final Symbol symbol = entry.getValue();
-            setSymbolQualifiedName(symbol, cls, suffix);
+            if (!symbol.isResolved()) {
+                setSymbolQualifiedName(symbol, cls, suffix);
+            }
             final String fullName = symbol.getFullName();
             if (!names.containsKey(fullName)) {
-                names.put(fullName, new ArrayList<Class<?>>());
+                names.put(fullName, new ArrayList<>());
             }
             names.get(fullName).add(cls);
         }
@@ -240,12 +241,15 @@ public class SymbolTable {
         public Object getName(String className, String classSimpleName);
     }
 
-    public boolean isImported(Symbol symbol) {
-        final Class<?> cls = getSymbolClass(symbol);
-        if (cls != null) {
-            return settings.getModuleDependencies().getFullName(cls) != null;
+    public Symbol getSymbolIfImported(Class<?> cls) {
+        final Pair<String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
+        if (fullNameFromDependency != null) {
+            final Symbol symbol = new Symbol(null);
+            symbol.setFullName(fullNameFromDependency.getValue1(), fullNameFromDependency.getValue2());
+            return symbol;
+        } else {
+            return null;
         }
-        return false;
     }
 
     public static class NameConflictException extends RuntimeException {

@@ -6,7 +6,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.stream.Stream;
 
 
@@ -36,9 +37,8 @@ public class InfoJsonEmitter {
     }
 
     private InfoJson getInfoJson(TsModel tsModel) {
-        final InfoJson infoJson = new InfoJson();
-
-        infoJson.classes = Stream
+        final LinkedHashMap<String, InfoJson.ClassInfo> map = new LinkedHashMap<>();
+        Stream
                 .of(
                         tsModel.getBeans(),
                         tsModel.getEnums(),
@@ -52,7 +52,14 @@ public class InfoJsonEmitter {
                     typeMapping.typeName = declaration.name.getFullName();
                     return typeMapping;
                 })
-                .collect(Collectors.toList());
+                .forEach(info -> {
+                    // remove duplicates, append new items to the end
+                    map.remove(info.javaClass);
+                    map.put(info.javaClass, info);
+                });
+
+        final InfoJson infoJson = new InfoJson();
+        infoJson.classes = new ArrayList<>(map.values());
         return infoJson;
     }
 

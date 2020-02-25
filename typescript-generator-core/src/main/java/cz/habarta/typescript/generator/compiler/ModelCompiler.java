@@ -21,7 +21,6 @@ import cz.habarta.typescript.generator.emitter.TsBeanCategory;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsCallExpression;
 import cz.habarta.typescript.generator.emitter.TsConstructorModel;
-import cz.habarta.typescript.generator.emitter.TsDeclarationModel;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
 import cz.habarta.typescript.generator.emitter.TsExpression;
 import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
@@ -180,7 +179,6 @@ public class ModelCompiler {
 
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
         symbolTable.resolveSymbolNames();
-        tsModel = removeDeclarationsImportedFromDependencies(symbolTable, tsModel);
         tsModel = sortDeclarations(symbolTable, tsModel);
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.AfterDeclarationSorting, extensionTransformers);
         return tsModel;
@@ -1128,19 +1126,6 @@ public class ModelCompiler {
                 })
                 .collect(Collectors.toList())
         );
-    }
-
-    private static TsModel removeDeclarationsImportedFromDependencies(SymbolTable symbolTable, TsModel tsModel) {
-        return tsModel
-                .withBeans(filterOutImported(symbolTable, tsModel.getBeans()))
-                .withEnums(filterOutImported(symbolTable, tsModel.getEnums()))
-                .withTypeAliases(filterOutImported(symbolTable, tsModel.getTypeAliases()));
-    }
-
-    private static <T extends TsDeclarationModel> List<T> filterOutImported(SymbolTable symbolTable, List<T> declarations) {
-        return declarations.stream()
-                .filter(declaration -> !symbolTable.isImported(declaration.getName()))
-                .collect(Collectors.toList());
     }
 
     private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {

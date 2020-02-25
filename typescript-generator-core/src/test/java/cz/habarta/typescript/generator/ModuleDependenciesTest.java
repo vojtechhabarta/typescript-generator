@@ -1,9 +1,12 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,13 +28,13 @@ public class ModuleDependenciesTest {
         settings.npmVersion = "1.0.0";
         settings.generateInfoJson = true;
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(A1.class, A2.class, Enum1.class),
+                Input.from(A1.class, A2.class, Enum1.class, ABase.class),
                 Output.to(new File("target/test-module-dependencies/a/a.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/a/a.d.ts");
-        Assert.assertTrue(output.contains("interface A1"));
-        Assert.assertTrue(output.contains("namespace NS"));
-        Assert.assertTrue(output.contains("interface A2"));
-        Assert.assertTrue(output.contains("type Enum1"));
+        Assert.assertTrue(output.contains("interface A1 {"));
+        Assert.assertTrue(output.contains("namespace NS {"));
+        Assert.assertTrue(output.contains("interface A2 {"));
+        Assert.assertTrue(output.contains("type Enum1 ="));
     }
 
     private void generateModuleB() {
@@ -48,13 +51,19 @@ public class ModuleDependenciesTest {
                 Output.to(new File("target/test-module-dependencies/b/b.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/b/b.d.ts");
         Assert.assertTrue(output.contains("import * as a from \"../a\""));
-        Assert.assertTrue(output.contains("interface B1 extends a.A1"));
-        Assert.assertTrue(output.contains("objectA: a.A1"));
-        Assert.assertTrue(output.contains("enum1: a.Enum1"));
-        Assert.assertTrue(output.contains("interface B2 extends a.NS.A2"));
-        Assert.assertTrue(output.contains("objectA: a.NS.A2"));
-        Assert.assertTrue(output.contains("interface D1 extends C<a.A1>"));
-        Assert.assertTrue(output.contains("interface D2 extends C<a.NS.A2>"));
+        Assert.assertTrue(output.contains("interface B1 extends a.A1 {"));
+        Assert.assertTrue(output.contains("objectA: a.A1;"));
+        Assert.assertTrue(output.contains("enum1: a.Enum1;"));
+        Assert.assertTrue(output.contains("aBase: a.ABaseUnion<string>;"));
+        Assert.assertTrue(output.contains("aBases: a.ABaseUnion<string>[];"));
+        Assert.assertTrue(output.contains("interface B2 extends a.NS.A2 {"));
+        Assert.assertTrue(output.contains("objectA: a.NS.A2;"));
+        Assert.assertTrue(output.contains("interface D1 extends C<a.A1> {"));
+        Assert.assertTrue(output.contains("interface D2 extends C<a.NS.A2> {"));
+        Assert.assertTrue(!output.contains("interface A1 {"));
+        Assert.assertTrue(!output.contains("namespace NS {"));
+        Assert.assertTrue(!output.contains("interface A2 {"));
+        Assert.assertTrue(!output.contains("type Enum1 ="));
     }
 
     /// module "a"
@@ -71,12 +80,28 @@ public class ModuleDependenciesTest {
         c1, c2
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(name = "ADerived1", value = ADerived1.class),
+        @JsonSubTypes.Type(name = "ADerived2", value = ADerived2.class),
+    })
+    private static abstract class ABase<T> {
+    }
+
+    private static class ADerived1<T> extends ABase<T> {
+    }
+
+    private static class ADerived2<T> extends ABase<T> {
+    }
+
     /// module "b"
 
     private static class B1 extends A1 {
         public String b;
         public A1 objectA;
         public Enum1 enum1;
+        public ABase<String> aBase;
+        public List<ABase<String>> aBases;
     }
 
     private static class B2 extends A2 {
