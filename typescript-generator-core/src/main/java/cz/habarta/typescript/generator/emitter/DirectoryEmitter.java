@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.TsProperty;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TsType.BasicArrayType;
 import cz.habarta.typescript.generator.TsType.FunctionType;
+import cz.habarta.typescript.generator.TsType.GenericBasicType;
 import cz.habarta.typescript.generator.TsType.GenericReferenceType;
 import cz.habarta.typescript.generator.TsType.IndexedArrayType;
 import cz.habarta.typescript.generator.TsType.IntersectionType;
@@ -33,6 +34,10 @@ public class DirectoryEmitter extends Emitter {
 
     public DirectoryEmitter(Settings settings) {
         super(settings);
+    }
+
+    public Output getOutput() {
+        return output;
     }
 
     @Override
@@ -150,6 +155,7 @@ public class DirectoryEmitter extends Emitter {
         for (EmitterExtension emitterExtension : settings.extensions) {
             if (emitterExtension instanceof DirectoryEmitterExtension) {
                 DirectoryEmitterExtension directoryEmitter = (DirectoryEmitterExtension) emitterExtension;
+                directoryEmitter.setOutput(output);
 
                 final List<String> extensionLines = new ArrayList<>();
                 final EmitterExtension.Writer extensionWriter = line -> extensionLines.add(line);
@@ -190,12 +196,11 @@ public class DirectoryEmitter extends Emitter {
             collectType(list, ((OptionalType) type).type);
         } else if (type instanceof FunctionType) {
             collectType(list, ((FunctionType) type).type);
+        } else if (type instanceof GenericBasicType) {
+            collectTypes(list, ((GenericBasicType) type).typeArguments);
         } else if (type instanceof GenericReferenceType) {
             list.add(type);
-            List<TsType> typeArguments = ((GenericReferenceType) type).typeArguments;
-            for (TsType tsType : typeArguments) {
-                collectType(list, tsType);
-            }
+            collectTypes(list, ((GenericReferenceType) type).typeArguments);
         } else if (type instanceof UnionType) {
             List<TsType> types2 = ((UnionType) type).types;
             for (TsType tsType2 : types2) {
