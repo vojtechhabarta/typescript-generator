@@ -159,7 +159,12 @@ public abstract class ModelParser {
             return true;
         }
         if (settings.optionalProperties == null || settings.optionalProperties == OptionalProperties.useSpecifiedAnnotations) {
-            return Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.optionalAnnotations);
+            if (!settings.optionalAnnotations.isEmpty()) {
+                return Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.optionalAnnotations);
+            }
+            if (!settings.requiredAnnotations.isEmpty()) {
+                return !Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.requiredAnnotations);
+            }
         }
         return false;
     }

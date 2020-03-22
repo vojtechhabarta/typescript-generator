@@ -225,7 +225,7 @@ public class GenerateMojo extends AbstractMojo {
      * Specifies how properties are defined to be optional.
      * Supported values are:
      * <ul>
-     * <li><code>useSpecifiedAnnotations</code> - annotations specified using {@link #optionalAnnotations} parameter</li>
+     * <li><code>useSpecifiedAnnotations</code> - annotations specified using {@link #optionalAnnotations} or {@link #requiredAnnotations} parameter</li>
      * <li><code>useLibraryDefinition</code> - examples: <code>@JsonProperty(required = false)</code> when using <code>jackson2</code> library
      *   or <code>@XmlElement(required = false)</code> when using <code>jaxb</code> library</li>
      * <li><code>all</code> - all properties are optional</li>
@@ -625,10 +625,18 @@ public class GenerateMojo extends AbstractMojo {
      * The presence of any annotation in this list on a JSON property will cause
      * the typescript-generator to treat that property as optional when generating
      * the corresponding TypeScript interface.
-     * Example optional annotation: <code>javax.annotation.Nullable</code>
+     * Example optional annotation: <code>javax.annotation.Nullable</code>.
+     * This parameter is "opposite" of {@link #requiredAnnotations}, only one of them could be used.
      */
     @Parameter
     private List<String> optionalAnnotations;
+
+    /**
+     * Properties will be treated as optional except those annotated with any of specified annotations.
+     * This parameter is "opposite" of {@link #optionalAnnotations}, only one of them could be used.
+     */
+    @Parameter
+    private List<String> requiredAnnotations;
 
     /**
      * When any of specified annotations is used on a Java type typescript-generator treats this type as nullable.
@@ -836,6 +844,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
             settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
             settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+            settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
             settings.loadNullableAnnotations(classLoader, nullableAnnotations);
             settings.generateInfoJson = generateInfoJson;
             settings.generateNpmPackageJson = generateNpmPackageJson;

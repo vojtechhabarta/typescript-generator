@@ -110,6 +110,7 @@ public class Settings {
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> excludePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+    public List<Class<? extends Annotation>> requiredAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> nullableAnnotations = new ArrayList<>();
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
@@ -237,6 +238,10 @@ public class Settings {
         this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
     }
 
+    public void loadRequiredAnnotations(ClassLoader classLoader, List<String> requiredAnnotations) {
+        this.requiredAnnotations = loadClasses(classLoader, requiredAnnotations, Annotation.class);
+    }
+
     public void loadNullableAnnotations(ClassLoader classLoader, List<String> nullableAnnotations) {
         this.nullableAnnotations = loadClasses(classLoader, nullableAnnotations, Annotation.class);
     }
@@ -344,6 +349,9 @@ public class Settings {
                         "Suggestion: annotation '%s' supports 'TYPE_PARAMETER' or 'TYPE_USE' target. Consider using 'nullableAnnotations' parameter instead of 'optionalAnnotations'.",
                         annotation.getName()));
             }
+        }
+        if (!optionalAnnotations.isEmpty() && !requiredAnnotations.isEmpty()) {
+            throw new RuntimeException("Only one of 'optionalAnnotations' and 'requiredAnnotations' can be used at the same time.");
         }
         for (Class<? extends Annotation> annotation : nullableAnnotations) {
             final Target target = annotation.getAnnotation(Target.class);
