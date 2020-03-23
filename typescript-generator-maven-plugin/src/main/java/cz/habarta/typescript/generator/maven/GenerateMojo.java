@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.JsonbConfiguration;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.ModuleDependency;
 import cz.habarta.typescript.generator.NullabilityDefinition;
@@ -213,6 +214,15 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private Jackson2Configuration jackson2Configuration;
+
+    /**
+     * Specifies JSON-B global configuration.
+     * Description of individual parameters is in
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a>
+     * class on GitHub (latest version).
+     */
+    @Parameter
+    private JsonbConfiguration jsonbConfiguration;
 
     /**
      * <b>Deprecated</b>, use {@link #optionalProperties} parameter.
@@ -796,6 +806,7 @@ public class GenerateMojo extends AbstractMojo {
             settings.moduleDependencies = moduleDependencies;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
+            settings.jsonbConfiguration = jsonbConfiguration;
             settings.setJackson2Configuration(classLoader, jackson2Configuration);
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
