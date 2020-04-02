@@ -53,6 +53,7 @@ public class Settings {
     private LoadedModuleDependencies loadedModuleDependencies = null;
     public JsonLibrary jsonLibrary = null;
     public Jackson2ConfigurationResolved jackson2Configuration = null;
+    public JsonbConfiguration jsonbConfiguration = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations

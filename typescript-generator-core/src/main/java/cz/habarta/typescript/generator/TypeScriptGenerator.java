@@ -10,6 +10,7 @@ import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.parser.GsonParser;
 import cz.habarta.typescript.generator.parser.Jackson1Parser;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
+import cz.habarta.typescript.generator.parser.JsonbParser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.ModelParser;
 import cz.habarta.typescript.generator.parser.RestApplicationParser;
@@ -190,6 +191,8 @@ public class TypeScriptGenerator {
                 return new Jackson2Parser.JaxbParserFactory();
             case gson:
                 return new GsonParser.Factory();
+            case jsonb:
+                return new JsonbParser.Factory();
             default:
                 throw new RuntimeException();
         }

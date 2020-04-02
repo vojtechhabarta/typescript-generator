@@ -77,6 +77,11 @@
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jsonb_1.0_spec</artifactId>
+            <version>1.2</version>
+        </dependency>
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>

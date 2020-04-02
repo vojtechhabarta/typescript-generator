@@ -1,5 +1,5 @@
 package cz.habarta.typescript.generator;
 
 public enum JsonLibrary {
-    jackson1, jackson2, jaxb, gson
+    jackson1, jackson2, jaxb, gson, jsonb
 }
