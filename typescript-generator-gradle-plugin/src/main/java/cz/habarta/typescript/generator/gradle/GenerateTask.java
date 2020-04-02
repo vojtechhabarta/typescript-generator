@@ -134,13 +134,12 @@ public class GenerateTask extends DefaultTask {
         // class loader
         final Set<URL> urls = new LinkedHashSet<>();
         for (Task task : getProject().getTasks()) {
-            if (task.getName().startsWith("compile") && !task.getName().startsWith("compileTest")) {
+            if ("compileClasspath".equals(task.getName())) {
                 for (File file : task.getOutputs().getFiles()) {
                     urls.add(file.toURI().toURL());
                 }
             }
         }
-        urls.addAll(getFilesFromConfiguration("compile"));
         urls.addAll(getFilesFromConfiguration("compileClasspath"));
 
         try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
