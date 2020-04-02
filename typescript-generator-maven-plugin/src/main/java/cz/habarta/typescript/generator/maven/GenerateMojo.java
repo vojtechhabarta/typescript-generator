@@ -200,6 +200,7 @@ public class GenerateMojo extends AbstractMojo {
      * <li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
      * <li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package<li>
      * <li><code>gson</code> - annotations from `com.google.gson.annotations` package<li>
+     * <li><code>jsonb</code> - annotations from `javax.json.bind.annotation` package<li>
      * </ul>
      * Required parameter, recommended value is <code>jackson2</code>.
      */
@@ -806,8 +807,8 @@ public class GenerateMojo extends AbstractMojo {
             settings.moduleDependencies = moduleDependencies;
             settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
             settings.jsonLibrary = jsonLibrary;
-            settings.jsonbConfiguration = jsonbConfiguration;
             settings.setJackson2Configuration(classLoader, jackson2Configuration);
+            settings.jsonbConfiguration = jsonbConfiguration;
             settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
             settings.optionalProperties = optionalProperties;
             settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
