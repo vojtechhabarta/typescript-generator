@@ -442,7 +442,7 @@ public class JaxrsApplicationTest {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
-        settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
+        settings.javadocXmlFiles = Arrays.asList(new File("src/test/javadoc/test-javadoc.xml"));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         Assert.assertTrue(output.contains("Returns person with specified ID."));
     }

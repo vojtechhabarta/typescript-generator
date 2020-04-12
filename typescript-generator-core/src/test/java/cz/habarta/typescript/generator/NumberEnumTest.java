@@ -75,7 +75,7 @@ public class NumberEnumTest {
     @Test
     public void testJavadoc() {
         final Settings settings = TestUtils.settings();
-        settings.javadocXmlFiles = Arrays.asList(new File("target/test-javadoc.xml"));
+        settings.javadocXmlFiles = Arrays.asList(new File("src/test/javadoc/test-javadoc.xml"));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeCode.class));
         Assert.assertTrue(output.contains("Documentation for SomeCode enum."));
         Assert.assertTrue(output.contains("Documentation for VALUE0."));
