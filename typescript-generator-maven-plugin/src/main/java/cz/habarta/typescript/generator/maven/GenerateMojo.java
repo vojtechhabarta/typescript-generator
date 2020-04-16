@@ -22,11 +22,13 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.List;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -777,18 +779,57 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private String projectBuildDirectory;
 
+    /**
+     * Enables to exclude artifacts from being scanned.
+     * Format is groupId:artifactId and artifactId can end with
+     * a wildcard to filter all artifact starting with a prefix.
+     */
+    @Parameter
+    private List<String> excludedArtifacts;
+
+    /**
+     * Default will match compile scope (compile+system+provided) but you can
+     * customize the included scope in the scanning.
+     */
+    @Parameter
+    private List<String> includedScopes;
+
     @Override
     public void execute() {
         TypeScriptGenerator.setLogger(new Logger(loggingLevel));
         TypeScriptGenerator.printVersion();
 
         // class loader
-        final List<URL> urls = new ArrayList<>();
+        final List<URL> urls;
         try {
-            for (String element : project.getCompileClasspathElements()) {
-                urls.add(new File(element).toURI().toURL());
-            }
-        } catch (DependencyResolutionRequiredException | IOException e) {
+            urls = Stream.concat(
+                    Stream.of(new File(project.getBuild().getOutputDirectory()).toURI().toURL()),
+                    project.getArtifacts().stream()
+                            .filter(a -> a.getFile() != null && a.getArtifactHandler().isAddedToClasspath())
+                            .filter(a -> { // filter by scope, default being "compile"
+                                final String scope = a.getScope();
+                                if (includedScopes == null) {
+                                    return Artifact.SCOPE_COMPILE.equals(scope) ||
+                                            Artifact.SCOPE_PROVIDED.equals(scope) ||
+                                            Artifact.SCOPE_SYSTEM.equals(scope);
+                                }
+                                return includedScopes.stream().anyMatch(s -> s.equals(scope));
+                            })
+                            .filter(a -> { // filter artifacts
+                                return excludedArtifacts == null || excludedArtifacts.stream().noneMatch(exclude -> {
+                                    final String id = a.getGroupId() + ':' + a.getArtifactId();
+                                    return exclude.endsWith("*") ? id.startsWith(exclude.substring(0, exclude.length() - 1)) : exclude.equals(id);
+                                });
+                            })
+                            .map(a -> {
+                                try {
+                                    return a.getFile().toURI().toURL();
+                                } catch (final MalformedURLException e) {
+                                    throw new IllegalArgumentException(e);
+                                }
+                            }))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
