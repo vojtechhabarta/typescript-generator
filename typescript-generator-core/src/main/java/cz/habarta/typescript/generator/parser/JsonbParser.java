@@ -102,6 +102,9 @@ public class JsonbParser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
+        properties.stream()
+                .filter(p -> Class.class.isInstance(p.getType()) && Class.class.cast(p.getType()).isEnum())
+                .forEach(enumProp -> addBeanToQueue(new SourceType<>(Class.class.cast(enumProp.getType()))));
         return new BeanModel(
                 sourceClass.type, superclass, null, null, null,
                 interfaces, properties, null);
