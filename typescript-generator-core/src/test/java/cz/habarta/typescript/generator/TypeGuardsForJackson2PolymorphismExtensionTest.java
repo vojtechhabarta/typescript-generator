@@ -16,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("unused")
 public class TypeGuardsForJackson2PolymorphismExtensionTest {
 
     @Test

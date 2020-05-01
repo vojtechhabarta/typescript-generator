@@ -24,6 +24,7 @@ public class MapEntryTest {
 
     @JsonFormat(shape = JsonFormat.Shape.NATURAL)
     public static class Entry1<K, V> extends AbstractMap.SimpleEntry<K, V> {
+        private static final long serialVersionUID = 1L;
         public Entry1(K key, V value) {
             super(key, value);
         }
@@ -31,6 +32,7 @@ public class MapEntryTest {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public static class Entry2<K, V> extends AbstractMap.SimpleEntry<K, V> {
+        private static final long serialVersionUID = 1L;
         public Entry2(K key, V value) {
             super(key, value);
         }

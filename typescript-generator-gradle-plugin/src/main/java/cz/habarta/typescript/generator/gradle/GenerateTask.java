@@ -121,6 +121,87 @@ public class GenerateTask extends DefaultTask {
     @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
 
+    @SuppressWarnings("deprecation")
+    private Settings createSettings(URLClassLoader classLoader) {
+        final Settings settings = new Settings();
+        if (outputFileType != null) {
+            settings.outputFileType = outputFileType;
+        }
+        settings.outputKind = outputKind;
+        settings.module = module;
+        settings.namespace = namespace;
+        settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
+        settings.umdNamespace = umdNamespace;
+        settings.moduleDependencies = moduleDependencies;
+        settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
+        settings.jsonLibrary = jsonLibrary;
+        settings.setJackson2Configuration(classLoader, jackson2Configuration);
+        settings.jsonbConfiguration = jsonbConfiguration;
+        settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
+        settings.optionalProperties = optionalProperties;
+        settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
+        settings.nullabilityDefinition = nullabilityDefinition;
+        settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
+        settings.removeTypeNamePrefix = removeTypeNamePrefix;
+        settings.removeTypeNameSuffix = removeTypeNameSuffix;
+        settings.addTypeNamePrefix = addTypeNamePrefix;
+        settings.addTypeNameSuffix = addTypeNameSuffix;
+        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.customTypeNamingFunction = customTypeNamingFunction;
+        settings.referencedFiles = referencedFiles;
+        settings.importDeclarations = importDeclarations;
+        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
+        settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
+        settings.mapDate = mapDate;
+        settings.mapEnum = mapEnum;
+        settings.nonConstEnums = nonConstEnums;
+        settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
+        settings.mapClasses = mapClasses;
+        settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
+        settings.generateConstructors = generateConstructors;
+        settings.disableTaggedUnions = disableTaggedUnions;
+        settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
+        settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
+        settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
+        settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
+        settings.generateSpringApplicationClient = generateSpringApplicationClient;
+        settings.scanSpringApplication = scanSpringApplication;
+        settings.jaxrsNamespacing = jaxrsNamespacing;
+        settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
+        settings.restNamespacing = restNamespacing;
+        settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
+        settings.restResponseType = restResponseType;
+        settings.setRestOptionsType(restOptionsType);
+        settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
+        settings.sortDeclarations = sortDeclarations;
+        settings.sortTypeDeclarations = sortTypeDeclarations;
+        settings.noFileComment = noFileComment;
+        settings.noTslintDisable = noTslintDisable;
+        settings.noEslintDisable = noEslintDisable;
+        settings.tsNoCheck = tsNoCheck;
+        settings.javadocXmlFiles = javadocXmlFiles;
+        settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
+        settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
+        settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
+        settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
+        settings.loadNullableAnnotations(classLoader, nullableAnnotations);
+        settings.generateInfoJson = generateInfoJson;
+        settings.generateNpmPackageJson = generateNpmPackageJson;
+        settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
+        settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+        settings.npmBuildScript = npmBuildScript;
+        settings.setStringQuotes(stringQuotes);
+        settings.setIndentString(indentString);
+        settings.displaySerializerWarning = displaySerializerWarning;
+        settings.debug = debug;
+        settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
+        settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
+        settings.loadJackson2Modules(classLoader, jackson2Modules);
+        settings.classLoader = classLoader;
+        return settings;
+    }
+
     @TaskAction
     public void generate() throws Exception {
         if (outputKind == null) {
@@ -147,83 +228,7 @@ public class GenerateTask extends DefaultTask {
 
         try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
 
-            // Settings
-            final Settings settings = new Settings();
-            if (outputFileType != null) {
-                settings.outputFileType = outputFileType;
-            }
-            settings.outputKind = outputKind;
-            settings.module = module;
-            settings.namespace = namespace;
-            settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
-            settings.umdNamespace = umdNamespace;
-            settings.moduleDependencies = moduleDependencies;
-            settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
-            settings.jsonLibrary = jsonLibrary;
-            settings.setJackson2Configuration(classLoader, jackson2Configuration);
-            settings.jsonbConfiguration = jsonbConfiguration;
-            settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
-            settings.optionalProperties = optionalProperties;
-            settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
-            settings.nullabilityDefinition = nullabilityDefinition;
-            settings.declarePropertiesAsReadOnly = declarePropertiesAsReadOnly;
-            settings.removeTypeNamePrefix = removeTypeNamePrefix;
-            settings.removeTypeNameSuffix = removeTypeNameSuffix;
-            settings.addTypeNamePrefix = addTypeNamePrefix;
-            settings.addTypeNameSuffix = addTypeNameSuffix;
-            settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
-            settings.customTypeNamingFunction = customTypeNamingFunction;
-            settings.referencedFiles = referencedFiles;
-            settings.importDeclarations = importDeclarations;
-            settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
-            settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
-            settings.mapDate = mapDate;
-            settings.mapEnum = mapEnum;
-            settings.nonConstEnums = nonConstEnums;
-            settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
-            settings.mapClasses = mapClasses;
-            settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
-            settings.generateConstructors = generateConstructors;
-            settings.disableTaggedUnions = disableTaggedUnions;
-            settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
-            settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
-            settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
-            settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
-            settings.generateSpringApplicationClient = generateSpringApplicationClient;
-            settings.scanSpringApplication = scanSpringApplication;
-            settings.jaxrsNamespacing = jaxrsNamespacing;
-            settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
-            settings.restNamespacing = restNamespacing;
-            settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
-            settings.restResponseType = restResponseType;
-            settings.setRestOptionsType(restOptionsType);
-            settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
-            settings.sortDeclarations = sortDeclarations;
-            settings.sortTypeDeclarations = sortTypeDeclarations;
-            settings.noFileComment = noFileComment;
-            settings.noTslintDisable = noTslintDisable;
-            settings.noEslintDisable = noEslintDisable;
-            settings.tsNoCheck = tsNoCheck;
-            settings.javadocXmlFiles = javadocXmlFiles;
-            settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
-            settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
-            settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
-            settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
-            settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
-            settings.loadNullableAnnotations(classLoader, nullableAnnotations);
-            settings.generateInfoJson = generateInfoJson;
-            settings.generateNpmPackageJson = generateNpmPackageJson;
-            settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
-            settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
-            settings.npmBuildScript = npmBuildScript;
-            settings.setStringQuotes(stringQuotes);
-            settings.setIndentString(indentString);
-            settings.displaySerializerWarning = displaySerializerWarning;
-            settings.debug = debug;
-            settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
-            settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
-            settings.loadJackson2Modules(classLoader, jackson2Modules);
-            settings.classLoader = classLoader;
+            final Settings settings = createSettings(classLoader);
 
             final Input.Parameters parameters = new Input.Parameters();
             parameters.classNames = classes;

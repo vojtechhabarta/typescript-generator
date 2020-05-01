@@ -21,7 +21,7 @@ public class AxiosClientExtensionTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = RestNamespacing.perResource;
+        settings.restNamespacing = RestNamespacing.perResource;
         settings.extensions.add(new AxiosClientExtension());
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;

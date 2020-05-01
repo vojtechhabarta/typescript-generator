@@ -67,7 +67,6 @@ public class TsModel {
         return enums;
     }
 
-    @SuppressWarnings("unchecked")
     public List<TsEnumModel> getEnums(EnumKind enumKind) {
         final List<TsEnumModel> result = new ArrayList<>();
         for (TsEnumModel enumModel : enums) {

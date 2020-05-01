@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("unused")
 public class NullabilityTest {
 
     @Test
@@ -49,7 +50,7 @@ public class NullabilityTest {
         public @Nullable Boolean isNullableFlag;
         public Boolean isNonNullableFlag;
 
-        public <B extends T> @Nullable B getData() {
+        public <D extends T> @Nullable D getData() {
             return null;
         }
 

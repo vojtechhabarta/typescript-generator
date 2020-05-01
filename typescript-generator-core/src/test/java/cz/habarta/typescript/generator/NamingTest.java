@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("unused")
 public class NamingTest {
 
     @Test(expected = SymbolTable.NameConflictException.class)

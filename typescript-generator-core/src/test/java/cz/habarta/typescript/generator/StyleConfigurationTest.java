@@ -7,6 +7,7 @@ import org.junit.Test;
 public class StyleConfigurationTest {
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testOutputWithCustomStyle() {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final Settings settings = TestUtils.settings();

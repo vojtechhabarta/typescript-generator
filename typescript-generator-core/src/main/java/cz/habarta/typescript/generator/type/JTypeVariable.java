@@ -73,7 +73,7 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
 
     @Override
     public Annotation[] getDeclaredAnnotations() {
-        return getAnnotations();
+        return declaredAnnotations;
     }
 
     @Override

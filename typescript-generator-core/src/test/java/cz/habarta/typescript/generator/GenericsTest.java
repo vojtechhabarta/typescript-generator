@@ -18,10 +18,11 @@ public class GenericsTest {
     @Test
     public void testAdvancedGenerics() throws Exception {
         final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
         settings.addTypeNamePrefix = "I";
 
         final StringWriter stringWriter = new StringWriter();
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(stringWriter), true, 0);
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class), Output.to(stringWriter));
         final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
@@ -42,10 +43,11 @@ public class GenericsTest {
     @Test
     public void testWildcardGeneric() {
         final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
         settings.addTypeNamePrefix = "I";
 
         final StringWriter stringWriter = new StringWriter();
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(C.class), Output.to(stringWriter), true, 0);
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(C.class), Output.to(stringWriter));
         final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
@@ -58,10 +60,11 @@ public class GenericsTest {
     @Test
     public void testNonGenericExtends() {
         final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
         settings.sortDeclarations = true;
 
         final StringWriter stringWriter = new StringWriter();
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(E.class), Output.to(stringWriter), true, 0);
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(E.class), Output.to(stringWriter));
         final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
@@ -81,11 +84,12 @@ public class GenericsTest {
     @Test
     public void testImplements() {
         final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.module;
         settings.sortDeclarations = true;
         settings.setExcludeFilter(Arrays.asList(Comparable.class.getName()), null);
 
         final StringWriter stringWriter = new StringWriter();
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(IA.class), Output.to(stringWriter), true, 0);
+        new TypeScriptGenerator(settings).generateTypeScript(Input.from(IA.class), Output.to(stringWriter));
         final String actual = stringWriter.toString().trim();
         final String nl = settings.newline;
         final String expected =
@@ -211,6 +215,7 @@ public class GenericsTest {
     }
 
     public static class MyId implements Serializable {
+        private static final long serialVersionUID = 1L;
     }
 
     public interface IdView<T extends Serializable> {

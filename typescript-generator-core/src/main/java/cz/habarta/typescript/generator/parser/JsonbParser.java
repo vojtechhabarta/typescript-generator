@@ -21,14 +21,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -165,7 +163,7 @@ public class JsonbParser extends ModelParser {
 
         private Member findMember(final DecoratedType value) {
             if (FieldAndMethodAccessMode.CompositeDecoratedType.class.isInstance(value)) { // unwrap to use the right reader
-                final FieldAndMethodAccessMode.CompositeDecoratedType decoratedType = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(value);
+                final FieldAndMethodAccessMode.CompositeDecoratedType<?> decoratedType = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(value);
                 return findMember(DecoratedType.class.cast(decoratedType.getType1()));
             } else if (JsonbParser.FieldAccessMode.FieldDecoratedType.class.isInstance(value)){
                 return JsonbParser.FieldAccessMode.FieldDecoratedType.class.cast(value).getField();
@@ -192,7 +190,7 @@ public class JsonbParser extends ModelParser {
             if (!FieldAndMethodAccessMode.CompositeDecoratedType.class.isInstance(dt)) {
                 return isTransient(dt) || shouldSkip(visibility, dt);
             }
-            final FieldAndMethodAccessMode.CompositeDecoratedType cdt = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(dt);
+            final FieldAndMethodAccessMode.CompositeDecoratedType<?> cdt = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(dt);
             return isTransient(cdt.getType1()) || isTransient(cdt.getType2()) ||
                     (shouldSkip(visibility, cdt.getType1()) && shouldSkip(visibility, cdt.getType2()));
         }
@@ -277,9 +275,7 @@ public class JsonbParser extends ModelParser {
 
             public FieldDecoratedType(final Field field, final Type type) {
                 this.field = field;
-                if (!field.isAccessible()) {
-                    this.field.setAccessible(true);
-                }
+                this.field.setAccessible(true);
                 this.type = type;
             }
 
@@ -372,9 +368,7 @@ public class JsonbParser extends ModelParser {
 
             public MethodDecoratedType(final Method method, final Type type) {
                 this.method = method;
-                if (!method.isAccessible()) {
-                    method.setAccessible(true);
-                }
+                method.setAccessible(true);
                 this.type = type;
             }
 
@@ -442,30 +436,17 @@ public class JsonbParser extends ModelParser {
                 final JsonbParser.DecoratedType existing = readers.get(entry.getKey());
                 if (existing == null) {
                     if (f != null) { // useful to hold the Field and transient state for example, just as fallback
-                        readers.put(entry.getKey(), new CompositeDecoratedType(
+                        readers.put(entry.getKey(), new CompositeDecoratedType<>(
                                 entry.getValue(), new FieldAccessMode.FieldDecoratedType(f, f.getType())));
                     } else {
                         readers.put(entry.getKey(), entry.getValue());
                     }
                 } else {
-                    readers.put(entry.getKey(), new CompositeDecoratedType(entry.getValue(), existing));
+                    readers.put(entry.getKey(), new CompositeDecoratedType<>(entry.getValue(), existing));
                 }
             }
 
             return readers;
-        }
-
-        private Method getMethod(final String methodName, final Class<?> type, final Class<?>... args) {
-            try {
-                return type.getDeclaredMethod(methodName, args);
-            } catch (final NoSuchMethodException e) {
-                try { // retry but just for public methods
-                    return type.getMethod(methodName, args);
-                } catch (final NoSuchMethodException e2) {
-                    // no-op
-                }
-                return null;
-            }
         }
 
         private Field getField(final String fieldName, final Class<?> type) {
@@ -491,14 +472,14 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <T extends Annotation> T getClassOrPackageAnnotation(final Class<T> clazz) {
-                final T found = type1.getClassOrPackageAnnotation(clazz);
+            public <A extends Annotation> A getClassOrPackageAnnotation(final Class<A> clazz) {
+                final A found = type1.getClassOrPackageAnnotation(clazz);
                 return found == null ? type2.getClassOrPackageAnnotation(clazz) : found;
             }
 
             @Override
-            public <T extends Annotation> T getAnnotation(final Class<T> clazz) {
-                final T found = type1.getAnnotation(clazz);
+            public <A extends Annotation> A getAnnotation(final Class<A> clazz) {
+                final A found = type1.getAnnotation(clazz);
                 return found == null ? type2.getAnnotation(clazz) : found;
             }
 
@@ -555,8 +536,8 @@ public class JsonbParser extends ModelParser {
             JsonbVisibility visibility = type.getAnnotation(JsonbVisibility.class);
             if (visibility != null) {
                 try {
-                    return visibility.value().newInstance();
-                } catch (final InstantiationException | IllegalAccessException e) {
+                    return visibility.value().getConstructor().newInstance();
+                } catch (final ReflectiveOperationException e) {
                     throw new IllegalArgumentException(e);
                 }
             }
@@ -565,8 +546,8 @@ public class JsonbParser extends ModelParser {
                 visibility = p.getAnnotation(JsonbVisibility.class);
                 if (visibility != null) {
                     try {
-                        return visibility.value().newInstance();
-                    } catch (final InstantiationException | IllegalAccessException e) {
+                        return visibility.value().getConstructor().newInstance();
+                    } catch (final ReflectiveOperationException e) {
                         throw new IllegalArgumentException(e);
                     }
                 }
@@ -764,34 +745,6 @@ public class JsonbParser extends ModelParser {
             return null;
         }
 
-        public static <T extends Annotation> T getAnnotation(final Class<?> clazz, final Class<T> api) {
-            Class<?> current = clazz;
-            final Set<Class<?>> visited = new HashSet<>();
-            while (current != null && current != Object.class) {
-                if (!visited.add(current)) {
-                    return null;
-                }
-                final T annotation = current.getAnnotation(api);
-                if (annotation != null) {
-                    return annotation;
-                }
-                final T meta = findMeta(clazz.getAnnotations(), api);
-                if (meta != null) {
-                    return meta;
-                }
-                current = current.getSuperclass();
-            }
-            return null;
-        }
-
-        public static <T extends Annotation> T getAnnotation(final Package pck, final Class<T> api) {
-            final T annotation = pck.getAnnotation(api);
-            if (annotation != null) {
-                return annotation;
-            }
-            return findMeta(pck.getAnnotations(), api);
-        }
-
         public static <T extends Annotation> T findMeta(final Annotation[] annotations, final Class<T> api) {
             for (final Annotation a : annotations) {
                 final Class<? extends Annotation> userType = a.annotationType();
@@ -813,6 +766,7 @@ public class JsonbParser extends ModelParser {
             return null;
         }
 
+        @SuppressWarnings("unchecked")
         private static <T extends Annotation> T newAnnotation(final Map<String, Method> methodMapping, final Annotation user, final T johnzon) {
             return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{johnzon.annotationType()},
                     (proxy, method, args) -> {

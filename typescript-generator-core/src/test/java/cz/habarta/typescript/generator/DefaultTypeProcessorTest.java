@@ -10,6 +10,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class DefaultTypeProcessorTest {
 
     @Test

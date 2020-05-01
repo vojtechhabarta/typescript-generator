@@ -5,6 +5,7 @@ import org.junit.Test
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 
+@Suppress("UNUSED_PARAMETER")
 class KotlinTest {
 
     @Test

@@ -192,7 +192,7 @@ public class OptionalAnnotationTest {
             final Settings settings = TestUtils.settings();
             settings.optionalAnnotations = Arrays.asList(MarkerAnnotation.class);
             settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
-            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
+            new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
             Assert.fail();
         } catch (Exception e) {
             // expected - optionalAnnotations and requiredAnnotations cannot be used together

@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("unused")
 public class ObjectAsIdTest {
 
     @Test
@@ -104,6 +105,7 @@ public class ObjectAsIdTest {
     }
 
     @SafeVarargs
+    @SuppressWarnings("varargs")
     private static <V> Map<String, V> generateMap(V... values) {
         final AtomicInteger index = new AtomicInteger();
         return Stream.of(values).collect(Collectors.toMap(

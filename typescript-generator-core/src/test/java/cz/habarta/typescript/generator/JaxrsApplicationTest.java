@@ -59,6 +59,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("unused")
 public class JaxrsApplicationTest {
 
     @Test
@@ -411,7 +412,7 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = RestNamespacing.perResource;
+        settings.restNamespacing = RestNamespacing.perResource;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         Assert.assertTrue(errorMessage, !output.contains("class OrganizationApplicationClient"));
@@ -426,8 +427,8 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         settings.generateJaxrsApplicationClient = true;
-        settings.jaxrsNamespacing = RestNamespacing.byAnnotation;
-        settings.jaxrsNamespacingAnnotation = Api.class;
+        settings.restNamespacing = RestNamespacing.byAnnotation;
+        settings.restNamespacingAnnotation = Api.class;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         Assert.assertTrue(errorMessage, output.contains("class OrgApiClient implements OrgApi "));
