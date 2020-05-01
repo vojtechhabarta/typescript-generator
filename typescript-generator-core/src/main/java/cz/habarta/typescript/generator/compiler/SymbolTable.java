@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.compiler;
 
+import com.oracle.truffle.js.scriptengine.GraalJSScriptEngine;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Pair;
@@ -14,11 +15,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
 
 
 /**
@@ -149,7 +148,7 @@ public class SymbolTable {
                 }
 
                 final Object getNameResult = function.getName(cls.getName(), cls.getSimpleName());
-                if (getNameResult != null && !isUndefined(getNameResult)) {
+                if (getNameResult instanceof String) {
                     return (String) getNameResult;
                 }
             } catch (ScriptException e) {
@@ -205,26 +204,9 @@ public class SymbolTable {
         return Keywords.contains(word);
     }
 
-    private static boolean isUndefined(Object variable) {
-        return ScriptObjectMirror.isUndefined(variable);
-    }
-
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
         if (customTypeNamingFunction == null) {
-            final String engineMimeType = "application/javascript";
-            final ScriptEngineManager manager = new ScriptEngineManager();
-
-            // getting ScriptEngine from manager doesn't work in Maven plugin on Java 9
-//            final ScriptEngine engine = manager.getEngineByMimeType(engineMimeType);
-            final ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
-
-            if (engine == null) {
-                TypeScriptGenerator.getLogger().error(String.format("Script engine for '%s' MIME type not found. Available engines: %s", engineMimeType, manager.getEngineFactories().size()));
-                for (ScriptEngineFactory factory : manager.getEngineFactories()) {
-                    TypeScriptGenerator.getLogger().info(String.format("  %s %s - MIME types: %s", factory.getEngineName(), factory.getEngineVersion(), factory.getMimeTypes()));
-                }
-                throw new RuntimeException("Cannot evaluate function specified using 'customTypeNamingFunction' parameter. See log for details.");
-            }
+            final ScriptEngine engine = GraalJSScriptEngine.create(null, Context.newBuilder("js").allowHostAccess(HostAccess.ALL));
             engine.eval("var getName = " + settings.customTypeNamingFunction);
             final Invocable invocable = (Invocable) engine;
             customTypeNamingFunction = invocable.getInterface(CustomTypeNamingFunction.class);

@@ -18,6 +18,7 @@
         <jackson1.version>1.9.13</jackson1.version>
         <jackson2.version>2.10.3</jackson2.version>
         <jersey.version>2.27</jersey.version>
+        <graalvm.version>20.0.0</graalvm.version>
     </properties>
 
     <dependencies>
@@ -81,6 +82,17 @@
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>${graalvm.version}</version>
         </dependency>
         <!--test dependencies-->
         <dependency>
