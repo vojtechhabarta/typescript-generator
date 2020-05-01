@@ -90,13 +90,13 @@
                             <goal>compile</goal>
                         </goals>
                     </execution> -->
-                    <execution>
+                    <!-- <execution>
                         <id>test-compile</id>
                         <phase>test-compile</phase>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
-                    </execution>
+                    </execution> -->
                 </executions>
                 <configuration>
                     <jvmTarget>${java.version}</jvmTarget>
