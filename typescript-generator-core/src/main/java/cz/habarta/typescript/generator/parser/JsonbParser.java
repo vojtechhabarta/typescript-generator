@@ -41,17 +41,8 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 
 // simplified+dependency free version of apache johnzon JsonbAccessMode
 public class JsonbParser extends ModelParser {
-    private static final Class<? extends Annotation> JOHNZON_ANY;
-    static {
-        Class<? extends Annotation> johnzonAny = null;
-        try {
-            johnzonAny = (Class<? extends Annotation>) Thread.currentThread().getContextClassLoader()
-                    .loadClass("org.apache.johnzon.mapper.JohnzonAny");
-        } catch (ClassNotFoundException e) {
-            // no-op
-        }
-        JOHNZON_ANY = johnzonAny;
-    }
+
+    private final Class<? extends Annotation> johnzonAny;
 
     public static class Factory extends ModelParser.Factory {
 
@@ -75,6 +66,17 @@ public class JsonbParser extends ModelParser {
     public JsonbParser(Settings settings, TypeProcessor commonTypeProcessor,
                        List<RestApplicationParser> restApplicationParsers) {
         super(settings, commonTypeProcessor, restApplicationParsers);
+        johnzonAny = loadJohnzonAnyClass();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Annotation> loadJohnzonAnyClass() {
+        try {
+            return (Class<? extends Annotation>) settings.classLoader
+                    .loadClass("org.apache.johnzon.mapper.JohnzonAny");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
@@ -110,19 +112,24 @@ public class JsonbParser extends ModelParser {
 
     private JsonbPropertyExtractor createExtractor() {
         return new JsonbPropertyExtractor(
+                johnzonAny,
                 new PropertyNamingStrategyFactory(Optional.ofNullable(settings.jsonbConfiguration).map(c -> c.namingStrategy).orElse("IDENTITY")).create(),
-                new DefaultPropertyVisibilityStrategy(),
-                new FieldAndMethodAccessMode());
+                new DefaultPropertyVisibilityStrategy(settings.classLoader),
+                new FieldAndMethodAccessMode(johnzonAny));
     }
 
     private static class JsonbPropertyExtractor {
+        private final Class<? extends Annotation> johnzonAny;
         private final PropertyNamingStrategy naming;
         private final PropertyVisibilityStrategy visibility;
         private final BaseAccessMode delegate;
 
-        public JsonbPropertyExtractor(final PropertyNamingStrategy propertyNamingStrategy,
-                                      final PropertyVisibilityStrategy visibilityStrategy,
-                                      final BaseAccessMode delegate) {
+        public JsonbPropertyExtractor(
+                final Class<? extends Annotation> johnzonAny,
+                final PropertyNamingStrategy propertyNamingStrategy,
+                final PropertyVisibilityStrategy visibilityStrategy,
+                final BaseAccessMode delegate) {
+            this.johnzonAny = johnzonAny;
             this.naming = propertyNamingStrategy;
             this.visibility = visibilityStrategy;
             this.delegate = delegate;
@@ -131,7 +138,7 @@ public class JsonbParser extends ModelParser {
         public List<PropertyModel> visit(final Class<?> clazz) {
             return delegate.find(clazz).entrySet().stream()
                     .filter(e -> !isTransient(e.getValue(), visibility))
-                    .filter(e -> JOHNZON_ANY == null || e.getValue().getAnnotation(JOHNZON_ANY) == null)
+                    .filter(e -> johnzonAny == null || e.getValue().getAnnotation(johnzonAny) == null)
                     .map(e -> {
                         final Type type;
                         final Type readerType = e.getValue().getType();
@@ -230,12 +237,18 @@ public class JsonbParser extends ModelParser {
     }
 
     private static class FieldAccessMode implements BaseAccessMode {
+        private final Class<? extends Annotation> johnzonAny;
+
+        public FieldAccessMode(final Class<? extends Annotation> johnzonAny) {
+            this.johnzonAny = johnzonAny;
+        }
+
         @Override
         public Map<String, JsonbParser.DecoratedType> find(final Class<?> clazz) {
             final Map<String, JsonbParser.DecoratedType> readers = new HashMap<>();
             for (final Map.Entry<String, Field> f : fields(clazz, true).entrySet()) {
                 final String key = f.getKey();
-                if (isIgnored(key) || (JOHNZON_ANY != null && Meta.getAnnotation(f.getValue(), JOHNZON_ANY) != null)) {
+                if (isIgnored(key) || (johnzonAny != null && Meta.getAnnotation(f.getValue(), johnzonAny) != null)) {
                     continue;
                 }
 
@@ -313,6 +326,12 @@ public class JsonbParser extends ModelParser {
     }
 
     private static class MethodAccessMode implements BaseAccessMode {
+        private final Class<? extends Annotation> johnzonAny;
+
+        public MethodAccessMode(final Class<? extends Annotation> johnzonAny) {
+            this.johnzonAny = johnzonAny;
+        }
+
         @Override
         public Map<String, DecoratedType> find(final Class<?> clazz) {
             final Map<String, DecoratedType> readers = new HashMap<>();
@@ -320,7 +339,7 @@ public class JsonbParser extends ModelParser {
                 readers.putAll(Stream.of(clazz.getMethods())
                         .filter(it -> it.getDeclaringClass() != Object.class && it.getParameterCount() == 0)
                         .filter(it -> !"toString".equals(it.getName()) && !"hashCode".equals(it.getName()))
-                        .filter(it -> !isIgnored(it.getName()) && JOHNZON_ANY != null && Meta.getAnnotation(it, JOHNZON_ANY) == null)
+                        .filter(it -> !isIgnored(it.getName()) && johnzonAny != null && Meta.getAnnotation(it, johnzonAny) == null)
                         .collect(Collectors.toMap(Method::getName, it -> new MethodDecoratedType(it, it.getGenericReturnType()) {
                         })));
             } else {
@@ -329,7 +348,7 @@ public class JsonbParser extends ModelParser {
                     final Method readMethod = descriptor.getReadMethod();
                     final String name = descriptor.getName();
                     if (readMethod != null && readMethod.getDeclaringClass() != Object.class) {
-                        if (isIgnored(name) || JOHNZON_ANY != null && Meta.getAnnotation(readMethod, JOHNZON_ANY) != null) {
+                        if (isIgnored(name) || johnzonAny != null && Meta.getAnnotation(readMethod, johnzonAny) != null) {
                             continue;
                         }
                         readers.put(name, new MethodDecoratedType(readMethod, readMethod.getGenericReturnType()));
@@ -409,9 +428,9 @@ public class JsonbParser extends ModelParser {
         private final FieldAccessMode fields;
         private final MethodAccessMode methods;
 
-        private FieldAndMethodAccessMode() {
-            this.fields = new FieldAccessMode();
-            this.methods = new MethodAccessMode();
+        private FieldAndMethodAccessMode(final Class<? extends Annotation> johnzonAny) {
+            this.fields = new FieldAccessMode(johnzonAny);
+            this.methods = new MethodAccessMode(johnzonAny);
         }
 
         @Override
@@ -512,8 +531,13 @@ public class JsonbParser extends ModelParser {
     }
 
 
-    private static class DefaultPropertyVisibilityStrategy implements javax.json.bind.config.PropertyVisibilityStrategy {
+    private static class DefaultPropertyVisibilityStrategy implements PropertyVisibilityStrategy {
+        private final ClassLoader classLoader;
         private final ConcurrentMap<Class<?>, PropertyVisibilityStrategy> strategies = new ConcurrentHashMap<>();
+
+        public DefaultPropertyVisibilityStrategy(ClassLoader classLoader) {
+            this.classLoader = classLoader;
+        }
 
         @Override
         public boolean isVisible(final Field field) {
@@ -560,8 +584,7 @@ public class JsonbParser extends ModelParser {
                 p = Package.getPackage(parentPack);
                 if (p == null) {
                     try {
-                        p = Optional.ofNullable(type.getClassLoader()).orElseGet(ClassLoader::getSystemClassLoader)
-                                .loadClass(parentPack + ".package-info").getPackage();
+                        p = classLoader.loadClass(parentPack + ".package-info").getPackage();
                     } catch (final ClassNotFoundException e) {
                         // no-op
                     }
