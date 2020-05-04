@@ -21,21 +21,25 @@
             <groupId>org.gradle</groupId>
             <artifactId>gradle-core</artifactId>
             <version>${gradle.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-base-services</artifactId>
             <version>${gradle.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-base-services-groovy</artifactId>
             <version>${gradle.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-logging</artifactId>
             <version>${gradle.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
