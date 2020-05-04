@@ -1,9 +1,9 @@
 
 package cz.habarta.typescript.generator.ext;
 
+import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.emitter.Emitter;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
@@ -13,8 +13,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+public class AxiosClientExtension extends Extension {
 
-public class AxiosClientExtension extends EmitterExtension {
+    public static final String CFG_AXIOS_VERSION = "axiosVersion";
+
+    private String axiosVersion = "0.19.2";
+
+    @Override
+    public void setConfiguration(Map<String, String> configuration) throws RuntimeException {
+        if (configuration.containsKey(CFG_AXIOS_VERSION)) {
+            this.axiosVersion = configuration.get(CFG_AXIOS_VERSION);
+        }
+    }
 
     @Override
     public EmitterExtensionFeatures getFeatures() {
@@ -25,7 +35,7 @@ public class AxiosClientExtension extends EmitterExtension {
         features.generatesJaxrsApplicationClient = true;
         features.restResponseType = "Promise<Axios.GenericAxiosResponse<R>>";
         features.restOptionsType = "<O>";
-        features.npmPackageDependencies = Collections.singletonMap("axios", "0.19.0");
+        features.npmPackageDependencies = Collections.singletonMap("axios", axiosVersion);
         return features;
     }
 
