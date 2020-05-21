@@ -791,8 +791,9 @@ public class ModelCompiler {
     }
 
     private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {
+        final String parameterName = parameter.getName();
         final TsType parameterType = typeFromJava(symbolTable, parameter.getType(), method.getName(), method.getOriginClass());
-        return new TsParameterModel(parameter.getName(), parameterType);
+        return new TsParameterModel(parameterName, parameterType);
     }
 
     private static TsTemplateLiteral processPathTemplate(PathTemplate pathTemplate) {
@@ -1197,7 +1198,9 @@ public class ModelCompiler {
     }
 
     public static String getValidIdentifierName(String name) {
-        return removeInvalidIdentifierCharacters(replaceDashPattern(name));
+        final String identifier = removeInvalidIdentifierCharacters(replaceDashPattern(name));
+        final String prefix = SymbolTable.isReservedWord(identifier) ? "_" : "";
+        return prefix + identifier;
     }
 
     private static String replaceDashPattern(String name) {

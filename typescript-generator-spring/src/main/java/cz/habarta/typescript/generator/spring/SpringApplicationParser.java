@@ -118,7 +118,7 @@ public class SpringApplicationParser extends RestApplicationParser {
             TypeScriptGenerator.getLogger().verbose("Parsing Spring RestController: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
             final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(cls, RequestMapping.class);
-            final String path = requestMapping != null && requestMapping.path() != null ? requestMapping.path()[0] : null;
+            final String path = requestMapping != null && requestMapping.path() != null && requestMapping.path().length != 0 ? requestMapping.path()[0] : null;
             final JaxrsApplicationParser.ResourceContext context = new JaxrsApplicationParser.ResourceContext(cls, path);
             parseController(result, context, cls);
             return result;

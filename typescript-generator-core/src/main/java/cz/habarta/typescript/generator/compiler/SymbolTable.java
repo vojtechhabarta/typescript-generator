@@ -200,7 +200,7 @@ public class SymbolTable {
         "yield"
     ));
 
-    private static boolean isReservedWord(String word) {
+    public static boolean isReservedWord(String word) {
         return Keywords.contains(word);
     }
 

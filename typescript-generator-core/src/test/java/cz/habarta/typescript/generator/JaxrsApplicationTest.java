@@ -603,6 +603,28 @@ public class JaxrsApplicationTest {
         }
     }
 
+    @Test
+    public void testPathParameterWithReservedWord() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationInterface = true;
+        settings.generateJaxrsApplicationClient = true;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ResourceWithReservedWord.class));
+        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>;"));
+        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]> {"));
+        Assert.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
+    }
+
+    @Path("")
+    public static class ResourceWithReservedWord {
+
+        @GET
+        @Path("/logs/{class}")
+        public Collection<String> getLogs(@PathParam("class") String clazz) {
+            return null;
+        }
+    }
+
 //    http://localhost:9998/bean-param?id=1&name=vh&description=desc&message=hello
 
     @Path("bean-param")

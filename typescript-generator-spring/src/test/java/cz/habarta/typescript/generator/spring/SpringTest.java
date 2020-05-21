@@ -9,6 +9,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
@@ -79,6 +80,25 @@ public class SpringTest {
         Assert.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
         Assert.assertTrue(output.contains("uriEncoding`owners2/${ownerId}/pets2/${petId}`"));
         Assert.assertTrue(output.contains("interface Pet"));
+    }
+
+    @Test
+    public void testPathParameterWithReservedWord() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithReservedWord.class));
+        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>"));
+        Assert.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
+    }
+
+    @RestController
+    @RequestMapping
+    public static class ControllerWithReservedWord {
+        @GetMapping(value = "/logs/{class}")
+        public Collection<String> getLogs(@PathVariable("class") String clazz) {
+            return null;
+        }
     }
 
     @Test
