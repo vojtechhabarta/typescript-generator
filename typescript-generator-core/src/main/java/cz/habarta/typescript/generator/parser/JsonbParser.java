@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.util.PropertyMember;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -118,13 +119,13 @@ public class JsonbParser extends ModelParser {
                 new FieldAndMethodAccessMode(johnzonAny));
     }
 
-    private static class JsonbPropertyExtractor {
+    private class JsonbPropertyExtractor {
         private final Class<? extends Annotation> johnzonAny;
         private final PropertyNamingStrategy naming;
         private final PropertyVisibilityStrategy visibility;
         private final BaseAccessMode delegate;
 
-        public JsonbPropertyExtractor(
+        private JsonbPropertyExtractor(
                 final Class<? extends Annotation> johnzonAny,
                 final PropertyNamingStrategy propertyNamingStrategy,
                 final PropertyVisibilityStrategy visibilityStrategy,
@@ -135,13 +136,14 @@ public class JsonbParser extends ModelParser {
             this.delegate = delegate;
         }
 
-        public List<PropertyModel> visit(final Class<?> clazz) {
+        private List<PropertyModel> visit(final Class<?> clazz) {
             return delegate.find(clazz).entrySet().stream()
                     .filter(e -> !isTransient(e.getValue(), visibility))
                     .filter(e -> johnzonAny == null || e.getValue().getAnnotation(johnzonAny) == null)
                     .map(e -> {
                         final Type type;
-                        final Type readerType = e.getValue().getType();
+                        final DecoratedType decoratedType = e.getValue();
+                        final Type readerType = decoratedType.getType();
                         if (isOptional(readerType)) {
                             type = ParameterizedType.class.cast(readerType).getActualTypeArguments()[0];
                         } else if (OptionalInt.class == readerType) {
@@ -157,21 +159,34 @@ public class JsonbParser extends ModelParser {
                             type = readerType;
                         }
 
-                        final JsonbProperty property = e.getValue().getAnnotation(JsonbProperty.class);
-                        // final JsonbNillable nillable = e.getValue().getClassOrPackageAnnotation(JsonbNillable.class);
+                        final Member member = findMember(decoratedType);
+                        final PropertyMember propertyMember = wrapMember(
+                                settings.getTypeParser(), member, decoratedType::getAnnotation, member.getName(), member.getDeclaringClass());
+
+                        final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
                         return new PropertyModel(
-                                key, type, false /* nillable == null || nillable.value() */,
-                                findMember(e.getValue()), null, null, null);
+                                key, type, JsonbParser.this.isPropertyOptional(propertyMember) || !isFinal(decoratedType),
+                                member, null, null, null);
                     })
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
         }
 
+        private boolean isFinal(final DecoratedType value) {
+            final Member member = findMember(value);
+            return Field.class.isInstance(member) && Modifier.isFinal(member.getModifiers());
+        }
+
         private Member findMember(final DecoratedType value) {
             if (FieldAndMethodAccessMode.CompositeDecoratedType.class.isInstance(value)) { // unwrap to use the right reader
                 final FieldAndMethodAccessMode.CompositeDecoratedType<?> decoratedType = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(value);
-                return findMember(DecoratedType.class.cast(decoratedType.getType1()));
+                final DecoratedType type1 = decoratedType.getType1();
+                final DecoratedType type2 = decoratedType.getType2();
+                if (FieldAccessMode.FieldDecoratedType.class.isInstance(type1)) {
+                    return findMember(type1);
+                }
+                return findMember(type2);
             } else if (JsonbParser.FieldAccessMode.FieldDecoratedType.class.isInstance(value)){
                 return JsonbParser.FieldAccessMode.FieldDecoratedType.class.cast(value).getField();
             } else if (MethodAccessMode.MethodDecoratedType.class.isInstance(value)){
@@ -229,7 +244,6 @@ public class JsonbParser extends ModelParser {
         Type getType();
         <T extends Annotation> T getAnnotation(Class<T> clazz);
         <T extends Annotation> T getClassOrPackageAnnotation(Class<T> clazz);
-        boolean isNillable(boolean globalConfig);
     }
 
     private interface BaseAccessMode  {
@@ -309,11 +323,6 @@ public class JsonbParser extends ModelParser {
             @Override
             public <T extends Annotation> T getAnnotation(final Class<T> clazz) {
                 return Meta.getAnnotation(field, clazz);
-            }
-
-            @Override
-            public boolean isNillable(final boolean global) {
-                return global;
             }
 
             @Override
@@ -411,11 +420,6 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public boolean isNillable(final boolean global) {
-                return global;
-            }
-
-            @Override
             public String toString() {
                 return "MethodDecoratedType{" +
                         "method=" + method +
@@ -505,11 +509,6 @@ public class JsonbParser extends ModelParser {
             @Override
             public Type getType() {
                 return type1.getType();
-            }
-
-            @Override
-            public boolean isNillable(final boolean global) {
-                return type1.isNillable(global) || type2.isNillable(global);
             }
 
             public DecoratedType getType1() {
