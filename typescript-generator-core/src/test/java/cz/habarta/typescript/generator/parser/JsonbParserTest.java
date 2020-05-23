@@ -83,6 +83,19 @@ public class JsonbParserTest {
         }
     }
 
+    public static class NillableConstructorParameter {
+        private final int foo;
+
+        @JsonbCreator // we agree it is a stupid case but generator must respect user choice
+        public NillableConstructorParameter(@JsonbProperty(value = "foo", nillable = true) final int foo) {
+            this.foo = foo;
+        }
+
+        public int getFoo() {
+            return foo;
+        }
+    }
+
     public static class ObjecWithRequiredProperty {
         @RequiredAnnotation
         public String foo;
@@ -139,6 +152,10 @@ public class JsonbParserTest {
         }
         {
             final String output = generate(settings, RequiredOptional.class);
+            Assert.assertTrue(output, output.contains(" foo?: number"));
+        }
+        {
+            final String output = generate(settings, NillableConstructorParameter.class);
             Assert.assertTrue(output, output.contains(" foo?: number"));
         }
     }

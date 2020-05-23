@@ -158,14 +158,16 @@ public class JsonbParser extends ModelParser {
             return Stream.of(constructor.getParameters())
                     .map(it -> {
                         final Type type = it.getParameterizedType();
+                        final Optional<JsonbProperty> property = Optional.ofNullable(it.getAnnotation(JsonbProperty.class));
                         return new PropertyModel(
-                                Optional.ofNullable(it.getAnnotation(JsonbProperty.class))
+                                property
                                     .map(JsonbProperty::value)
                                     .filter(p -> !p.isEmpty())
                                     .orElseGet(it::getName),
                                 type,
                                 isOptional(type) || OptionalInt.class == type ||
-                                        OptionalLong.class == type || OptionalDouble.class == type,
+                                        OptionalLong.class == type || OptionalDouble.class == type ||
+                                        property.map(JsonbProperty::nillable).orElse(false),
                                 new ParameterMember(it),
                                 null, null, null);
                     });
