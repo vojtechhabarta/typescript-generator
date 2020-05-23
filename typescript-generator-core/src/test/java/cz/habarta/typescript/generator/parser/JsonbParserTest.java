@@ -2,9 +2,14 @@ package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.OptionalInt;
+import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,6 +23,7 @@ public class JsonbParserTest {
     public void before() {
         settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.jsonb;
+        settings.optionalProperties = OptionalProperties.useLibraryDefinition;
     }
 
     private static class OverridenPropertyName {
@@ -49,21 +55,51 @@ public class JsonbParserTest {
     public static class Required {
         public final int foo;
 
-        public Required(int foo) {
+        @JsonbCreator
+        public Required(final int foo) {
             this.foo = foo;
+        }
+    }
+
+    public static class RequiredOptional {
+        public final int foo;
+
+        @JsonbCreator
+        public RequiredOptional(final OptionalInt foo) {
+            this.foo = foo.orElse(1);
         }
     }
 
     public static class RequiredWithGetter {
         private final int foo;
 
-        public RequiredWithGetter(int foo) {
+        @JsonbCreator
+        public RequiredWithGetter(final int foo) {
             this.foo = foo;
         }
 
         public int getFoo() {
             return foo;
         }
+    }
+
+    public static class ObjecWithRequiredProperty {
+        @RequiredAnnotation
+        public String foo;
+        public String bar;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RequiredAnnotation {
+    }
+
+    @Test
+    public void testRequiredPropertyMarkedByAnnotation() {
+        settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
+        settings.requiredAnnotations.add(RequiredAnnotation.class);
+        final String output = generate(settings, ObjecWithRequiredProperty.class);
+        Assert.assertTrue(output, output.contains(" foo:"));
+        Assert.assertTrue(output, output.contains(" bar?:"));
     }
 
     @Test
@@ -100,6 +136,10 @@ public class JsonbParserTest {
         {
             final String output = generate(settings, RequiredWithGetter.class);
             Assert.assertTrue(output, output.contains(" foo: number"));
+        }
+        {
+            final String output = generate(settings, RequiredOptional.class);
+            Assert.assertTrue(output, output.contains(" foo?: number"));
         }
     }
 

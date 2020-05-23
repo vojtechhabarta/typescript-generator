@@ -1,6 +1,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.util.PropertyMember;
@@ -9,15 +10,18 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +38,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import javax.json.bind.annotation.JsonbVisibility;
@@ -137,6 +142,36 @@ public class JsonbParser extends ModelParser {
         }
 
         private List<PropertyModel> visit(final Class<?> clazz) {
+            return Stream.of(clazz.getConstructors())
+                    .filter(it -> it.isAnnotationPresent(JsonbCreator.class))
+                    .findFirst()
+                    .map(it -> new ArrayList<>(Stream.concat(visitConstructor(it), visitClass(clazz).stream())
+                            .collect(Collectors.toMap(PropertyModel::getName, Function.identity(), (a, b) -> a)) // merge models
+                            .values()))
+                    .orElseGet(() -> new ArrayList<>(visitClass(clazz)));
+        }
+
+        private Stream<PropertyModel> visitConstructor(final Constructor<?> constructor) {
+            // JSON-B 1.0 assumes all constructor params are required even if impls can diverge on that due
+            // to user feedbacks so for our libraryDefinition let's assume it is true.
+            // only exception is about optional wrappers which can be optional indeed
+            return Stream.of(constructor.getParameters())
+                    .map(it -> {
+                        final Type type = it.getParameterizedType();
+                        return new PropertyModel(
+                                Optional.ofNullable(it.getAnnotation(JsonbProperty.class))
+                                    .map(JsonbProperty::value)
+                                    .filter(p -> !p.isEmpty())
+                                    .orElseGet(it::getName),
+                                type,
+                                isOptional(type) || OptionalInt.class == type ||
+                                        OptionalLong.class == type || OptionalDouble.class == type,
+                                new ParameterMember(it),
+                                null, null, null);
+                    });
+        }
+
+        private List<PropertyModel> visitClass(final Class<?> clazz) {
             return delegate.find(clazz).entrySet().stream()
                     .filter(e -> !isTransient(e.getValue(), visibility))
                     .filter(e -> johnzonAny == null || e.getValue().getAnnotation(johnzonAny) == null)
@@ -166,16 +201,13 @@ public class JsonbParser extends ModelParser {
                         final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
                         return new PropertyModel(
-                                key, type, JsonbParser.this.isPropertyOptional(propertyMember) || !isFinal(decoratedType),
+                                key, type,
+                                settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
+                                        JsonbParser.this.isPropertyOptional(propertyMember),
                                 member, null, null, null);
                     })
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
-        }
-
-        private boolean isFinal(final DecoratedType value) {
-            final Member member = findMember(value);
-            return Field.class.isInstance(member) && Modifier.isFinal(member.getModifiers());
         }
 
         private Member findMember(final DecoratedType value) {
@@ -802,6 +834,50 @@ public class JsonbParser extends ModelParser {
                             throw ite.getTargetException();
                         }
                     });
+        }
+    }
+
+    private static class ParameterMember implements Member, AnnotatedElement {
+        private final Parameter parameter;
+
+        public ParameterMember(final Parameter parameter) {
+            this.parameter = parameter;
+        }
+
+        @Override
+        public Class<?> getDeclaringClass() {
+            return parameter.getDeclaringExecutable().getDeclaringClass();
+        }
+
+        @Override
+        public String getName() {
+            return parameter.getName();
+        }
+
+        @Override
+        public int getModifiers() {
+            return parameter.getModifiers();
+        }
+
+        @Override
+        public boolean isSynthetic() {
+            return parameter.isSynthetic();
+        }
+
+
+        @Override
+        public <T extends Annotation> T getAnnotation(final Class<T> type) {
+            return parameter.getAnnotation(type);
+        }
+
+        @Override
+        public Annotation[] getAnnotations() {
+            return parameter.getAnnotations();
+        }
+
+        @Override
+        public Annotation[] getDeclaredAnnotations() {
+            return parameter.getDeclaredAnnotations();
         }
     }
 }
