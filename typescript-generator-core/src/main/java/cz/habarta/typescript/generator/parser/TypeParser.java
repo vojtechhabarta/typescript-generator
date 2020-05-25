@@ -11,6 +11,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -52,7 +54,8 @@ public class TypeParser {
         public Type getFieldType(Field field);
         public Type getMethodReturnType(Method method);
         public List<Type> getMethodParameterTypes(Method method);
-    }
+        public List<Type> getConstructorParameterTypes(Constructor<?> constructor);
+        }
 
     private LanguageTypeParser getTypeParser(Class<?> declaringClass) {
         final boolean isKotlinClass = KotlinTypeParser.isKotlinClass(declaringClass);
@@ -69,6 +72,10 @@ public class TypeParser {
 
     public List<Type> getMethodParameterTypes(Method method) {
         return getTypeParser(method.getDeclaringClass()).getMethodParameterTypes(method);
+    }
+
+    public List<Type> getConstructorParameterTypes(Constructor<?> constructor) {
+        return getTypeParser(constructor.getDeclaringClass()).getConstructorParameterTypes(constructor);
     }
 
     //
@@ -95,7 +102,16 @@ public class TypeParser {
 
         @Override
         public List<Type> getMethodParameterTypes(Method method) {
-            return Arrays.stream(method.getAnnotatedParameterTypes())
+            return getExecutableParameterTypes(method);
+        }
+
+        @Override
+        public List<Type> getConstructorParameterTypes(Constructor<?> constructor) {
+            return getExecutableParameterTypes(constructor);
+        }
+
+        private List<Type> getExecutableParameterTypes(Executable executable) {
+            return Arrays.stream(executable.getAnnotatedParameterTypes())
                     .map(annotatedType -> getType(annotatedType))
                     .collect(Collectors.toList());
         }
@@ -185,6 +201,16 @@ public class TypeParser {
         @Override
         public List<Type> getMethodParameterTypes(Method method) {
             final KFunction<?> kFunction = ReflectJvmMapping.getKotlinFunction(method);
+            return getKFunctionParameterTypes(method, kFunction);
+        }
+
+        @Override
+        public List<Type> getConstructorParameterTypes(Constructor<?> constructor) {
+            final KFunction<?> kFunction = ReflectJvmMapping.getKotlinFunction(constructor);
+            return getKFunctionParameterTypes(constructor, kFunction);
+        }
+
+        private List<Type> getKFunctionParameterTypes(Executable executable, KFunction<?> kFunction) {
             if (kFunction != null) {
                 final List<KParameter> kParameters = kFunction.getParameters().stream()
                         .filter(kParameter -> kParameter.getKind() == KParameter.Kind.VALUE)
@@ -196,7 +222,7 @@ public class TypeParser {
                         new LinkedHashMap<>()
                 );
             }
-            return javaTypeParser.getMethodParameterTypes(method);
+            return javaTypeParser.getExecutableParameterTypes(executable);
         }
 
         private Type getType(KType kType, Map<String, JTypeVariable<?>> typeParameters) {
