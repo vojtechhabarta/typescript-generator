@@ -1,22 +1,30 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.type.JGenericArrayType;
+import cz.habarta.typescript.generator.util.Pair;
+import cz.habarta.typescript.generator.util.PropertyMember;
+import cz.habarta.typescript.generator.util.Utils;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +41,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import javax.json.bind.annotation.JsonbVisibility;
@@ -118,13 +127,13 @@ public class JsonbParser extends ModelParser {
                 new FieldAndMethodAccessMode(johnzonAny));
     }
 
-    private static class JsonbPropertyExtractor {
+    private class JsonbPropertyExtractor {
         private final Class<? extends Annotation> johnzonAny;
         private final PropertyNamingStrategy naming;
         private final PropertyVisibilityStrategy visibility;
         private final BaseAccessMode delegate;
 
-        public JsonbPropertyExtractor(
+        private JsonbPropertyExtractor(
                 final Class<? extends Annotation> johnzonAny,
                 final PropertyNamingStrategy propertyNamingStrategy,
                 final PropertyVisibilityStrategy visibilityStrategy,
@@ -135,13 +144,54 @@ public class JsonbParser extends ModelParser {
             this.delegate = delegate;
         }
 
-        public List<PropertyModel> visit(final Class<?> clazz) {
+        private List<PropertyModel> visit(final Class<?> clazz) {
+            return Stream.of(clazz.getConstructors())
+                    .filter(it -> it.isAnnotationPresent(JsonbCreator.class))
+                    .findFirst()
+                    .map(it -> new ArrayList<>(Stream.concat(visitConstructor(it), visitClass(clazz).stream())
+                            .collect(Collectors.toMap(PropertyModel::getName, Function.identity(), (a, b) -> a)) // merge models
+                            .values()))
+                    .orElseGet(() -> new ArrayList<>(visitClass(clazz)));
+        }
+
+        private Stream<PropertyModel> visitConstructor(final Constructor<?> constructor) {
+            // JSON-B 1.0 assumes all constructor params are required even if impls can diverge on that due
+            // to user feedbacks so for our libraryDefinition let's assume it is true.
+            // only exception is about optional wrappers which can be optional indeed
+            final List<Type> parameterTypes = settings.getTypeParser().getConstructorParameterTypes(constructor);
+            final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(constructor.getParameters()), parameterTypes);
+            return parameters.stream()
+                    .map(it -> {
+                        final Type type = it.getValue2();
+                        final Parameter parameter = it.getValue1();
+                        final Optional<JsonbProperty> property = Optional.ofNullable(
+                                parameter.getAnnotation(JsonbProperty.class));
+                        final PropertyMember propertyMember = new PropertyMember(
+                                parameter, it.getValue2(), parameter.getAnnotatedType(), parameter::getAnnotation);
+                        return new PropertyModel(
+                                property
+                                    .map(JsonbProperty::value)
+                                    .filter(p -> !p.isEmpty())
+                                    .orElseGet(parameter::getName),
+                                type,
+                                settings.optionalProperties != OptionalProperties.useLibraryDefinition ?
+                                        isPropertyOptional(propertyMember) :
+                                        (isOptional(type) || OptionalInt.class == type ||
+                                        OptionalLong.class == type || OptionalDouble.class == type ||
+                                        property.map(JsonbProperty::nillable).orElse(false)),
+                                new ParameterMember(parameter),
+                                null, null, null);
+                    });
+        }
+
+        private List<PropertyModel> visitClass(final Class<?> clazz) {
             return delegate.find(clazz).entrySet().stream()
                     .filter(e -> !isTransient(e.getValue(), visibility))
                     .filter(e -> johnzonAny == null || e.getValue().getAnnotation(johnzonAny) == null)
                     .map(e -> {
                         final Type type;
-                        final Type readerType = e.getValue().getType();
+                        final DecoratedType decoratedType = e.getValue();
+                        final Type readerType = decoratedType.getType();
                         if (isOptional(readerType)) {
                             type = ParameterizedType.class.cast(readerType).getActualTypeArguments()[0];
                         } else if (OptionalInt.class == readerType) {
@@ -152,17 +202,22 @@ public class JsonbParser extends ModelParser {
                             type = Double.class;
                         } else if (isOptionalArray(readerType)) {
                             final Type optionalUnwrappedType = findOptionalType(GenericArrayType.class.cast(readerType).getGenericComponentType());
-                            type = new GenericArrayTypeImpl(optionalUnwrappedType);
+                            type = new JGenericArrayType(optionalUnwrappedType);
                         } else {
                             type = readerType;
                         }
 
-                        final JsonbProperty property = e.getValue().getAnnotation(JsonbProperty.class);
-                        // final JsonbNillable nillable = e.getValue().getClassOrPackageAnnotation(JsonbNillable.class);
+                        final Member member = findMember(decoratedType);
+                        final PropertyMember propertyMember = wrapMember(
+                                settings.getTypeParser(), member, decoratedType::getAnnotation, member.getName(), member.getDeclaringClass());
+
+                        final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
                         return new PropertyModel(
-                                key, type, false /* nillable == null || nillable.value() */,
-                                findMember(e.getValue()), null, null, null);
+                                key, type,
+                                settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
+                                        JsonbParser.this.isPropertyOptional(propertyMember),
+                                member, null, null, null);
                     })
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
@@ -171,7 +226,12 @@ public class JsonbParser extends ModelParser {
         private Member findMember(final DecoratedType value) {
             if (FieldAndMethodAccessMode.CompositeDecoratedType.class.isInstance(value)) { // unwrap to use the right reader
                 final FieldAndMethodAccessMode.CompositeDecoratedType<?> decoratedType = FieldAndMethodAccessMode.CompositeDecoratedType.class.cast(value);
-                return findMember(DecoratedType.class.cast(decoratedType.getType1()));
+                final DecoratedType type1 = decoratedType.getType1();
+                final DecoratedType type2 = decoratedType.getType2();
+                if (FieldAccessMode.FieldDecoratedType.class.isInstance(type1)) {
+                    return findMember(type1);
+                }
+                return findMember(type2);
             } else if (JsonbParser.FieldAccessMode.FieldDecoratedType.class.isInstance(value)){
                 return JsonbParser.FieldAccessMode.FieldDecoratedType.class.cast(value).getField();
             } else if (MethodAccessMode.MethodDecoratedType.class.isInstance(value)){
@@ -229,7 +289,6 @@ public class JsonbParser extends ModelParser {
         Type getType();
         <T extends Annotation> T getAnnotation(Class<T> clazz);
         <T extends Annotation> T getClassOrPackageAnnotation(Class<T> clazz);
-        boolean isNillable(boolean globalConfig);
     }
 
     private interface BaseAccessMode  {
@@ -309,11 +368,6 @@ public class JsonbParser extends ModelParser {
             @Override
             public <T extends Annotation> T getAnnotation(final Class<T> clazz) {
                 return Meta.getAnnotation(field, clazz);
-            }
-
-            @Override
-            public boolean isNillable(final boolean global) {
-                return global;
             }
 
             @Override
@@ -411,11 +465,6 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public boolean isNillable(final boolean global) {
-                return global;
-            }
-
-            @Override
             public String toString() {
                 return "MethodDecoratedType{" +
                         "method=" + method +
@@ -505,11 +554,6 @@ public class JsonbParser extends ModelParser {
             @Override
             public Type getType() {
                 return type1.getType();
-            }
-
-            @Override
-            public boolean isNillable(final boolean global) {
-                return type1.isNillable(global) || type2.isNillable(global);
             }
 
             public DecoratedType getType1() {
@@ -670,39 +714,6 @@ public class JsonbParser extends ModelParser {
         }
     }
 
-    private static class GenericArrayTypeImpl implements GenericArrayType {
-        private final Type componentType;
-
-        public GenericArrayTypeImpl(final Type componentType) {
-            this.componentType = componentType;
-        }
-
-        @Override
-        public Type getGenericComponentType() {
-            return componentType;
-        }
-
-        @Override
-        public int hashCode() {
-            return componentType.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            } else if (obj instanceof GenericArrayType) {
-                return ((GenericArrayType) obj).getGenericComponentType().equals(componentType);
-            }
-            return false;
-
-        }
-
-        public String toString() {
-            return componentType + "[]";
-        }
-    }
-
     private static class Records {
         private static final Method IS_RECORD;
 
@@ -803,6 +814,50 @@ public class JsonbParser extends ModelParser {
                             throw ite.getTargetException();
                         }
                     });
+        }
+    }
+
+    private static class ParameterMember implements Member, AnnotatedElement {
+        private final Parameter parameter;
+
+        public ParameterMember(final Parameter parameter) {
+            this.parameter = parameter;
+        }
+
+        @Override
+        public Class<?> getDeclaringClass() {
+            return parameter.getDeclaringExecutable().getDeclaringClass();
+        }
+
+        @Override
+        public String getName() {
+            return parameter.getName();
+        }
+
+        @Override
+        public int getModifiers() {
+            return parameter.getModifiers();
+        }
+
+        @Override
+        public boolean isSynthetic() {
+            return parameter.isSynthetic();
+        }
+
+
+        @Override
+        public <T extends Annotation> T getAnnotation(final Class<T> type) {
+            return parameter.getAnnotation(type);
+        }
+
+        @Override
+        public Annotation[] getAnnotations() {
+            return parameter.getAnnotations();
+        }
+
+        @Override
+        public Annotation[] getDeclaredAnnotations() {
+            return parameter.getDeclaredAnnotations();
         }
     }
 }
