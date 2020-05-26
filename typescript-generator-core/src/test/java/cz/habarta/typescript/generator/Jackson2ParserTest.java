@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
@@ -69,6 +72,7 @@ public class Jackson2ParserTest {
         final BeanModel bean2 = model.getBean(SubTypeDiscriminatedByName2.class);
         final BeanModel bean3 = model.getBean(SubTypeDiscriminatedByName3.class);
         final BeanModel bean4 = model.getBean(SubTypeDiscriminatedByName4.class);
+        final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
         Assert.assertEquals(4, bean0.getTaggedUnionClasses().size());
         Assert.assertNull(bean1.getTaggedUnionClasses());
         Assert.assertNull(bean2.getTaggedUnionClasses());
@@ -80,8 +84,18 @@ public class Jackson2ParserTest {
         Assert.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName4", bean4.getDiscriminantLiteral());
     }
 
+    @Test
+    public void testRegisteredSubtypeName() {
+        final Jackson2Parser jacksonParser = getJackson2Parser();
+        final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName5.class);
+        final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
+        Assert.assertEquals("NamedByModule", bean5.getDiscriminantLiteral());
+    }
+
     static Jackson2Parser getJackson2Parser() {
         final Settings settings = new Settings();
+        settings.jackson2Modules.add(NamedSubtypeModule.class);
+
         return new Jackson2Parser(settings, new DefaultTypeProcessor());
     }
 
@@ -116,6 +130,12 @@ public class Jackson2ParserTest {
     private static class SubTypeDiscriminatedByName3 implements ParentWithNameDiscriminant {
     }
     private static class SubTypeDiscriminatedByName4 implements ParentWithNameDiscriminant {
+    }
+
+    /**
+     * Custom name registered with registerSubtypes
+     */
+    static class SubTypeDiscriminatedByName5 implements ParentWithNameDiscriminant {
     }
 
     public static void main(String[] args) throws JsonProcessingException {
@@ -324,4 +344,13 @@ public class Jackson2ParserTest {
         Empty
     }
 
+    public static class NamedSubtypeModule extends SimpleModule {
+
+        @Override
+        public void setupModule(SetupContext context) {
+            registerSubtypes(new NamedType(SubTypeDiscriminatedByName5.class, "NamedByModule"));
+            super.setupModule(context);
+        }
+    }
 }
+
