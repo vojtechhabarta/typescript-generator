@@ -4,7 +4,6 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
-import cz.habarta.typescript.generator.type.JGenericArrayType;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
@@ -189,24 +188,7 @@ public class JsonbParser extends ModelParser {
                     .filter(e -> !isTransient(e.getValue(), visibility))
                     .filter(e -> johnzonAny == null || e.getValue().getAnnotation(johnzonAny) == null)
                     .map(e -> {
-                        final Type type;
                         final DecoratedType decoratedType = e.getValue();
-                        final Type readerType = decoratedType.getType();
-                        if (isOptional(readerType)) {
-                            type = ParameterizedType.class.cast(readerType).getActualTypeArguments()[0];
-                        } else if (OptionalInt.class == readerType) {
-                            type = Integer.class;
-                        } else if (OptionalLong.class == readerType) {
-                            type = Long.class;
-                        } else if (OptionalDouble.class == readerType) {
-                            type = Double.class;
-                        } else if (isOptionalArray(readerType)) {
-                            final Type optionalUnwrappedType = findOptionalType(GenericArrayType.class.cast(readerType).getGenericComponentType());
-                            type = new JGenericArrayType(optionalUnwrappedType);
-                        } else {
-                            type = readerType;
-                        }
-
                         final Member member = findMember(decoratedType);
                         final PropertyMember propertyMember = wrapMember(
                                 settings.getTypeParser(), member, decoratedType::getAnnotation, member.getName(), member.getDeclaringClass());
@@ -214,7 +196,10 @@ public class JsonbParser extends ModelParser {
                         final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
                         return new PropertyModel(
-                                key, type,
+                                key,
+                                Field.class.isInstance(member) ?
+                                    settings.getTypeParser().getFieldType(Field.class.cast(member)) :
+                                    settings.getTypeParser().getMethodReturnType(Method.class.cast(member)),
                                 settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
                                         JsonbParser.this.isPropertyOptional(propertyMember),
                                 member, null, null, null);
