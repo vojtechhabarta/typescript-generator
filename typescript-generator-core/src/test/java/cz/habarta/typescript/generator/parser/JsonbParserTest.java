@@ -102,6 +102,14 @@ public class JsonbParserTest {
         public String bar;
     }
 
+    public static class ObjectWithRequiredPropertyAndConstructor {
+        public String foo;
+        public String bar;
+
+        @JsonbCreator
+        public ObjectWithRequiredPropertyAndConstructor(@RequiredAnnotation final String foo, final String bar) {}
+    }
+
     @Retention(RetentionPolicy.RUNTIME)
     public @interface RequiredAnnotation {
     }
@@ -111,6 +119,15 @@ public class JsonbParserTest {
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.requiredAnnotations.add(RequiredAnnotation.class);
         final String output = generate(settings, ObjecWithRequiredProperty.class);
+        Assert.assertTrue(output, output.contains(" foo:"));
+        Assert.assertTrue(output, output.contains(" bar?:"));
+    }
+
+    @Test
+    public void testRequiredPropertyMarkedByAnnotationAndConstructorFactory() {
+        settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
+        settings.requiredAnnotations.add(RequiredAnnotation.class);
+        final String output = generate(settings, ObjectWithRequiredPropertyAndConstructor.class);
         Assert.assertTrue(output, output.contains(" foo:"));
         Assert.assertTrue(output, output.contains(" bar?:"));
     }

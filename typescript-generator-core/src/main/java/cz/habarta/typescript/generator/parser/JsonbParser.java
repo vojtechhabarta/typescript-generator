@@ -4,7 +4,10 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.type.JGenericArrayType;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
+import cz.habarta.typescript.generator.util.Utils;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -155,20 +158,28 @@ public class JsonbParser extends ModelParser {
             // JSON-B 1.0 assumes all constructor params are required even if impls can diverge on that due
             // to user feedbacks so for our libraryDefinition let's assume it is true.
             // only exception is about optional wrappers which can be optional indeed
-            return Stream.of(constructor.getParameters())
+            final List<Type> parameterTypes = settings.getTypeParser().getConstructorParameterTypes(constructor);
+            final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(constructor.getParameters()), parameterTypes);
+            return parameters.stream()
                     .map(it -> {
-                        final Type type = it.getParameterizedType();
-                        final Optional<JsonbProperty> property = Optional.ofNullable(it.getAnnotation(JsonbProperty.class));
+                        final Type type = it.getValue2();
+                        final Parameter parameter = it.getValue1();
+                        final Optional<JsonbProperty> property = Optional.ofNullable(
+                                parameter.getAnnotation(JsonbProperty.class));
+                        final PropertyMember propertyMember = new PropertyMember(
+                                parameter, it.getValue2(), parameter.getAnnotatedType(), parameter::getAnnotation);
                         return new PropertyModel(
                                 property
                                     .map(JsonbProperty::value)
                                     .filter(p -> !p.isEmpty())
-                                    .orElseGet(it::getName),
+                                    .orElseGet(parameter::getName),
                                 type,
-                                isOptional(type) || OptionalInt.class == type ||
+                                settings.optionalProperties != OptionalProperties.useLibraryDefinition ?
+                                        isPropertyOptional(propertyMember) :
+                                        (isOptional(type) || OptionalInt.class == type ||
                                         OptionalLong.class == type || OptionalDouble.class == type ||
-                                        property.map(JsonbProperty::nillable).orElse(false),
-                                new ParameterMember(it),
+                                        property.map(JsonbProperty::nillable).orElse(false)),
+                                new ParameterMember(parameter),
                                 null, null, null);
                     });
         }
@@ -191,7 +202,7 @@ public class JsonbParser extends ModelParser {
                             type = Double.class;
                         } else if (isOptionalArray(readerType)) {
                             final Type optionalUnwrappedType = findOptionalType(GenericArrayType.class.cast(readerType).getGenericComponentType());
-                            type = new GenericArrayTypeImpl(optionalUnwrappedType);
+                            type = new JGenericArrayType(optionalUnwrappedType);
                         } else {
                             type = readerType;
                         }
@@ -700,39 +711,6 @@ public class JsonbParser extends ModelParser {
                 }
                 return global.toString();
             }
-        }
-    }
-
-    private static class GenericArrayTypeImpl implements GenericArrayType {
-        private final Type componentType;
-
-        public GenericArrayTypeImpl(final Type componentType) {
-            this.componentType = componentType;
-        }
-
-        @Override
-        public Type getGenericComponentType() {
-            return componentType;
-        }
-
-        @Override
-        public int hashCode() {
-            return componentType.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            } else if (obj instanceof GenericArrayType) {
-                return ((GenericArrayType) obj).getGenericComponentType().equals(componentType);
-            }
-            return false;
-
-        }
-
-        public String toString() {
-            return componentType + "[]";
         }
     }
 
