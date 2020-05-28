@@ -8,9 +8,11 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 import java.util.OptionalInt;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +114,47 @@ public class JsonbParserTest {
 
     @Retention(RetentionPolicy.RUNTIME)
     public @interface RequiredAnnotation {
+    }
+
+    public static class ListOfNullableElementsField {
+        public List<@Nullable String> foos;
+    }
+
+    public static class ListOfNullableElementsGetter {
+        public List<@Nullable String> getFoos() {
+            return null;
+        }
+    }
+
+    public static class ListOfNullableElementsConstructor {
+        private List<String> foos;
+
+        @JsonbCreator
+        public ListOfNullableElementsConstructor(List<@Nullable String> foos) {
+            this.foos = foos;
+        }
+    }
+
+    @Test
+    public void testNullabilityField() {
+        settings.nullableAnnotations.add(Nullable.class);
+        final String output = generate(settings, ListOfNullableElementsField.class);
+        Assert.assertTrue(output, output.contains(" foos?: (string | null)[];"));
+    }
+
+    @Test
+    public void testNullabilityGetter() {
+        settings.nullableAnnotations.add(Nullable.class);
+        final String output = generate(settings, ListOfNullableElementsGetter.class);
+        Assert.assertTrue(output, output.contains(" foos?: (string | null)[];"));
+    }
+
+    @Test
+    public void testNullabilityConstructor() {
+        settings.nullableAnnotations.add(Nullable.class);
+        final String output = generate(settings, ListOfNullableElementsConstructor.class);
+        System.out.println(output);
+        Assert.assertTrue(output, output.contains(" foos: (string | null)[];"));
     }
 
     @Test
