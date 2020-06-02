@@ -110,9 +110,6 @@ public class JsonbParser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        properties.stream()
-                .filter(p -> Class.class.isInstance(p.getType()))
-                .forEach(p -> addBeanToQueue(new SourceType<>(Class.class.cast(p.getType()))));
         return new BeanModel(
                 sourceClass.type, superclass, null, null, null,
                 interfaces, properties, null);
@@ -167,19 +164,19 @@ public class JsonbParser extends ModelParser {
                                 parameter.getAnnotation(JsonbProperty.class));
                         final PropertyMember propertyMember = new PropertyMember(
                                 parameter, it.getValue2(), parameter.getAnnotatedType(), parameter::getAnnotation);
-                        return new PropertyModel(
+                        return JsonbParser.this.processTypeAndCreateProperty(
                                 property
                                     .map(JsonbProperty::value)
                                     .filter(p -> !p.isEmpty())
                                     .orElseGet(parameter::getName),
-                                type,
+                                type, null,
                                 settings.optionalProperties != OptionalProperties.useLibraryDefinition ?
                                         isPropertyOptional(propertyMember) :
                                         (isOptional(type) || OptionalInt.class == type ||
                                         OptionalLong.class == type || OptionalDouble.class == type ||
                                         property.map(JsonbProperty::nillable).orElse(false)),
-                                new ParameterMember(parameter),
-                                null, null, null);
+                                constructor.getDeclaringClass(), new ParameterMember(parameter),
+                                null, null);
                     });
         }
 
@@ -195,14 +192,13 @@ public class JsonbParser extends ModelParser {
 
                         final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
-                        return new PropertyModel(
-                                key,
-                                Field.class.isInstance(member) ?
-                                    settings.getTypeParser().getFieldType(Field.class.cast(member)) :
-                                    settings.getTypeParser().getMethodReturnType(Method.class.cast(member)),
-                                settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
+                        return JsonbParser.this.processTypeAndCreateProperty(
+                                key, Field.class.isInstance(member) ?
+                                        settings.getTypeParser().getFieldType(Field.class.cast(member)) :
+                                        settings.getTypeParser().getMethodReturnType(Method.class.cast(member)),
+                                null, settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
                                         JsonbParser.this.isPropertyOptional(propertyMember),
-                                member, null, null, null);
+                                clazz, member, null, null);
                     })
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
