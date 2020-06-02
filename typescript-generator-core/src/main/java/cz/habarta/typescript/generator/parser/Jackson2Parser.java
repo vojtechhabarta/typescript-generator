@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
@@ -50,6 +53,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -361,6 +365,21 @@ public class Jackson2Parser extends ModelParser {
         if (parentJsonTypeInfo.use() == JsonTypeInfo.Id.CLASS) {
             return cls.getName();
         }
+        // find custom name registered with `registerSubtypes`
+        AnnotatedClass annotatedClass = AnnotatedClassResolver
+            .resolveWithoutSuperTypes(objectMapper.getSerializationConfig(), cls);
+        Collection<NamedType> subtypes = objectMapper.getSubtypeResolver()
+            .collectAndResolveSubtypesByClass(objectMapper.getSerializationConfig(),
+                annotatedClass);
+
+        if (subtypes.size() == 1) {
+            NamedType subtype = subtypes.iterator().next();
+
+            if (subtype.getName() != null) {
+                return subtype.getName();
+            }
+        }
+
         // find @JsonTypeName recursively
         final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class);
         if (jsonTypeName != null && !jsonTypeName.value().isEmpty()) {
