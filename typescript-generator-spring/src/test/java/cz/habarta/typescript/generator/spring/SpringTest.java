@@ -65,7 +65,7 @@ public class SpringTest {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
-        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller1.class));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller1WithMapping.class));
         Assert.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
         Assert.assertTrue(output.contains("uriEncoding`owners/${ownerId}/pets/${petId}`"));
         Assert.assertTrue(output.contains("interface Pet"));
@@ -161,9 +161,8 @@ public class SpringTest {
         Assert.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
-    @RestController
     @RequestMapping("/owners/{ownerId}")
-    public static class Controller1 {
+    public static class Controller1WithMapping   {
         @GetMapping("/pets/{petId}")
         public Pet findPet(
                 @PathVariable("ownerId") Long ownerId,

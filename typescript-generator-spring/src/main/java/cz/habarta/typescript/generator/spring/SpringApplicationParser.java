@@ -114,7 +114,8 @@ public class SpringApplicationParser extends RestApplicationParser {
 
         // controller
         final RestController controller = AnnotationUtils.findAnnotation(cls, RestController.class);
-        if (controller != null) {
+        final RequestMapping mapping = AnnotationUtils.findAnnotation(cls, RequestMapping.class);
+        if (controller != null || mapping != null) {
             TypeScriptGenerator.getLogger().verbose("Parsing Spring RestController: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
             final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(cls, RequestMapping.class);
