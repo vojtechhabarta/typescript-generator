@@ -15,6 +15,7 @@ import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsBinaryExpression;
 import cz.habarta.typescript.generator.emitter.TsBinaryOperator;
 import cz.habarta.typescript.generator.emitter.TsCallExpression;
+import cz.habarta.typescript.generator.emitter.TsConstructorModel;
 import cz.habarta.typescript.generator.emitter.TsExpression;
 import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
 import cz.habarta.typescript.generator.emitter.TsHelper;
@@ -135,7 +136,7 @@ public class JsonDeserializationExtension extends Extension {
                 new TsBinaryExpression(
                         new TsIdentifierReference("target"),
                         TsBinaryOperator.BarBar,
-                        new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, null)
+                        new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, getConstructorParameters(bean))
                 )
         ));
         if (bean.getParent() != null) {
@@ -167,6 +168,18 @@ public class JsonDeserializationExtension extends Extension {
                 body,
                 null
         );
+    }
+
+    private static List<TsIdentifierReference> getConstructorParameters(TsBeanModel bean) {
+        TsConstructorModel constructor = bean.getConstructor();
+        if (constructor == null) {
+            return null;
+        }
+        List<TsIdentifierReference> parameters = new ArrayList<>();
+        for (TsParameterModel parameter : constructor.getParameters()) {
+            parameters.add(new TsIdentifierReference(parameter.name));
+        }
+        return parameters;
     }
 
     private static TsMethodModel createDeserializationGenericFunctionConstructor(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {

@@ -284,6 +284,19 @@ public class ClassesTest {
     }
 
     @Test
+    public void testConstructorOnInterface() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBarInterface.class));
+        Assert.assertFalse(output.contains("constructor"));
+    }
+
+    private interface FooBarInterface {
+    }
+
+    @Test
     public void testConstructorWithGenericsAndInheritance() {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;

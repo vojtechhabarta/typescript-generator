@@ -519,13 +519,17 @@ public class ModelCompiler {
                     )));
                 }
             }
-            final TsConstructorModel constructor = new TsConstructorModel(
-                    TsModifierFlags.None,
-                    Arrays.asList(new TsParameterModel("data", dataType)),
-                    body,
-                    /*comments*/ null
-            );
-            beans.add(bean.withConstructor(constructor));
+            if (bean.isClass()) {
+                final TsConstructorModel constructor = new TsConstructorModel(
+                        TsModifierFlags.None,
+                        Arrays.asList(new TsParameterModel("data", dataType)),
+                        body,
+                        /*comments*/ null
+                );
+                beans.add(bean.withConstructor(constructor));
+            } else {
+                beans.add(bean);
+            }
         }
         return tsModel.withBeans(beans);
     }
