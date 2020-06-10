@@ -7,6 +7,8 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,6 +20,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -360,4 +363,28 @@ public class SpringTest {
             return ResponseEntity.ok(Arrays.asList( "a" , "b" , "c" ));
         }
     }
+
+    @Test
+    public void testCustomControllerAnnotaion() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomAnnotatedController.class));
+        System.out.println(output);
+        Assert.assertTrue(output.contains("getText(): RestResponse<string>"));
+    }
+
+    @MyRestController
+    public class CustomAnnotatedController {
+        @GetMapping("/text")
+        public String getText() {
+            return "";
+        }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Component
+    public @interface MyRestController {
+    }
+
 }

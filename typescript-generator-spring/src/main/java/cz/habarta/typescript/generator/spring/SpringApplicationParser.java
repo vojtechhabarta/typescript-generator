@@ -39,12 +39,12 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ValueConstants;
 
 public class SpringApplicationParser extends RestApplicationParser {
@@ -113,9 +113,9 @@ public class SpringApplicationParser extends RestApplicationParser {
         }
 
         // controller
-        final RestController controller = AnnotationUtils.findAnnotation(cls, RestController.class);
-        if (controller != null) {
-            TypeScriptGenerator.getLogger().verbose("Parsing Spring RestController: " + cls.getName());
+        final Component component = AnnotationUtils.findAnnotation(cls, Component.class);
+        if (component != null) {
+            TypeScriptGenerator.getLogger().verbose("Parsing Spring component: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
             final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(cls, RequestMapping.class);
             final String path = requestMapping != null && requestMapping.path() != null && requestMapping.path().length != 0 ? requestMapping.path()[0] : null;
@@ -153,7 +153,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                             throw new RuntimeException(e);
                         }
                     })
-                    .filter(instance -> AnnotationUtils.findAnnotation(instance, RestController.class) != null)
+                    .filter(instance -> AnnotationUtils.findAnnotation(instance, Component.class) != null)
                     .collect(Collectors.toList());
                 return classes;
             }
