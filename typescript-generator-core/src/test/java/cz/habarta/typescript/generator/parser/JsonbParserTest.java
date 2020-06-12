@@ -153,7 +153,6 @@ public class JsonbParserTest {
     public void testNullabilityConstructor() {
         settings.nullableAnnotations.add(Nullable.class);
         final String output = generate(settings, ListOfNullableElementsConstructor.class);
-        System.out.println(output);
         Assert.assertTrue(output, output.contains(" foos: (string | null)[];"));
     }
 

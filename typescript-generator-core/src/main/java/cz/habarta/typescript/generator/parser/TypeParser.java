@@ -55,7 +55,7 @@ public class TypeParser {
         public Type getMethodReturnType(Method method);
         public List<Type> getMethodParameterTypes(Method method);
         public List<Type> getConstructorParameterTypes(Constructor<?> constructor);
-        }
+    }
 
     private LanguageTypeParser getTypeParser(Class<?> declaringClass) {
         final boolean isKotlinClass = KotlinTypeParser.isKotlinClass(declaringClass);

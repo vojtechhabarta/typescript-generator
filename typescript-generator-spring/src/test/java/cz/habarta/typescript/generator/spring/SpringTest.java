@@ -370,7 +370,6 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomAnnotatedController.class));
-        System.out.println(output);
         Assert.assertTrue(output.contains("getText(): RestResponse<string>"));
     }
 
