@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-import static org.junit.Assert.assertSame;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,8 +23,8 @@ public class Jackson2DeserializableRootType {
                         .readValue("{\"type\": \"subType\"}",
                                         NonAbstractRoot.class);
 
-        assertSame(NonAbstractRoot.class, nar.getClass());
-        assertSame(NonAbstractRootSub.class, nars.getClass());
+        Assert.assertSame(NonAbstractRoot.class, nar.getClass());
+        Assert.assertSame(NonAbstractRootSub.class, nars.getClass());
     }
 
     @Test
