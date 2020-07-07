@@ -19,6 +19,10 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import static cz.habarta.typescript.generator.util.Utils.getInheritanceChain;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -40,6 +44,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -295,6 +300,25 @@ public class SpringApplicationParser extends RestApplicationParser {
                             parameter.getName()
                         ), parameter.getParameterizedType()), isRequired));
                         foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                    }
+
+                    final ModelAttribute modelAttributeAnnotation = AnnotationUtils.findAnnotation(parameter, ModelAttribute.class);
+                    if (modelAttributeAnnotation != null) {
+                        try {
+                            final BeanInfo beanInfo = Introspector.getBeanInfo(parameter.getType());
+                            for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+                                final Method writeMethod = propertyDescriptor.getWriteMethod();
+                                if (writeMethod != null) {
+                                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(
+                                            propertyDescriptor.getName(),
+                                            propertyDescriptor.getPropertyType()
+                                    ), false));
+                                    foundType(result, propertyDescriptor.getPropertyType(), controllerClass, method.getName());
+                                }
+                            }
+                        } catch (IntrospectionException e) {
+                            TypeScriptGenerator.getLogger().warning(String.format("Cannot introspect '%s' class: " + e.getMessage(), parameter.getAnnotatedType()));
+                        }
                     }
                 }
             }

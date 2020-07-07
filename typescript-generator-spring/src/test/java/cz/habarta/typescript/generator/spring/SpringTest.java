@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -195,6 +196,30 @@ public class SpringTest {
                 @RequestParam(required = false) String message
         ) {
             return message;
+        }
+    }
+
+    @Test
+    public void testQueryParametersWithModel() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithModelAttribute.class));
+        System.out.println(output);
+        Assert.assertTrue(output.contains("echoWithModelAttribute(queryParams?: { message?: string; }): RestResponse<string>"));
+    }
+
+    @RestController
+    public static class ControllerWithModelAttribute {
+        @RequestMapping("/echoWithModelAttribute")
+        public String echoWithModelAttribute(@ModelAttribute FilterParams nested) {
+            return nested.getMessage();
+        }
+
+        static class FilterParams {
+            private String message;
+            public String getMessage() { return message; }
+            public void setMessage(String message) { this.message = message; }
         }
     }
 
