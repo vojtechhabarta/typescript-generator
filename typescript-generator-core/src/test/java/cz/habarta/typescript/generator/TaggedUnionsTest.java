@@ -23,7 +23,7 @@ public class TaggedUnionsTest {
         @JsonSubTypes.Type(Rectangle.class),
         @JsonSubTypes.Type(Circle.class),
     })
-    private static class Shape {
+    private abstract static class Shape {
     }
 
     @JsonTypeName("square")
@@ -127,7 +127,7 @@ public class TaggedUnionsTest {
         @JsonSubTypes.Type(DieselCar.class),
         @JsonSubTypes.Type(ElectricCar.class),
     })
-    private static class Car {
+    private abstract static class Car {
         public String name;
     }
 

@@ -18,7 +18,7 @@ public class OnePossiblePropertyValueAssigningExtensionTest {
     private static final String BASE_PATH = "/ext/OnePossiblePropertyValueAssigningExtensionTest-";
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "discriminator")
-    static class BaseClass {
+    abstract static class BaseClass {
 
         @JsonProperty
         private Long field1;
