@@ -10,17 +10,35 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Assert;
 import org.junit.Test;
@@ -344,6 +362,7 @@ public class Jackson2ParserTest {
     }
 
     public static class NamedSubtypeModule extends SimpleModule {
+        private static final long serialVersionUID = 1L;
 
         @Override
         public void setupModule(SetupContext context) {
@@ -351,5 +370,98 @@ public class Jackson2ParserTest {
             super.setupModule(context);
         }
     }
-}
 
+    public interface Identifyable {
+        public String getId();
+    }
+
+    public static class Project implements Identifyable {
+        @Override
+        public String getId() {
+            return UUID.randomUUID().toString();
+        }
+        public String getName() {
+            return "myProject";
+        }
+    }
+
+    public static class Contract {
+
+        @JsonSerialize(using = IdSerializer.class)
+        public Project project;
+
+        @JsonSerialize(contentUsing = IdSerializer.class)
+        public List<Project> projects;
+
+        @JsonSerialize(contentUsing = IdSerializer.class)
+        public Map<String, Project> projectMap;
+
+        @JsonDeserialize(using = LocalDateTimeJsonDeserializer.class)
+        public LocalDateTime localDateTime;
+
+    }
+
+    public static class IdSerializer extends JsonSerializer<Identifyable> {
+        @Override
+        public void serialize(Identifyable value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeStartObject();
+            gen.writeStringField("id", value.getId());
+            gen.writeEndObject();
+        }
+    }
+
+    public static class LocalDateTimeJsonDeserializer extends StdDeserializer<LocalDateTime> {
+        private static final long serialVersionUID = 1L;
+
+        public LocalDateTimeJsonDeserializer() {
+            super(LocalDateTime.class);
+        }
+
+        @Override
+        public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
+            final String text = p.getText();
+            return Objects.equals("TODAY", text)
+                    ? LocalDateTime.of(LocalDate.parse("2020-07-17"), LocalTime.MIN)
+                    : LocalDateTime.parse(text);
+        }
+    }
+
+    @Test
+    public void testJacksonIdSerializer() throws JsonProcessingException {
+        final Contract contract = new Contract();
+        contract.project = new Project();
+        contract.projects = Collections.singletonList(new Project());
+        contract.projectMap = Collections.singletonMap("p1", new Project());
+        final String output = new ObjectMapper().writeValueAsString(contract);
+        Assert.assertTrue(output.contains(q("'project':{'id':")));
+        Assert.assertTrue(output.contains(q("'projects':[{'id':")));
+        Assert.assertTrue(output.contains(q("'projectMap':{'p1':{'id'")));
+        Assert.assertFalse(output.contains("name"));
+    }
+
+    @Test
+    public void testJacksonLocalDateTimeDeserializer() throws JsonProcessingException {
+        final String json = q("{ 'localDateTime': 'TODAY' }");
+        final Contract contract = new ObjectMapper().readValue(json, Contract.class);
+        Assert.assertEquals(LocalDate.parse("2020-07-17"), contract.localDateTime.toLocalDate());
+    }
+
+    private static String q(String json) {
+        return json.replace('\'', '"');
+    }
+
+    @Test
+    public void testSerializerAndDeserializer() {
+        final Settings settings = TestUtils.settings();
+        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
+        settings.jackson2Configuration.serializerTypeMappings = Collections.singletonMap(IdSerializer.class, "{ id: string }");
+        settings.jackson2Configuration.deserializerTypeMappings = Collections.singletonMap(LocalDateTimeJsonDeserializer.class, "\"TODAY\" | string");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Contract.class));
+        Assert.assertTrue(output.contains("project: { id: string }"));
+        Assert.assertTrue(output.contains("projects: { id: string }[]"));
+        Assert.assertTrue(output.contains("projectMap: { [index: string]: { id: string } }"));
+        Assert.assertTrue(output.contains("localDateTime: \"TODAY\" | string"));
+    }
+
+}

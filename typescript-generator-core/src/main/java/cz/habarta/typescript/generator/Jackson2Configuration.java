@@ -62,4 +62,18 @@ public class Jackson2Configuration {
      */
     public boolean disableObjectIdentityFeature;
 
+    /**
+     * Types produced by <code>JsonSerializer</code>s.
+     * Multiple mappings can be specified, each using following format: <code>serializerClassName:typescriptType</code>.
+     * Example: <code>org.example.IdSerializer:string</code> or <code>org.example.IdSerializer:{ id: string }</code>
+     */
+    public List<String> serializerTypeMappings;
+
+    /**
+     * Types produced by <code>JsonDeserializer</code>s.
+     * Multiple mappings can be specified, each using following format: <code>deserializerClassName:typescriptType</code>.
+     * Example: <code>org.example.MyDeserializer:string</code>
+     */
+    public List<String> deserializerTypeMappings;
+
 }

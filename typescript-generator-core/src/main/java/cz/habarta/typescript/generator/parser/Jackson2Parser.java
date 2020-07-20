@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -25,6 +26,8 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
@@ -39,6 +42,7 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
@@ -160,6 +164,30 @@ public class Jackson2Parser extends ModelParser {
                     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
                         if (context.getTypeContext() instanceof Jackson2TypeContext) {
                             final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
+                            final Jackson2ConfigurationResolved configuration = jackson2TypeContext.parser.settings.jackson2Configuration;
+                            // JsonSerialize
+                            final JsonSerialize jsonSerialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonSerialize.class);
+                            if (jsonSerialize != null) {
+                                @SuppressWarnings("unchecked")
+                                final Class<? extends JsonSerializer<?>> using = (Class<? extends JsonSerializer<?>>)
+                                    (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
+                                final String mappedType = configuration.serializerTypeMappings.get(using);
+                                if (mappedType != null) {
+                                    return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
+                                }
+                            }
+                            // JsonDeserialize
+                            final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonDeserialize.class);
+                            if (jsonDeserialize != null) {
+                                @SuppressWarnings("unchecked")
+                                final Class<? extends JsonDeserializer<?>> using = (Class<? extends JsonDeserializer<?>>)
+                                    (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
+                                final String mappedType = configuration.deserializerTypeMappings.get(using);
+                                if (mappedType != null) {
+                                    return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
+                                }
+                            }
+                            // disableObjectIdentityFeature
                             if (!jackson2TypeContext.disableObjectIdentityFeature) {
                                 final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanPropertyWriter);
                                 if (resultType != null) {

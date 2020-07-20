@@ -36,11 +36,17 @@ public interface TypeProcessor {
         private final SymbolTable symbolTable;
         private final TypeProcessor typeProcessor;
         private final Object typeContext;
+        private final boolean insideCollection;
 
         public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, Object typeContext) {
+            this(symbolTable, typeProcessor, typeContext, false);
+        }
+
+        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, Object typeContext, boolean insideCollection) {
             this.symbolTable = Objects.requireNonNull(symbolTable, "symbolTable");
             this.typeProcessor = Objects.requireNonNull(typeProcessor, "typeProcessor");
             this.typeContext = typeContext;
+            this.insideCollection = insideCollection;
         }
 
         public Symbol getSymbol(Class<?> cls) {
@@ -55,12 +61,24 @@ public interface TypeProcessor {
             return typeProcessor.processType(javaType, this);
         }
 
+        public Result processTypeInsideCollection(Type javaType) {
+            return typeProcessor.processType(javaType, this.withInsideCollection());
+        }
+
         public Object getTypeContext() {
             return typeContext;
         }
 
+        public boolean isInsideCollection() {
+            return insideCollection;
+        }
+
         public Context withTypeContext(Object typeContext) {
-            return new Context(symbolTable, typeProcessor, typeContext);
+            return new Context(symbolTable, typeProcessor, typeContext, insideCollection);
+        }
+
+        public Context withInsideCollection() {
+            return new Context(symbolTable, typeProcessor, typeContext, true);
         }
 
     }

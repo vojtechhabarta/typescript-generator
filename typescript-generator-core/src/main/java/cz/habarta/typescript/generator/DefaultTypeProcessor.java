@@ -52,17 +52,19 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
             if (javaClass.isArray()) {
-                final Result result = context.processType(javaClass.getComponentType());
+                final Result result = context.processTypeInsideCollection(javaClass.getComponentType());
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
             if (javaClass.isEnum()) {
                 return new Result(new TsType.EnumReferenceType(context.getSymbol(javaClass)), javaClass);
             }
             if (Collection.class.isAssignableFrom(javaClass)) {
-                return new Result(new TsType.BasicArrayType(TsType.Any));
+                final Result result = context.processTypeInsideCollection(Object.class);
+                return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
             if (Map.class.isAssignableFrom(javaClass)) {
-                return new Result(new TsType.IndexedArrayType(TsType.String, TsType.Any));
+                final Result result = context.processTypeInsideCollection(Object.class);
+                return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
             }
             if (OptionalInt.class.isAssignableFrom(javaClass) ||
                     OptionalLong.class.isAssignableFrom(javaClass) ||
@@ -88,12 +90,12 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
                 if (Collection.class.isAssignableFrom(javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
+                    final Result result = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
                 if (Map.class.isAssignableFrom(javaClass)) {
                     final Result keyResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
-                    final Result valueResult = context.processType(parameterizedType.getActualTypeArguments()[1]);
+                    final Result valueResult = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[1]);
                     if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
                         return new Result(
                                 new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueResult.getTsType()),
@@ -128,7 +130,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
         }
         if (javaType instanceof GenericArrayType) {
             final GenericArrayType genericArrayType = (GenericArrayType) javaType;
-            final Result result = context.processType(genericArrayType.getGenericComponentType());
+            final Result result = context.processTypeInsideCollection(genericArrayType.getGenericComponentType());
             return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
         }
         if (javaType instanceof TypeVariable) {
