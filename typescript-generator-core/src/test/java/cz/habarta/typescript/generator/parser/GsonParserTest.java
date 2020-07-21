@@ -64,4 +64,16 @@ public class GsonParserTest {
         final Settings settings = new Settings();
         return new GsonParser(settings, new DefaultTypeProcessor());
     }
+
+    private static class Demo {
+        public static String THIS_FIELD_SHOULD_NOT_BE_INCLUDED = "test";
+        public String thisShouldBeIncluded = "test";
+    }
+
+    @Test
+    public void testStaticFieldNotIncluded() {
+        final String output = generate(settings, Demo.class);
+        Assert.assertTrue(!output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
+    }
+
 }

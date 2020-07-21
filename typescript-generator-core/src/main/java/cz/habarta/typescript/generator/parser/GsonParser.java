@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,9 @@ public class GsonParser extends ModelParser {
         Class<?> cls = sourceClass.type;
         while (cls != null) {
             for (Field field : cls.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
                 String name = field.getName();
                 SerializedName serializedName = field.getAnnotation(SerializedName.class);
                 if (serializedName != null) {
