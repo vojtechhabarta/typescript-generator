@@ -22,4 +22,25 @@ public class UtilsTest {
         Assert.assertEquals("\\Qcz.habarta.test.\\E[^.\\$]*\\Q\\E", Utils.globsToRegexps(Arrays.asList("cz.habarta.test.*")).get(0).toString());
     }
 
+    @Test
+    public void testPathJoin() {
+        Assert.assertEquals("controller", Utils.joinPath("/controller", null));
+        Assert.assertEquals("controller/", Utils.joinPath("/controller/", null));
+        Assert.assertEquals("path", Utils.joinPath(null, "/path"));
+        Assert.assertEquals("path/", Utils.joinPath(null, "/path/"));
+        Assert.assertEquals("", Utils.joinPath(null, "/"));
+
+        Assert.assertEquals("controller", Utils.joinPath("/controller", ""));
+        Assert.assertEquals("controller/", Utils.joinPath("/controller", "/"));
+        Assert.assertEquals("controller/path", Utils.joinPath("/controller", "/path"));
+        Assert.assertEquals("controller/path", Utils.joinPath("/controller", "path"));
+        Assert.assertEquals("controller/path/", Utils.joinPath("/controller", "/path/"));
+
+        Assert.assertEquals("controller/", Utils.joinPath("/controller/", ""));
+        Assert.assertEquals("controller/", Utils.joinPath("/controller/", "/"));
+        Assert.assertEquals("controller/path", Utils.joinPath("/controller/", "/path"));
+        Assert.assertEquals("controller/path", Utils.joinPath("/controller/", "path"));
+        Assert.assertEquals("controller/path/", Utils.joinPath("/controller/", "/path/"));
+    }
+
 }

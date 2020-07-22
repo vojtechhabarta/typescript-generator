@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -408,6 +409,27 @@ public class SpringTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Component
     public @interface MyRestController {
+    }
+
+    @Test
+    public void testUrlTrailingSlash() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TestUrlTrailingSlashController.class));
+        Assert.assertTrue(Pattern.compile("response\\(\\):.*\\n.*uriEncoding`controller/`").matcher(output).find());
+        Assert.assertTrue(Pattern.compile("response2\\(\\):.*\\n.*uriEncoding`controller`").matcher(output).find());
+    }
+
+    @RestController
+    @RequestMapping("/controller")
+    public class TestUrlTrailingSlashController {
+        @GetMapping("/")
+        public void response() {
+        }
+        @GetMapping("")
+        public void response2() {
+        }
     }
 
 }
