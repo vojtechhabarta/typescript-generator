@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.maven;
 import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
+import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -215,6 +216,15 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private Jackson2Configuration jackson2Configuration;
+
+    /**
+     * Specifies Gson global configuration.
+     * Description of individual parameters is in
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a>
+     * class on GitHub (latest version).
+     */
+    @Parameter
+    private GsonConfiguration gsonConfiguration;
 
     /**
      * Specifies JSON-B global configuration.
@@ -792,6 +802,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
+        settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;

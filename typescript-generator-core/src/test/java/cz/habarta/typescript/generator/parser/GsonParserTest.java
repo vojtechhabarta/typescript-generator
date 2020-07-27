@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 import com.google.gson.annotations.SerializedName;
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
 import cz.habarta.typescript.generator.DummyBean;
+import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Settings;
@@ -12,12 +13,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class GsonParserTest {
 
     private Settings settings;
 
     private static class DummyBeanGson {
-        @SuppressWarnings("unused")
         private int privateField;
     }
 
@@ -74,6 +75,14 @@ public class GsonParserTest {
     public void testStaticFieldNotIncluded() {
         final String output = generate(settings, Demo.class);
         Assert.assertTrue(!output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
+    }
+
+    @Test
+    public void testStaticFieldIncluded() {
+        settings.gsonConfiguration = new GsonConfiguration();
+        settings.gsonConfiguration.excludeFieldsWithModifiers = "transient";
+        final String output = generate(settings, Demo.class);
+        Assert.assertTrue(output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
     }
 
 }

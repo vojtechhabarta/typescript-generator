@@ -1,7 +1,10 @@
 package cz.habarta.typescript.generator.parser;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
+import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
 import java.lang.reflect.Field;
@@ -29,6 +32,8 @@ public class GsonParser extends ModelParser {
 
     }
 
+    private final Gson gson;
+
     public GsonParser(Settings settings, TypeProcessor commonTypeProcessor) {
         this(settings, commonTypeProcessor, Collections.emptyList());
     }
@@ -39,6 +44,13 @@ public class GsonParser extends ModelParser {
         if (!settings.optionalAnnotations.isEmpty()) {
 
         }
+        final GsonConfiguration config = settings.gsonConfiguration;
+        int modifiers = config != null && config.excludeFieldsWithModifiers != null
+            ? Settings.parseModifiers(config.excludeFieldsWithModifiers, Modifier.fieldModifiers())
+            : Modifier.STATIC | Modifier.TRANSIENT;
+        this.gson = new GsonBuilder()
+            .excludeFieldsWithModifiers(modifiers)
+            .create();
     }
 
     private static TypeProcessor createSpecificTypeProcessor() {
@@ -59,7 +71,7 @@ public class GsonParser extends ModelParser {
         Class<?> cls = sourceClass.type;
         while (cls != null) {
             for (Field field : cls.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers())) {
+                if (gson.excluder().excludeField(field, /*serialize*/true)) {
                     continue;
                 }
                 String name = field.getName();

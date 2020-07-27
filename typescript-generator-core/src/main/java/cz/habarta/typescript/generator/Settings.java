@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -53,6 +54,7 @@ public class Settings {
     private LoadedModuleDependencies loadedModuleDependencies = null;
     public JsonLibrary jsonLibrary = null;
     public Jackson2ConfigurationResolved jackson2Configuration = null;
+    public GsonConfiguration gsonConfiguration = null;
     public JsonbConfiguration jsonbConfiguration = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
@@ -730,6 +732,45 @@ public class Settings {
             return requiredType.cast(classLoader.loadClass(className).getConstructor().newInstance());
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static int parseModifiers(String modifiers, int allowedModifiers) {
+        return Stream.of(modifiers.split("\\|"))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(s -> {
+                try {
+                    return javax.lang.model.element.Modifier.valueOf(s.toUpperCase(Locale.US));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid modifier: " + s);
+                }
+            })
+            .mapToInt(modifier -> {
+                final int mod = Settings.modifierToBitMask(modifier);
+                if ((mod & allowedModifiers) == 0) {
+                    throw new RuntimeException("Modifier not allowed: " + modifier);
+                }
+                return mod;
+            })
+            .reduce(0, (a, b) -> a | b);
+    }
+
+    private static int modifierToBitMask(javax.lang.model.element.Modifier modifier) {
+        switch (modifier) {
+            case PUBLIC: return java.lang.reflect.Modifier.PUBLIC;
+            case PROTECTED: return java.lang.reflect.Modifier.PROTECTED;
+            case PRIVATE: return java.lang.reflect.Modifier.PRIVATE;
+            case ABSTRACT: return java.lang.reflect.Modifier.ABSTRACT;
+            // case DEFAULT: no equivalent
+            case STATIC: return java.lang.reflect.Modifier.STATIC;
+            case FINAL: return java.lang.reflect.Modifier.FINAL;
+            case TRANSIENT: return java.lang.reflect.Modifier.TRANSIENT;
+            case VOLATILE: return java.lang.reflect.Modifier.VOLATILE;
+            case SYNCHRONIZED: return java.lang.reflect.Modifier.SYNCHRONIZED;
+            case NATIVE: return java.lang.reflect.Modifier.NATIVE;
+            case STRICTFP: return java.lang.reflect.Modifier.STRICT;
+            default: return 0;
         }
     }
 

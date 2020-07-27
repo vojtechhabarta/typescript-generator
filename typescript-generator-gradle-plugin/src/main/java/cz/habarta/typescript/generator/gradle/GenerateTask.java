@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.gradle;
 import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
+import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -57,6 +58,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludePropertyAnnotations;
     public JsonLibrary jsonLibrary;
     public Jackson2Configuration jackson2Configuration;
+    public GsonConfiguration gsonConfiguration;
     public JsonbConfiguration jsonbConfiguration;
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
@@ -136,6 +138,7 @@ public class GenerateTask extends DefaultTask {
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
+        settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
