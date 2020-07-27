@@ -29,6 +29,8 @@ public class UtilsTest {
         Assert.assertEquals("path", Utils.joinPath(null, "/path"));
         Assert.assertEquals("path/", Utils.joinPath(null, "/path/"));
         Assert.assertEquals("", Utils.joinPath(null, "/"));
+        Assert.assertEquals("", Utils.joinPath("/", null));
+        Assert.assertEquals("path", Utils.joinPath("/", "path"));
 
         Assert.assertEquals("controller", Utils.joinPath("/controller", ""));
         Assert.assertEquals("controller/", Utils.joinPath("/controller", "/"));

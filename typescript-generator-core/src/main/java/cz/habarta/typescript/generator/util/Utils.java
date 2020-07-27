@@ -50,38 +50,19 @@ public final class Utils {
     }
 
     public static String joinPath(String part1, String part2) {
-        StringBuilder url = new StringBuilder();
-        if (part1 != null) {
-            String path1 = trimTrailing(part1);
-            url.append(path1);
-        }
-
-        if (part2 == null) {
-            return url.toString();
-        }
-
-        String path2 = trimTrailing(part2);
-        boolean urlPartHasTrailingSlash = url.length() > 0 && url.charAt(url.length() - 1) == '/';
-
-        if (url.length() > 0 && !path2.isEmpty() && ! path2.equals("/") && ! urlPartHasTrailingSlash) {
-            url.append("/");
-        }
-
-        if (!path2.isEmpty() && ! (path2.equals("/") && urlPartHasTrailingSlash) && !(path2.equals("/") && url.length() == 0)) {
-            url.append(path2);
-        }
-
-        return url.toString();
+        final String path = Stream.of(part1, part2)
+            .filter(part -> part != null && !part.isEmpty())  // remove empty parts
+            .reduce((a, b) -> trimRightSlash(a) + "/" + trimLeftSlash(b))  // join
+            .orElse("");  // if all parts are empty
+        return trimLeftSlash(path);  // trim leading slash
     }
 
-    private static String trimTrailing(String path) {
-        if (path.equals("/")) {
-            return path;
-        }
-        if (path.startsWith("/")) {
-            return path.substring(1);
-        }
-        return path;
+    private static String trimLeftSlash(String path) {
+        return path.startsWith("/") ? path.substring(1) : path;
+    }
+
+    private static String trimRightSlash(String path) {
+        return  path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
     }
 
     public static Class<?> getRawClassOrNull(Type type) {
