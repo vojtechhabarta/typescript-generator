@@ -14,7 +14,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -221,17 +220,8 @@ public class JsonbParser extends ModelParser {
             throw new IllegalArgumentException("Unsupported reader: " + value);
         }
 
-        private Type findOptionalType(final Type writerType) {
-            return ParameterizedType.class.cast(writerType).getActualTypeArguments()[0];
-        }
-
         private boolean isOptional(final Type type) {
             return ParameterizedType.class.isInstance(type) && Optional.class == ParameterizedType.class.cast(type).getRawType();
-        }
-
-        private boolean isOptionalArray(final Type value) {
-            return GenericArrayType.class.isInstance(value) &&
-                    isOptional(GenericArrayType.class.cast(value).getGenericComponentType());
         }
 
         private boolean isTransient(final JsonbParser.DecoratedType dt, final PropertyVisibilityStrategy visibility) {

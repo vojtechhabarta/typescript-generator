@@ -126,6 +126,7 @@ public class JsonbParserTest {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ListOfNullableElementsConstructor {
         private List<String> foos;
 

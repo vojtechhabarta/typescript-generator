@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class ModelCompilerTest {
 
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
-        Assert.assertThat(
+        MatcherAssert.assertThat(
                 result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType,
                 CoreMatchers.instanceOf(TsType.UnionType.class)
         );
@@ -74,7 +75,7 @@ public class ModelCompilerTest {
 
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
-        Assert.assertThat(
+        MatcherAssert.assertThat(
                 result.getBean(WithTypeParam.class).getProperties().get(0).tsType,
                 CoreMatchers.instanceOf(TsType.UnionType.class)
         );

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,7 +62,7 @@ public class ExtensionTest {
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
         Assert.assertEquals(1, result.getBean(Implementation.class).getComments().size());
-        Assert.assertThat(result.getBean(Implementation.class).getComments().get(0), CoreMatchers.containsString("My new comment"));
+        MatcherAssert.assertThat(result.getBean(Implementation.class).getComments().get(0), CoreMatchers.containsString("My new comment"));
     }
 
     private static class Implementation { }
