@@ -164,25 +164,25 @@ public class Jackson2Parser extends ModelParser {
                     public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
                         if (context.getTypeContext() instanceof Jackson2TypeContext) {
                             final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
-                            final Jackson2ConfigurationResolved configuration = jackson2TypeContext.parser.settings.jackson2Configuration;
+                            final Jackson2ConfigurationResolved config = jackson2TypeContext.parser.settings.jackson2Configuration;
                             // JsonSerialize
                             final JsonSerialize jsonSerialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonSerialize.class);
-                            if (jsonSerialize != null) {
+                            if (jsonSerialize != null && config != null && config.serializerTypeMappings != null) {
                                 @SuppressWarnings("unchecked")
                                 final Class<? extends JsonSerializer<?>> using = (Class<? extends JsonSerializer<?>>)
                                     (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
-                                final String mappedType = configuration.serializerTypeMappings.get(using);
+                                final String mappedType = config.serializerTypeMappings.get(using);
                                 if (mappedType != null) {
                                     return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
                                 }
                             }
                             // JsonDeserialize
                             final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonDeserialize.class);
-                            if (jsonDeserialize != null) {
+                            if (jsonDeserialize != null && config != null && config.deserializerTypeMappings != null) {
                                 @SuppressWarnings("unchecked")
                                 final Class<? extends JsonDeserializer<?>> using = (Class<? extends JsonDeserializer<?>>)
                                     (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
-                                final String mappedType = configuration.deserializerTypeMappings.get(using);
+                                final String mappedType = config.deserializerTypeMappings.get(using);
                                 if (mappedType != null) {
                                     return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
                                 }
