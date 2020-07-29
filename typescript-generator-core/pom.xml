@@ -61,7 +61,7 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.24</version>
+            <version>4.8.87</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
