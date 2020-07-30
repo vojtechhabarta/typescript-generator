@@ -18,7 +18,7 @@
         <jackson1.version>1.9.13</jackson1.version>
         <jackson2.version>2.11.1</jackson2.version>
         <jersey.version>2.31</jersey.version>
-        <graalvm.version>20.0.0</graalvm.version>
+        <graalvm.version>20.1.0</graalvm.version>
     </properties>
 
     <dependencies>
