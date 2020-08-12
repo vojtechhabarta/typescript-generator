@@ -5,6 +5,8 @@ import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import cz.habarta.typescript.generator.util.Utils;
+import io.vavr.collection.LinearSeq;
+import io.vavr.control.Option;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -58,11 +60,11 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (javaClass.isEnum()) {
                 return new Result(new TsType.EnumReferenceType(context.getSymbol(javaClass)), javaClass);
             }
-            if (Collection.class.isAssignableFrom(javaClass)) {
+            if (Collection.class.isAssignableFrom(javaClass) || LinearSeq.class.isAssignableFrom(javaClass)) {
                 final Result result = context.processTypeInsideCollection(Object.class);
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
-            if (Map.class.isAssignableFrom(javaClass)) {
+            if (Map.class.isAssignableFrom(javaClass) || io.vavr.collection.Map.class.isAssignableFrom(javaClass)) {
                 final Result result = context.processTypeInsideCollection(Object.class);
                 return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
             }
@@ -89,11 +91,11 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (Collection.class.isAssignableFrom(javaClass)) {
+                if (Collection.class.isAssignableFrom(javaClass) || LinearSeq.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
-                if (Map.class.isAssignableFrom(javaClass)) {
+                if (Map.class.isAssignableFrom(javaClass) || io.vavr.collection.Map.class.isAssignableFrom(javaClass)) {
                     final Result keyResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     final Result valueResult = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[1]);
                     if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
@@ -108,7 +110,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
                         );
                     }
                 }
-                if (Optional.class.isAssignableFrom(javaClass)) {
+                if (Optional.class.isAssignableFrom(javaClass) || Option.class.isAssignableFrom(javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
                 }

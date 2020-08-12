@@ -1,7 +1,9 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
+import io.vavr.control.Option;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -13,10 +15,11 @@ import org.junit.Test;
 @SuppressWarnings("unused")
 public class DefaultTypeProcessorTest {
 
+    private final TypeProcessor converter = new DefaultTypeProcessor();
+    final TypeProcessor.Context context = getTestContext(converter);
+
     @Test
     public void testTypeConversion() {
-        TypeProcessor converter = new DefaultTypeProcessor();
-        final TypeProcessor.Context context = getTestContext(converter);
         assertEquals(context.getSymbol(A.class).getFullName(), converter.processType(A.class, context).getTsType().toString());
         assertEquals(context.getSymbol(B.class).getFullName(), converter.processType(B.class, context).getTsType().toString());
         assertEquals(TsType.Void, converter.processType(void.class, context).getTsType());
@@ -29,11 +32,20 @@ public class DefaultTypeProcessorTest {
 
     @Test
     public void testWildcards() throws NoSuchFieldException {
-        TypeProcessor converter = new DefaultTypeProcessor();
-        final TypeProcessor.Context context = getTestContext(converter);
-        assertEquals("string[]", converter.processType(C.class.getDeclaredField("x").getGenericType(), context).getTsType().toString());
-        assertEquals("any[]", converter.processType(C.class.getDeclaredField("y").getGenericType(), context).getTsType().toString());
-        assertEquals("any[]", converter.processType(C.class.getDeclaredField("z").getGenericType(), context).getTsType().toString());
+        assertEquals("string[]", typeOf("x", C.class, converter, context).toString());
+        assertEquals("any[]", typeOf("y", C.class, converter, context).toString());
+        assertEquals("any[]", typeOf("z", C.class, converter, context).toString());
+    }
+
+    @Test
+    public void testVavrTypes() throws NoSuchFieldException {
+        assertEquals("string[]", typeOf("x", D.class, converter, context).toString());
+        assertEquals("{ [index: string]: number }", typeOf("y", D.class, converter, context).toString());
+        assertEquals(TsType.Number.optional(), typeOf("z", D.class, converter, context));
+    }
+
+    private TsType typeOf(String z, Class<?> clazz, TypeProcessor converter, TypeProcessor.Context context) throws NoSuchFieldException {
+        return converter.processType(clazz.getDeclaredField(z).getGenericType(), context).getTsType();
     }
 
     private static class A {
@@ -48,6 +60,12 @@ public class DefaultTypeProcessorTest {
         List<? extends String> x;
         List<? super String> y;
         List<?> z;
+    }
+
+    private static class D {
+        io.vavr.collection.List<String> x;
+        io.vavr.collection.Map<String, BigInteger> y;
+        Option<BigDecimal> z;
     }
 
     public static TypeProcessor.Context getTestContext(final TypeProcessor typeProcessor) {
