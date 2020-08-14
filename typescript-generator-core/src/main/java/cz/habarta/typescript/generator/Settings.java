@@ -128,6 +128,7 @@ public class Settings {
     public boolean jackson2ModuleDiscovery = false;
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
+    public boolean skip = false;
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 

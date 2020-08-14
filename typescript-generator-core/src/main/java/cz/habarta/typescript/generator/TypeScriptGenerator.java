@@ -71,6 +71,10 @@ public class TypeScriptGenerator {
     }
 
     public void generateTypeScript(Input input, Output output) {
+        if (settings.skip) {
+            TypeScriptGenerator.getLogger().info("Skipping plugin execution");
+            return;
+        }
         generateTypeScript(input, output, false, 0);
     }
 

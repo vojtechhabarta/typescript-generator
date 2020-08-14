@@ -787,6 +787,9 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private String projectBuildDirectory;
 
+    @Parameter
+    private boolean skip;
+
     @SuppressWarnings("deprecation")
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
@@ -866,6 +869,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
+        settings.skip = skip;
         return settings;
     }
 
