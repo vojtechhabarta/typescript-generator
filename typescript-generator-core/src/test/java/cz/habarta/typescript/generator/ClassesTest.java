@@ -277,6 +277,36 @@ public class ClassesTest {
         Assert.assertTrue(output.contains("constructor(data: FooBar)"));
     }
 
+    @Test
+    public void testSortedConstructor() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalAnnotations = Arrays.asList(Nullable.class);
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        settings.sortDeclarations = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
+        String sortedPropertyAssignments = "" +
+                "        this.bar = data.bar;" + settings.newline +
+                "        this.foo = data.foo;";
+        Assert.assertTrue(output.contains(sortedPropertyAssignments));
+    }
+
+    @Test
+    public void testUnsortedConstructor() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalAnnotations = Arrays.asList(Nullable.class);
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        settings.sortDeclarations = false;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
+        String unsortedPropertyAssignments = "" +
+                "        this.foo = data.foo;" + settings.newline +
+                "        this.bar = data.bar;";
+        Assert.assertTrue(output.contains(unsortedPropertyAssignments));
+    }
+
     private static class FooBar {
         @Nullable
         public String foo;

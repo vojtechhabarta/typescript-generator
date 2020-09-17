@@ -121,7 +121,7 @@ public class ModelCompiler {
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
         if (settings.generateConstructors) {
-            tsModel = addConstructors(symbolTable, tsModel);
+            tsModel = addConstructors(symbolTable, tsModel, settings.sortDeclarations);
         }
 
         // REST
@@ -493,7 +493,7 @@ public class ModelCompiler {
         return tsModel.withBeans(beans);
     }
 
-    private TsModel addConstructors(SymbolTable symbolTable, TsModel tsModel) {
+    private TsModel addConstructors(SymbolTable symbolTable, TsModel tsModel, Boolean sortDeclarations) {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
@@ -510,7 +510,11 @@ public class ModelCompiler {
                         )
                 ));
             }
-            for (TsPropertyModel property : bean.getProperties()) {
+            List<TsPropertyModel> beanProperties = bean.getProperties();
+            if (sortDeclarations) {
+                Collections.sort(beanProperties);
+            }
+            for (TsPropertyModel property : beanProperties) {
                 final Map<String, TsType> inheritedProperties = ModelCompiler.getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
                 if (!inheritedProperties.containsKey(property.getName())) {
                     body.add(new TsExpressionStatement(new TsAssignmentExpression(
