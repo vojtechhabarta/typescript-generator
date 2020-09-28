@@ -161,7 +161,7 @@ public class TypeScriptGenerator {
         }
         processors.add(new CustomMappingTypeProcessor(settings.getValidatedCustomTypeMappings()));
         processors.addAll(specificTypeProcessors);
-        processors.add(new DefaultTypeProcessor());
+        processors.add(new DefaultTypeProcessor(settings.getLoadedDataLibraries()));
         final TypeProcessor typeProcessor = new TypeProcessor.Chain(processors);
         return typeProcessor;
     }

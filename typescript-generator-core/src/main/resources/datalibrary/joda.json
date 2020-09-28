@@ -1,0 +1,57 @@
+{
+    "$schema": "./_schema.json",
+    "info": {
+        "source": "https://github.com/JodaOrg/joda-time",
+        "jacksonModule": "https://github.com/FasterXML/jackson-datatype-joda/blob/master/src/main/java/com/fasterxml/jackson/datatype/joda/JodaModule.java"
+    },
+    "classMappings": [
+        {
+            "className": "org.joda.time.DateTime",
+            "semanticType": "date"
+        },
+        {
+            "className": "org.joda.time.DateTimeZone",
+            "semanticType": "string"
+        },
+        {
+            "className": "org.joda.time.Duration",
+            "semanticType": "number"
+        },
+        {
+            "className": "org.joda.time.Instant",
+            "semanticType": "date"
+        },
+        {
+            "className": "org.joda.time.LocalDateTime",
+            "semanticType": "date"
+        },
+        {
+            "className": "org.joda.time.LocalDate",
+            "semanticType": "date"
+        },
+        {
+            "className": "org.joda.time.LocalTime",
+            "semanticType": "date"
+        },
+        {
+            "className": "org.joda.time.Period",
+            "semanticType": "string"
+        },
+        {
+            "className": "org.joda.time.Interval",
+            "semanticType": "string"
+        },
+        {
+            "className": "org.joda.time.MonthDay",
+            "semanticType": "string"
+        },
+        {
+            "className": "org.joda.time.YearMonth",
+            "semanticType": "string"
+        },
+        {
+            "className": "org.joda.time.DateMidnight",
+            "semanticType": "date"
+        }
+    ]
+}

@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,17 +36,7 @@ public class DateTest {
         Assert.assertTrue(dts.contains("dateList: Date[];"));
         Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
         Assert.assertTrue(dts.contains("dates: Date[];"));
-    }
-
-    @Test
-    public void testDate_forJodaDateTime() {
-        final Settings settings = TestUtils.settings();
-        settings.customTypeMappings.put("org.joda.time.DateTime", "Date");
-        final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: Date;"));
-        Assert.assertTrue(dts.contains("dateList: Date[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
-        Assert.assertTrue(dts.contains("dates: Date[];"));
+        Assert.assertTrue(dts.contains("calendar: Date;"));
     }
 
     @Test
@@ -57,19 +48,8 @@ public class DateTest {
         Assert.assertTrue(dts.contains("dateList: DateAsNumber[];"));
         Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsNumber[] };"));
         Assert.assertTrue(dts.contains("dates: DateAsNumber[];"));
+        Assert.assertTrue(dts.contains("calendar: DateAsNumber;"));
         Assert.assertTrue(dts.contains("type DateAsNumber = number;"));
-    }
-
-    @Test
-    public void testDateAsNumber_forJodaDateTime() {
-        final Settings settings = TestUtils.settings();
-        settings.customTypeMappings.put("org.joda.time.DateTime", "number");
-        final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: number;"));
-        Assert.assertTrue(dts.contains("dateList: number[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: number[] };"));
-        Assert.assertTrue(dts.contains("dates: number[];"));
-        Assert.assertTrue(!dts.contains("type DateAsNumber = number;"));
     }
 
     @Test
@@ -81,19 +61,8 @@ public class DateTest {
         Assert.assertTrue(dts.contains("dateList: DateAsString[];"));
         Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
         Assert.assertTrue(dts.contains("dates: DateAsString[];"));
+        Assert.assertTrue(dts.contains("calendar: DateAsString;"));
         Assert.assertTrue(dts.contains("type DateAsString = string;"));
-    }
-
-    @Test
-    public void testDateAsString_forJodaDateTime() {
-        final Settings settings = TestUtils.settings();
-        settings.customTypeMappings.put("org.joda.time.DateTime", "string");
-        final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: string;"));
-        Assert.assertTrue(dts.contains("dateList: string[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: string[] };"));
-        Assert.assertTrue(dts.contains("dates: string[];"));
-        Assert.assertTrue(!dts.contains("type DateAsString = string;"));
     }
 
     @Test
@@ -118,7 +87,7 @@ public class DateTest {
 
     public static void main(String[] args) throws JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper()
-                .findAndRegisterModules()
+                .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         final Clock clock = Clock.fixed(Instant.parse("2017-09-02T19:11:00Z"), ZoneId.systemDefault());
         System.out.println(objectMapper.writeValueAsString(new Date()));
@@ -141,13 +110,7 @@ class Dates {
     public List<Date> dateList;
     public Map<String, List<Date>> datesMap;
     public Date[] dates;
-}
-
-class JodaDates {
-    public org.joda.time.DateTime date;
-    public List<org.joda.time.DateTime> dateList;
-    public Map<String, List<org.joda.time.DateTime>> datesMap;
-    public org.joda.time.DateTime[] dates;
+    public Calendar calendar;
 }
 
 class Java8Dates {

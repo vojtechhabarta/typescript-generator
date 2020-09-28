@@ -1,0 +1,109 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "type": "object",
+    "definitions": {
+        "mapping": {
+            "type": "object",
+            "properties": {
+                "className": {
+                    "markdownDescription": "Specifies class (including its subclasses). When mapping generic class to `customType` mapped class name must include generic parameters for example like this: `com.google.common.collect.Range<C>`.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "className"
+            ]
+        }
+    },
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "info": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "type": "string"
+                },
+                "jacksonModule": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "classMappings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {
+                        "allOf": [
+                            {
+                                "$ref": "#/definitions/mapping"
+                            },
+                            {
+                                "properties": {
+                                    "semanticType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "date",
+                                            "any",
+                                            "void",
+                                            "list",
+                                            "map",
+                                            "optional",
+                                            "wrapper"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "semanticType"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "$ref": "#/definitions/mapping"
+                            },
+                            {
+                                "properties": {
+                                    "customType": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "customType"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "typeAliases": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "definition": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "definition"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

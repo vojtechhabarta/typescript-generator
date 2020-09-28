@@ -7,6 +7,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.UUID;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -52,6 +53,13 @@ public class DefaultTypeProcessorTest {
 
     public static TypeProcessor.Context getTestContext(final TypeProcessor typeProcessor) {
         return new TypeProcessor.Context(new SymbolTable(TestUtils.settings()), typeProcessor, null);
+    }
+
+    @Test
+    public void testRawTypes() {
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(DummyBean.class));
+        Assert.assertTrue(output.contains("rawListProperty: any[]"));
+        Assert.assertTrue(output.contains("rawMapProperty: { [index: string]: any }"));
     }
 
 }

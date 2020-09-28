@@ -44,6 +44,17 @@ public class GenericsResolver {
         return result;
     }
 
+    public static List<Type> resolveBaseGenericVariables(Class<?> baseClass, Type contextType) {
+        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(contextType);
+        if (rawClassAndTypeArguments != null) {
+            final ResolvedClass resolvedContextType = new ResolvedClass(null, null, null).resolveAncestor(contextType);
+            final List<ResolvedClass> path = traverseSomeInheritancePath(resolvedContextType, baseClass);
+            final ResolvedClass resolvedClass = path != null && !path.isEmpty() ? path.get(0) : resolvedContextType;
+            return new ArrayList<>(resolvedClass.resolvedTypeParameters.values());
+        }
+        return Arrays.asList(baseClass.getTypeParameters());
+    }
+
     private static String mapGenericVariableToParent(String typeVariableName, ResolvedClass resolvedParent) {
         if (typeVariableName == null) {
             return null;

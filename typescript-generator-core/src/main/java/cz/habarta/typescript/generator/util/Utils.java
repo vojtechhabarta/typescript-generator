@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.type.JGenericArrayType;
@@ -10,6 +11,7 @@ import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -27,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -123,6 +126,20 @@ public final class Utils {
                 (deque, item) -> deque.addFirst(item),
                 (deque1, deque2) -> { deque2.addAll(deque1); return deque2; },
                 deque -> deque);
+    }
+
+    public static <T, K, U> Collector<T, ?, Map<K,U>> toMap(
+            Function<? super T, ? extends K> keyMapper,
+            Function<? super T, ? extends U> valueMapper
+    ) {
+        return Collectors.toMap(
+                keyMapper,
+                valueMapper,
+                (a, b) -> {
+                    throw new IllegalStateException("Duplicate key " + a);
+                },
+                LinkedHashMap::new
+        );
     }
 
     // remove on Java 9 and replace with Stream.iterate
@@ -394,7 +411,16 @@ public final class Utils {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper;
+    }
+
+    public static <T> T loadJson(ObjectMapper objectMapper, InputStream inputStream, Class<T> type) {
+        try {
+            return objectMapper.readValue(inputStream, type);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String objectToString(Object object) {
