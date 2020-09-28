@@ -121,7 +121,7 @@ public class ModelCompiler {
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
         if (settings.generateConstructors) {
-            tsModel = addConstructors(symbolTable, tsModel, settings.sortDeclarations);
+            tsModel = addConstructors(symbolTable, tsModel);
         }
 
         // REST
@@ -493,7 +493,7 @@ public class ModelCompiler {
         return tsModel.withBeans(beans);
     }
 
-    private TsModel addConstructors(SymbolTable symbolTable, TsModel tsModel, Boolean sortDeclarations) {
+    private TsModel addConstructors(SymbolTable symbolTable, TsModel tsModel) {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
@@ -511,7 +511,7 @@ public class ModelCompiler {
                 ));
             }
             List<TsPropertyModel> beanProperties = bean.getProperties();
-            if (sortDeclarations) {
+            if (settings.sortDeclarations) {
                 Collections.sort(beanProperties);
             }
             for (TsPropertyModel property : beanProperties) {
