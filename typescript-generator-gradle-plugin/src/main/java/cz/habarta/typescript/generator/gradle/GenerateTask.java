@@ -60,6 +60,7 @@ public class GenerateTask extends DefaultTask {
     public Jackson2Configuration jackson2Configuration;
     public GsonConfiguration gsonConfiguration;
     public JsonbConfiguration jsonbConfiguration;
+    public List<String> additionalDataLibraries;
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
@@ -140,6 +141,7 @@ public class GenerateTask extends DefaultTask {
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
         settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
+        settings.additionalDataLibraries = additionalDataLibraries;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;

@@ -11,15 +11,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -31,15 +31,41 @@ import javax.xml.bind.JAXBElement;
 
 public class DefaultTypeProcessor implements TypeProcessor {
 
+    private final LoadedDataLibraries known;
+
+    public DefaultTypeProcessor() {
+        this(null);
+    }
+
+    public DefaultTypeProcessor(LoadedDataLibraries dataLibraries) {
+        this.known = LoadedDataLibraries.join(getKnownClasses(), dataLibraries);
+    }
+
+    private static boolean isAssignableFrom(List<Class<?>> classes, Class<?> cls) {
+        return classes.stream().anyMatch(c -> c.isAssignableFrom(cls));
+    }
+
     @Override
     public Result processType(Type javaType, Context context) {
-        if (KnownTypes.containsKey(javaType)) {
-            return new Result(KnownTypes.get(javaType));
+        if (Objects.equals(javaType, Object.class)) {
+            return new Result(TsType.Any);
         }
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
-            if (Temporal.class.isAssignableFrom(javaClass)) {
+            if (isAssignableFrom(known.stringClasses, javaClass)) {
+                return new Result(TsType.String);
+            }
+            if (isAssignableFrom(known.numberClasses, javaClass)) {
+                return new Result(TsType.Number);
+            }
+            if (isAssignableFrom(known.booleanClasses, javaClass)) {
+                return new Result(TsType.Boolean);
+            }
+            if (isAssignableFrom(known.dateClasses, javaClass)) {
                 return new Result(TsType.Date);
+            }
+            if (isAssignableFrom(known.voidClasses, javaClass)) {
+                return new Result(TsType.Void);
             }
         }
         if (javaType instanceof Class) {
@@ -51,6 +77,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
         }
         if (javaType instanceof Class) {
             final Class<?> javaClass = (Class<?>) javaType;
+            if (isAssignableFrom(known.anyClasses, javaClass)) {
+                return new Result(TsType.Any);
+            }
             if (javaClass.isArray()) {
                 final Result result = context.processTypeInsideCollection(javaClass.getComponentType());
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
@@ -58,20 +87,19 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (javaClass.isEnum()) {
                 return new Result(new TsType.EnumReferenceType(context.getSymbol(javaClass)), javaClass);
             }
-            if (Collection.class.isAssignableFrom(javaClass)) {
+            if (isAssignableFrom(known.listClasses, javaClass)) {
                 final Result result = context.processTypeInsideCollection(Object.class);
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
-            if (Map.class.isAssignableFrom(javaClass)) {
-                final Result result = context.processTypeInsideCollection(Object.class);
-                return new Result(new TsType.IndexedArrayType(TsType.String, result.getTsType()), result.getDiscoveredClasses());
+            if (isAssignableFrom(known.mapClasses, javaClass)) {
+                return processMapType(String.class, Object.class, context);
             }
             if (OptionalInt.class.isAssignableFrom(javaClass) ||
                     OptionalLong.class.isAssignableFrom(javaClass) ||
                     OptionalDouble.class.isAssignableFrom(javaClass)) {
                 return new Result(TsType.Number.optional());
             }
-            if (JAXBElement.class.isAssignableFrom(javaClass)) {
+            if (isAssignableFrom(known.wrapperClasses, javaClass)) {
                 return new Result(TsType.Any);
             }
             // generic structural type used without type arguments
@@ -89,30 +117,18 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (Collection.class.isAssignableFrom(javaClass)) {
+                if (isAssignableFrom(known.listClasses, javaClass)) {
                     final Result result = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
                 }
-                if (Map.class.isAssignableFrom(javaClass)) {
-                    final Result keyResult = context.processType(parameterizedType.getActualTypeArguments()[0]);
-                    final Result valueResult = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[1]);
-                    if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
-                        return new Result(
-                                new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueResult.getTsType()),
-                                Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
-                        );
-                    } else {
-                        return new Result(
-                                new TsType.IndexedArrayType(TsType.String, valueResult.getTsType()),
-                                valueResult.getDiscoveredClasses()
-                        );
-                    }
+                if (isAssignableFrom(known.mapClasses, javaClass)) {
+                    return processMapType(parameterizedType.getActualTypeArguments()[0], parameterizedType.getActualTypeArguments()[1], context);
                 }
-                if (Optional.class.isAssignableFrom(javaClass)) {
+                if (isAssignableFrom(known.optionalClasses, javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
                 }
-                if (JAXBElement.class.isAssignableFrom(javaClass)) {
+                if (isAssignableFrom(known.wrapperClasses, javaClass)) {
                     final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
                     return new Result(result.getTsType(), result.getDiscoveredClasses());
                 }
@@ -173,38 +189,38 @@ public class DefaultTypeProcessor implements TypeProcessor {
         return null;
     }
 
-    private static Map<Type, TsType> getKnownTypes() {
-        final Map<Type, TsType> knownTypes = new LinkedHashMap<>();
-        // java.lang
-        knownTypes.put(Object.class, TsType.Any);
-        knownTypes.put(Byte.class, TsType.Number);
-        knownTypes.put(Byte.TYPE, TsType.Number);
-        knownTypes.put(Short.class, TsType.Number);
-        knownTypes.put(Short.TYPE, TsType.Number);
-        knownTypes.put(Integer.class, TsType.Number);
-        knownTypes.put(Integer.TYPE, TsType.Number);
-        knownTypes.put(Long.class, TsType.Number);
-        knownTypes.put(Long.TYPE, TsType.Number);
-        knownTypes.put(Float.class, TsType.Number);
-        knownTypes.put(Float.TYPE, TsType.Number);
-        knownTypes.put(Double.class, TsType.Number);
-        knownTypes.put(Double.TYPE, TsType.Number);
-        knownTypes.put(Boolean.class, TsType.Boolean);
-        knownTypes.put(Boolean.TYPE, TsType.Boolean);
-        knownTypes.put(Character.class, TsType.String);
-        knownTypes.put(Character.TYPE, TsType.String);
-        knownTypes.put(String.class, TsType.String);
-        knownTypes.put(void.class, TsType.Void);
-        knownTypes.put(Void.class, TsType.Void);
-        knownTypes.put(Number.class, TsType.Number);
-        // other java packages
-        knownTypes.put(BigDecimal.class, TsType.Number);
-        knownTypes.put(BigInteger.class, TsType.Number);
-        knownTypes.put(Date.class, TsType.Date);
-        knownTypes.put(UUID.class, TsType.String);
-        return knownTypes;
+    private Result processMapType(Type keyType, Type valueType, Context context) {
+        final Result keyResult = context.processType(keyType);
+        final Result valueResult = context.processTypeInsideCollection(valueType);
+        final TsType valueTsType = valueResult.getTsType();
+        if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
+            return new Result(
+                    new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
+                    Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
+            );
+        } else {
+            return new Result(
+                    new TsType.IndexedArrayType(TsType.String, valueTsType),
+                    valueResult.getDiscoveredClasses()
+            );
+        }
     }
 
-    private static final Map<Type, TsType> KnownTypes = getKnownTypes();
+    private static LoadedDataLibraries getKnownClasses() {
+        return new LoadedDataLibraries(
+            Arrays.asList(char.class, Character.class, String.class, UUID.class),
+            Arrays.asList(byte.class, short.class, int.class, long.class, float.class, double.class, Number.class),
+            Arrays.asList(boolean.class, Boolean.class),
+            Arrays.asList(Date.class, Calendar.class, Temporal.class),
+            Arrays.asList(),
+            Arrays.asList(void.class, Void.class),
+            Arrays.asList(Collection.class),
+            Arrays.asList(Map.class),
+            Arrays.asList(Optional.class),
+            Arrays.asList(JAXBElement.class),
+            Arrays.asList(),
+            Arrays.asList()
+        );
+    }
 
 }

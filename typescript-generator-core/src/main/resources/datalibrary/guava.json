@@ -1,0 +1,71 @@
+{
+    "$schema": "./_schema.json",
+    "info": {
+        "source": "https://github.com/google/guava",
+        "jacksonModule": "https://github.com/FasterXML/jackson-datatypes-collections/blob/master/guava/src/main/java/com/fasterxml/jackson/datatype/guava/GuavaModule.java"
+    },
+    "classMappings": [
+        {
+            "className": "com.google.common.base.Optional",
+            "semanticType": "optional"
+        },
+        {
+            "className": "com.google.common.collect.RangeSet<C>",
+            "customType": "GuavaRangeSet<C>"
+        },
+        {
+            "className": "com.google.common.collect.Range<C>",
+            "customType": "GuavaRange<C>"
+        },
+        {
+            "className": "com.google.common.collect.Table<R, C, V>",
+            "customType": "GuavaTable<V>"
+        },
+        {
+            "className": "com.google.common.net.HostAndPort",
+            "semanticType": "string"
+        },
+        {
+            "className": "com.google.common.net.InternetDomainName",
+            "semanticType": "string"
+        },
+        {
+            "className": "com.google.common.cache.CacheBuilderSpec",
+            "semanticType": "string"
+        },
+        {
+            "className": "com.google.common.cache.CacheBuilder<K, V>",
+            "customType": "string"
+        },
+        {
+            "className": "com.google.common.hash.HashCode",
+            "semanticType": "string"
+        },
+        {
+            "className": "com.google.common.collect.FluentIterable",
+            "semanticType": "list"
+        },
+        {
+            "className": "com.google.common.collect.Multimap<K, V>",
+            "customType": "GuavaMultimap<V>"
+        }
+    ],
+    "typeAliases": [
+        {
+            "name": "GuavaRangeSet<C>",
+            "definition": "GuavaRange<C>[]"
+        },
+        {
+            "name": "GuavaRange<C>",
+            "definition": "{ lowerEndpoint: C, lowerBoundType: 'OPEN' | 'CLOSED', upperEndpoint: C, upperBoundType: 'OPEN' | 'CLOSED' }"
+        },
+        {
+            "name": "GuavaTable<V>",
+            "definition": "{ [index: string]: { [index: string]: V } }"
+        },
+        {
+            "name": "GuavaMultimap<V>",
+            "definition": "{ [index: string]: V[] }"
+        }
+    ]
+}

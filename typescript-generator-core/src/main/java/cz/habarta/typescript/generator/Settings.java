@@ -1,7 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
@@ -12,6 +14,7 @@ import cz.habarta.typescript.generator.parser.TypeParser;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -56,6 +59,8 @@ public class Settings {
     public Jackson2ConfigurationResolved jackson2Configuration = null;
     public GsonConfiguration gsonConfiguration = null;
     public JsonbConfiguration jsonbConfiguration = null;
+    public List<String> additionalDataLibraries = new ArrayList<>();
+    private LoadedDataLibraries loadedDataLibrariesClasses = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
@@ -137,12 +142,21 @@ public class Settings {
     }
 
     public static class CustomTypeMapping {
+        public final Class<?> rawClass;
+        public final boolean matchSubclasses;
         public final GenericName javaType;
         public final GenericName tsType;
 
-        public CustomTypeMapping(GenericName javaType, GenericName tsType) {
+        public CustomTypeMapping(Class<?> rawClass, boolean matchSubclasses, GenericName javaType, GenericName tsType) {
+            this.rawClass = rawClass;
+            this.matchSubclasses = matchSubclasses;
             this.javaType = javaType;
             this.tsType = tsType;
+        }
+
+        @Override
+        public String toString() {
+            return Utils.objectToString(this);
         }
     }
 
@@ -268,6 +282,9 @@ public class Settings {
     }
 
     public void validate() {
+        if (classLoader == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
         if (outputKind == null) {
             throw new RuntimeException("Required 'outputKind' parameter is not configured. " + seeLink());
         }
@@ -421,7 +438,7 @@ public class Settings {
             throw new RuntimeException("'npmBuildScript' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
         getModuleDependencies();
-
+        getLoadedDataLibraries();
         if (declarePropertiesAsOptional) {
             TypeScriptGenerator.getLogger().warning("Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
             if (optionalProperties == null) {
@@ -452,55 +469,69 @@ public class Settings {
 
     public List<CustomTypeMapping> getValidatedCustomTypeMappings() {
         if (validatedCustomTypeMappings == null) {
-            validatedCustomTypeMappings = new ArrayList<>();
-            for (Map.Entry<String, String> entry : customTypeMappings.entrySet()) {
-                final String javaName = entry.getKey();
-                final String tsName = entry.getValue();
-                try {
-                    final GenericName genericJavaName = parseGenericName(javaName);
-                    final GenericName genericTsName = parseGenericName(tsName);
-                    validateTypeParameters(genericJavaName.typeParameters);
-                    validateTypeParameters(genericTsName.typeParameters);
-                    final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, Object.class);
-                    final int required = cls.getTypeParameters().length;
-                    final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
-                    if (specified != required) {
-                        final String parameters = Stream.of(cls.getTypeParameters())
-                                .map(TypeVariable::getName)
-                                .collect(Collectors.joining(", "));
-                        final String signature = cls.getName() + (parameters.isEmpty() ? "" : "<" + parameters + ">");
-                        throw new RuntimeException(String.format(
-                                "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
-                                required, specified, signature));
-                    }
-                    validatedCustomTypeMappings.add(new CustomTypeMapping(genericJavaName, genericTsName));
-                } catch (Exception e) {
-                    throw new RuntimeException(String.format("Failed to parse configured custom type mapping '%s:%s': %s", javaName, tsName, e.getMessage()), e);
-                }
-            }
+            validatedCustomTypeMappings = Utils.concat(
+                    validateCustomTypeMappings(customTypeMappings, false),
+                    getLoadedDataLibraries().typeMappings);
         }
         return validatedCustomTypeMappings;
     }
 
-    public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
-        if (validatedCustomTypeAliases == null) {
-            validatedCustomTypeAliases = new ArrayList<>();
-            for (Map.Entry<String, String> entry : customTypeAliases.entrySet()) {
-                final String tsName = entry.getKey();
-                final String tsDefinition = entry.getValue();
-                try {
-                    final GenericName genericTsName = parseGenericName(tsName);
-                    if (!ModelCompiler.isValidIdentifierName(genericTsName.rawName)) {
-                        throw new RuntimeException(String.format("Invalid identifier: '%s'", genericTsName.rawName));
-                    }
-                    validateTypeParameters(genericTsName.typeParameters);
-                    validatedCustomTypeAliases.add(new CustomTypeAlias(genericTsName, tsDefinition));
-                } catch (Exception e) {
-                    throw new RuntimeException(String.format("Failed to parse configured custom type alias '%s:%s': %s", tsName, tsDefinition, e.getMessage()), e);
+    private List<CustomTypeMapping> validateCustomTypeMappings(Map<String, String> customTypeMappings, boolean matchSubclasses) {
+        final List<CustomTypeMapping> mappings = new ArrayList<>();
+        for (Map.Entry<String, String> entry : customTypeMappings.entrySet()) {
+            final String javaName = entry.getKey();
+            final String tsName = entry.getValue();
+            try {
+                final GenericName genericJavaName = parseGenericName(javaName);
+                final GenericName genericTsName = parseGenericName(tsName);
+                validateTypeParameters(genericJavaName.typeParameters);
+                validateTypeParameters(genericTsName.typeParameters);
+                final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, Object.class);
+                final int required = cls.getTypeParameters().length;
+                final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
+                if (specified != required) {
+                    final String parameters = Stream.of(cls.getTypeParameters())
+                            .map(TypeVariable::getName)
+                            .collect(Collectors.joining(", "));
+                    final String signature = cls.getName() + (parameters.isEmpty() ? "" : "<" + parameters + ">");
+                    throw new RuntimeException(String.format(
+                            "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
+                            required, specified, signature));
                 }
+                mappings.add(new CustomTypeMapping(cls, matchSubclasses, genericJavaName, genericTsName));
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to parse configured custom type mapping '%s:%s': %s", javaName, tsName, e.getMessage()), e);
             }
         }
+        return mappings;
+    }
+
+    public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
+        if (validatedCustomTypeAliases == null) {
+            validatedCustomTypeAliases = Utils.concat(
+                    validateCustomTypeAliases(customTypeAliases),
+                    getLoadedDataLibraries().typeAliases);
+        }
         return validatedCustomTypeAliases;
+    }
+
+    public List<CustomTypeAlias> validateCustomTypeAliases(Map<String, String> customTypeAliases) {
+        final List<CustomTypeAlias> aliases = new ArrayList<>();
+        for (Map.Entry<String, String> entry : customTypeAliases.entrySet()) {
+            final String tsName = entry.getKey();
+            final String tsDefinition = entry.getValue();
+            try {
+                final GenericName genericTsName = parseGenericName(tsName);
+                if (!ModelCompiler.isValidIdentifierName(genericTsName.rawName)) {
+                    throw new RuntimeException(String.format("Invalid identifier: '%s'", genericTsName.rawName));
+                }
+                validateTypeParameters(genericTsName.typeParameters);
+                aliases.add(new CustomTypeAlias(genericTsName, tsDefinition));
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to parse configured custom type alias '%s:%s': %s", tsName, tsDefinition, e.getMessage()), e);
+            }
+        }
+        return aliases;
     }
 
     private static GenericName parseGenericName(String name) {
@@ -558,6 +589,65 @@ public class Settings {
             loadedModuleDependencies = new LoadedModuleDependencies(this, moduleDependencies);
         }
         return loadedModuleDependencies;
+    }
+
+    public LoadedDataLibraries getLoadedDataLibraries() {
+        if (loadedDataLibrariesClasses == null) {
+            loadedDataLibrariesClasses = loadDataLibrariesClasses();
+        }
+        return loadedDataLibrariesClasses;
+    }
+
+    private LoadedDataLibraries loadDataLibrariesClasses() {
+        if (additionalDataLibraries == null) {
+            return new LoadedDataLibraries();
+        }
+        final List<LoadedDataLibraries> loaded = new ArrayList<>();
+        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        for (String library : additionalDataLibraries) {
+            final String resource = "datalibrary/" + library + ".json";
+            TypeScriptGenerator.getLogger().verbose("Loading resource " + resource);
+            final InputStream inputStream = classLoader.getResourceAsStream(resource);
+            if (inputStream == null) {
+                throw new RuntimeException("Resource not found: " + resource);
+            }
+            final DataLibraryJson dataLibrary = Utils.loadJson(objectMapper, inputStream, DataLibraryJson.class);
+            final Map<String, String> typeMappings = Utils.listFromNullable(dataLibrary.classMappings).stream()
+                    .filter(mapping -> mapping.customType != null)
+                    .collect(Utils.toMap(
+                            mapping -> mapping.className,
+                            mapping -> mapping.customType
+                    ));
+            final Map<String, String> typeAliases = Utils.listFromNullable(dataLibrary.typeAliases).stream()
+                    .collect(Utils.toMap(
+                            alias -> alias.name,
+                            alias -> alias.definition
+                    ));
+            loaded.add(new LoadedDataLibraries(
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.String),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Number),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Boolean),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Date),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Any),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Void),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.List),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Map),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Optional),
+                loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Wrapper),
+                validateCustomTypeMappings(typeMappings, true),
+                validateCustomTypeAliases(typeAliases)
+            ));
+        }
+        return LoadedDataLibraries.join(loaded);
+    }
+
+    private List<Class<?>> loadDataLibraryClasses(DataLibraryJson dataLibrary, DataLibraryJson.SemanticType semanticType) {
+        final List<String> classNames = dataLibrary.classMappings.stream()
+                .filter(mapping -> mapping.semanticType == semanticType)
+                .map(mapping -> mapping.className)
+                .collect(Collectors.toList());
+        return loadClasses(classLoader, classNames, Object.class);
     }
 
     public Predicate<String> getExcludeFilter() {

@@ -236,6 +236,20 @@ public class GenerateMojo extends AbstractMojo {
     private JsonbConfiguration jsonbConfiguration;
 
     /**
+     * Allows to add support for specified libraries.
+     * Some libraries have special Jackson serializers and deserializers for their data types so this parameter allows to reflect actual JSON format of those data types.
+     * Note: specified library must be present in project dependencies (typescript-generator itself doesn't depend on those libraries).
+     * Supported libraries are:
+     * <ul>
+     * <li><code>guava</code> (<a href="https://github.com/google/guava">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
+     * <li><code>joda</code> (<a href="https://github.com/JodaOrg/joda-time">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
+     * <li><code>vavr</code> (<a href="https://github.com/vavr-io/vavr">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
+     * </ul>
+     */
+    @Parameter
+    private List<String> additionalDataLibraries;
+
+    /**
      * <b>Deprecated</b>, use {@link #optionalProperties} parameter.
      */
     @Deprecated
@@ -804,6 +818,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
         settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
+        settings.additionalDataLibraries = additionalDataLibraries;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;

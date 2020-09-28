@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,6 +102,39 @@ public class GenericsResolverTest {
     static class R12<U, V> extends R1<V, U> {
     }
     static class R123<A, B, C> extends R12<C, List<B>> {
+    }
+
+    @Test
+    public void testResolvingGenericVariablesInContextType1() throws NoSuchFieldException {
+        final Type contextType = MyClass.class.getField("property1").getGenericType();
+        final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
+        Assert.assertEquals(Arrays.asList("java.lang.String", "java.lang.Integer"), resolvedTypeParameters.stream().map(Type::getTypeName).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void testResolvingGenericVariablesInContextType3() throws NoSuchFieldException {
+        final Type contextType = MyClass.class.getField("property3").getGenericType();
+        final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
+        Assert.assertEquals(Arrays.asList("java.lang.Integer", "java.lang.Boolean"), resolvedTypeParameters.stream().map(Type::getTypeName).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void testResolvingGenericVariablesInContextTypeBase() throws NoSuchFieldException {
+        final Type contextType = MyClass.class.getField("propertyBase").getGenericType();
+        final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
+        Assert.assertEquals(Arrays.asList("java.lang.Integer", "java.lang.String"), resolvedTypeParameters.stream().map(Type::getTypeName).collect(Collectors.toList()));
+    }
+
+    static class BaseClass<A, B> {}
+
+    static class SubClass1<B> extends BaseClass<String, B> {}
+
+    static class SubClass3<X, Y, Z> extends BaseClass<Z, Y> {}
+
+    static class MyClass {
+        public SubClass1<Integer> property1;
+        public SubClass3<String, Boolean, Integer> property3;
+        public BaseClass<Integer, String> propertyBase;
     }
 
 }

@@ -1,0 +1,47 @@
+{
+    "$schema": "./_schema.json",
+    "info": {
+        "source": "https://github.com/vavr-io/vavr",
+        "jacksonModule": "https://github.com/vavr-io/vavr-jackson/blob/master/src/main/java/io/vavr/jackson/datatype/VavrModule.java"
+    },
+    "classMappings": [
+        {
+            "className": "io.vavr.Lazy",
+            "semanticType": "wrapper"
+        },
+        {
+            "className": "io.vavr.control.Option",
+            "semanticType": "optional"
+        },
+        {
+            "className": "io.vavr.collection.CharSeq",
+            "semanticType": "string"
+        },
+        {
+            "className": "io.vavr.collection.Seq",
+            "semanticType": "list"
+        },
+        {
+            "className": "io.vavr.collection.Set",
+            "semanticType": "list"
+        },
+        {
+            "className": "io.vavr.collection.PriorityQueue",
+            "semanticType": "list"
+        },
+        {
+            "className": "io.vavr.collection.Map",
+            "semanticType": "map"
+        },
+        {
+            "className": "io.vavr.collection.Multimap<K, V>",
+            "customType": "VavrMultimap<V>"
+        }
+    ],
+    "typeAliases": [
+        {
+            "name": "VavrMultimap<V>",
+            "definition": "{ [index: string]: V[] }"
+        }
+    ]
+}
