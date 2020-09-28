@@ -795,6 +795,9 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private Logger.Level loggingLevel;
 
+    @Parameter(property = "typescript.generator.skip")
+    private boolean skip;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -888,6 +891,10 @@ public class GenerateMojo extends AbstractMojo {
     public void execute() {
         TypeScriptGenerator.setLogger(new Logger(loggingLevel));
         TypeScriptGenerator.printVersion();
+        if (skip) {
+            TypeScriptGenerator.getLogger().info("Skipping plugin execution");
+            return;
+        }
 
         // class loader
         final List<URL> urls = new ArrayList<>();
