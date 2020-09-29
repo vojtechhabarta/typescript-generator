@@ -596,7 +596,7 @@ public class JsonbParser extends ModelParser {
                     break;
                 }
                 final String parentPack = name.substring(0, end);
-                p = Package.getPackage(parentPack);
+                p = classLoader.getDefinedPackage(parentPack);
                 if (p == null) {
                     try {
                         p = classLoader.loadClass(parentPack + ".package-info").getPackage();
