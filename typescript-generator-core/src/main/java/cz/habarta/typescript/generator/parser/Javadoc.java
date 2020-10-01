@@ -90,8 +90,8 @@ public class Javadoc {
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
-        final String propertyComment;
-        final List<TagInfo> tags;
+        String propertyComment = null;
+        List<TagInfo> tags = null;
         if (property.getOriginalMember() instanceof java.lang.reflect.Method) {
             final Method dMethod = findJavadocMethod(property.getOriginalMember().getName(), dMethods);
             propertyComment = dMethod != null ? dMethod.getComment() : null;
@@ -100,7 +100,9 @@ public class Javadoc {
             final Field dField = findJavadocField(property.getOriginalMember().getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
-        } else {
+        } 
+        if (propertyComment == null )  {
+            //give a chance for comments on fields but not on getter setters
             final Field dField = findJavadocField(property.getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
