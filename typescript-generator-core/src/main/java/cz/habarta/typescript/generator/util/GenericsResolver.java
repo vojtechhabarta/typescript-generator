@@ -48,7 +48,7 @@ public class GenericsResolver {
     public static List<Type> resolveBaseGenericVariables(Class<?> baseClass, Type contextType) {
         final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(contextType);
         if (rawClassAndTypeArguments != null) {
-            if (rawClassAndTypeArguments.getValue2().isEmpty()) {
+            if (!rawClassAndTypeArguments.getValue2().isPresent()) {
                 return Collections.nCopies(baseClass.getTypeParameters().length, Object.class);
             }
             final ResolvedClass resolvedContextType = new ResolvedClass(null, null, null).resolveAncestor(contextType);
@@ -119,7 +119,7 @@ public class GenericsResolver {
 
         public ResolvedClass resolveAncestor(Type ancestor) {
             final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(ancestor);
-            if (rawClassAndTypeArguments == null || rawClassAndTypeArguments.getValue2().isEmpty()) {
+            if (rawClassAndTypeArguments == null || !rawClassAndTypeArguments.getValue2().isPresent()) {
                 return null;
             }
             final Class<?> cls = rawClassAndTypeArguments.getValue1();
