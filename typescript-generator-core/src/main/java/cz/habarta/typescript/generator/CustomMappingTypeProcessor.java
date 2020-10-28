@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.GenericsResolver;
-import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -20,11 +19,10 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
 
     @Override
     public Result processType(Type javaType, Context context) {
-        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(javaType);
-        if (rawClassAndTypeArguments == null) {
+        final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+        if (rawClass == null) {
             return null;
         }
-        final Class<?> rawClass = rawClassAndTypeArguments.getValue1();
         final Settings.CustomTypeMapping mapping = customMappings.stream()
                 .filter(m -> m.matchSubclasses
                         ? m.rawClass.isAssignableFrom(rawClass)

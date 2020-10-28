@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -45,8 +46,11 @@ public class GenericsResolver {
     }
 
     public static List<Type> resolveBaseGenericVariables(Class<?> baseClass, Type contextType) {
-        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(contextType);
+        final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(contextType);
         if (rawClassAndTypeArguments != null) {
+            if (rawClassAndTypeArguments.getValue2().isEmpty()) {
+                return Collections.nCopies(baseClass.getTypeParameters().length, Object.class);
+            }
             final ResolvedClass resolvedContextType = new ResolvedClass(null, null, null).resolveAncestor(contextType);
             final List<ResolvedClass> path = traverseSomeInheritancePath(resolvedContextType, baseClass);
             final ResolvedClass resolvedClass = path != null && !path.isEmpty() ? path.get(0) : resolvedContextType;
@@ -114,10 +118,13 @@ public class GenericsResolver {
         }
 
         public ResolvedClass resolveAncestor(Type ancestor) {
-            final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(ancestor);
+            final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(ancestor);
+            if (rawClassAndTypeArguments == null || rawClassAndTypeArguments.getValue2().isEmpty()) {
+                return null;
+            }
             final Class<?> cls = rawClassAndTypeArguments.getValue1();
             final List<TypeVariable<?>> typeVariables = Arrays.asList(cls.getTypeParameters());
-            final List<Type> arguments = rawClassAndTypeArguments.getValue2();
+            final List<Type> arguments = rawClassAndTypeArguments.getValue2().get();
             final Map<String, Type> typeParameters = new LinkedHashMap<>();
             final int count = Math.min(typeVariables.size(), arguments.size());
             for (int i = 0; i < count; i++) {

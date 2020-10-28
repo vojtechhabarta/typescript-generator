@@ -53,14 +53,25 @@ public class LoadedDataLibraries {
         this.dateClasses = dateClasses;
         this.anyClasses = anyClasses;
         this.voidClasses = voidClasses;
-        this.listClasses = listClasses;
-        this.mapClasses = mapClasses;
-        this.optionalClasses = optionalClasses;
-        this.wrapperClasses = wrapperClasses;
+        this.listClasses = validateNumberOfGenericParameters(listClasses, 1);
+        this.mapClasses = validateNumberOfGenericParameters(mapClasses, 2);
+        this.optionalClasses = validateNumberOfGenericParameters(optionalClasses, 1);
+        this.wrapperClasses = validateNumberOfGenericParameters(wrapperClasses, 1);
         this.typeMappings = typeMappings;
         this.typeAliases = typeAliases;
     }
 
+    private static List<Class<?>> validateNumberOfGenericParameters(List<Class<?>> classes, int required) {
+        for (Class<?> cls : classes) {
+            if (cls.getTypeParameters().length != required) {
+                throw new RuntimeException(String.format(
+                        "Data library class '%s' is required to have %d generic type parameters but it has %d",
+                        cls.getName(), required, cls.getTypeParameters().length));
+            }
+        }
+        return classes;
+    }
+    
     public static LoadedDataLibraries join(LoadedDataLibraries... jsons) {
         return join(Arrays.asList(jsons));
     }

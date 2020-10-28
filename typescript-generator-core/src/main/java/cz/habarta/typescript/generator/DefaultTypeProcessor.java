@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
+import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -42,7 +43,11 @@ public class DefaultTypeProcessor implements TypeProcessor {
     }
 
     private static boolean isAssignableFrom(List<Class<?>> classes, Class<?> cls) {
-        return classes.stream().anyMatch(c -> c.isAssignableFrom(cls));
+        return assignableFrom(classes, cls).isPresent();
+    }
+
+    private static Optional<Class<?>> assignableFrom(List<Class<?>> classes, Class<?> cls) {
+        return classes.stream().filter(c -> c.isAssignableFrom(cls)).findFirst();
     }
 
     @Override
@@ -87,20 +92,15 @@ public class DefaultTypeProcessor implements TypeProcessor {
             if (javaClass.isEnum()) {
                 return new Result(new TsType.EnumReferenceType(context.getSymbol(javaClass)), javaClass);
             }
-            if (isAssignableFrom(known.listClasses, javaClass)) {
-                final Result result = context.processTypeInsideCollection(Object.class);
-                return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
-            }
-            if (isAssignableFrom(known.mapClasses, javaClass)) {
-                return processMapType(String.class, Object.class, context);
+            // list, map, optional, wrapper
+            final Result knownGenericTypeResult = processKnownGenericType(javaClass, javaClass, context);
+            if (knownGenericTypeResult != null) {
+                return knownGenericTypeResult;
             }
             if (OptionalInt.class.isAssignableFrom(javaClass) ||
                     OptionalLong.class.isAssignableFrom(javaClass) ||
                     OptionalDouble.class.isAssignableFrom(javaClass)) {
                 return new Result(TsType.Number.optional());
-            }
-            if (isAssignableFrom(known.wrapperClasses, javaClass)) {
-                return new Result(TsType.Any);
             }
             // generic structural type used without type arguments
             if (javaClass.getTypeParameters().length > 0) {
@@ -117,20 +117,10 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                if (isAssignableFrom(known.listClasses, javaClass)) {
-                    final Result result = context.processTypeInsideCollection(parameterizedType.getActualTypeArguments()[0]);
-                    return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
-                }
-                if (isAssignableFrom(known.mapClasses, javaClass)) {
-                    return processMapType(parameterizedType.getActualTypeArguments()[0], parameterizedType.getActualTypeArguments()[1], context);
-                }
-                if (isAssignableFrom(known.optionalClasses, javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
-                    return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
-                }
-                if (isAssignableFrom(known.wrapperClasses, javaClass)) {
-                    final Result result = context.processType(parameterizedType.getActualTypeArguments()[0]);
-                    return new Result(result.getTsType(), result.getDiscoveredClasses());
+                // list, map, optional, wrapper
+                final Result knownGenericTypeResult = processKnownGenericType(javaType, javaClass, context);
+                if (knownGenericTypeResult != null) {
+                    return knownGenericTypeResult;
                 }
                 // generic structural type
                 final List<Class<?>> discoveredClasses = new ArrayList<>();
@@ -189,21 +179,49 @@ public class DefaultTypeProcessor implements TypeProcessor {
         return null;
     }
 
-    private Result processMapType(Type keyType, Type valueType, Context context) {
-        final Result keyResult = context.processType(keyType);
-        final Result valueResult = context.processTypeInsideCollection(valueType);
-        final TsType valueTsType = valueResult.getTsType();
-        if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
-            return new Result(
-                    new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
-                    Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
-            );
-        } else {
-            return new Result(
-                    new TsType.IndexedArrayType(TsType.String, valueTsType),
-                    valueResult.getDiscoveredClasses()
-            );
+    private Result processKnownGenericType(Type javaType, Class<?> rawClass, Context context) {
+
+        final Optional<Class<?>> listBaseClass = assignableFrom(known.listClasses, rawClass);
+        if (listBaseClass.isPresent()) {
+            final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(listBaseClass.get(), javaType);
+            final Result result = context.processTypeInsideCollection(resolvedGenericVariables.get(0));
+            return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
         }
+
+        final Optional<Class<?>> mapBaseClass = assignableFrom(known.mapClasses, rawClass);
+        if (mapBaseClass.isPresent()) {
+            final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(mapBaseClass.get(), javaType);
+            final Result keyResult = context.processType(resolvedGenericVariables.get(0));
+            final Result valueResult = context.processTypeInsideCollection(resolvedGenericVariables.get(1));
+            final TsType valueTsType = valueResult.getTsType();
+            if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
+                return new Result(
+                        new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
+                        Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
+                );
+            } else {
+                return new Result(
+                        new TsType.IndexedArrayType(TsType.String, valueTsType),
+                        valueResult.getDiscoveredClasses()
+                );
+            }
+        }
+
+        final Optional<Class<?>> optionalBaseClass = assignableFrom(known.optionalClasses, rawClass);
+        if (optionalBaseClass.isPresent()) {
+            final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(optionalBaseClass.get(), javaType);
+            final Result result = context.processType(resolvedGenericVariables.get(0));
+            return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
+        }
+
+        final Optional<Class<?>> wrapperBaseClass = assignableFrom(known.wrapperClasses, rawClass);
+        if (wrapperBaseClass.isPresent()) {
+            final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(wrapperBaseClass.get(), javaType);
+            final Result result = context.processType(resolvedGenericVariables.get(0));
+            return new Result(result.getTsType(), result.getDiscoveredClasses());
+        }
+
+        return null;
     }
 
     private static LoadedDataLibraries getKnownClasses() {

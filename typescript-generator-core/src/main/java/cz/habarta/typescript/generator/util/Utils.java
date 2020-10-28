@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -69,20 +70,22 @@ public final class Utils {
     }
 
     public static Class<?> getRawClassOrNull(Type type) {
-        final Pair<Class<?>, List<Type>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
+        final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
         return rawClassAndTypeArguments != null ? rawClassAndTypeArguments.getValue1() : null;
     }
 
-    public static Pair<Class<?>, List<Type>> getRawClassAndTypeArguments(Type type) {
+    public static Pair<Class<?>, Optional<List<Type>>> getRawClassAndTypeArguments(Type type) {
         if (type instanceof Class) {
             final Class<?> javaClass = (Class<?>) type;
-            return Pair.of(javaClass, Arrays.asList(javaClass.getTypeParameters()));
+            return javaClass.getTypeParameters().length != 0
+                    ? Pair.of(javaClass, Optional.empty())  // raw usage of generic class
+                    : Pair.of(javaClass, Optional.of(Collections.emptyList()));  // non-generic class
         }
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
             if (parameterizedType.getRawType() instanceof Class) {
                 final Class<?> javaClass = (Class<?>) parameterizedType.getRawType();
-                return Pair.of(javaClass, Arrays.asList(parameterizedType.getActualTypeArguments()));
+                return Pair.of(javaClass, Optional.of(Arrays.asList(parameterizedType.getActualTypeArguments())));
             }
         }
         return null;
