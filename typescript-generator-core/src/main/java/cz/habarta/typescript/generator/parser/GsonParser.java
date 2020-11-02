@@ -1,5 +1,7 @@
 package cz.habarta.typescript.generator.parser;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
@@ -7,6 +9,8 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 public class GsonParser extends ModelParser {
 
@@ -50,6 +55,17 @@ public class GsonParser extends ModelParser {
             : Modifier.STATIC | Modifier.TRANSIENT;
         this.gson = new GsonBuilder()
             .excludeFieldsWithModifiers(modifiers)
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                    return !isAnnotatedPropertyIncluded(fieldAttributes::getAnnotation, fieldAttributes.getDeclaringClass().getName() + "." + fieldAttributes.getName());
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> aClass) {
+                    return false;
+                }
+            })
             .create();
     }
 
