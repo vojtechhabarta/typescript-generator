@@ -1,5 +1,7 @@
 package cz.habarta.typescript.generator.parser;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
@@ -50,6 +52,17 @@ public class GsonParser extends ModelParser {
             : Modifier.STATIC | Modifier.TRANSIENT;
         this.gson = new GsonBuilder()
             .excludeFieldsWithModifiers(modifiers)
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                    return !isAnnotatedPropertyIncluded(fieldAttributes::getAnnotation, fieldAttributes.getDeclaringClass().getName() + "." + fieldAttributes.getName());
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> aClass) {
+                    return false;
+                }
+            })
             .create();
     }
 
