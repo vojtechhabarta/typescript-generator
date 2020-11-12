@@ -1,4 +1,3 @@
-/* tslint:disable */
 
 export class BaseClass {
     discriminator: "OnePossiblePropertyValueAssigningExtensionTest$SubClass" | "OnePossiblePropertyValueAssigningExtensionTest$OtherSubClass";

@@ -47,6 +47,7 @@ import cz.habarta.typescript.generator.parser.MethodModel;
 import cz.habarta.typescript.generator.parser.MethodParameterModel;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PathTemplate;
+import cz.habarta.typescript.generator.parser.PropertyAccess;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
@@ -215,7 +216,7 @@ public class ModelCompiler {
 
     public TsType javaToTypeScript(Type type) {
         final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
-                Collections.singletonList(new PropertyModel("property", type, false, null, null, null, null)), null);
+                Collections.singletonList(new PropertyModel("property", type, false, null, null, null, null, null)), null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
         return tsModel.getBeans().get(0).getProperties().get(0).getTsType();
@@ -386,7 +387,18 @@ public class ModelCompiler {
         final TsType type = typeFromJava(symbolTable, property.getType(), property.getContext(), property.getName(), bean.getOrigin());
         final TsType tsType = property.isOptional() ? type.optional() : type;
         final TsModifierFlags modifiers = TsModifierFlags.None.setReadonly(settings.declarePropertiesAsReadOnly);
-        return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, property.getComments());
+        final List<String> comments = settings.generateReadonlyAndWriteonlyJSDocTags
+                ? Utils.concat(property.getComments(), getPropertyAccessComments(property.getAccess()))
+                : property.getComments();
+        return new TsPropertyModel(prefix + property.getName() + suffix, tsType, modifiers, /*ownProperty*/ false, comments);
+    }
+
+    private static List<String> getPropertyAccessComments(PropertyAccess access) {
+        final String accessTag =
+                access == PropertyAccess.ReadOnly ? "@readonly" :
+                access == PropertyAccess.WriteOnly ? "@writeonly" :
+                null;
+        return accessTag != null ? Collections.singletonList(accessTag) : null;
     }
 
     private TsEnumModel processEnum(SymbolTable symbolTable, EnumModel enumModel) {

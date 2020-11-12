@@ -16,10 +16,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
@@ -29,6 +30,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
+import com.fasterxml.jackson.databind.deser.BeanDeserializer;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
+import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
+import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -48,6 +53,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.type.JUnionType;
+import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
@@ -59,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -166,7 +173,7 @@ public class Jackson2Parser extends ModelParser {
                             final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
                             final Jackson2ConfigurationResolved config = jackson2TypeContext.parser.settings.jackson2Configuration;
                             // JsonSerialize
-                            final JsonSerialize jsonSerialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonSerialize.class);
+                            final JsonSerialize jsonSerialize = jackson2TypeContext.beanProperty.getAnnotation(JsonSerialize.class);
                             if (jsonSerialize != null && config != null && config.serializerTypeMappings != null) {
                                 @SuppressWarnings("unchecked")
                                 final Class<? extends JsonSerializer<?>> using = (Class<? extends JsonSerializer<?>>)
@@ -177,7 +184,7 @@ public class Jackson2Parser extends ModelParser {
                                 }
                             }
                             // JsonDeserialize
-                            final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanPropertyWriter.getAnnotation(JsonDeserialize.class);
+                            final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanProperty.getAnnotation(JsonDeserialize.class);
                             if (jsonDeserialize != null && config != null && config.deserializerTypeMappings != null) {
                                 @SuppressWarnings("unchecked")
                                 final Class<? extends JsonDeserializer<?>> using = (Class<? extends JsonDeserializer<?>>)
@@ -189,7 +196,7 @@ public class Jackson2Parser extends ModelParser {
                             }
                             // disableObjectIdentityFeature
                             if (!jackson2TypeContext.disableObjectIdentityFeature) {
-                                final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanPropertyWriter);
+                                final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanProperty);
                                 if (resultType != null) {
                                     return context.withTypeContext(null).processType(resultType);
                                 }
@@ -218,12 +225,12 @@ public class Jackson2Parser extends ModelParser {
 
     private static class Jackson2TypeContext {
         public final Jackson2Parser parser;
-        public final BeanPropertyWriter beanPropertyWriter;
+        public final BeanProperty beanProperty;
         public final boolean disableObjectIdentityFeature;
 
-        public Jackson2TypeContext(Jackson2Parser parser, BeanPropertyWriter beanPropertyWriter, boolean disableObjectIdentityFeature) {
+        public Jackson2TypeContext(Jackson2Parser parser, BeanProperty beanProperty, boolean disableObjectIdentityFeature) {
             this.parser = parser;
-            this.beanPropertyWriter = beanPropertyWriter;
+            this.beanProperty = beanProperty;
             this.disableObjectIdentityFeature = disableObjectIdentityFeature;
         }
     }
@@ -241,32 +248,34 @@ public class Jackson2Parser extends ModelParser {
     private BeanModel parseBean(SourceType<Class<?>> sourceClass, List<String> classComments) {
         final List<PropertyModel> properties = new ArrayList<>();
 
-        final BeanHelper beanHelper = getBeanHelper(sourceClass.type);
-        if (beanHelper != null) {
-            for (final BeanPropertyWriter beanPropertyWriter : beanHelper.getProperties()) {
-                final Member member = beanPropertyWriter.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanPropertyWriter::getAnnotation, beanPropertyWriter.getName(), sourceClass.type);
+        final BeanHelpers beanHelpers = getBeanHelpers(sourceClass.type);
+        if (beanHelpers != null) {
+            for (final Pair<BeanProperty, PropertyAccess> pair : beanHelpers.getPropertiesAndAccess()) {
+                final BeanProperty beanProperty = pair.getValue1();
+                final PropertyAccess access = pair.getValue2();
+                final Member member = beanProperty.getMember().getMember();
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
                 Type propertyType = propertyMember.getType();
-                final List<String> propertyComments = getComments(beanPropertyWriter.getAnnotation(JsonPropertyDescription.class));
+                final List<String> propertyComments = getComments(beanProperty.getAnnotation(JsonPropertyDescription.class));
 
                 final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(
                         this,
-                        beanPropertyWriter,
+                        beanProperty,
                         settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
 
-                if (!isAnnotatedPropertyIncluded(beanPropertyWriter::getAnnotation, sourceClass.type.getName() + "." + beanPropertyWriter.getName())) {
+                if (!isAnnotatedPropertyIncluded(beanProperty::getAnnotation, sourceClass.type.getName() + "." + beanProperty.getName())) {
                     continue;
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
-                        ? !beanPropertyWriter.isRequired()
+                        ? !beanProperty.isRequired()
                         : isPropertyOptional(propertyMember);
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
-                final JsonUnwrapped annotation = beanPropertyWriter.getAnnotation(JsonUnwrapped.class);
+                final JsonUnwrapped annotation = beanProperty.getAnnotation(JsonUnwrapped.class);
                 if (annotation != null && annotation.enabled()) {
                     pullProperties = new PropertyModel.PullProperties(annotation.prefix(), annotation.suffix());
                 }
-                properties.add(processTypeAndCreateProperty(beanPropertyWriter.getName(), propertyType, jackson2TypeContext, optional, sourceClass.type, member, pullProperties, propertyComments));
+                properties.add(processTypeAndCreateProperty(beanProperty.getName(), propertyType, jackson2TypeContext, optional, access, sourceClass.type, member, pullProperties, propertyComments));
             }
         }
         if (sourceClass.type.isEnum()) {
@@ -322,21 +331,21 @@ public class Jackson2Parser extends ModelParser {
     }
 
     // @JsonIdentityInfo and @JsonIdentityReference
-    private Type processIdentity(Type propertyType, BeanPropertyWriter propertyWriter) {
+    private Type processIdentity(Type propertyType, BeanProperty beanProperty) {
 
         final Class<?> clsT = Utils.getRawClassOrNull(propertyType);
-        final Class<?> clsW = propertyWriter.getType().getRawClass();
+        final Class<?> clsW = beanProperty.getType().getRawClass();
         final Class<?> cls = clsT != null ? clsT : clsW;
 
         if (cls != null) {
             final JsonIdentityInfo identityInfoC = cls.getAnnotation(JsonIdentityInfo.class);
-            final JsonIdentityInfo identityInfoP = propertyWriter.getAnnotation(JsonIdentityInfo.class);
+            final JsonIdentityInfo identityInfoP = beanProperty.getAnnotation(JsonIdentityInfo.class);
             final JsonIdentityInfo identityInfo = identityInfoP != null ? identityInfoP : identityInfoC;
             if (identityInfo == null) {
                 return null;
             }
             final JsonIdentityReference identityReferenceC = cls.getAnnotation(JsonIdentityReference.class);
-            final JsonIdentityReference identityReferenceP = propertyWriter.getAnnotation(JsonIdentityReference.class);
+            final JsonIdentityReference identityReferenceP = beanProperty.getAnnotation(JsonIdentityReference.class);
             final JsonIdentityReference identityReference = identityReferenceP != null ? identityReferenceP : identityReferenceC;
             final boolean alwaysAsId = identityReference != null && identityReference.alwaysAsId();
 
@@ -344,18 +353,18 @@ public class Jackson2Parser extends ModelParser {
             if (identityInfo.generator() == ObjectIdGenerators.None.class) {
                 return null;
             } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
-                final BeanHelper beanHelper = getBeanHelper(cls);
-                if (beanHelper == null) {
+                final BeanHelpers beanHelpers = getBeanHelpers(cls);
+                if (beanHelpers == null) {
                     return null;
                 }
-                final BeanPropertyWriter[] properties = beanHelper.getProperties();
-                final Optional<BeanPropertyWriter> idProperty = Stream.of(properties)
+                final List<BeanProperty> properties = beanHelpers.getProperties();
+                final Optional<BeanProperty> idPropertyOptional = properties.stream()
                         .filter(p -> p.getName().equals(identityInfo.property()))
                         .findFirst();
-                if (idProperty.isPresent()) {
-                    final BeanPropertyWriter idPropertyWriter = idProperty.get();
-                    final Member idMember = idPropertyWriter.getMember().getMember();
-                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idPropertyWriter::getAnnotation, idPropertyWriter.getName(), cls);
+                if (idPropertyOptional.isPresent()) {
+                    final BeanProperty idProperty = idPropertyOptional.get();
+                    final Member idMember = idProperty.getMember().getMember();
+                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idProperty::getAnnotation, idProperty.getName(), cls);
                     idType = idPropertyMember.getType();
                 } else {
                     return null;
@@ -471,42 +480,184 @@ public class Jackson2Parser extends ModelParser {
         return null;
     }
 
-    private BeanHelper getBeanHelper(Class<?> beanClass) {
+    private BeanHelpers getBeanHelpers(Class<?> beanClass) {
         if (beanClass == null) {
             return null;
         }
         if (beanClass == Enum.class) {
             return null;
         }
+        final JavaType javaType = objectMapper.constructType(beanClass);
+        final BeanSerializerHelper beanSerializerHelper = createBeanSerializerHelper(javaType);
+        if (beanSerializerHelper != null) {
+            final BeanDeserializerHelper beanDeserializerHelper = createBeanDeserializerHelper(javaType);
+            return new BeanHelpers(beanClass, beanSerializerHelper, beanDeserializerHelper);
+        }
+        return null;
+    }
+
+    private BeanSerializerHelper createBeanSerializerHelper(JavaType javaType) {
         try {
-            final DefaultSerializerProvider.Impl serializerProvider1 = (DefaultSerializerProvider.Impl) objectMapper.getSerializerProvider();
-            final DefaultSerializerProvider.Impl serializerProvider2 = serializerProvider1.createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
-            final JavaType simpleType = objectMapper.constructType(beanClass);
-            final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider2, simpleType);
-            if (jsonSerializer == null) {
-                return null;
-            }
-            if (jsonSerializer instanceof BeanSerializer) {
-                return new BeanHelper((BeanSerializer) jsonSerializer);
+            final DefaultSerializerProvider.Impl serializerProvider = new DefaultSerializerProvider.Impl()
+                    .createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
+            final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider, javaType);
+            if (jsonSerializer != null && jsonSerializer instanceof BeanSerializer) {
+                return new BeanSerializerHelper((BeanSerializer) jsonSerializer);
             } else {
                 return null;
             }
-        } catch (JsonMappingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return null;
         }
     }
 
-    private static class BeanHelper extends BeanSerializer {
+    private BeanDeserializerHelper createBeanDeserializerHelper(JavaType javaType) {
+        try {
+            final DeserializationContext deserializationContext = new DefaultDeserializationContext.Impl(objectMapper.getDeserializationContext().getFactory())
+                    .createInstance(objectMapper.getDeserializationConfig(), null, null);
+            final BeanDescription beanDescription = deserializationContext.getConfig().introspect(javaType);
+            final JsonDeserializer<?> jsonDeserializer = BeanDeserializerFactory.instance.createBeanDeserializer(deserializationContext, javaType, beanDescription);
+            if (jsonDeserializer != null && jsonDeserializer instanceof BeanDeserializer) {
+                return new BeanDeserializerHelper((BeanDeserializer) jsonDeserializer);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // for tests
+    protected List<BeanProperty> getBeanProperties(Class<?> beanClass) {
+        return getBeanHelpers(beanClass).getProperties();
+    }
+
+    private static class BeanHelpers {
+        public final Class<?> beanClass;
+        public final BeanSerializerHelper serializer;
+        public final BeanDeserializerHelper deserializer;
+
+        public BeanHelpers(Class<?> beanClass, BeanSerializerHelper serializer, BeanDeserializerHelper deserializer) {
+            this.beanClass = beanClass;
+            this.serializer = serializer;
+            this.deserializer = deserializer;
+        }
+
+        public List<BeanProperty> getProperties() {
+            return getPropertiesAndAccess().stream()
+                    .map(Pair::getValue1)
+                    .collect(Collectors.toList());
+        }
+
+        public List<Pair<BeanProperty, PropertyAccess>> getPropertiesAndAccess() {
+            return getPropertiesPairs().stream()
+                    .map(pair -> pair.getValue1() != null
+                            ? Pair.of(pair.getValue1(), pair.getValue2() != null ? PropertyAccess.ReadWrite : PropertyAccess.ReadOnly)
+                            : Pair.of(pair.getValue2(), PropertyAccess.WriteOnly)
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        private List<Pair<BeanProperty, BeanProperty>> getPropertiesPairs() {
+            final List<BeanProperty> serializableProperties = getSerializableProperties();
+            final List<BeanProperty> deserializableProperties = getDeserializableProperties();
+            final List<Pair<BeanProperty, BeanProperty>> properties = Stream
+                    .concat(
+                            serializableProperties.stream()
+                                    .map(property -> Pair.of(property, getBeanProperty(deserializableProperties, property.getName()))),
+                            deserializableProperties.stream()
+                                    .filter(property -> getBeanProperty(serializableProperties, property.getName()) == null)
+                                    .map(property -> Pair.of((BeanProperty) null, property))
+                    )
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            // sort
+            final Comparator<Pair<BeanProperty, BeanProperty>> bySerializationOrder = (pair1, pair2) ->
+                    pair1.getValue1() != null && pair2.getValue1() != null
+                            ? Integer.compare(
+                                    serializableProperties.indexOf(pair1.getValue1()),
+                                    serializableProperties.indexOf(pair2.getValue1()))
+                            : 0;
+            final Comparator<Pair<BeanProperty, BeanProperty>> byIndex = Comparator.comparing(
+                    pair -> getIndex(pair),
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            final List<Field> fields = Utils.getAllFields(beanClass);
+            final Comparator<Pair<BeanProperty, BeanProperty>> byFieldIndex = Comparator.comparing(
+                    pair -> getFieldIndex(fields, pair),
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            properties.sort(bySerializationOrder
+                    .thenComparing(byIndex)
+                    .thenComparing(byFieldIndex));
+            return properties;
+        }
+
+        private static BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
+            return properties.stream()
+                    .filter(dp -> Objects.equals(dp.getName(), name))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        private static Integer getIndex(Pair<BeanProperty, BeanProperty> pair) {
+            final Integer index1 = getIndex(pair.getValue1());
+            return index1 != null ? index1 : getIndex(pair.getValue2());
+        }
+
+        private static Integer getIndex(BeanProperty property) {
+            if (property == null) {
+                return null;
+            }
+            return property.getMetadata().getIndex();
+        }
+
+        private static Integer getFieldIndex(List<Field> fields, Pair<BeanProperty, BeanProperty> pair) {
+            final Integer fieldIndex1 = getFieldIndex(fields, pair.getValue1());
+            return fieldIndex1 != null ? fieldIndex1 : getFieldIndex(fields, pair.getValue2());
+        }
+
+        private static Integer getFieldIndex(List<Field> fields, BeanProperty property) {
+            if (property == null) {
+                return null;
+            }
+            final int index = fields.indexOf(property.getMember().getMember());
+            return index != -1 ? index : null;
+        }
+
+        private List<BeanProperty> getSerializableProperties() {
+            return serializer != null
+                    ? Arrays.asList(serializer.getProps())
+                    : Collections.emptyList();
+        }
+
+        private List<BeanProperty> getDeserializableProperties() {
+            return deserializer != null
+                    ? Arrays.asList(deserializer.getBeanProperties().getPropertiesInInsertionOrder())
+                    : Collections.emptyList();
+        }
+    }
+
+    private static class BeanSerializerHelper extends BeanSerializer {
         private static final long serialVersionUID = 1;
 
-        public BeanHelper(BeanSerializer src) {
+        public BeanSerializerHelper(BeanSerializer src) {
             super(src);
         }
 
-        public BeanPropertyWriter[] getProperties() {
+        public BeanPropertyWriter[] getProps() {
             return _props;
         }
+    }
 
+    private static class BeanDeserializerHelper extends BeanDeserializer {
+        private static final long serialVersionUID = 1;
+
+        public BeanDeserializerHelper(BeanDeserializer src) {
+            super(src);
+        }
+
+        public BeanPropertyMap getBeanProperties() {
+            return _beanProperties;
+        }
     }
 
     private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass, List<String> classComments) {

@@ -255,7 +255,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         for (Field field : fields) {
             final QueryParam annotation = field.getAnnotation(QueryParam.class);
             if (annotation != null) {
-                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, field, null, null, null));
+                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, null, field, null, null, null));
             }
         }
         try {
@@ -265,7 +265,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 if (writeMethod != null) {
                     final QueryParam annotation = writeMethod.getAnnotation(QueryParam.class);
                     if (annotation != null) {
-                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, writeMethod, null, null, null));
+                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, null, writeMethod, null, null, null));
                     }
                 }
             }

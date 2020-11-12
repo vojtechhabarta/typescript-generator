@@ -475,6 +475,12 @@ public class GenerateMojo extends AbstractMojo {
     private boolean disableTaggedUnions;
 
     /**
+     * If <code>true</code> JSDoc tags <code>@readonly</code> and <code>@writeonly</code> will be generated on properties with read-only or write-only access.
+     */
+    @Parameter
+    private boolean generateReadonlyAndWriteonlyJSDocTags;
+
+    /**
      * If <code>true</code> Swagger annotations will not be used.
      */
     @Parameter
@@ -845,6 +851,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.generateConstructors = generateConstructors;
         settings.disableTaggedUnions = disableTaggedUnions;
+        settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
         settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
