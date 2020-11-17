@@ -90,6 +90,7 @@ public class Settings {
     private Predicate<String> mapClassesAsClassesFilter = null;
     public boolean generateConstructors = false;
     public boolean disableTaggedUnions = false;
+    public boolean generateReadonlyAndWriteonlyJSDocTags = false;
     public boolean ignoreSwaggerAnnotations = false;
     public boolean generateJaxrsApplicationInterface = false;
     public boolean generateJaxrsApplicationClient = false;

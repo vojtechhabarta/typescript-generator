@@ -84,6 +84,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> mapClassesAsClassesPatterns;
     public boolean generateConstructors;
     public boolean disableTaggedUnions;
+    public boolean generateReadonlyAndWriteonlyJSDocTags;
     public boolean ignoreSwaggerAnnotations;
     public boolean generateJaxrsApplicationInterface;
     public boolean generateJaxrsApplicationClient;
@@ -165,6 +166,7 @@ public class GenerateTask extends DefaultTask {
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.generateConstructors = generateConstructors;
         settings.disableTaggedUnions = disableTaggedUnions;
+        settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
         settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;

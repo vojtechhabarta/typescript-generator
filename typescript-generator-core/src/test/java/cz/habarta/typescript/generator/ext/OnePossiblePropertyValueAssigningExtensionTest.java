@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.Input;
-import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Settings;
+import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
@@ -65,15 +65,12 @@ public class OnePossiblePropertyValueAssigningExtensionTest {
     }
 
     private static Settings createBaseSettings(OnePossiblePropertyValueAssigningExtension extension) {
-        Settings settings = new Settings();
+        Settings settings = TestUtils.settings();
         settings.sortDeclarations = true;
         settings.extensions.add(extension);
-        settings.jsonLibrary = JsonLibrary.jackson2;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
         settings.mapClasses = ClassMapping.asClasses;
-        settings.noFileComment = true;
-        settings.noEslintDisable = true;
         return settings;
     }
 

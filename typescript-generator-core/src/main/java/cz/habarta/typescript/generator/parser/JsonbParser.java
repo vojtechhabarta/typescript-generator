@@ -174,7 +174,7 @@ public class JsonbParser extends ModelParser {
                                         (isOptional(type) || OptionalInt.class == type ||
                                         OptionalLong.class == type || OptionalDouble.class == type ||
                                         property.map(JsonbProperty::nillable).orElse(false)),
-                                constructor.getDeclaringClass(), new ParameterMember(parameter),
+                                null, constructor.getDeclaringClass(), new ParameterMember(parameter),
                                 null, null);
                     });
         }
@@ -197,7 +197,7 @@ public class JsonbParser extends ModelParser {
                                         settings.getTypeParser().getMethodReturnType(Method.class.cast(member)),
                                 null, settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
                                         JsonbParser.this.isPropertyOptional(propertyMember),
-                                clazz, member, null, null);
+                                null, clazz, member, null, null);
                     })
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());

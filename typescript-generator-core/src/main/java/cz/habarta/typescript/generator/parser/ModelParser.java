@@ -130,10 +130,15 @@ public abstract class ModelParser {
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            return new PropertyMember(method, typeParser.getMethodReturnType(method), method.getAnnotatedReturnType(), annotationGetter);
+            switch (method.getParameterCount()) {
+                case 0:
+                    return new PropertyMember(method, typeParser.getMethodReturnType(method), method.getAnnotatedReturnType(), annotationGetter);
+                case 1:
+                    return new PropertyMember(method, typeParser.getMethodParameterTypes(method).get(0), method.getAnnotatedParameterTypes()[0], annotationGetter);
+            }
         }
         throw new RuntimeException(String.format(
-                "Unexpected member type '%s' in property '%s' in class '%s'",
+                "Unexpected member '%s' in property '%s' in class '%s'",
                 propertyMember != null ? propertyMember.getClass().getName() : null,
                 propertyName,
                 sourceClass.getName()));
@@ -185,13 +190,13 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
+    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, PropertyAccess access, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
         final Type resolvedType = GenericsResolver.resolveType(usedInClass, type, originalMember.getDeclaringClass());
         final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, typeContext, settings);
         for (Class<?> cls : classes) {
             typeQueue.add(new SourceType<>(cls, usedInClass, name));
         }
-        return new PropertyModel(name, resolvedType, optional, originalMember, pullProperties, typeContext, comments);
+        return new PropertyModel(name, resolvedType, optional, access, originalMember, pullProperties, typeContext, comments);
     }
 
     public static boolean containsProperty(List<PropertyModel> properties, String propertyName) {
