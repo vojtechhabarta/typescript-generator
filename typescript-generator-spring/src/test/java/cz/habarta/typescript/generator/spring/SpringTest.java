@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -429,6 +430,23 @@ public class SpringTest {
         }
         @GetMapping("")
         public void response2() {
+        }
+    }
+
+    @Test
+    public void testMultiValueMapRequestParam() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithMultiValueMap.class));
+        Assert.assertTrue(output.contains("search(queryParams?: { [index: string]: any }): RestResponse<string>"));
+    }
+
+    @RestController
+    public class ControllerWithMultiValueMap {
+        @GetMapping("/search")
+        public String search(@RequestParam MultiValueMap<String, String> params) {
+            return "";
         }
     }
 

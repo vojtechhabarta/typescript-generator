@@ -726,43 +726,47 @@ public class ModelCompiler {
         final TsParameterModel queryParameter;
         if (queryParams != null && !queryParams.isEmpty()) {
             final List<TsType> types = new ArrayList<>();
-            final List<TsProperty> currentSingles = new ArrayList<>();
-            final Runnable flushSingles = () -> {
-                if (!currentSingles.isEmpty()) {
-                    types.add(new TsType.ObjectType(currentSingles));
-                    currentSingles.clear();
-                }
-            };
-            for (RestQueryParam restQueryParam : queryParams) {
-                if (restQueryParam instanceof RestQueryParam.Single) {
-                    final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
-                    final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                    currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
-                }
-                if (restQueryParam instanceof RestQueryParam.Bean) {
-                    final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
-                    flushSingles.run();
-                    final Symbol queryParamsSymbol = symbolTable.getSymbol(queryBean.getOrigin(), "QueryParams");
-                    if (tsModel.getBean(queryParamsSymbol) == null) {
-                        tsModel.getBeans().add(new TsBeanModel(
-                                queryBean.getOrigin(),
-                                TsBeanCategory.Data,
-                                /*isClass*/false,
-                                queryParamsSymbol,
-                                /*typeParameters*/null,
-                                /*parent*/null,
-                                /*extendsList*/null,
-                                /*implementsList*/null,
-                                processProperties(symbolTable, null, queryBean),
-                                /*constructor*/null,
-                                /*methods*/null,
-                                /*comments*/null
-                        ));
+            if (queryParams.stream().anyMatch(param -> param instanceof RestQueryParam.Map)) {
+                types.add(new TsType.IndexedArrayType(TsType.String, TsType.Any));
+            } else {
+                final List<TsProperty> currentSingles = new ArrayList<>();
+                final Runnable flushSingles = () -> {
+                    if (!currentSingles.isEmpty()) {
+                        types.add(new TsType.ObjectType(currentSingles));
+                        currentSingles.clear();
                     }
-                    types.add(new TsType.ReferenceType(queryParamsSymbol));
+                };
+                for (RestQueryParam restQueryParam : queryParams) {
+                    if (restQueryParam instanceof RestQueryParam.Single) {
+                        final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
+                        final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
+                        currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
+                    }
+                    if (restQueryParam instanceof RestQueryParam.Bean) {
+                        final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
+                        flushSingles.run();
+                        final Symbol queryParamsSymbol = symbolTable.getSymbol(queryBean.getOrigin(), "QueryParams");
+                        if (tsModel.getBean(queryParamsSymbol) == null) {
+                            tsModel.getBeans().add(new TsBeanModel(
+                                    queryBean.getOrigin(),
+                                    TsBeanCategory.Data,
+                                    /*isClass*/false,
+                                    queryParamsSymbol,
+                                    /*typeParameters*/null,
+                                    /*parent*/null,
+                                    /*extendsList*/null,
+                                    /*implementsList*/null,
+                                    processProperties(symbolTable, null, queryBean),
+                                    /*constructor*/null,
+                                    /*methods*/null,
+                                    /*comments*/null
+                            ));
+                        }
+                        types.add(new TsType.ReferenceType(queryParamsSymbol));
+                    }
                 }
+                flushSingles.run();
             }
-            flushSingles.run();
             boolean allQueryParamsOptional = queryParams.stream().noneMatch(queryParam -> queryParam.required);
             TsType.IntersectionType queryParamType = new TsType.IntersectionType(types);
             queryParameter = new TsParameterModel("queryParams", allQueryParamsOptional ? new TsType.OptionalType(queryParamType) : queryParamType);

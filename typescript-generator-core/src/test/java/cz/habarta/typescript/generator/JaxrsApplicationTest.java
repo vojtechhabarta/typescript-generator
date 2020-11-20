@@ -185,7 +185,7 @@ public class JaxrsApplicationTest {
     private static class TestApplication extends Application {
         @Override
         public Set<Class<?>> getClasses() {
-            return new LinkedHashSet<Class<?>>(Arrays.asList(
+            return new LinkedHashSet<>(Arrays.asList(
                     TestResource1.class
             ));
         }

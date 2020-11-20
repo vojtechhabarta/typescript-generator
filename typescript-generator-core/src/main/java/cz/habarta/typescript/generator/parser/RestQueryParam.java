@@ -37,4 +37,10 @@ public abstract class RestQueryParam {
         }
     }
 
+    public static class Map extends RestQueryParam {
+        public Map(boolean required) {
+            super(required);
+        }
+    }
+
 }
