@@ -53,6 +53,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.JAXBElement;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Assert;
@@ -691,7 +692,7 @@ public class JaxrsApplicationTest {
     }
 
     public static void main(String[] args) {
-        final ResourceConfig config = new ResourceConfig(BeanParamResource.class);
+        final ResourceConfig config = new ResourceConfig(BeanParamResource.class, JacksonFeature.class);
         JdkHttpServerFactory.createHttpServer(URI.create("http://localhost:9998/"), config);
         System.out.println("Jersey started.");
     }

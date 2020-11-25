@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -491,6 +492,81 @@ public class TaggedUnionsTest {
         settings.mapPackagesToNamespaces = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EntityCollection.class));
         Assert.assertTrue(output.contains("type EntityUnion<T> = cz.habarta.typescript.generator.TaggedUnionsTest.Foo | cz.habarta.typescript.generator.TaggedUnionsTest.Bar"));
+    }
+
+    @Test
+    public void testTaggedUnionsWithExistingProperty() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Geometry2.class));
+        final String expected = (
+                "\n" +
+                "interface Geometry2 {\n" +
+                "    shapes: Shape2Union[];\n" +
+                "}\n" +
+                "\n" +
+                "interface Shape2 {\n" +
+                "    kind: 'square' | 'rectangle' | 'circle';\n" +
+                "}\n" +
+                "\n" +
+                "interface Square2 extends Shape2 {\n" +
+                "    kind: 'square';\n" +
+                "    size: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle2 extends Shape2 {\n" +
+                "    kind: 'rectangle';\n" +
+                "    width: number;\n" +
+                "    height: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface Circle2 extends Shape2 {\n" +
+                "    kind: 'circle';\n" +
+                "    radius: number;\n" +
+                "}\n" +
+                "\n" +
+                "type Shape2Union = Square2 | Rectangle2 | Circle2;\n" +
+                ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    private static class Geometry2 {
+        public List<Shape2> shapes;
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(Square2.class),
+        @JsonSubTypes.Type(Rectangle2.class),
+        @JsonSubTypes.Type(Circle2.class),
+    })
+    private abstract static class Shape2 {
+        @JsonProperty("kind")
+        private final String kind;
+
+        public Shape2() {
+            final JsonTypeName annotation = getClass().getAnnotation(JsonTypeName.class);
+            if (annotation == null) {
+                throw new RuntimeException("Annotation @JsonTypeName not specified on " + getClass());
+            }
+            this.kind = annotation.value();
+        }
+    }
+
+    @JsonTypeName("square")
+    private static class Square2 extends Shape2 {
+        public double size;
+    }
+
+    @JsonTypeName("rectangle")
+    private static class Rectangle2 extends Shape2 {
+        public double width;
+        public double height;
+    }
+
+    @JsonTypeName("circle")
+    private static class Circle2 extends Shape2 {
+        public double radius;
     }
 
 }

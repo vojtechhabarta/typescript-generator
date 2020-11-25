@@ -283,6 +283,7 @@ public class Jackson2Parser extends ModelParser {
         }
 
         final String discriminantProperty;
+        final boolean syntheticDiscriminantProperty;
         final String discriminantLiteral;
 
         final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
@@ -290,22 +291,35 @@ public class Jackson2Parser extends ModelParser {
         if (isSupported(jsonTypeInfo)) {
             // this is parent
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
+            syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(jsonTypeInfo);
             discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(jsonTypeInfo, sourceClass.type);
         } else if (isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
+            syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(parentJsonTypeInfo);
             discriminantLiteral = getTypeName(parentJsonTypeInfo, sourceClass.type);
         } else {
             // not part of explicit hierarchy
             discriminantProperty = null;
+            syntheticDiscriminantProperty = false;
             discriminantLiteral = null;
         }
 
-        if (discriminantProperty != null && properties.stream().anyMatch(property -> Objects.equals(property.getName(), discriminantProperty))) {
-            TypeScriptGenerator.getLogger().warning(String.format(
-                    "Class '%s' has duplicate property '%s'. "
-                            + "For more information see 'https://github.com/vojtechhabarta/typescript-generator/issues/392'.",
-                    sourceClass.type.getName(), discriminantProperty));
+        if (discriminantProperty != null) {
+            final PropertyModel foundDiscriminantProperty = properties.stream()
+                    .filter(property -> Objects.equals(property.getName(), discriminantProperty))
+                    .findFirst()
+                    .orElse(null);
+            if (foundDiscriminantProperty != null) {
+                if (syntheticDiscriminantProperty) {
+                    TypeScriptGenerator.getLogger().warning(String.format(
+                            "Class '%s' has duplicate property '%s'. "
+                                    + "For more information see 'https://github.com/vojtechhabarta/typescript-generator/issues/392'.",
+                            sourceClass.type.getName(), discriminantProperty));
+                } else {
+                    properties.remove(foundDiscriminantProperty);
+                }
+            }
         }
 
         final List<Class<?>> taggedUnionClasses;
@@ -387,8 +401,12 @@ public class Jackson2Parser extends ModelParser {
 
     private static boolean isSupported(JsonTypeInfo jsonTypeInfo) {
         return jsonTypeInfo != null &&
-                jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY &&
+                (jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY || jsonTypeInfo.include() == JsonTypeInfo.As.EXISTING_PROPERTY) &&
                 (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME || jsonTypeInfo.use() == JsonTypeInfo.Id.CLASS);
+    }
+
+    private boolean isDiscriminantPropertySynthetic(JsonTypeInfo jsonTypeInfo) {
+        return jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY;
     }
 
     private String getDiscriminantPropertyName(JsonTypeInfo jsonTypeInfo) {
