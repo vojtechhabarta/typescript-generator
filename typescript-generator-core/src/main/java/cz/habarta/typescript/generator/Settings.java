@@ -83,6 +83,7 @@ public class Settings {
     private List<CustomTypeAlias> validatedCustomTypeAliases = null;
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public boolean pascalCaseEnums = false;
     public boolean nonConstEnums = false;
     public List<Class<? extends Annotation>> nonConstEnumAnnotations = new ArrayList<>();
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
