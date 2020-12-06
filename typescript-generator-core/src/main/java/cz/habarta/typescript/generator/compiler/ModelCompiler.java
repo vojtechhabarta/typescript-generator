@@ -154,6 +154,11 @@ public class ModelCompiler {
         // enums
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
         tsModel = addEnumValuesToJavadoc(tsModel);
+
+        if (settings.pascalCaseEnums) {
+            tsModel = transformEnumKeysToPascalCase(tsModel);
+        }
+
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
                 tsModel = transformEnumsToUnions(tsModel);
@@ -857,6 +862,41 @@ public class ModelCompiler {
             }
         });
         return model.withTypeAliases(new ArrayList<>(typeAliases));
+    }
+
+    private String convertStringToPascalCase(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder();
+        String[] parts = text
+            .replaceAll( // Split words
+                String.format("%s|%s|%s",
+                    "(?<=[A-Z])(?=[A-Z][a-z])",
+                    "(?<=[^A-Z])(?=[A-Z])",
+                    "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                "_"
+            )
+            .replaceAll("__", "") // Handles existing underscores
+            .split("_");
+        for (String part : parts) {
+            sb.append(part.substring(0, 1).toUpperCase() + part.substring(1).toLowerCase());
+        }
+        return sb.toString();
+    }
+
+    private TsModel transformEnumKeysToPascalCase(TsModel tsModel) {
+        final List<TsEnumModel> stringEnums = tsModel.getEnums(EnumKind.StringBased);
+        final LinkedHashSet<TsEnumModel> enums = new LinkedHashSet<>();
+        for (TsEnumModel enumModel : stringEnums) {
+            final List<EnumMemberModel> members = new ArrayList<>();
+            for (EnumMemberModel member : enumModel.getMembers()) {
+                members.add(new EnumMemberModel(convertStringToPascalCase(member.getPropertyName()), (String) member.getEnumValue(), member.getComments()));
+            }
+            enums.add(enumModel.withMembers(members));
+        }
+        return tsModel.withRemovedEnums(stringEnums).withAddedEnums(new ArrayList<>(enums));
     }
 
     private TsModel transformEnumsToUnions(TsModel tsModel) {
