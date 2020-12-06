@@ -36,6 +36,10 @@ public class EnumMemberModel {
         return comments;
     }
 
+    public EnumMemberModel withPropertyName(String propertyName) {
+        return new EnumMemberModel(propertyName, enumValue, comments);
+    }
+
     public EnumMemberModel withComments(List<String> comments) {
         return new EnumMemberModel(propertyName, enumValue, comments);
     }

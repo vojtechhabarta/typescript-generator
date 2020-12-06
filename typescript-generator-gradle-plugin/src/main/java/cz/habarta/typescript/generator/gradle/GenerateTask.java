@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.GsonConfiguration;
+import cz.habarta.typescript.generator.IdentifierCasing;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -78,6 +79,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> customTypeAliases;
     public DateMapping mapDate;
     public EnumMapping mapEnum;
+    public IdentifierCasing enumMemberCasing;
     public boolean nonConstEnums;
     public List<String> nonConstEnumAnnotations;
     public ClassMapping mapClasses;
@@ -160,6 +162,7 @@ public class GenerateTask extends DefaultTask {
         settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
+        settings.enumMemberCasing = enumMemberCasing;
         settings.nonConstEnums = nonConstEnums;
         settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
         settings.mapClasses = mapClasses;

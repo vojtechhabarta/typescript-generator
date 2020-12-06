@@ -83,7 +83,7 @@ public class Settings {
     private List<CustomTypeAlias> validatedCustomTypeAliases = null;
     public DateMapping mapDate; // default is DateMapping.asDate
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
-    public boolean pascalCaseEnums = false;
+    public IdentifierCasing enumMemberCasing; // default is IdentifierCasing.keepOriginal
     public boolean nonConstEnums = false;
     public List<Class<? extends Annotation>> nonConstEnumAnnotations = new ArrayList<>();
     public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
@@ -350,6 +350,9 @@ public class Settings {
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;
             }
+        }
+        if (enumMemberCasing != null && mapEnum != EnumMapping.asEnum && mapEnum != EnumMapping.asNumberBasedEnum) {
+            throw new RuntimeException("'enumMemberCasing' parameter can only be used when 'mapEnum' parameter is set to 'asEnum' or 'asNumberBasedEnum'.");
         }
         if ((nonConstEnums || !nonConstEnumAnnotations.isEmpty()) && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("Non-const enums can only be used in implementation files but 'outputFileType' parameter is not set to 'implementationFile'.");

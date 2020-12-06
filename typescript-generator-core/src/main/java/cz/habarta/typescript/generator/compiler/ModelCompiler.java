@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.compiler;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.Extension;
+import cz.habarta.typescript.generator.IdentifierCasing;
 import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.RestNamespacing;
@@ -154,11 +155,9 @@ public class ModelCompiler {
         // enums
         tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
         tsModel = addEnumValuesToJavadoc(tsModel);
-
-        if (settings.pascalCaseEnums) {
-            tsModel = transformEnumKeysToPascalCase(tsModel);
+        if (settings.enumMemberCasing != null && settings.enumMemberCasing != IdentifierCasing.keepOriginal) {
+            tsModel = transformEnumMembersCase(tsModel);
         }
-
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
                 tsModel = transformEnumsToUnions(tsModel);
@@ -864,39 +863,42 @@ public class ModelCompiler {
         return model.withTypeAliases(new ArrayList<>(typeAliases));
     }
 
-    private String convertStringToPascalCase(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
-        StringBuilder sb = new StringBuilder();
-        String[] parts = text
-            .replaceAll( // Split words
-                String.format("%s|%s|%s",
-                    "(?<=[A-Z])(?=[A-Z][a-z])",
-                    "(?<=[^A-Z])(?=[A-Z])",
-                    "(?<=[A-Za-z])(?=[^A-Za-z])"
-                ),
-                "_"
-            )
-            .replaceAll("__", "") // Handles existing underscores
-            .split("_");
-        for (String part : parts) {
-            sb.append(part.substring(0, 1).toUpperCase() + part.substring(1).toLowerCase());
-        }
-        return sb.toString();
+    static List<String> splitIdentifierIntoWords(String identifier) {
+        final String pattern = String.join("|",
+                "_",  // example: UPPER CASE
+                "(?<=\\p{javaUpperCase})" + "(?=\\p{javaUpperCase}\\p{javaLowerCase})",  // example: XML Http
+                "(?<=[^_\\p{javaUpperCase}])" + "(?=\\p{javaUpperCase})",  // example: camel Case
+                "(?<=[\\p{javaUpperCase}\\p{javaLowerCase}])" + "(?=[^\\p{javaUpperCase}\\p{javaLowerCase}])",  // example: string 2
+                "(?<=[^_\\p{javaUpperCase}\\p{javaLowerCase}])" + "(?=[\\p{javaUpperCase}\\p{javaLowerCase}])"  // example: 2 json
+        );
+        return Arrays.asList(identifier.split(pattern));
     }
 
-    private TsModel transformEnumKeysToPascalCase(TsModel tsModel) {
-        final List<TsEnumModel> stringEnums = tsModel.getEnums(EnumKind.StringBased);
+    private String convertIdentifierCasing(String identifier) {
+        final List<String> words = splitIdentifierIntoWords(identifier);
+        final String pascalCase = words.stream()
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                .collect(Collectors.joining());
+        if (settings.enumMemberCasing == IdentifierCasing.PascalCase) {
+            return pascalCase;
+        }
+        if (settings.enumMemberCasing == IdentifierCasing.camelCase) {
+            return pascalCase.substring(0, 1).toLowerCase() + pascalCase.substring(1);
+        }
+        return identifier;
+    }
+
+    private TsModel transformEnumMembersCase(TsModel tsModel) {
+        final List<TsEnumModel> originalEnums = tsModel.getEnums();
         final LinkedHashSet<TsEnumModel> enums = new LinkedHashSet<>();
-        for (TsEnumModel enumModel : stringEnums) {
+        for (TsEnumModel enumModel : originalEnums) {
             final List<EnumMemberModel> members = new ArrayList<>();
             for (EnumMemberModel member : enumModel.getMembers()) {
-                members.add(new EnumMemberModel(convertStringToPascalCase(member.getPropertyName()), (String) member.getEnumValue(), member.getComments()));
+                members.add(member.withPropertyName(convertIdentifierCasing(member.getPropertyName())));
             }
             enums.add(enumModel.withMembers(members));
         }
-        return tsModel.withRemovedEnums(stringEnums).withAddedEnums(new ArrayList<>(enums));
+        return tsModel.withRemovedEnums(originalEnums).withAddedEnums(new ArrayList<>(enums));
     }
 
     private TsModel transformEnumsToUnions(TsModel tsModel) {

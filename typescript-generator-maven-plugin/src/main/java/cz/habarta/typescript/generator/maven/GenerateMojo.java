@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.GsonConfiguration;
+import cz.habarta.typescript.generator.IdentifierCasing;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -418,6 +419,19 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private EnumMapping mapEnum;
+
+    /**
+     * Specifies how enum members will be named.
+     * Supported values are:
+     * <ul>
+     * <li><code>keepOriginal</code> - keeps member name as is</li>
+     * <li><code>PascalCase</code> - converts name to Pascal case (upper camel case) convention</li>
+     * <li><code>camelCase</code> - converts name to lower camel case convention</li>
+     * </ul>
+     * Default value is <code>keepOriginal</code>.
+     */
+    @Parameter
+    private IdentifierCasing enumMemberCasing;
 
     /**
      * If <code>true</code> generated enums will not have <code>const</code> keyword.<br>
@@ -845,6 +859,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
+        settings.enumMemberCasing = enumMemberCasing;
         settings.nonConstEnums = nonConstEnums;
         settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);
         settings.mapClasses = mapClasses;

@@ -127,7 +127,7 @@ public class EnumTest {
     public void testEnumsAsPascalCaseWithClassEnumPattern() {
         final Settings settings = TestUtils.settings();
         settings.mapEnum = EnumMapping.asEnum;
-        settings.pascalCaseEnums = true;
+        settings.enumMemberCasing = IdentifierCasing.PascalCase;
         settings.jsonLibrary = JsonLibrary.jackson2;
         final ClassEnumExtension classEnumExtension = new ClassEnumExtension();
         classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "Enum"));
@@ -151,6 +151,17 @@ public class EnumTest {
                         "}\n"
         ).replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
+    }
+
+    @Test
+    public void testEnumsAsCamelCase() {
+        final Settings settings = TestUtils.settings();
+        settings.mapEnum = EnumMapping.asNumberBasedEnum;
+        settings.enumMemberCasing = IdentifierCasing.camelCase;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyMixedCaseEnum.class));
+        assertTrue(output.contains("camelCaseType"));
+        assertTrue(output.contains("pascalCaseType"));
+        assertTrue(output.contains("upperCaseType"));
     }
 
     @Test
