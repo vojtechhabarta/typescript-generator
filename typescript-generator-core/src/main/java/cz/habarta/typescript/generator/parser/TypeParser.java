@@ -14,6 +14,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import kotlin.Metadata;
+import kotlin.NotImplementedError;
 import kotlin.jvm.JvmClassMappingKt;
 import kotlin.reflect.KClass;
 import kotlin.reflect.KClassifier;
@@ -261,7 +263,7 @@ public class TypeParser {
                 } else {
                     final TypeVariable<?> typeVariable = getJavaTypeVariable(kType);
                     final JTypeVariable<?> newTypeVariable = new JTypeVariable<>(
-                            typeVariable != null ? typeVariable.getGenericDeclaration() : null,
+                            typeVariable != null ? getTypeVariableGenericDeclaration(typeVariable) : null,
                             kTypeParameter.getName(),
                             /*bounds*/ null,
                             typeVariable != null ? typeVariable.getAnnotatedBounds() : null,
@@ -275,6 +277,14 @@ public class TypeParser {
                 }
             }
             throw new RuntimeException("Unexpected type: " + kType.toString());
+        }
+
+        private <D extends GenericDeclaration> D getTypeVariableGenericDeclaration(TypeVariable<D> typeVariable) {
+            try {
+                return typeVariable.getGenericDeclaration();
+            } catch (NotImplementedError e) {
+                return null;
+            }
         }
 
         private List<Type> getTypes(List<KType> kTypes, Map<String, JTypeVariable<?>> typeParameters) {
