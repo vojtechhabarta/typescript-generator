@@ -212,7 +212,8 @@ public class Emitter implements EmitterExtension.Writer {
         final String staticString = property.modifiers.isStatic ? "static " : "";
         final String readonlyString = property.modifiers.isReadonly ? "readonly " : "";
         final String questionMark = tsType instanceof TsType.OptionalType ? "?" : "";
-        writeIndentedLine(staticString + readonlyString + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + ";");
+        final String defaultString = property.getDefaultValue() != null ? " = " + property.getDefaultValue().format(settings) : "";
+        writeIndentedLine(staticString + readonlyString + quoteIfNeeded(property.getName(), settings) + questionMark + ": " + tsType.format(settings) + defaultString + ";");
     }
 
     private void emitDecorators(List<TsDecorator> decorators) {

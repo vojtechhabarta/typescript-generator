@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.ModelTransformer;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +22,20 @@ public abstract class Extension extends EmitterExtension {
     public static class TransformerDefinition {
         public final ModelCompiler.TransformationPhase phase;
         public final ModelTransformer transformer;
+        public final TsModelTransformer tsTransformer;
 
         public TransformerDefinition(ModelCompiler.TransformationPhase phase, ModelTransformer transformer) {
             this.phase = phase;
             this.transformer = transformer;
+            this.tsTransformer = (context, model) -> transformer.transformModel(context.getSymbolTable(), model);
         }
+
+        public TransformerDefinition(ModelCompiler.TransformationPhase phase, TsModelTransformer transformer) {
+            this.phase = phase;
+            this.transformer = null;
+            this.tsTransformer = transformer;
+        }
+
     }
 
 }

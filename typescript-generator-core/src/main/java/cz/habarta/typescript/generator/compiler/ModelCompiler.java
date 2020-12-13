@@ -153,7 +153,7 @@ public class ModelCompiler {
         tsModel = transformDates(symbolTable, tsModel);
 
         // enums
-        tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
+        tsModel = applyExtensionTransformers(symbolTable, model, tsModel, TransformationPhase.BeforeEnums, extensionTransformers);
         tsModel = addEnumValuesToJavadoc(tsModel);
         if (settings.enumMemberCasing != null && settings.enumMemberCasing != IdentifierCasing.keepOriginal) {
             tsModel = transformEnumMembersCase(tsModel);
@@ -182,10 +182,10 @@ public class ModelCompiler {
         tsModel = eliminateUndefinedFromOptionalPropertiesAndParameters(symbolTable, tsModel);
         tsModel = transformOptionalProperties(symbolTable, tsModel);
 
-        tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
+        tsModel = applyExtensionTransformers(symbolTable, model, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
         symbolTable.resolveSymbolNames();
         tsModel = sortDeclarations(symbolTable, tsModel);
-        tsModel = applyExtensionTransformers(symbolTable, tsModel, TransformationPhase.AfterDeclarationSorting, extensionTransformers);
+        tsModel = applyExtensionTransformers(symbolTable, model, tsModel, TransformationPhase.AfterDeclarationSorting, extensionTransformers);
         return tsModel;
     }
 
@@ -200,7 +200,9 @@ public class ModelCompiler {
         return transformers;
     }
 
-    private static Model applyExtensionModelTransformers(SymbolTable symbolTable, Model model, List<Extension.TransformerDefinition> transformerDefinitions) {
+    private static Model applyExtensionModelTransformers(SymbolTable symbolTable, Model model,
+            List<Extension.TransformerDefinition> transformerDefinitions
+    ) {
         for (Extension.TransformerDefinition definition : transformerDefinitions) {
             if (definition.phase == TransformationPhase.BeforeTsModel) {
                 model = definition.transformer.transformModel(symbolTable, model);
@@ -209,13 +211,16 @@ public class ModelCompiler {
         return model;
     }
 
-    private static TsModel applyExtensionTransformers(SymbolTable symbolTable, TsModel model, TransformationPhase phase, List<Extension.TransformerDefinition> transformerDefinitions) {
+    private static TsModel applyExtensionTransformers(SymbolTable symbolTable, Model model, TsModel tsModel,
+            TransformationPhase phase, List<Extension.TransformerDefinition> transformerDefinitions
+    ) {
+        final TsModelTransformer.Context context = new TsModelTransformer.Context(symbolTable, model);
         for (Extension.TransformerDefinition definition : transformerDefinitions) {
             if (definition.phase == phase) {
-                model = definition.transformer.transformModel(symbolTable, model);
+                tsModel = definition.tsTransformer.transformModel(context, tsModel);
             }
         }
-        return model;
+        return tsModel;
     }
 
     public TsType javaToTypeScript(Type type) {
