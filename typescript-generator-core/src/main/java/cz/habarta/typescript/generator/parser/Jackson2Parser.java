@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
+import com.fasterxml.jackson.databind.deser.CreatorProperty;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
@@ -254,7 +255,13 @@ public class Jackson2Parser extends ModelParser {
                 final BeanProperty beanProperty = pair.getValue1();
                 final PropertyAccess access = pair.getValue2();
                 final Member member = beanProperty.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
+                final PropertyMember propertyMember;
+                try {
+                    propertyMember = wrapMember(settings.getTypeParser(), member, beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
+                } catch(Exception e) {
+                    TypeScriptGenerator.getLogger().error(e.getMessage());
+                    continue;
+                }
                 Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanProperty.getAnnotation(JsonPropertyDescription.class));
 
@@ -611,7 +618,8 @@ public class Jackson2Parser extends ModelParser {
 
         private static BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
             return properties.stream()
-                    .filter(dp -> Objects.equals(dp.getName(), name))
+                    .filter(dp -> Objects.equals(dp.getName(), name) ||
+                            (dp.getMember() != null && Objects.equals(dp.getMember().getName(), name)))
                     .findFirst()
                     .orElse(null);
         }

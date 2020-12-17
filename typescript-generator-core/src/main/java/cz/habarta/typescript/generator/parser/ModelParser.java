@@ -13,6 +13,7 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -35,7 +36,7 @@ public abstract class ModelParser {
     private final TypeProcessor commonTypeProcessor;
     private final List<RestApplicationParser> restApplicationParsers;
         
-    public static abstract class Factory {
+    public abstract static class Factory {
 
         public TypeProcessor getSpecificTypeProcessor() {
             return null;
@@ -122,8 +123,13 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, AnnotationGetter annotationGetter,
-            String propertyName, Class<?> sourceClass) {
+    protected static PropertyMember wrapMember(
+            TypeParser typeParser,
+            Member propertyMember,
+            AnnotationGetter annotationGetter,
+            String propertyName,
+            Class<?> sourceClass
+    ) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
             return new PropertyMember(field, typeParser.getFieldType(field), field.getAnnotatedType(), annotationGetter);
@@ -137,6 +143,9 @@ public abstract class ModelParser {
                     return new PropertyMember(method, typeParser.getMethodParameterTypes(method).get(0), method.getAnnotatedParameterTypes()[0], annotationGetter);
             }
         }
+        if(propertyMember instanceof Constructor) {
+            //TODO: There needs to be code here to handle this as all CreatorProperty objects will yield this
+        }
         throw new RuntimeException(String.format(
                 "Unexpected member '%s' in property '%s' in class '%s'",
                 propertyMember != null ? propertyMember.getClass().getName() : null,
@@ -144,7 +153,10 @@ public abstract class ModelParser {
                 sourceClass.getName()));
     }
 
-    protected boolean isAnnotatedPropertyIncluded(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction, String propertyDescription) {
+    protected boolean isAnnotatedPropertyIncluded(
+            Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
+            String propertyDescription
+    ) {
         boolean isIncluded = settings.includePropertyAnnotations.isEmpty()
                 || Utils.hasAnyAnnotation(getAnnotationFunction, settings.includePropertyAnnotations);
         if (!isIncluded) {

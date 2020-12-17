@@ -21,11 +21,14 @@ public class SortedTypesTest {
         String expected = "" +
 ""                           + settings.newline +
 "interface A {"              + settings.newline +
+"    w: string;"             + settings.newline +
 "    x: number;"             + settings.newline +
 "    yyy: number;"           + settings.newline +
+"    z: boolean;"            + settings.newline +
 "}"                          + settings.newline +
 ""                           + settings.newline +
 "interface B {"              + settings.newline +
+"    a: boolean;"            + settings.newline +
 "    x: number;"             + settings.newline +
 "}"                          + settings.newline +
 "";
@@ -35,9 +38,11 @@ public class SortedTypesTest {
     }
 
     public static class A {
+        public boolean getZ() { return false; }
         public int getYYY() {
             return -1;
         }
+        public String getW() { return "Hello World!"; }
         public int getX() {
             return -1;
         }
@@ -47,5 +52,6 @@ public class SortedTypesTest {
         public int getX() {
             return -1;
         }
+        public boolean getA() { return false; }
     }
 }
