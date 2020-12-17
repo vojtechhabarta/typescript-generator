@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsParameter;
+import cz.habarta.typescript.generator.TsProperty;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.ModelTransformer;
@@ -45,8 +46,10 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class JsonDeserializationExtension extends Extension {
@@ -148,7 +151,11 @@ public class JsonDeserializationExtension extends Extension {
                     )
             ));
         }
-        for (TsPropertyModel property : bean.getProperties()) {
+        List<TsPropertyModel> sortedProperties = bean.getProperties()
+                .stream()
+                .sorted(Comparator.comparing(TsProperty::getName))
+                .collect(Collectors.toList());
+        for (TsPropertyModel property : sortedProperties) {
             final Map<String, TsType> inheritedProperties = ModelCompiler.getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
             if (!inheritedProperties.containsKey(property.getName())) {
                 body.add(new TsExpressionStatement(new TsAssignmentExpression(
