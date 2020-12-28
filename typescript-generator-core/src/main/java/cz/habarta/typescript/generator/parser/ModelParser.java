@@ -13,6 +13,7 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -122,7 +123,7 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, AnnotationGetter annotationGetter,
+    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, Integer creatorIndex, AnnotationGetter annotationGetter,
             String propertyName, Class<?> sourceClass) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
@@ -130,18 +131,29 @@ public abstract class ModelParser {
         }
         if (propertyMember instanceof Method) {
             final Method method = (Method) propertyMember;
-            switch (method.getParameterCount()) {
-                case 0:
-                    return new PropertyMember(method, typeParser.getMethodReturnType(method), method.getAnnotatedReturnType(), annotationGetter);
-                case 1:
-                    return new PropertyMember(method, typeParser.getMethodParameterTypes(method).get(0), method.getAnnotatedParameterTypes()[0], annotationGetter);
+            if (creatorIndex != null) {
+                return new PropertyMember(method, typeParser.getMethodParameterTypes(method).get(creatorIndex), method.getAnnotatedParameterTypes()[creatorIndex], annotationGetter);
+            } else {
+                switch (method.getParameterCount()) {
+                    case 0:
+                        return new PropertyMember(method, typeParser.getMethodReturnType(method), method.getAnnotatedReturnType(), annotationGetter);
+                    case 1:
+                        return new PropertyMember(method, typeParser.getMethodParameterTypes(method).get(0), method.getAnnotatedParameterTypes()[0], annotationGetter);
+                }
             }
         }
-        throw new RuntimeException(String.format(
+        if (propertyMember instanceof Constructor) {
+            final Constructor<?> constructor = (Constructor<?>) propertyMember;
+            if (creatorIndex != null) {
+                return new PropertyMember(constructor, typeParser.getConstructorParameterTypes(constructor).get(creatorIndex), constructor.getAnnotatedParameterTypes()[creatorIndex], annotationGetter);
+            }
+        }
+        TypeScriptGenerator.getLogger().verbose(String.format(
                 "Unexpected member '%s' in property '%s' in class '%s'",
                 propertyMember != null ? propertyMember.getClass().getName() : null,
                 propertyName,
                 sourceClass.getName()));
+        return null;
     }
 
     protected boolean isAnnotatedPropertyIncluded(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction, String propertyDescription) {

@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -28,9 +29,12 @@ import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -460,6 +464,73 @@ public class Jackson2ParserTest {
         Assert.assertTrue(output.contains("projects: { id: string }[]"));
         Assert.assertTrue(output.contains("projectMap: { [index: string]: { id: string } }"));
         Assert.assertTrue(output.contains("localDateTime: \"TODAY\" | string"));
+    }
+
+    @Test
+    public void testConstructor() throws JsonProcessingException {
+//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
+
+        final Settings settings = TestUtils.settings();
+        settings.generateReadonlyAndWriteonlyJSDocTags = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonCreatorConstructor.class));
+        Assert.assertTrue(output.contains("a: string;"));
+        Assert.assertTrue(output.contains("b: string;"));
+        Assert.assertTrue(output.contains("@writeonly"));
+    }
+
+    public static class ClassWithJsonCreatorConstructor {
+        protected final String a;
+        protected final String b;
+
+        @JsonCreator
+        private ClassWithJsonCreatorConstructor(@JsonProperty("a") String a, @MyOptional @JsonProperty("b") String b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + "a=" + a + ", b=" + b + '}';
+        }
+        
+    }
+    @Test
+    public void testFactoryMethod() throws JsonProcessingException {
+//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
+
+        final Settings settings = TestUtils.settings();
+        settings.generateReadonlyAndWriteonlyJSDocTags = true;
+        settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
+        settings.optionalAnnotations = Arrays.asList(MyOptional.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonCreatorFactoryMethod.class));
+        Assert.assertTrue(output.contains("a: string;"));
+        Assert.assertTrue(output.contains("b?: string;"));
+        Assert.assertTrue(output.contains("@writeonly"));
+    }
+
+    public static class ClassWithJsonCreatorFactoryMethod {
+        protected final String a;
+        protected final String b;
+
+        private ClassWithJsonCreatorFactoryMethod(String a, String b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @JsonCreator
+        public static ClassWithJsonCreatorFactoryMethod create(@JsonProperty("a") String a, @MyOptional @JsonProperty("b") String b) {
+            return new ClassWithJsonCreatorFactoryMethod(a, b);
+        }
+
+        @Override
+        public String toString() {
+            return "{" + "a=" + a + ", b=" + b + '}';
+        }
+        
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MyOptional {
     }
 
 }

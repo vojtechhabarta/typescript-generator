@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -187,7 +188,10 @@ public class JsonbParser extends ModelParser {
                         final DecoratedType decoratedType = e.getValue();
                         final Member member = findMember(decoratedType);
                         final PropertyMember propertyMember = wrapMember(
-                                settings.getTypeParser(), member, decoratedType::getAnnotation, member.getName(), member.getDeclaringClass());
+                                settings.getTypeParser(), member, /*creatorIndex*/ null, decoratedType::getAnnotation, member.getName(), member.getDeclaringClass());
+                        if (propertyMember == null) {
+                            return null;
+                        }
 
                         final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
@@ -199,6 +203,7 @@ public class JsonbParser extends ModelParser {
                                         JsonbParser.this.isPropertyOptional(propertyMember),
                                 null, clazz, member, null, null);
                     })
+                    .filter(Objects::nonNull)
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
         }

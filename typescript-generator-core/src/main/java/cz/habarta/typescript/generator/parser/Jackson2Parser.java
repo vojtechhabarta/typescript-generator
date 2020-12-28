@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
+import com.fasterxml.jackson.databind.deser.CreatorProperty;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
@@ -254,7 +255,10 @@ public class Jackson2Parser extends ModelParser {
                 final BeanProperty beanProperty = pair.getValue1();
                 final PropertyAccess access = pair.getValue2();
                 final Member member = beanProperty.getMember().getMember();
-                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, getCreatorIndex(beanProperty), beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
+                if (propertyMember == null) {
+                    continue;
+                }
                 Type propertyType = propertyMember.getType();
                 final List<String> propertyComments = getComments(beanProperty.getAnnotation(JsonPropertyDescription.class));
 
@@ -344,6 +348,15 @@ public class Jackson2Parser extends ModelParser {
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, classComments);
     }
 
+    private static Integer getCreatorIndex(BeanProperty beanProperty) {
+        if (beanProperty instanceof CreatorProperty) {
+            final CreatorProperty creatorProperty = (CreatorProperty) beanProperty;
+            return creatorProperty.getCreatorIndex();
+        } else {
+            return null;
+        }
+    }
+
     // @JsonIdentityInfo and @JsonIdentityReference
     private Type processIdentity(Type propertyType, BeanProperty beanProperty) {
 
@@ -378,8 +391,8 @@ public class Jackson2Parser extends ModelParser {
                 if (idPropertyOptional.isPresent()) {
                     final BeanProperty idProperty = idPropertyOptional.get();
                     final Member idMember = idProperty.getMember().getMember();
-                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, idProperty::getAnnotation, idProperty.getName(), cls);
-                    idType = idPropertyMember.getType();
+                    final PropertyMember idPropertyMember = wrapMember(settings.getTypeParser(), idMember, getCreatorIndex(idProperty), idProperty::getAnnotation, idProperty.getName(), cls);
+                    idType = idPropertyMember != null ? idPropertyMember.getType() : Object.class;
                 } else {
                     return null;
                 }
@@ -507,8 +520,8 @@ public class Jackson2Parser extends ModelParser {
         }
         final JavaType javaType = objectMapper.constructType(beanClass);
         final BeanSerializerHelper beanSerializerHelper = createBeanSerializerHelper(javaType);
-        if (beanSerializerHelper != null) {
-            final BeanDeserializerHelper beanDeserializerHelper = createBeanDeserializerHelper(javaType);
+        final BeanDeserializerHelper beanDeserializerHelper = createBeanDeserializerHelper(javaType);
+        if (beanSerializerHelper != null || beanDeserializerHelper != null) {
             return new BeanHelpers(beanClass, beanSerializerHelper, beanDeserializerHelper);
         }
         return null;
