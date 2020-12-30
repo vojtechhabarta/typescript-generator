@@ -122,6 +122,7 @@ public class ModelCompiler {
         tsModel = addCustomTypeAliases(symbolTable, tsModel);
         tsModel = removeInheritedProperties(symbolTable, tsModel);
         tsModel = addImplementedProperties(symbolTable, tsModel);
+        tsModel = sortPropertiesDeclarations(symbolTable, tsModel);
         if (settings.generateConstructors) {
             tsModel = addConstructors(symbolTable, tsModel);
         }
@@ -184,7 +185,7 @@ public class ModelCompiler {
 
         tsModel = applyExtensionTransformers(symbolTable, model, tsModel, TransformationPhase.BeforeSymbolResolution, extensionTransformers);
         symbolTable.resolveSymbolNames();
-        tsModel = sortDeclarations(symbolTable, tsModel);
+        tsModel = sortTypeDeclarations(symbolTable, tsModel);
         tsModel = applyExtensionTransformers(symbolTable, model, tsModel, TransformationPhase.AfterDeclarationSorting, extensionTransformers);
         return tsModel;
     }
@@ -531,11 +532,7 @@ public class ModelCompiler {
                         )
                 ));
             }
-            List<TsPropertyModel> beanProperties = bean.getProperties();
-            if (settings.sortDeclarations) {
-                Collections.sort(beanProperties);
-            }
-            for (TsPropertyModel property : beanProperties) {
+            for (TsPropertyModel property : bean.getProperties()) {
                 final Map<String, TsType> inheritedProperties = ModelCompiler.getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
                 if (!inheritedProperties.containsKey(property.getName())) {
                     body.add(new TsExpressionStatement(new TsAssignmentExpression(
@@ -1200,15 +1197,19 @@ public class ModelCompiler {
         );
     }
 
-    private TsModel sortDeclarations(SymbolTable symbolTable, TsModel tsModel) {
-        final List<TsBeanModel> beans = tsModel.getBeans();
-        final List<TsAliasModel> aliases = tsModel.getTypeAliases();
-        final List<TsEnumModel> enums = tsModel.getEnums();
+    private TsModel sortPropertiesDeclarations(SymbolTable symbolTable, TsModel tsModel) {
         if (settings.sortDeclarations) {
-            for (TsBeanModel bean : beans) {
+            for (TsBeanModel bean : tsModel.getBeans()) {
                 Collections.sort(bean.getProperties());
             }
         }
+        return tsModel;
+    }
+
+    private TsModel sortTypeDeclarations(SymbolTable symbolTable, TsModel tsModel) {
+        final List<TsBeanModel> beans = tsModel.getBeans();
+        final List<TsAliasModel> aliases = tsModel.getTypeAliases();
+        final List<TsEnumModel> enums = tsModel.getEnums();
         if (settings.sortDeclarations || settings.sortTypeDeclarations) {
             Collections.sort(beans);
             Collections.sort(aliases);
