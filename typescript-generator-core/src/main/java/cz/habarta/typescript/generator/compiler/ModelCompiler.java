@@ -944,7 +944,7 @@ public class ModelCompiler {
         for (TsEnumModel enumModel : stringEnums) {
             final List<EnumMemberModel> members = new ArrayList<>();
             for (EnumMemberModel member : enumModel.getMembers()) {
-                members.add(new EnumMemberModel(member.getPropertyName(), (Number) null, member.getComments()));
+                members.add(new EnumMemberModel(member.getPropertyName(), (Number) null, member.getOriginalField(), member.getComments()));
             }
             enums.add(enumModel.withMembers(members));
         }

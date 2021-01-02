@@ -54,7 +54,7 @@ public class ClassEnumExtension extends Extension {
                     List<EnumMemberModel> members = new ArrayList<>();
                     for (Field declaredField : tsBeanModel.getOrigin().getDeclaredFields()) {
                         if (declaredField.getType().getName().equals(tsBeanModel.getOrigin().getName())) {
-                            members.add(new EnumMemberModel(declaredField.getName(), declaredField.getName(), null));
+                            members.add(new EnumMemberModel(declaredField.getName(), declaredField.getName(), declaredField, null));
                         }
                     }
                     TsEnumModel temp = new TsEnumModel(

@@ -86,18 +86,22 @@ public class Javadoc {
             final PropertyModel enrichedProperty = enrichProperty(property, dFields, dMethods);
             enrichedProperties.add(enrichedProperty);
         }
-        return bean.withProperties(enrichedProperties).withComments(Utils.concat(getComments(beanComment, tags), bean.getComments()));
+        return bean
+                .withProperties(enrichedProperties)
+                .withComments(combineComments(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
         String propertyComment = null;
         List<TagInfo> tags = null;
         if (property.getOriginalMember() instanceof java.lang.reflect.Method) {
-            final Method dMethod = findJavadocMethod(property.getOriginalMember().getName(), dMethods);
+            final java.lang.reflect.Method method = (java.lang.reflect.Method) property.getOriginalMember();
+            final Method dMethod = findJavadocMethod(method.getName(), dMethods);
             propertyComment = dMethod != null ? dMethod.getComment() : null;
             tags = dMethod != null ? dMethod.getTag() : null;
         } else if (property.getOriginalMember() instanceof java.lang.reflect.Field) {
-            final Field dField = findJavadocField(property.getOriginalMember().getName(), dFields);
+            final java.lang.reflect.Field field = (java.lang.reflect.Field) property.getOriginalMember();
+            final Field dField = findJavadocField(field.getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
         } 
@@ -107,7 +111,8 @@ public class Javadoc {
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
         }
-        return property.withComments(getComments(propertyComment, tags));
+        return property
+                .withComments(combineComments(getComments(propertyComment, tags), property.getComments()));
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
@@ -119,14 +124,17 @@ public class Javadoc {
         }
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
-        return enumModel.withMembers(enrichedMembers).withComments(Utils.concat(getComments(enumComment, tags), enumModel.getComments()));
+        return enumModel
+                .withMembers(enrichedMembers)
+                .withComments(combineComments(getComments(enumComment, tags), enumModel.getComments()));
     }
 
     private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember, Enum dEnum) {
         final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
         final List<TagInfo> tags = dConstant != null ? dConstant.getTag(): null;
         final String memberComment = dConstant != null ? dConstant.getComment() : null;
-        return enumMember.withComments(Utils.concat(getComments(memberComment, tags), enumMember.getComments()));
+        return enumMember
+                .withComments(combineComments(getComments(memberComment, tags), enumMember.getComments()));
     }
 
     private RestApplicationModel enrichRestApplication(RestApplicationModel restApplicationModel) {
@@ -140,9 +148,10 @@ public class Javadoc {
 
     private RestMethodModel enrichRestMethod(RestMethodModel method) {
         final Method dMethod = findJavadocMethod(method.getOriginClass(), method.getName(), dRoots);
-        return dMethod != null
-                ? method.withComments(getComments(dMethod.getComment(), dMethod.getTag()))
-                : method;
+        final String comment = dMethod != null ? dMethod.getComment() : null;
+        final List<TagInfo> tags = dMethod != null ? dMethod.getTag() : null;
+        return method
+                .withComments(combineComments(getComments(comment, tags), method.getComments()));
     }
 
     // finders
@@ -255,6 +264,11 @@ public class Javadoc {
             }
         }
         return result;
+    }
+
+    private static List<String> combineComments(List<String> firstComments, List<String> secondComments) {
+        // consider putting tags (from both comments) after regular comments
+        return Utils.concat(firstComments, secondComments);
     }
 
 }

@@ -23,15 +23,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public abstract class ModelParser {
 
     protected final Settings settings;
     private final Javadoc javadoc;
+    private final DeprecationEnricher deprecationEnricher;
     private final Queue<SourceType<? extends Type>> typeQueue;
     private final TypeProcessor commonTypeProcessor;
     private final List<RestApplicationParser> restApplicationParsers;
@@ -49,6 +52,7 @@ public abstract class ModelParser {
     public ModelParser(Settings settings, TypeProcessor commonTypeProcessor, List<RestApplicationParser> restApplicationParsers) {
         this.settings = settings;
         this.javadoc = new Javadoc(settings);
+        this.deprecationEnricher = new DeprecationEnricher();
         this.typeQueue = new LinkedList<>();
         this.restApplicationParsers = restApplicationParsers;
         this.commonTypeProcessor = commonTypeProcessor;
@@ -65,6 +69,7 @@ public abstract class ModelParser {
             model = Swagger.enrichModel(model);
         }
         model = javadoc.enrichModel(model);
+        model = deprecationEnricher.enrichModel(model);
         return model;
     }
 
@@ -191,8 +196,9 @@ public abstract class ModelParser {
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")
             final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) sourceClass.type;
+            final Map<String, Field> fields = Stream.of(enumClass.getDeclaredFields()).collect(Utils.toMap(field -> field.getName(), field -> field));
             for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                values.add(new EnumMemberModel(enumConstant.name(), enumConstant.name(), null));
+                values.add(new EnumMemberModel(enumConstant.name(), enumConstant.name(), fields.get(enumConstant.name()), null));
             }
         }
         return new EnumModel(sourceClass.type, EnumKind.StringBased, values, null);

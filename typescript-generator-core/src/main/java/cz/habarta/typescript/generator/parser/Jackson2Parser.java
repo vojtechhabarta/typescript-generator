@@ -720,9 +720,9 @@ public class Jackson2Parser extends ModelParser {
 
                 final List<String> constantComments = getComments(constant.getAnnotation(JsonPropertyDescription.class));
                 if (value instanceof String) {
-                    enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, constantComments));
+                    enumMembers.add(new EnumMemberModel(constant.getName(), (String) value, constant, constantComments));
                 } else if (value instanceof Number) {
-                    enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, constantComments));
+                    enumMembers.add(new EnumMemberModel(constant.getName(), (Number) value, constant, constantComments));
                 } else {
                     TypeScriptGenerator.getLogger().warning(String.format("'%s' enum as a @JsonValue that isn't a String or Number, ignoring", enumClass.getName()));
                 }

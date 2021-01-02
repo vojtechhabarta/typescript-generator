@@ -12,6 +12,8 @@ import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import io.github.classgraph.ClassGraph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
@@ -449,6 +451,26 @@ public class JaxrsApplicationTest {
         Assert.assertTrue(output.contains("Returns person with specified ID."));
     }
 
+    @Test
+    public void testSwaggerComments() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationInterface = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        Assert.assertTrue(output.contains("Comment in swagger annotation"));
+        Assert.assertTrue(output.contains("Response code 200 - ok"));
+        Assert.assertTrue(output.contains("Response code 400 - not ok"));
+    }
+
+    @Test
+    public void testDeprecatedAnnotationComment() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateJaxrsApplicationInterface = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
+        Assert.assertTrue(output.contains("@deprecated"));
+    }
+
     @ApplicationPath("api")
     public static class OrganizationApplication extends Application {
         @Override
@@ -491,17 +513,23 @@ public class JaxrsApplicationTest {
 
     @Path("people/{personId}")
     public static class PersonResource {
+
         @PathParam("personId")
         protected long personId;
-        /**
-         * Returns person with specified ID.
-         */
+
+        @ApiOperation(value = "Comment in swagger annotation")
+        @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 400, message = "not ok"),
+        })
         @GET
         public Person getPerson() {
             return null;
         }
+
         @GET
         @Path("address/{address-id}")
+        @Deprecated
         public Address getAddress(@PathParam("address-id") long addressId) {
             return null;
         }

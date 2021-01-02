@@ -53,12 +53,43 @@ public class JavadocTest {
             Assert.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
             Assert.assertTrue(generated.contains("Documentation for interface getter property."));
             Assert.assertTrue(generated.contains("@return value of getterPropery"));
-            Assert.assertTrue(generated.contains("@deprecated replaced by something else"));
+            Assert.assertTrue(generated.contains("@deprecated replaced by something else\n"));
+            Assert.assertTrue(!generated.contains("@deprecated\n"));
             Assert.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
             Assert.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
             Assert.assertTrue(generated.contains("ff0000"));
             Assert.assertTrue(generated.contains("00ff00"));
             Assert.assertTrue(generated.contains("0000ff"));
+        }
+        {
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedClassWithoutJavadoc.class));
+            final String expected = ""
+                    + "/**\n"
+                    + " * @deprecated\n"
+                    + " */\n"
+                    + "interface DeprecatedClassWithoutJavadoc {\n"
+                    + "    /**\n"
+                    + "     * @deprecated\n"
+                    + "     */\n"
+                    + "    deprecatedField: string;\n"
+                    + "}";
+            Assert.assertEquals(expected.trim(), generated.trim());
+        }
+        {
+            final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumWithoutJavadoc.class));
+            final String expected = ""
+                    + "/**\n"
+                    + " * @deprecated\n"
+                    + " * \n"
+                    + " * Values:\n"
+                    + " * - `North`\n"
+                    + " * - `East` - @deprecated\n"
+                    + " * - `South`\n"
+                    + " * - `West`\n"
+                    + " */\n"
+                    + "type DeprecatedEnumWithoutJavadoc = \"North\" | \"East\" | \"South\" | \"West\";\n"
+                    + "";
+            Assert.assertEquals(expected.trim(), generated.trim());
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithBrElements.class));
@@ -125,6 +156,24 @@ public class JavadocTest {
     public static class ClassWithoutJavadoc {
 
         public String undocumentedField;
+
+    }
+
+    @Deprecated
+    public static class DeprecatedClassWithoutJavadoc {
+
+        @Deprecated
+        public String deprecatedField;
+
+    }
+
+    @Deprecated
+    public static enum DeprecatedEnumWithoutJavadoc {
+
+        North,
+        @Deprecated East,
+        South,
+        West;
 
     }
 

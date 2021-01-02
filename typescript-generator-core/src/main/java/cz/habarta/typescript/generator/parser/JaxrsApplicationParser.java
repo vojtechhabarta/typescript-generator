@@ -230,7 +230,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             // comments
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
-            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType,
+            model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType, method,
                     context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
