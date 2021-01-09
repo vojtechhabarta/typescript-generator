@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
+import cz.habarta.typescript.generator.util.DeprecationUtils;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -77,14 +78,17 @@ public class DeprecationEnricher {
     }
 
     private static List<String> addDeprecation(List<String> comments, AnnotatedElement annotatedElement) {
-        return annotatedElement != null && annotatedElement.isAnnotationPresent(Deprecated.class) && !containsDeprecatedTag(comments)
-                ? Utils.concat(comments, Collections.singletonList("@deprecated"))
-                : comments;
+        if (annotatedElement == null || !annotatedElement.isAnnotationPresent(Deprecated.class) || containsDeprecatedTag(comments)) {
+            return comments;
+        }
+
+        String deprecatedComment = DeprecationUtils.convertToComment(annotatedElement.getAnnotation(Deprecated.class));
+        return Utils.concat(comments, Collections.singletonList(deprecatedComment));
     }
 
     private static boolean containsDeprecatedTag(List<String> comments) {
         return comments != null
-                ? comments.stream().anyMatch(comment -> comment.startsWith("@deprecated"))
+                ? comments.stream().anyMatch(comment -> comment.startsWith(DeprecationUtils.DEPRECATED))
                 : false;
     }
 
