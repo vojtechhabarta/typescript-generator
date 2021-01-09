@@ -14,11 +14,11 @@ public final class DeprecationUtils {
 
         List<String> additional = new ArrayList<>();
         if (since != null && !since.isEmpty()) {
-            additional.add("since: " + since);
+            additional.add("since " + since);
         }
         if (forRemoval != null && forRemoval) {
-            additional.add("forRemoval: true");
+            additional.add("for removal");
         }
-        return additional.isEmpty() ? DEPRECATED : (DEPRECATED + " " + String.join("; ", additional));
+        return additional.isEmpty() ? DEPRECATED : (DEPRECATED + " " + String.join(", ", additional));
     }
 }
