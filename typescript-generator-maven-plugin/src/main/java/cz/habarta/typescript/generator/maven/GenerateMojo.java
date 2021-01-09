@@ -415,7 +415,8 @@ public class GenerateMojo extends AbstractMojo {
      * <li><code>asEnum</code> - creates string enum. Requires TypeScript 2.4</li>
      * <li><code>asNumberBasedEnum</code> - creates enum of named number values</li>
      * </ul>
-     * Default value is <code>asUnion</code>.
+     * Default value is <code>asUnion</code>.<br>
+     * See also <code>nonConstEnums</code> parameter.
      */
     @Parameter
     private EnumMapping mapEnum;
