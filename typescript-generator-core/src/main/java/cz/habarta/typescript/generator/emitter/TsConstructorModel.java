@@ -10,4 +10,8 @@ public class TsConstructorModel extends TsCallableModel {
         super("constructor", modifiers, null, parameters, null, body, comments);
     }
 
+    public TsConstructorModel withParameters(List<TsParameterModel> parameters) {
+        return new TsConstructorModel(modifiers, parameters, body, comments);
+    }
+
 }

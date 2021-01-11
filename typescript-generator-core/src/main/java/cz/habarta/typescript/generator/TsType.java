@@ -394,7 +394,7 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return Emitter.formatParameterList(parameters, false) + " => " + type.format(settings);
+            return Emitter.formatParameterList(parameters) + " => " + type.format(settings);
         }
 
     }

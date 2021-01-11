@@ -218,12 +218,22 @@ public class Emitter implements EmitterExtension.Writer {
 
     private void emitDecorators(List<TsDecorator> decorators) {
         for (TsDecorator decorator : decorators) {
-            final String at = decorator.getIdentifierReference().getIdentifier().startsWith("@") ? "" : "@";
-            final String parameters = decorator.getArguments() != null
-                    ? ("(" + formatList(settings, decorator.getArguments()) + ")")
-                    : "";
-            writeIndentedLine(at + decorator.getIdentifierReference().format(settings) + parameters);
+            writeIndentedLine(formatDecorator(settings, decorator));
         }
+    }
+
+    private static String formatDecoratorList(Settings settings, List<TsDecorator> decorators) {
+        return decorators.stream()
+                .map(decorator -> formatDecorator(settings, decorator))
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String formatDecorator(Settings settings, TsDecorator decorator) {
+        final String at = decorator.getIdentifierReference().getIdentifier().startsWith("@") ? "" : "@";
+        final String parameters = decorator.getArguments() != null
+                ? ("(" + formatList(settings, decorator.getArguments()) + ")")
+                : "";
+        return at + decorator.getIdentifierReference().format(settings) + parameters;
     }
 
     public static String quoteIfNeeded(String name, Settings settings) {
@@ -247,9 +257,12 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitCallable(TsCallableModel method) {
         writeNewLine();
         emitComments(method.getComments());
+        if (method instanceof TsMethodModel) {
+            emitDecorators(((TsMethodModel) method).getDecorators());
+        }
         final String staticString = method.getModifiers().isStatic ? "static " : "";
         final String typeParametersString = method.getTypeParameters().isEmpty() ? "" : "<" + formatList(settings, method.getTypeParameters()) + ">";
-        final String parametersString = formatParameterList(method.getParameters(), true);
+        final String parametersString = formatParameterModelList(settings, method.getParameters());
         final String type = method.getReturnType() != null ? ": " + method.getReturnType() : "";
         final String signature = staticString + method.getName() + typeParametersString + parametersString + type;
         if (method.getBody() != null) {
@@ -263,18 +276,34 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    public static String formatParameterList(List<? extends TsParameter> parameters, boolean alwaysEncloseInParentheses) {
+    public static String formatParameterModelList(Settings settings, List<TsParameterModel> parameters) {
+        final List<String> params = new ArrayList<>();
+        for (TsParameterModel parameter : parameters) {
+            final List<TsDecorator> decorators = parameter.getDecorators();
+            final String decoratorsString = decorators != null && !decorators.isEmpty() ? formatDecoratorList(settings, decorators) + " " : "";
+            final TsAccessibilityModifier accessibilityModifier = parameter.getAccessibilityModifier();
+            final String access = accessibilityModifier != null ? accessibilityModifier.format() + " " : "";
+            params.add(decoratorsString + access + formatParameterNameAndType(parameter));
+        }
+        return joinParameters(params, true);
+    }
+
+    public static String formatParameterList(List<TsParameter> parameters) {
         final List<String> params = new ArrayList<>();
         for (TsParameter parameter : parameters) {
-            final TsAccessibilityModifier accessibilityModifier = parameter instanceof TsParameterModel
-                    ? ((TsParameterModel) parameter).getAccessibilityModifier()
-                    : null;
-            final String access = accessibilityModifier != null ? accessibilityModifier.format() + " " : "";
-            final String questionMark = (parameter.getTsType() instanceof TsType.OptionalType) ? "?" : "";
-            final String type = parameter.getTsType() != null ? ": " + parameter.getTsType() : "";
-            params.add(access + parameter.getName() + questionMark + type);
+            params.add(formatParameterNameAndType(parameter));
         }
-        boolean parentheses = alwaysEncloseInParentheses || (parameters.size() != 1 || parameters.get(0).tsType != null);
+        final boolean parentheses = parameters.size() != 1 || parameters.get(0).tsType != null;
+        return joinParameters(params, parentheses);
+    }
+
+    private static String formatParameterNameAndType(TsParameter parameter) {
+        final String questionMark = (parameter.getTsType() instanceof TsType.OptionalType) ? "?" : "";
+        final String type = parameter.getTsType() != null ? ": " + parameter.getTsType() : "";
+        return parameter.getName() + questionMark + type;
+    }
+
+    private static String joinParameters(List<String> params, boolean parentheses) {
         return parentheses
                 ? "(" + String.join(", ", params) + ")"
                 : String.join(", ", params);

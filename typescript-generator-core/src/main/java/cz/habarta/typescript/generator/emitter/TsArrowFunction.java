@@ -29,7 +29,7 @@ public class TsArrowFunction extends TsExpression {
 
     @Override
     public String format(Settings settings) {
-        return Emitter.formatParameterList(parameters, false) + " => " + expression.format(settings);
+        return Emitter.formatParameterList(parameters) + " => " + expression.format(settings);
     }
     
 }
