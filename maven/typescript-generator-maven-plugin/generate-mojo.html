@@ -34,7 +34,7 @@
         <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2021-01-15<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 2.28.790</li>
+          <li id="projectVersion">Version: 2.28.791</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -67,7 +67,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:2.28.790:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:2.28.791:generate</p>
       
 <p><b>Description</b>:</p>
       
@@ -1132,6 +1132,19 @@ Default value is <code>${project.artifactId}</code>.<br /></td>
           
 <tr class="a">
             
+<td><code><a href="#npmTypescriptVersion">&lt;npmTypescriptVersion&gt;</a></code></td>
+            
+<td><code>String</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Specifies TypeScript version declared in NPM
+<code>package.json</code>.<br />
+Default value is <code>^2.4</code>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
 <td><code><a href="#npmVersion">&lt;npmVersion&gt;</a></code></td>
             
 <td><code>String</code></td>
@@ -1144,7 +1157,7 @@ is <code>true</code>.<br />
 Default value is <code>1.0.0</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#nullabilityDefinition">&lt;nullabilityDefinition&gt;</a></code></td>
             
@@ -1186,7 +1199,7 @@ undefined</code> without type alias</li>
 Default value is <code>nullInlineUnion</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#nullableAnnotations">&lt;nullableAnnotations&gt;</a></code></td>
             
@@ -1207,7 +1220,7 @@ Example optional annotation:
 <code>org.checkerframework.checker.nullness.qual.Nullable</code><br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#optionalAnnotations">&lt;optionalAnnotations&gt;</a></code></td>
             
@@ -1223,7 +1236,7 @@ parameter is &quot;opposite&quot; of <code>requiredAnnotations</code>, only
 one of them could be used.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#optionalProperties">&lt;optionalProperties&gt;</a></code></td>
             
@@ -1250,7 +1263,7 @@ false)</code> when using <code>jaxb</code> library</li>
 Default value is <code>useSpecifiedAnnotations</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#optionalPropertiesDeclaration">&lt;optionalPropertiesDeclaration&gt;</a></code></td>
             
@@ -1285,7 +1298,7 @@ but its type will be union with <code>undefined</code> value</li>
 Default value is <code>questionMark</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#outputFile">&lt;outputFile&gt;</a></code></td>
             
@@ -1296,7 +1309,7 @@ Default value is <code>questionMark</code>.<br /></td>
 <td>Path and name of generated TypeScript file.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#outputFileType">&lt;outputFileType&gt;</a></code></td>
             
@@ -1317,7 +1330,7 @@ generate runnable TypeScript code.<br />
 Default value is <code>declarationFile</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#referencedFiles">&lt;referencedFiles&gt;</a></code></td>
             
@@ -1331,7 +1344,7 @@ can be used with <code>customTypeMappings</code> to provide needed
 TypeScript types.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#removeTypeNamePrefix">&lt;removeTypeNamePrefix&gt;</a></code></td>
             
@@ -1344,7 +1357,7 @@ enums. For example if set to <code>Json</code> then mapping for
 <code>JsonData</code> will be <code>Data</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#removeTypeNameSuffix">&lt;removeTypeNameSuffix&gt;</a></code></td>
             
@@ -1357,7 +1370,7 @@ enums. For example if set to <code>JSON</code> then mapping for
 <code>DataJSON</code> will be <code>Data</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#requiredAnnotations">&lt;requiredAnnotations&gt;</a></code></td>
             
@@ -1370,7 +1383,7 @@ any of specified annotations. This parameter is &quot;opposite&quot; of
 <code>optionalAnnotations</code>, only one of them could be used.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#restNamespacing">&lt;restNamespacing&gt;</a></code></td>
             
@@ -1396,7 +1409,7 @@ grouped by annotation specified using
 Default value is <code>singleObject</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#restNamespacingAnnotation">&lt;restNamespacingAnnotation&gt;</a></code></td>
             
@@ -1418,7 +1431,7 @@ Format is <code>annotationClass#annotationElement</code> where
 </ul><br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#restOptionsType">&lt;restOptionsType&gt;</a></code></td>
             
@@ -1434,7 +1447,7 @@ specific (for example <code>AxiosRequestConfig</code>) or generic
 (for example <code>&lt;O&gt;</code>).<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#restResponseType">&lt;restResponseType&gt;</a></code></td>
             
@@ -1450,7 +1463,7 @@ or <code>AxiosPromise</code>) is returned instead of actual
 response data.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#scanSpringApplication">&lt;scanSpringApplication&gt;</a></code></td>
             
@@ -1463,7 +1476,7 @@ scanned for classes to process. It is needed to specify application
 class using another parameter (for example <code>classes</code>).<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#skip">&lt;skip&gt;</a></code></td>
             
@@ -1474,7 +1487,7 @@ class using another parameter (for example <code>classes</code>).<br /></td>
 <td>(no description)<br /><b>User property is</b>: <code>typescript.generator.skip</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#sortDeclarations">&lt;sortDeclarations&gt;</a></code></td>
             
@@ -1486,7 +1499,7 @@ class using another parameter (for example <code>classes</code>).<br /></td>
 properties) will be sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#sortTypeDeclarations">&lt;sortTypeDeclarations&gt;</a></code></td>
             
@@ -1498,7 +1511,7 @@ properties) will be sorted alphabetically.<br /></td>
 be sorted alphabetically.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td><code><a href="#stringQuotes">&lt;stringQuotes&gt;</a></code></td>
             
@@ -1517,7 +1530,7 @@ be sorted alphabetically.<br /></td>
 Default value is <code>doubleQuotes</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td><code><a href="#tsNoCheck">&lt;tsNoCheck&gt;</a></code></td>
             
@@ -1527,18 +1540,6 @@ Default value is <code>doubleQuotes</code>.<br /></td>
             
 <td>If <code>true</code> generated file will have disabled TypeScript
 semantic checks using <code>@ts-nocheck</code> comment.<br /></td>
-          </tr>
-          
-<tr class="a">
-            
-<td><code><a href="#typescriptVersion">&lt;typescriptVersion&gt;</a></code></td>
-            
-<td><code>String</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Specifies Typescript version.<br />
-Default value is <code>^2.4</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -2480,6 +2481,18 @@ Default value is <code>${project.artifactId}</code>.</div>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
+<h4><a name="a.3CnpmTypescriptVersion.3E"></a><b><a name="npmTypescriptVersion">&lt;npmTypescriptVersion&gt;</a></b></h4>
+        
+<div>Specifies TypeScript version declared in NPM
+<code>package.json</code>.<br />
+Default value is <code>^2.4</code>.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.lang.String</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
 <h4><a name="a.3CnpmVersion.3E"></a><b><a name="npmVersion">&lt;npmVersion&gt;</a></b></h4>
         
 <div>Specifies NPM package version.<br />
@@ -2881,17 +2894,6 @@ semantic checks using <code>@ts-nocheck</code> comment.</div>
 <ul>
           
 <li><b>Type</b>: <code>boolean</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CtypescriptVersion.3E"></a><b><a name="typescriptVersion">&lt;typescriptVersion&gt;</a></b></h4>
-        
-<div>Specifies Typescript version.<br />
-Default value is <code>^2.4</code>.</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>java.lang.String</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
