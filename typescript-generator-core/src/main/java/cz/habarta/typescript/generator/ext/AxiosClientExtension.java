@@ -17,7 +17,7 @@ public class AxiosClientExtension extends Extension {
 
     public static final String CFG_AXIOS_VERSION = "axiosVersion";
 
-    private String axiosVersion = "0.19.2";
+    private String axiosVersion = "0.21.1";
 
     @Override
     public void setConfiguration(Map<String, String> configuration) throws RuntimeException {
