@@ -123,7 +123,8 @@ public class TypeScriptGenerator {
                 npmPackageJson.types = Utils.replaceExtension(outputFile, ".d.ts").getName();
                 npmPackageJson.main = Utils.replaceExtension(outputFile, ".js").getName();
                 npmPackageJson.dependencies.putAll(settings.npmPackageDependencies);
-                npmPackageJson.devDependencies = Collections.singletonMap("typescript", settings.typescriptVersion);
+                final String typescriptVersion = settings.npmTypescriptVersion != null ? settings.npmTypescriptVersion : settings.typescriptVersion;
+                npmPackageJson.devDependencies = Collections.singletonMap("typescript", typescriptVersion);
                 final String npmBuildScript = settings.npmBuildScript != null
                         ? settings.npmBuildScript
                         : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";

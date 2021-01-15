@@ -741,19 +741,19 @@ public class GenerateMojo extends AbstractMojo {
     private String npmVersion;
 
     /**
+     * Specifies TypeScript version declared in NPM <code>package.json</code>.<br>
+     * Default value is <code>^2.4</code>.
+     */
+    @Parameter
+    private String npmTypescriptVersion;
+
+    /**
      * Specifies NPM "build" script.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
      * Default value is <code>tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.
      */
     @Parameter
     private String npmBuildScript;
-
-    /**
-     * Specifies Typescript version.<br>
-     * Default value is <code>^2.4</code>.
-     */
-    @Parameter
-    private String typescriptVersion;
 
     /**
      * Specifies how strings will be quoted.
@@ -905,6 +905,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+        settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
@@ -914,7 +915,6 @@ public class GenerateMojo extends AbstractMojo {
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
-        settings.typescriptVersion = typescriptVersion;
         return settings;
     }
 

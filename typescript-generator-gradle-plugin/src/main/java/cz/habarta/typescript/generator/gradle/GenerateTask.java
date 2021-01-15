@@ -117,6 +117,7 @@ public class GenerateTask extends DefaultTask {
     public boolean generateNpmPackageJson;
     public String npmName;
     public String npmVersion;
+    public String npmTypescriptVersion;
     public String npmBuildScript;
     public StringQuotes stringQuotes;
     public String indentString;
@@ -200,6 +201,7 @@ public class GenerateTask extends DefaultTask {
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
+        settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
