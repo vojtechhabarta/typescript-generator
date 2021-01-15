@@ -709,7 +709,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * If <code>true</code> JSON file describing generated module will be generated.
      * In following typescript-generator run this allows to generate another module which could depend on currently generated module.
-     * Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs 
+     * Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs
      * when the module is referenced from another module using {@link #moduleDependencies} parameter.
      * Only applicable when {@link #outputKind} is set to <code>module</code>.
      */
@@ -747,6 +747,13 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private String npmBuildScript;
+
+    /**
+     * Specifies Typescript version.<br>
+     * Default value is <code>^2.4</code>.
+     */
+    @Parameter
+    private String typescriptVersion;
 
     /**
      * Specifies how strings will be quoted.
@@ -907,6 +914,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
+        settings.typescriptVersion = typescriptVersion;
         return settings;
     }
 
