@@ -609,4 +609,84 @@ public class TaggedUnionsTest {
         public double radius;
     }
 
+
+    static class RecordUsage {
+        public List<Record> records;
+        public List<FormRecord> formRecords;
+        public List<ListRecord> listRecords;
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = FormRecord.class),
+        @JsonSubTypes.Type(value = ListRecord.class),
+    })
+    static abstract class Record {}
+
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = OrderFormRecord.class, name = "order.form"),
+        @JsonSubTypes.Type(value = ProductFormRecord.class, name = "product.form"),
+    })
+    static abstract class FormRecord extends Record {}
+
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = OrderListRecord.class, name = "order.list"),
+        @JsonSubTypes.Type(value = ProductListRecord.class, name = "product.list"),
+    })
+    static abstract class ListRecord extends Record {}
+
+    static class OrderFormRecord extends FormRecord {}
+    static class OrderListRecord extends ListRecord {}
+    static class ProductFormRecord extends FormRecord {}
+    static class ProductListRecord extends ListRecord {}
+
+    @Test
+    public void testIntermediateUnions() {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(RecordUsage.class));
+        final String expected = ""
+                + "interface RecordUsage {\n"
+                + "    records: RecordUnion[];\n"
+                + "    formRecords: FormRecordUnion[];\n"
+                + "    listRecords: ListRecordUnion[];\n"
+                + "}\n"
+                + "\n"
+                + "interface Record {\n"
+                + "    '@type': 'order.form' | 'product.form' | 'order.list' | 'product.list';\n"
+                + "}\n"
+                + "\n"
+                + "interface FormRecord extends Record {\n"
+                + "    '@type': 'order.form' | 'product.form';\n"
+                + "}\n"
+                + "\n"
+                + "interface ListRecord extends Record {\n"
+                + "    '@type': 'order.list' | 'product.list';\n"
+                + "}\n"
+                + "\n"
+                + "interface OrderFormRecord extends FormRecord {\n"
+                + "    '@type': 'order.form';\n"
+                + "}\n"
+                + "\n"
+                + "interface ProductFormRecord extends FormRecord {\n"
+                + "    '@type': 'product.form';\n"
+                + "}\n"
+                + "\n"
+                + "interface OrderListRecord extends ListRecord {\n"
+                + "    '@type': 'order.list';\n"
+                + "}\n"
+                + "\n"
+                + "interface ProductListRecord extends ListRecord {\n"
+                + "    '@type': 'product.list';\n"
+                + "}\n"
+                + "\n"
+                + "type RecordUnion = FormRecord | ListRecord;\n"
+                + "\n"
+                + "type FormRecordUnion = OrderFormRecord | ProductFormRecord;\n"
+                + "\n"
+                + "type ListRecordUnion = OrderListRecord | ProductListRecord;\n"
+                + "";
+        Assert.assertEquals(expected.trim(), output.trim());
+    }
+
 }
