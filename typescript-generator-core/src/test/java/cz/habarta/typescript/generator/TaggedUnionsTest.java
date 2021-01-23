@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -530,10 +533,47 @@ public class TaggedUnionsTest {
         Assert.assertEquals(expected, output);
     }
 
+    @Test
+    public void testTaggedUnionDisabledUsingAnnotation() {
+        final Settings settings = TestUtils.settings();
+        settings.disableTaggedUnionAnnotations = Arrays.asList(TestMarker.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Geometry2.class));
+        final String expected = (
+                "\n" +
+                "interface Geometry2 {\n" +
+                "    shapes: Shape2[];\n" +
+                "}\n" +
+                "\n" +
+                "interface Shape2 {\n" +
+                "    kind: string;\n" +
+                "}\n" +
+                "\n" +
+                "interface Square2 extends Shape2 {\n" +
+                "    size: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface Rectangle2 extends Shape2 {\n" +
+                "    width: number;\n" +
+                "    height: number;\n" +
+                "}\n" +
+                "\n" +
+                "interface Circle2 extends Shape2 {\n" +
+                "    radius: number;\n" +
+                "}\n" +
+                ""
+                ).replace('\'', '"');
+        Assert.assertEquals(expected, output);
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface TestMarker {
+    }
+
     private static class Geometry2 {
         public List<Shape2> shapes;
     }
 
+    @TestMarker
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "kind")
     @JsonSubTypes({
         @JsonSubTypes.Type(Square2.class),

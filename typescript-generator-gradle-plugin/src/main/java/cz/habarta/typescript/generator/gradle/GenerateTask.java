@@ -85,6 +85,7 @@ public class GenerateTask extends DefaultTask {
     public ClassMapping mapClasses;
     public List<String> mapClassesAsClassesPatterns;
     public boolean generateConstructors;
+    public List<String> disableTaggedUnionAnnotations;
     public boolean disableTaggedUnions;
     public boolean generateReadonlyAndWriteonlyJSDocTags;
     public boolean ignoreSwaggerAnnotations;
@@ -169,6 +170,7 @@ public class GenerateTask extends DefaultTask {
         settings.mapClasses = mapClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.generateConstructors = generateConstructors;
+        settings.loadDisableTaggedUnionAnnotations(classLoader, disableTaggedUnionAnnotations);
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;

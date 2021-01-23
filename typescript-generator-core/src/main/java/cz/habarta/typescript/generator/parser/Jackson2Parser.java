@@ -290,15 +290,17 @@ public class Jackson2Parser extends ModelParser {
         final boolean syntheticDiscriminantProperty;
         final String discriminantLiteral;
 
-        final JsonTypeInfo jsonTypeInfo = sourceClass.type.getAnnotation(JsonTypeInfo.class);
-        final JsonTypeInfo parentJsonTypeInfo;
-        if (isSupported(jsonTypeInfo)) {
+        final Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo = Pair.of(sourceClass.type, sourceClass.type.getAnnotation(JsonTypeInfo.class));
+        final Pair<Class<?>, JsonTypeInfo> parentClassWithJsonTypeInfo;
+        if (isTaggedUnion(classWithJsonTypeInfo)) {
             // this is parent
+            final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(jsonTypeInfo);
             discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(jsonTypeInfo, sourceClass.type);
-        } else if (isSupported(parentJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
+        } else if (isTaggedUnion(parentClassWithJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
+            final JsonTypeInfo parentJsonTypeInfo = parentClassWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(parentJsonTypeInfo);
             discriminantLiteral = getTypeName(parentJsonTypeInfo, sourceClass.type);
@@ -412,7 +414,12 @@ public class Jackson2Parser extends ModelParser {
         return null;
     }
 
-    private static boolean isSupported(JsonTypeInfo jsonTypeInfo) {
+    private boolean isTaggedUnion(Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo) {
+        final Class<?> cls = classWithJsonTypeInfo.getValue1();
+        final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
+        if (cls == null || Utils.hasAnyAnnotation(cls::getAnnotation, settings.disableTaggedUnionAnnotations)) {
+            return false;
+        }
         return jsonTypeInfo != null &&
                 (jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY || jsonTypeInfo.include() == JsonTypeInfo.As.EXISTING_PROPERTY) &&
                 (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME || jsonTypeInfo.use() == JsonTypeInfo.Id.CLASS);
@@ -449,17 +456,12 @@ public class Jackson2Parser extends ModelParser {
         }
 
         // find @JsonTypeName recursively
-        final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class);
+        final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class).getValue2();
         if (jsonTypeName != null && !jsonTypeName.value().isEmpty()) {
             return jsonTypeName.value();
         }
         // find @JsonSubTypes.Type recursively
-        final JsonSubTypes jsonSubTypes = getAnnotationRecursive(cls, JsonSubTypes.class, new Predicate<JsonSubTypes>() {
-            @Override
-            public boolean test(JsonSubTypes types) {
-                return getJsonSubTypeForClass(types, cls) != null;
-            }
-        });
+        final JsonSubTypes jsonSubTypes = getAnnotationRecursive(cls, JsonSubTypes.class, (JsonSubTypes types) -> getJsonSubTypeForClass(types, cls) != null).getValue2();
         if (jsonSubTypes != null) {
             final JsonSubTypes.Type jsonSubType = getJsonSubTypeForClass(jsonSubTypes, cls);
             if (!jsonSubType.name().isEmpty()) {
@@ -486,29 +488,29 @@ public class Jackson2Parser extends ModelParser {
         return null;
     }
 
-    private static <T extends Annotation> T getAnnotationRecursive(Class<?> cls, Class<T> annotationClass) {
+    private static <T extends Annotation> Pair<Class<?>, T> getAnnotationRecursive(Class<?> cls, Class<T> annotationClass) {
         return getAnnotationRecursive(cls, annotationClass, null);
     }
 
-    private static <T extends Annotation> T getAnnotationRecursive(Class<?> cls, Class<T> annotationClass, Predicate<T> annotationFilter) {
+    private static <T extends Annotation> Pair<Class<?>, T> getAnnotationRecursive(Class<?> cls, Class<T> annotationClass, Predicate<T> annotationFilter) {
         if (cls == null) {
-            return null;
+            return Pair.of(null, null);
         }
         final T annotation = cls.getAnnotation(annotationClass);
         if (annotation != null && (annotationFilter == null || annotationFilter.test(annotation))) {
-            return annotation;
+            return Pair.of(cls, annotation);
         }
         for (Class<?> aInterface : cls.getInterfaces()) {
-            final T interfaceAnnotation = getAnnotationRecursive(aInterface, annotationClass, annotationFilter);
-            if (interfaceAnnotation != null) {
-                return interfaceAnnotation;
+            final Pair<Class<?>, T> classWithAnnotation = getAnnotationRecursive(aInterface, annotationClass, annotationFilter);
+            if (classWithAnnotation.getValue2() != null) {
+                return classWithAnnotation;
             }
         }
-        final T superclassAnnotation = getAnnotationRecursive(cls.getSuperclass(), annotationClass, annotationFilter);
-        if (superclassAnnotation != null) {
-            return superclassAnnotation;
+        final Pair<Class<?>, T> classWithAnnotation = getAnnotationRecursive(cls.getSuperclass(), annotationClass, annotationFilter);
+        if (classWithAnnotation.getValue2() != null) {
+            return classWithAnnotation;
         }
-        return null;
+        return Pair.of(null, null);
     }
 
     private BeanHelpers getBeanHelpers(Class<?> beanClass) {

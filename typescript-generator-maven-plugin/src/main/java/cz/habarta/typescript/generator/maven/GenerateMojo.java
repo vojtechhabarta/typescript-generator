@@ -484,7 +484,18 @@ public class GenerateMojo extends AbstractMojo {
     private boolean generateConstructors;
 
     /**
+     * Specifies annotations used for disabling tagged union created from classes.
+     * In case of Jackson2 library this means class hierarchy formed using <code>@JsonTypeInfo</code> and <code>@JsonSubTypes</code> annotations.
+     * While <code>disableTaggedUnions</code> parameter only disables creation of TypeScript discriminated union types
+     * this parameter allows to disable also processing of discriminant property.
+     */
+    @Parameter
+    private List<String> disableTaggedUnionAnnotations;
+
+    /**
      * If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types.
+     * This parameter does not disable processing of discriminant property.
+     * See also <code>disableTaggedUnionAnnotations</code> parameter.
      */
     @Parameter
     private boolean disableTaggedUnions;
@@ -873,6 +884,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.mapClasses = mapClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         settings.generateConstructors = generateConstructors;
+        settings.loadDisableTaggedUnionAnnotations(classLoader, disableTaggedUnionAnnotations);
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;

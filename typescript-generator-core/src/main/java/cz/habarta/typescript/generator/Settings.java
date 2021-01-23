@@ -90,6 +90,7 @@ public class Settings {
     public List<String> mapClassesAsClassesPatterns;
     private Predicate<String> mapClassesAsClassesFilter = null;
     public boolean generateConstructors = false;
+    public List<Class<? extends Annotation>> disableTaggedUnionAnnotations = new ArrayList<>();
     public boolean disableTaggedUnions = false;
     public boolean generateReadonlyAndWriteonlyJSDocTags = false;
     public boolean ignoreSwaggerAnnotations = false;
@@ -264,6 +265,10 @@ public class Settings {
 
     public void loadNullableAnnotations(ClassLoader classLoader, List<String> nullableAnnotations) {
         this.nullableAnnotations = loadClasses(classLoader, nullableAnnotations, Annotation.class);
+    }
+
+    public void loadDisableTaggedUnionAnnotations(ClassLoader classLoader, List<String> disableTaggedUnionAnnotations) {
+        this.disableTaggedUnionAnnotations = loadClasses(classLoader, disableTaggedUnionAnnotations, Annotation.class);
     }
 
     public void loadJackson2Modules(ClassLoader classLoader, List<String> jackson2Modules) {
