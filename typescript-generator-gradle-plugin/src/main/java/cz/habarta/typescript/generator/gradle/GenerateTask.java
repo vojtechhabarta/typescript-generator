@@ -53,6 +53,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> classesExtendingClasses;
     public String classesFromJaxrsApplication;
     public boolean classesFromAutomaticJaxrsApplication;
+    public List<String> scanningAcceptedPackages;
     public List<String> excludeClasses;
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
@@ -254,6 +255,7 @@ public class GenerateTask extends DefaultTask {
             parameters.automaticJaxrsApplication = classesFromAutomaticJaxrsApplication;
             parameters.isClassNameExcluded = settings.getExcludeFilter();
             parameters.classLoader = classLoader;
+            parameters.scanningAcceptedPackages = scanningAcceptedPackages;
             parameters.debug = loggingLevel == Logger.Level.Debug;
 
             final File output = outputFile != null

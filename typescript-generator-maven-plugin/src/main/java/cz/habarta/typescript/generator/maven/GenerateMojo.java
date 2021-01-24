@@ -170,6 +170,21 @@ public class GenerateMojo extends AbstractMojo {
     private boolean classesFromAutomaticJaxrsApplication;
 
     /**
+     * Allows to speed up classpath scanning by limiting scanning to specified packages.
+     * This optimization applies to following parameters:
+     * <ul>
+     * <li><code>classPatterns</code></li>
+     * <li><code>classesImplementingInterfaces</code></li>
+     * <li><code>classesExtendingClasses</code></li>
+     * <li><code>classesWithAnnotations</code></li>
+     * <li><code>classesFromAutomaticJaxrsApplication</code></li>
+     * </ul>
+     * This parameter is passed directly to underlying classpath scanning library (ClassGraph) without any validation or interpretation.
+     */
+    @Parameter
+    private List<String> scanningAcceptedPackages;
+
+    /**
      * List of classes excluded from processing.
      */
     @Parameter
@@ -963,6 +978,7 @@ public class GenerateMojo extends AbstractMojo {
             parameters.automaticJaxrsApplication = classesFromAutomaticJaxrsApplication;
             parameters.isClassNameExcluded = settings.getExcludeFilter();
             parameters.classLoader = classLoader;
+            parameters.scanningAcceptedPackages = scanningAcceptedPackages;
             parameters.debug = loggingLevel == Logger.Level.Debug;
 
             final File output = outputFile != null

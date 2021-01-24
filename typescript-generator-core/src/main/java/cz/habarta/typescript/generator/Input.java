@@ -78,6 +78,7 @@ public class Input {
         public boolean automaticJaxrsApplication;
         public Predicate<String> isClassNameExcluded;
         public URLClassLoader classLoader;
+        public List<String> scanningAcceptedPackages;
         public boolean debug;
     }
 
@@ -87,7 +88,7 @@ public class Input {
             if (parameters.classLoader != null) {
                 Thread.currentThread().setContextClassLoader(parameters.classLoader);
             }
-            try (final ClasspathScanner classpathScanner = new ClasspathScanner(parameters.classLoader, parameters.debug)) {
+            try (final ClasspathScanner classpathScanner = new ClasspathScanner(parameters.classLoader, parameters.scanningAcceptedPackages, parameters.debug)) {
                 final List<SourceType<Type>> types = new ArrayList<>();
                 if (parameters.classNames != null) {
                     types.addAll(fromClassNames(parameters.classNames));
@@ -142,11 +143,13 @@ public class Input {
     private static class ClasspathScanner implements AutoCloseable {
 
         private final URLClassLoader classLoader;
+        private final List<String> acceptedPackages;
         private final boolean verbose;
         private ScanResult scanResult = null;
 
-        public ClasspathScanner(URLClassLoader classLoader, boolean verbose) {
+        public ClasspathScanner(URLClassLoader classLoader, List<String> acceptedPackages, boolean verbose) {
             this.classLoader = classLoader;
+            this.acceptedPackages = acceptedPackages;
             this.verbose = verbose;
         }
 
@@ -160,6 +163,9 @@ public class Input {
                         .ignoreClassVisibility();
                 if (classLoader != null) {
                     classGraph = classGraph.overrideClasspath((Object[])classLoader.getURLs());
+                }
+                if (acceptedPackages != null && !acceptedPackages.isEmpty()) {
+                    classGraph = classGraph.acceptPackages(acceptedPackages.toArray(new String[0]));
                 }
                 if (verbose) {
                     classGraph = classGraph.verbose();

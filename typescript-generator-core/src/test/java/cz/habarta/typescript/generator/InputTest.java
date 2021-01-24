@@ -16,7 +16,7 @@ public class InputTest {
 
     @Test
     public void testScanner() {
-        final ScanResult scanResult = new ClassGraph().enableAllInfo().scan();
+        final ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("cz.habarta").scan();
         final List<String> allClassNames = scanResult.getAllClasses().getNames();
         final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
         Assert.assertTrue("Typescript-generator must have at least 20 tests :-)", testClassNames.size() > 20);
@@ -71,6 +71,7 @@ public class InputTest {
     public void testClassesWithAnnotations() {
         final Input.Parameters parameters = new Input.Parameters();
         parameters.classesWithAnnotations = Arrays.asList(MyJsonClass.class.getName());
+        parameters.scanningAcceptedPackages = Arrays.asList("cz.habarta");
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
         Assert.assertTrue(output.contains("name: string;"));
     }
