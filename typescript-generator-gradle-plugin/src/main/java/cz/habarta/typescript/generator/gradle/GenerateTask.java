@@ -238,7 +238,6 @@ public class GenerateTask extends DefaultTask {
                 }
             }
         }
-        urls.addAll(getFilesFromConfiguration("compile"));
         urls.addAll(getFilesFromConfiguration("compileClasspath"));
 
         try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {

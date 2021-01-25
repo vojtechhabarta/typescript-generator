@@ -13,7 +13,7 @@
     <name>typescript-generator-gradle-plugin</name>
 
     <properties>
-        <gradle.version>3.0</gradle.version>
+        <gradle.version>4.0</gradle.version>
     </properties>
 
     <dependencies>
