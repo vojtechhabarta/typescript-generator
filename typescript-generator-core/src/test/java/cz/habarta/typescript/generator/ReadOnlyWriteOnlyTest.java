@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,7 +70,7 @@ public class ReadOnlyWriteOnlyTest {
     }
 
     @Test
-    public void test() {
+    public void test() throws JsonProcessingException {
         final Settings settings = TestUtils.settings();
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ReadOnlyWriteOnlyUser.class));
@@ -93,7 +94,10 @@ public class ReadOnlyWriteOnlyTest {
                 + "     */\n"
                 + "    password2: string;\n"
                 + "}\n";
-        Assert.assertEquals(expected, output);
+        ObjectMapper mapper = JsonMapper.builder()
+                .nodeFactory(new SortingNodeFactory())
+                .build();
+        Assert.assertEquals(mapper.writeValueAsString(mapper.readTree(expected)), mapper.writeValueAsString(mapper.readTree(output)));
     }
 
 }
