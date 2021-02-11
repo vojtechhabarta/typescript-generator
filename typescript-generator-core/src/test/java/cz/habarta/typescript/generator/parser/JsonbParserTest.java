@@ -8,8 +8,12 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
+import java.util.UUID;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -104,6 +108,30 @@ public class JsonbParserTest {
         public String bar;
     }
 
+    public static class PrimitiveObjectWithTheOtherObject {
+        public char charVar1;
+        public byte byteVar1;
+        public short shortVar1;
+        public int intVar1;
+        public long longVar1;
+        public float floatVar1;
+        public double doubleVar1;
+        public boolean booleanVar1;
+        public String stringVar;
+        public Character charVar2;
+        public Byte byteVar2;
+        public Short shortVar2;
+        public Integer intVar2;
+        public Long longVar2;
+        public Float floatVar2;
+        public Double doubleVar2;
+        public Boolean booleanVar2;
+        public UUID uuidVar;
+        public Date dateVar;
+        public Collection<String> collectionVar;
+        public Map<String, String> mapVar;
+    }
+
     public static class ObjectWithRequiredPropertyAndConstructor {
         public String foo;
         public String bar;
@@ -173,6 +201,35 @@ public class JsonbParserTest {
         final String output = generate(settings, ObjectWithRequiredPropertyAndConstructor.class);
         Assert.assertTrue(output, output.contains(" foo:"));
         Assert.assertTrue(output, output.contains(" bar?:"));
+    }
+
+    @Test
+    public void testRequiredPropertyMarkedByAnnotationWithAllPrimitivesRequired() {
+        settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
+        settings.requiredAnnotations.add(RequiredAnnotation.class);
+        settings.allPrimitivesRequired = true;
+        final String output = generate(settings, PrimitiveObjectWithTheOtherObject.class);
+        Assert.assertTrue(output.contains("charVar1: string;"));
+        Assert.assertTrue(output.contains("byteVar1: number;"));
+        Assert.assertTrue(output.contains("shortVar1: number;"));
+        Assert.assertTrue(output.contains("intVar1: number;"));
+        Assert.assertTrue(output.contains("longVar1: number;"));
+        Assert.assertTrue(output.contains("floatVar1: number;"));
+        Assert.assertTrue(output.contains("doubleVar1: number;"));
+        Assert.assertTrue(output.contains("booleanVar1: boolean;"));
+        Assert.assertTrue(output.contains("stringVar?: string;"));
+        Assert.assertTrue(output.contains("charVar2?: string;"));
+        Assert.assertTrue(output.contains("byteVar2?: number;"));
+        Assert.assertTrue(output.contains("shortVar2?: number;"));
+        Assert.assertTrue(output.contains("intVar2?: number;"));
+        Assert.assertTrue(output.contains("longVar2?: number;"));
+        Assert.assertTrue(output.contains("floatVar2?: number;"));
+        Assert.assertTrue(output.contains("doubleVar2?: number;"));
+        Assert.assertTrue(output.contains("booleanVar2?: boolean;"));
+        Assert.assertTrue(output.contains("uuidVar?: string;"));
+        Assert.assertTrue(output.contains("dateVar?: Date;"));
+        Assert.assertTrue(output.contains("collectionVar?: string[];"));
+        Assert.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
     }
 
     @Test

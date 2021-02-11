@@ -5,6 +5,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -14,6 +16,7 @@ public class PropertyMember {
     private final Type type;
     private final AnnotatedType annotatedType;
     private final AnnotationGetter annotationGetter;
+    private final List<String> PRIMITIVES = Arrays.asList("byte", "short", "int", "long", "boolean", "float", "double", "char", "void");
 
     public PropertyMember(AnnotatedElement annotatedElement, Type type, AnnotatedType annotatedType, AnnotationGetter annotationGetter) {
         this.annotatedElement = Objects.requireNonNull(annotatedElement);
@@ -33,6 +36,10 @@ public class PropertyMember {
         return annotation != null
                 ? annotation
                 : annotatedType.getAnnotation(annotationClass);
+    }
+
+    public boolean isPrimitive() {
+        return PRIMITIVES.contains(type.getTypeName());
     }
 
 }

@@ -11,6 +11,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -206,6 +210,70 @@ public class OptionalAnnotationTest {
 
     @Retention(RetentionPolicy.RUNTIME)
     public @interface MarkerAnnotation {
+    }
+
+    @Test
+    public void testPrimitiveFieldRequired() {
+        {
+            final Settings settings = TestUtils.settings();
+            settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
+            settings.allPrimitivesRequired = true;
+            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
+            Assert.assertTrue(output.contains("charVar1: string;"));
+            Assert.assertTrue(output.contains("byteVar1: number;"));
+            Assert.assertTrue(output.contains("shortVar1: number;"));
+            Assert.assertTrue(output.contains("intVar1: number;"));
+            Assert.assertTrue(output.contains("longVar1: number;"));
+            Assert.assertTrue(output.contains("floatVar1: number;"));
+            Assert.assertTrue(output.contains("doubleVar1: number;"));
+            Assert.assertTrue(output.contains("booleanVar1: boolean;"));
+            Assert.assertTrue(output.contains("stringVar?: string;"));
+            Assert.assertTrue(output.contains("charVar2?: string;"));
+            Assert.assertTrue(output.contains("byteVar2?: number;"));
+            Assert.assertTrue(output.contains("shortVar2?: number;"));
+            Assert.assertTrue(output.contains("intVar2?: number;"));
+            Assert.assertTrue(output.contains("longVar2?: number;"));
+            Assert.assertTrue(output.contains("floatVar2?: number;"));
+            Assert.assertTrue(output.contains("doubleVar2?: number;"));
+            Assert.assertTrue(output.contains("booleanVar2?: boolean;"));
+            Assert.assertTrue(output.contains("uuidVar?: string;"));
+            Assert.assertTrue(output.contains("dateVar?: Date;"));
+            Assert.assertTrue(output.contains("collectionVar?: string[];"));
+            Assert.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
+        }
+        try {
+            final Settings settings = TestUtils.settings();
+            settings.requiredAnnotations = Arrays.asList();
+            settings.allPrimitivesRequired = true;
+            new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
+            Assert.fail();
+        } catch (Exception e) {
+            // expected - 'allPrimitivesRequired' parameter can only be used with 'requiredAnnotations' parameter
+        }
+    }
+
+    public class ClassWithPrimitiveField {
+        public char charVar1;
+        public byte byteVar1;
+        public short shortVar1;
+        public int intVar1;
+        public long longVar1;
+        public float floatVar1;
+        public double doubleVar1;
+        public boolean booleanVar1;
+        public String stringVar;
+        public Character charVar2;
+        public Byte byteVar2;
+        public Short shortVar2;
+        public Integer intVar2;
+        public Long longVar2;
+        public Float floatVar2;
+        public Double doubleVar2;
+        public Boolean booleanVar2;
+        public UUID uuidVar;
+        public Date dateVar;
+        public Collection<String> collectionVar;
+        public Map<String, String> mapVar;
     }
 
 }

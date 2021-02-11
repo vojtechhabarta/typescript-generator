@@ -184,6 +184,9 @@ public abstract class ModelParser {
             if (!settings.optionalAnnotations.isEmpty()) {
                 return Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.optionalAnnotations);
             }
+            if (settings.allPrimitivesRequired && propertyMember.isPrimitive()) {
+                return false;
+            }
             if (!settings.requiredAnnotations.isEmpty()) {
                 return !Utils.hasAnyAnnotation(propertyMember::getAnnotation, settings.requiredAnnotations);
             }
