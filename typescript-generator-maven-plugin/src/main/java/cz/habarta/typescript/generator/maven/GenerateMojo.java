@@ -780,6 +780,33 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private String npmBuildScript;
+    
+    /**
+     * List of additional NPM <code>dependencies</code>.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
+     * Each item it this list specifies dependencies with its version.<br>
+     * Item format is: <code>name:version</code>.
+     */
+    @Parameter
+    private List<String> npmDependencies;
+    
+    /**
+     * List of additional NPM <code>devDependencies</code>.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
+     * Each item it this list specifies dependencies with its version.<br>
+     * Item format is: <code>name:version</code>.
+     */
+    @Parameter
+    private List<String> npmDevDependencies;
+    
+    /**
+     * List of additional NPM <code>peerDependencies</code>.<br>
+     * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
+     * Each item it this list specifies dependencies with its version.<br>
+     * Item format is: <code>name:version</code>.
+     */
+    @Parameter
+    private List<String> npmPeerDependencies;
 
     /**
      * Specifies how strings will be quoted.
@@ -934,6 +961,9 @@ public class GenerateMojo extends AbstractMojo {
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
         settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
+        settings.npmPackageDependencies = Settings.convertDependenciesToMap(npmDependencies);
+        settings.npmDevDependencies = Settings.convertDependenciesToMap(npmDevDependencies);
+        settings.npmPeerDependencies = Settings.convertDependenciesToMap(npmPeerDependencies);
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;

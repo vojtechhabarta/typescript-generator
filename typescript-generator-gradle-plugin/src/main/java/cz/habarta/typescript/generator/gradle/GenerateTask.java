@@ -121,6 +121,9 @@ public class GenerateTask extends DefaultTask {
     public String npmVersion;
     public String npmTypescriptVersion;
     public String npmBuildScript;
+    public List<String> npmDependencies;
+    public List<String> npmDevDependencies;
+    public List<String> npmPeerDependencies;
     public StringQuotes stringQuotes;
     public String indentString;
     @Deprecated public boolean displaySerializerWarning;
@@ -206,6 +209,9 @@ public class GenerateTask extends DefaultTask {
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
         settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
+        settings.npmPackageDependencies = Settings.convertDependenciesToMap(npmDependencies);
+        settings.npmDevDependencies = Settings.convertDependenciesToMap(npmDevDependencies);
+        settings.npmPeerDependencies = Settings.convertDependenciesToMap(npmPeerDependencies);
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;

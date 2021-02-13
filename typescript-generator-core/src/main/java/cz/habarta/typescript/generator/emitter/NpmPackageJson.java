@@ -12,6 +12,7 @@ public class NpmPackageJson {
     public String main;
     public Map<String, String> dependencies;
     public Map<String, String> devDependencies;
+    public Map<String, String> peerDependencies;
     public Map<String, String> scripts;
 
 }

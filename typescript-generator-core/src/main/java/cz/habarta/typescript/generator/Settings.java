@@ -128,6 +128,8 @@ public class Settings {
     public String npmName = null;
     public String npmVersion = null;
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
+    public Map<String, String> npmDevDependencies = new LinkedHashMap<>();
+    public Map<String, String> npmPeerDependencies = new LinkedHashMap<>();
     public String typescriptVersion = "^2.4";
     public String npmTypescriptVersion = null;
     public String npmBuildScript = null;
@@ -288,6 +290,20 @@ public class Settings {
         }
         return result;
     }
+    
+    public static Map<String, String> convertDependenciesToMap(List<String> dependencies) {
+        final Map<String, String> result = new LinkedHashMap<>();
+        if (dependencies != null) {
+            for (String dependency : dependencies) {
+                final String[] values = dependency.split(":", 2);
+                if (values.length < 2) {
+                    throw new RuntimeException("Invalid dependency format: " + dependency);
+                }
+                result.put(values[0].trim(), values[1].trim());
+            }
+        }
+        return result;
+    }
 
     public void validate() {
         if (classLoader == null) {
@@ -352,6 +368,12 @@ public class Settings {
             }
             if (features.npmPackageDependencies != null) {
                 npmPackageDependencies.putAll(features.npmPackageDependencies);
+            }
+            if (features.npmDevDependencies != null) {
+                npmDevDependencies.putAll(features.npmDevDependencies);
+            }
+            if (features.npmPeerDependencies != null) {
+                npmPeerDependencies.putAll(features.npmPeerDependencies);
             }
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;

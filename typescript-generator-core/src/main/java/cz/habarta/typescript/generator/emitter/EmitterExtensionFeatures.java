@@ -17,5 +17,7 @@ public class EmitterExtensionFeatures {
     public String restResponseType = null;
     public String restOptionsType = null;
     public Map<String, String> npmPackageDependencies = null;
+    public Map<String, String> npmDevDependencies = null;
+    public Map<String, String> npmPeerDependencies = null;
 
 }

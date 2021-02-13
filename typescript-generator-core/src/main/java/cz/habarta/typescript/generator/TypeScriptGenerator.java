@@ -114,6 +114,8 @@ public class TypeScriptGenerator {
             npmPackageJson.version = settings.npmVersion;
             npmPackageJson.types = outputFile.getName();
             npmPackageJson.dependencies = new LinkedHashMap<>();
+            npmPackageJson.devDependencies = new LinkedHashMap<>();
+            npmPackageJson.peerDependencies = new LinkedHashMap<>();
             if (settings.moduleDependencies != null) {
                 for (ModuleDependency dependency : settings.moduleDependencies) {
                     npmPackageJson.dependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
@@ -123,8 +125,10 @@ public class TypeScriptGenerator {
                 npmPackageJson.types = Utils.replaceExtension(outputFile, ".d.ts").getName();
                 npmPackageJson.main = Utils.replaceExtension(outputFile, ".js").getName();
                 npmPackageJson.dependencies.putAll(settings.npmPackageDependencies);
+                npmPackageJson.devDependencies.putAll(settings.npmDevDependencies);
+                npmPackageJson.peerDependencies.putAll(settings.npmPeerDependencies);
                 final String typescriptVersion = settings.npmTypescriptVersion != null ? settings.npmTypescriptVersion : settings.typescriptVersion;
-                npmPackageJson.devDependencies = Collections.singletonMap("typescript", typescriptVersion);
+                npmPackageJson.devDependencies.put("typescript", typescriptVersion);
                 final String npmBuildScript = settings.npmBuildScript != null
                         ? settings.npmBuildScript
                         : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";
@@ -133,6 +137,12 @@ public class TypeScriptGenerator {
             }
             if (npmPackageJson.dependencies.isEmpty()) {
                 npmPackageJson.dependencies = null;
+            }
+            if (npmPackageJson.devDependencies.isEmpty()) {
+                npmPackageJson.devDependencies = null;
+            }
+            if (npmPackageJson.peerDependencies.isEmpty()) {
+                npmPackageJson.peerDependencies = null;
             }
             getNpmPackageJsonEmitter().emit(npmPackageJson, npmOutput.getWriter(), npmOutput.getName(), npmOutput.shouldCloseWriter());
         }
