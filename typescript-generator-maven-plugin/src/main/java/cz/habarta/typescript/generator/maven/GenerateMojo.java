@@ -733,8 +733,8 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> nullableAnnotations;
 
     /**
-     * If <code>true</code> All Java primitives will be treated as non nullable.
-     * Useful when used with {@link #requiredAnnotations} parameter.
+     * When using {@link #requiredAnnotations} to mark properties as not optional then
+     * setting this parameter to <code>true</code> marks also all properties of primitive type without explicit annotation.
      */
     @Parameter
     private boolean primitivePropertiesRequired;
