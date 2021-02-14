@@ -737,7 +737,7 @@ public class GenerateMojo extends AbstractMojo {
      * Useful when used with {@link #requiredAnnotations} parameter.
      */
     @Parameter
-    private boolean allPrimitivesRequired;
+    private boolean primitivePropertiesRequired;
 
     /**
      * If <code>true</code> JSON file describing generated module will be generated.
@@ -935,7 +935,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
-        settings.allPrimitivesRequired = allPrimitivesRequired;
+        settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;

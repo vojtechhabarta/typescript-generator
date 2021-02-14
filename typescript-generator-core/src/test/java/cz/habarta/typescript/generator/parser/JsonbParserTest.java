@@ -204,10 +204,10 @@ public class JsonbParserTest {
     }
 
     @Test
-    public void testRequiredPropertyMarkedByAnnotationWithAllPrimitivesRequired() {
+    public void testRequiredPropertyMarkedByAnnotationWithPrimitivePropertiesRequired() {
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.requiredAnnotations.add(RequiredAnnotation.class);
-        settings.allPrimitivesRequired = true;
+        settings.primitivePropertiesRequired = true;
         final String output = generate(settings, PrimitiveObjectWithTheOtherObject.class);
         Assert.assertTrue(output.contains("charVar1: string;"));
         Assert.assertTrue(output.contains("byteVar1: number;"));

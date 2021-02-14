@@ -123,7 +123,7 @@ public class Settings {
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> requiredAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> nullableAnnotations = new ArrayList<>();
-    public boolean allPrimitivesRequired = false;
+    public boolean primitivePropertiesRequired = false;
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
     public String npmName = null;
@@ -385,8 +385,8 @@ public class Settings {
         if (!optionalAnnotations.isEmpty() && !requiredAnnotations.isEmpty()) {
             throw new RuntimeException("Only one of 'optionalAnnotations' and 'requiredAnnotations' can be used at the same time.");
         }
-        if (allPrimitivesRequired && requiredAnnotations.isEmpty()) {
-            throw new RuntimeException("'allPrimitivesRequired' parameter can only be used with 'requiredAnnotations' parameter.");
+        if (primitivePropertiesRequired && requiredAnnotations.isEmpty()) {
+            throw new RuntimeException("'primitivePropertiesRequired' parameter can only be used with 'requiredAnnotations' parameter.");
         }
         for (Class<? extends Annotation> annotation : nullableAnnotations) {
             final Target target = annotation.getAnnotation(Target.class);

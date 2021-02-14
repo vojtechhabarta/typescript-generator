@@ -217,7 +217,7 @@ public class OptionalAnnotationTest {
         {
             final Settings settings = TestUtils.settings();
             settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
-            settings.allPrimitivesRequired = true;
+            settings.primitivePropertiesRequired = true;
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
             Assert.assertTrue(output.contains("charVar1: string;"));
             Assert.assertTrue(output.contains("byteVar1: number;"));
@@ -244,11 +244,11 @@ public class OptionalAnnotationTest {
         try {
             final Settings settings = TestUtils.settings();
             settings.requiredAnnotations = Arrays.asList();
-            settings.allPrimitivesRequired = true;
+            settings.primitivePropertiesRequired = true;
             new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
             Assert.fail();
         } catch (Exception e) {
-            // expected - 'allPrimitivesRequired' parameter can only be used with 'requiredAnnotations' parameter
+            // expected - 'primitivePropertiesRequired' parameter can only be used with 'requiredAnnotations' parameter
         }
     }
 
