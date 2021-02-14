@@ -733,6 +733,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> nullableAnnotations;
 
     /**
+     * If <code>true</code> All Java primitives will be treated as non nullable.
+     * Useful when used with {@link #requiredAnnotations} parameter.
+     */
+    @Parameter
+    private boolean primitivePropertiesRequired;
+
+    /**
      * If <code>true</code> JSON file describing generated module will be generated.
      * In following typescript-generator run this allows to generate another module which could depend on currently generated module.
      * Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs
@@ -928,6 +935,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
+        settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;

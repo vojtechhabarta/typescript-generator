@@ -115,6 +115,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> optionalAnnotations;
     public List<String> requiredAnnotations;
     public List<String> nullableAnnotations;
+    public boolean primitivePropertiesRequired;
     public boolean generateInfoJson;
     public boolean generateNpmPackageJson;
     public String npmName;
@@ -200,6 +201,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
+        settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
