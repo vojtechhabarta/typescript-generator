@@ -8,6 +8,9 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 @SuppressWarnings("unused")
 public class GenericCustomTypeMappingsTest {
@@ -135,4 +138,15 @@ public class GenericCustomTypeMappingsTest {
         Assert.assertTrue(output.contains("generic: string[]"));
     }
 
+    private static class BinaryData {
+        public byte[] data;
+    }
+
+    @Test
+    public void byteArrayAsString() {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("byte[]", "string");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BinaryData.class));
+        assertThat(output, containsString("data: string"));
+    }
 }
