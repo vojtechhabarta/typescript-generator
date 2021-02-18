@@ -5,12 +5,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-
+import org.junit.Assert;
+import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class GenericCustomTypeMappingsTest {
