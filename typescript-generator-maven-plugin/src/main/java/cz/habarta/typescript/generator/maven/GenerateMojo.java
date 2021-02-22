@@ -892,12 +892,12 @@ public class GenerateMojo extends AbstractMojo {
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
-        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.customTypeNaming = Settings.convertToMap(customTypeNaming, "customTypeNaming");
         settings.customTypeNamingFunction = customTypeNamingFunction;
         settings.referencedFiles = referencedFiles;
         settings.importDeclarations = importDeclarations;
-        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
-        settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
+        settings.customTypeMappings = Settings.convertToMap(customTypeMappings, "customTypeMapping");
+        settings.customTypeAliases = Settings.convertToMap(customTypeAliases, "customTypeAlias");
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
         settings.enumMemberCasing = enumMemberCasing;

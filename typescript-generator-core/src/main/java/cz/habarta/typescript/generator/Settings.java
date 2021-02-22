@@ -276,13 +276,13 @@ public class Settings {
         this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
     }
 
-    public static Map<String, String> convertToMap(List<String> mappings) {
+    public static Map<String, String> convertToMap(List<String> items, String itemName) {
         final Map<String, String> result = new LinkedHashMap<>();
-        if (mappings != null) {
-            for (String mapping : mappings) {
-                final String[] values = mapping.split(":", 2);
+        if (items != null) {
+            for (String item : items) {
+                final String[] values = item.split(":", 2);
                 if (values.length < 2) {
-                    throw new RuntimeException("Invalid mapping format: " + mapping);
+                    throw new RuntimeException(String.format("Invalid '%s' format: %s", itemName, item));
                 }
                 result.put(values[0].trim(), values[1].trim());
             }
