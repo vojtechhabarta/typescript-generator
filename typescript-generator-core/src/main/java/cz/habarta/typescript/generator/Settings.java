@@ -1,6 +1,18 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
+import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
+import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
+import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.parser.RestApplicationParser;
+import cz.habarta.typescript.generator.parser.TypeParser;
+import cz.habarta.typescript.generator.util.Pair;
+import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -24,20 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
-import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
-import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
-import cz.habarta.typescript.generator.parser.RestApplicationParser;
-import cz.habarta.typescript.generator.parser.TypeParser;
-import cz.habarta.typescript.generator.util.Pair;
-import cz.habarta.typescript.generator.util.Utils;
 
 
 /**

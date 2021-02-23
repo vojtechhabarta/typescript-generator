@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator;
 
 import java.lang.reflect.Modifier;
-
 import org.junit.Assert;
 import org.junit.Test;
 
