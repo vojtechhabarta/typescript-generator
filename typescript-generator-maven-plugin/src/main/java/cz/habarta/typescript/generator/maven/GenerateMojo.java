@@ -1,6 +1,21 @@
 
 package cz.habarta.typescript.generator.maven;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+
 import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
@@ -22,19 +37,6 @@ import cz.habarta.typescript.generator.StringQuotes;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
 
 /**
  * Generates TypeScript declaration file from specified java classes.
@@ -791,7 +793,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * List of additional NPM <code>dependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
-     * Each item it this list specifies dependencies with its version.<br>
+     * Each item it this list specifies dependency with its version.<br>
      * Item format is: <code>name:version</code>.
      */
     @Parameter
@@ -800,7 +802,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * List of additional NPM <code>devDependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
-     * Each item it this list specifies dependencies with its version.<br>
+     * Each item it this list specifies dependency with its version.<br>
      * Item format is: <code>name:version</code>.
      */
     @Parameter
@@ -809,7 +811,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * List of additional NPM <code>peerDependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
-     * Each item it this list specifies dependencies with its version.<br>
+     * Each item it this list specifies dependency with its version.<br>
      * Item format is: <code>name:version</code>.
      */
     @Parameter
@@ -969,9 +971,9 @@ public class GenerateMojo extends AbstractMojo {
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
         settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
-        settings.npmPackageDependencies = Settings.convertDependenciesToMap(npmDependencies);
-        settings.npmDevDependencies = Settings.convertDependenciesToMap(npmDevDependencies);
-        settings.npmPeerDependencies = Settings.convertDependenciesToMap(npmPeerDependencies);
+        settings.npmPackageDependencies = Settings.convertToMap(npmDependencies, "npmDependencies");
+        settings.npmDevDependencies = Settings.convertToMap(npmDevDependencies, "npmDevDependencies");
+        settings.npmPeerDependencies = Settings.convertToMap(npmPeerDependencies, "npmPeerDependencies");
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;

@@ -1,18 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
-import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
-import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
-import cz.habarta.typescript.generator.parser.RestApplicationParser;
-import cz.habarta.typescript.generator.parser.TypeParser;
-import cz.habarta.typescript.generator.util.Pair;
-import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -36,6 +24,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cz.habarta.typescript.generator.compiler.ModelCompiler;
+import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
+import cz.habarta.typescript.generator.emitter.EmitterExtension;
+import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
+import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.parser.RestApplicationParser;
+import cz.habarta.typescript.generator.parser.TypeParser;
+import cz.habarta.typescript.generator.util.Pair;
+import cz.habarta.typescript.generator.util.Utils;
 
 
 /**
@@ -292,20 +294,6 @@ public class Settings {
         return result;
     }
     
-    public static Map<String, String> convertDependenciesToMap(List<String> dependencies) {
-        final Map<String, String> result = new LinkedHashMap<>();
-        if (dependencies != null) {
-            for (String dependency : dependencies) {
-                final String[] values = dependency.split(":", 2);
-                if (values.length < 2) {
-                    throw new RuntimeException("Invalid dependency format: " + dependency);
-                }
-                result.put(values[0].trim(), values[1].trim());
-            }
-        }
-        return result;
-    }
-
     public void validate() {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();

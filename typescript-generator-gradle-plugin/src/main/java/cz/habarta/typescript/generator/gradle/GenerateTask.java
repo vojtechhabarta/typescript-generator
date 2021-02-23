@@ -1,6 +1,19 @@
 
 package cz.habarta.typescript.generator.gradle;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskAction;
+
 import cz.habarta.typescript.generator.ClassMapping;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
@@ -23,17 +36,6 @@ import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.util.Utils;
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.Task;
-import org.gradle.api.tasks.TaskAction;
 
 
 public class GenerateTask extends DefaultTask {
@@ -211,9 +213,9 @@ public class GenerateTask extends DefaultTask {
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
         settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
-        settings.npmPackageDependencies = Settings.convertDependenciesToMap(npmDependencies);
-        settings.npmDevDependencies = Settings.convertDependenciesToMap(npmDevDependencies);
-        settings.npmPeerDependencies = Settings.convertDependenciesToMap(npmPeerDependencies);
+        settings.npmPackageDependencies = Settings.convertToMap(npmDependencies, "npmDependencies");
+        settings.npmDevDependencies = Settings.convertToMap(npmDevDependencies, "npmDevDependencies");
+        settings.npmPeerDependencies = Settings.convertToMap(npmPeerDependencies, "npmPeerDependencies");
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.displaySerializerWarning = displaySerializerWarning;
