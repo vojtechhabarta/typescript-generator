@@ -268,6 +268,14 @@ public final class Utils {
                 .toArray(Type[]::new);
     }
 
+    public static boolean isPrimitiveType(Type type) {
+        if (type instanceof Class<?>) {
+            final Class<?> cls = (Class<?>) type;
+            return cls.isPrimitive();
+        }
+        return false;
+    }
+
     public static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
         if (list1 == null && list2 == null) {
             return null;

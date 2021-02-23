@@ -733,6 +733,13 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> nullableAnnotations;
 
     /**
+     * When using {@link #requiredAnnotations} to mark properties as not optional then
+     * setting this parameter to <code>true</code> marks also all properties of primitive type without explicit annotation.
+     */
+    @Parameter
+    private boolean primitivePropertiesRequired;
+
+    /**
      * If <code>true</code> JSON file describing generated module will be generated.
      * In following typescript-generator run this allows to generate another module which could depend on currently generated module.
      * Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs
@@ -912,12 +919,12 @@ public class GenerateMojo extends AbstractMojo {
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
-        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.customTypeNaming = Settings.convertToMap(customTypeNaming, "customTypeNaming");
         settings.customTypeNamingFunction = customTypeNamingFunction;
         settings.referencedFiles = referencedFiles;
         settings.importDeclarations = importDeclarations;
-        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
-        settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
+        settings.customTypeMappings = Settings.convertToMap(customTypeMappings, "customTypeMapping");
+        settings.customTypeAliases = Settings.convertToMap(customTypeAliases, "customTypeAlias");
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
         settings.enumMemberCasing = enumMemberCasing;
@@ -955,6 +962,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
+        settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? project.getArtifactId() : npmName;

@@ -123,6 +123,7 @@ public class Settings {
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> requiredAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> nullableAnnotations = new ArrayList<>();
+    public boolean primitivePropertiesRequired = false;
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
     public String npmName = null;
@@ -277,13 +278,13 @@ public class Settings {
         this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
     }
 
-    public static Map<String, String> convertToMap(List<String> mappings) {
+    public static Map<String, String> convertToMap(List<String> items, String itemName) {
         final Map<String, String> result = new LinkedHashMap<>();
-        if (mappings != null) {
-            for (String mapping : mappings) {
-                final String[] values = mapping.split(":", 2);
+        if (items != null) {
+            for (String item : items) {
+                final String[] values = item.split(":", 2);
                 if (values.length < 2) {
-                    throw new RuntimeException("Invalid mapping format: " + mapping);
+                    throw new RuntimeException(String.format("Invalid '%s' format: %s", itemName, item));
                 }
                 result.put(values[0].trim(), values[1].trim());
             }
@@ -405,6 +406,9 @@ public class Settings {
         }
         if (!optionalAnnotations.isEmpty() && !requiredAnnotations.isEmpty()) {
             throw new RuntimeException("Only one of 'optionalAnnotations' and 'requiredAnnotations' can be used at the same time.");
+        }
+        if (primitivePropertiesRequired && requiredAnnotations.isEmpty()) {
+            throw new RuntimeException("'primitivePropertiesRequired' parameter can only be used with 'requiredAnnotations' parameter.");
         }
         for (Class<? extends Annotation> annotation : nullableAnnotations) {
             final Target target = annotation.getAnnotation(Target.class);

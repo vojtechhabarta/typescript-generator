@@ -115,6 +115,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> optionalAnnotations;
     public List<String> requiredAnnotations;
     public List<String> nullableAnnotations;
+    public boolean primitivePropertiesRequired;
     public boolean generateInfoJson;
     public boolean generateNpmPackageJson;
     public String npmName;
@@ -160,12 +161,12 @@ public class GenerateTask extends DefaultTask {
         settings.removeTypeNameSuffix = removeTypeNameSuffix;
         settings.addTypeNamePrefix = addTypeNamePrefix;
         settings.addTypeNameSuffix = addTypeNameSuffix;
-        settings.customTypeNaming = Settings.convertToMap(customTypeNaming);
+        settings.customTypeNaming = Settings.convertToMap(customTypeNaming, "customTypeNaming");
         settings.customTypeNamingFunction = customTypeNamingFunction;
         settings.referencedFiles = referencedFiles;
         settings.importDeclarations = importDeclarations;
-        settings.customTypeMappings = Settings.convertToMap(customTypeMappings);
-        settings.customTypeAliases = Settings.convertToMap(customTypeAliases);
+        settings.customTypeMappings = Settings.convertToMap(customTypeMappings, "customTypeMapping");
+        settings.customTypeAliases = Settings.convertToMap(customTypeAliases, "customTypeAlias");
         settings.mapDate = mapDate;
         settings.mapEnum = mapEnum;
         settings.enumMemberCasing = enumMemberCasing;
@@ -203,6 +204,7 @@ public class GenerateTask extends DefaultTask {
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
+        settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
