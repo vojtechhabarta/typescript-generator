@@ -325,6 +325,9 @@ public class Settings {
         if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
             throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
         }
+        if (!generateNpmPackageJson && (!npmPackageDependencies.isEmpty() || !npmDevDependencies.isEmpty() || !npmPeerDependencies.isEmpty())) {
+            throw new RuntimeException("'npmDependencies', 'npmDevDependencies' and 'npmPeerDependencies' parameters are only applicable when generating NPM 'package.json'.");
+        }
         getValidatedCustomTypeMappings();
         getValidatedCustomTypeAliases();
         for (EmitterExtension extension : extensions) {
