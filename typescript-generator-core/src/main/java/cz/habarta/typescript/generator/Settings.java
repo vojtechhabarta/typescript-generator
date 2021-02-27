@@ -824,7 +824,12 @@ public class Settings {
         Objects.requireNonNull(requiredClassType, "requiredClassType");
         try {
             TypeScriptGenerator.getLogger().verbose("Loading class " + className);
-            final Class<?> loadedClass = classLoader.loadClass(className);
+            final Class<?> loadedClass;
+            if ("byte[]".equals(className)) {
+                loadedClass = byte[].class;
+            } else {
+                loadedClass = classLoader.loadClass(className);
+            }
             if (requiredClassType.isAssignableFrom(loadedClass)) {
                 @SuppressWarnings("unchecked")
                 final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
