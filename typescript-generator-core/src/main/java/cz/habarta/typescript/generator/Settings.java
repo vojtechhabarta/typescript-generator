@@ -129,6 +129,8 @@ public class Settings {
     public String npmName = null;
     public String npmVersion = null;
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
+    public Map<String, String> npmDevDependencies = new LinkedHashMap<>();
+    public Map<String, String> npmPeerDependencies = new LinkedHashMap<>();
     public String typescriptVersion = "^2.4";
     public String npmTypescriptVersion = null;
     public String npmBuildScript = null;
@@ -289,7 +291,7 @@ public class Settings {
         }
         return result;
     }
-
+    
     public void validate() {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
@@ -320,6 +322,9 @@ public class Settings {
         }
         if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
             throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
+        }
+        if (!generateNpmPackageJson && (!npmPackageDependencies.isEmpty() || !npmDevDependencies.isEmpty() || !npmPeerDependencies.isEmpty())) {
+            throw new RuntimeException("'npmDependencies', 'npmDevDependencies' and 'npmPeerDependencies' parameters are only applicable when generating NPM 'package.json'.");
         }
         getValidatedCustomTypeMappings();
         getValidatedCustomTypeAliases();
@@ -353,6 +358,12 @@ public class Settings {
             }
             if (features.npmPackageDependencies != null) {
                 npmPackageDependencies.putAll(features.npmPackageDependencies);
+            }
+            if (features.npmDevDependencies != null) {
+                npmDevDependencies.putAll(features.npmDevDependencies);
+            }
+            if (features.npmPeerDependencies != null) {
+                npmPeerDependencies.putAll(features.npmPeerDependencies);
             }
             if (features.overridesStringEnums) {
                 defaultStringEnumsOverriddenByExtension = true;
