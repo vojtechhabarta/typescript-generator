@@ -138,13 +138,22 @@ public class GenericCustomTypeMappingsTest {
 
     private static class BinaryData {
         public byte[] data;
+        public byte[][] dataArray;
+        public List<byte[]> dataList;
+        public long[] specialData;
     }
 
     @Test
     public void byteArrayAsString() {
         final Settings settings = TestUtils.settings();
-        settings.customTypeMappings = Collections.singletonMap("byte[]", "string");
+        settings.customTypeMappings.put("byte[]", "string");
+        settings.customTypeMappings.put("byte[][]", "DifferentString[]");
+        settings.customTypeMappings.put("long[]", "SpecialString");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BinaryData.class));
         assertThat(output, containsString("data: string"));
+        assertThat(output, containsString("dataArray: DifferentString[]"));
+        assertThat(output, containsString("dataList: string[]"));
+        assertThat(output, containsString("specialData: SpecialString"));
     }
+
 }

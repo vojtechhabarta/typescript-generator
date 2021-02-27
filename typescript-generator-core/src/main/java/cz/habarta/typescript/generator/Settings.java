@@ -824,11 +824,15 @@ public class Settings {
         Objects.requireNonNull(requiredClassType, "requiredClassType");
         try {
             TypeScriptGenerator.getLogger().verbose("Loading class " + className);
+            final Pair<String, Integer> pair = parseArrayClassDimensions(className);
+            final int arrayDimensions = pair.getValue2();
             final Class<?> loadedClass;
-            if ("byte[]".equals(className)) {
-                loadedClass = byte[].class;
+            if (arrayDimensions > 0) {
+                final String componentTypeName = pair.getValue1();
+                final Class<?> componentType = loadPrimitiveOrRegularClass(classLoader, componentTypeName);
+                loadedClass = Utils.getArrayClass(componentType, arrayDimensions);
             } else {
-                loadedClass = classLoader.loadClass(className);
+                loadedClass = loadPrimitiveOrRegularClass(classLoader, className);
             }
             if (requiredClassType.isAssignableFrom(loadedClass)) {
                 @SuppressWarnings("unchecked")
@@ -840,6 +844,22 @@ public class Settings {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Pair<String, Integer> parseArrayClassDimensions(String className) {
+        int dimensions = 0;
+        while (className.endsWith("[]")) {
+            dimensions++;
+            className = className.substring(0, className.length() - 2);
+        }
+        return Pair.of(className, dimensions);
+    }
+
+    private static Class<?> loadPrimitiveOrRegularClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
+        final Class<?> primitiveType = Utils.getPrimitiveType(className);
+        return primitiveType != null
+                ? primitiveType
+                : classLoader.loadClass(className);
     }
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {

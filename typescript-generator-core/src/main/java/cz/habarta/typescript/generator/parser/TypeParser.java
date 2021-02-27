@@ -315,7 +315,7 @@ public class TypeParser {
     private static boolean isArrayOfPrimitiveType(Type type) {
         if (type instanceof Class<?>) {
             final Class<?> cls = (Class<?>) type;
-            if (cls.isArray() && cls.getComponentType().isPrimitive()) {
+            if (cls.isArray() && (cls.getComponentType().isPrimitive() || isArrayOfPrimitiveType(cls.getComponentType()))) {
                 return true;
             }
         }

@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -73,7 +74,7 @@ public final class Utils {
         final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
         return rawClassAndTypeArguments != null ? rawClassAndTypeArguments.getValue1() : null;
     }
-
+    
     public static Pair<Class<?>, Optional<List<Type>>> getRawClassAndTypeArguments(Type type) {
         if (type instanceof Class) {
             final Class<?> javaClass = (Class<?>) type;
@@ -274,6 +275,18 @@ public final class Utils {
             return cls.isPrimitive();
         }
         return false;
+    }
+
+    private static final Map<String, Class<?>> primitiveTypes = Stream
+            .of(byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class, char.class, void.class)
+            .collect(Utils.toMap(cls -> cls.getName(), cls -> cls));
+
+    public static Class<?> getPrimitiveType(String typeName) {
+        return primitiveTypes.get(typeName);
+    }
+
+    public static Class<?> getArrayClass(Class<?> componentType, int dimensions) {
+        return Array.newInstance(componentType, new int[dimensions]).getClass();
     }
 
     public static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
