@@ -14,7 +14,7 @@
 
     <properties>
         <javax.activation.version>1.2.0</javax.activation.version>
-        <jaxb.version>2.3.2</jaxb.version>
+        <jaxb.version>3.0.0</jaxb.version>
         <jackson1.version>1.9.13</jackson1.version>
         <jackson2.version>2.12.1</jackson2.version>
         <jersey.version>3.0.1</jersey.version>
