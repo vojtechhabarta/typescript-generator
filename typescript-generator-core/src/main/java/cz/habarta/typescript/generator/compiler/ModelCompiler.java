@@ -637,7 +637,7 @@ public class ModelCompiler {
                 Collections.<TsStatement>emptyList(),
                 null
         );
-        final boolean bothInterfacesAndClients = settings.generateJaxrsApplicationInterface || settings.generateSpringApplicationInterface;
+        final boolean bothInterfacesAndClients = settings.generateJakartaRsApplicationInterface || settings.generateJaxrsApplicationInterface || settings.generateSpringApplicationInterface;
         final String groupingSuffix = bothInterfacesAndClients ? null : "Client";
         final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(tsModel, restApplications, symbolTable, groupingSuffix, responseSymbol, optionsType, true);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {

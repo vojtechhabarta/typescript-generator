@@ -90,6 +90,8 @@ public class GenerateTask extends DefaultTask {
     public boolean disableTaggedUnions;
     public boolean generateReadonlyAndWriteonlyJSDocTags;
     public boolean ignoreSwaggerAnnotations;
+    public boolean generateJakartaRsApplicationInterface;
+    public boolean generateJakartaRsApplicationClient;
     public boolean generateJaxrsApplicationInterface;
     public boolean generateJaxrsApplicationClient;
     public boolean generateSpringApplicationInterface;
@@ -179,6 +181,8 @@ public class GenerateTask extends DefaultTask {
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
+        settings.generateJakartaRsApplicationInterface = generateJakartaRsApplicationInterface;
+        settings.generateJakartaRsApplicationClient = generateJakartaRsApplicationClient;
         settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;

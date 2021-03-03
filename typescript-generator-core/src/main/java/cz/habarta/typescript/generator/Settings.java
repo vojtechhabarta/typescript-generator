@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
+import cz.habarta.typescript.generator.parser.JakartaRsApplicationParser;
 import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
 import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.parser.TypeParser;
@@ -94,6 +95,8 @@ public class Settings {
     public boolean disableTaggedUnions = false;
     public boolean generateReadonlyAndWriteonlyJSDocTags = false;
     public boolean ignoreSwaggerAnnotations = false;
+    public boolean generateJakartaRsApplicationInterface = false;
+    public boolean generateJakartaRsApplicationClient;
     public boolean generateJaxrsApplicationInterface = false;
     public boolean generateJaxrsApplicationClient = false;
     public boolean generateSpringApplicationInterface = false;
@@ -407,6 +410,10 @@ public class Settings {
                         "'%s' annotation cannot be used as nullable annotation because it doesn't have 'TYPE_PARAMETER' or 'TYPE_USE' target.",
                         annotation.getName()));
             }
+        }
+        
+        if (generateJakartaRsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
+            throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateJaxrsApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
@@ -761,9 +768,13 @@ public class Settings {
     public List<RestApplicationParser.Factory> getRestApplicationParserFactories() {
         if (restApplicationParserFactories == null) {
             final List<RestApplicationParser.Factory> factories = new ArrayList<>();
-            if (isGenerateJaxrs() || !isGenerateSpring()) {
+            if (isGenerateJaxrs() || (!isGenerateSpring() && !isGenerateJakartaRs())) {
                 factories.add(new JaxrsApplicationParser.Factory());
             }
+            if (isGenerateJakartaRs() || (!isGenerateSpring() && !isGenerateJaxrs())) {
+                factories.add(new JakartaRsApplicationParser.Factory());
+            }
+
             if (isGenerateSpring()) {
                 final String springClassName = "cz.habarta.typescript.generator.spring.SpringApplicationParser$Factory";
                 final Class<?> springClass;
@@ -786,6 +797,10 @@ public class Settings {
         }
         return restApplicationParserFactories;
     }
+    
+    public boolean isGenerateJakartaRs() {
+        return generateJakartaRsApplicationInterface || generateJakartaRsApplicationClient;
+    }
 
     public boolean isGenerateJaxrs() {
         return generateJaxrsApplicationInterface || generateJaxrsApplicationClient;
@@ -796,7 +811,7 @@ public class Settings {
     }
 
     public boolean isGenerateRest() {
-        return isGenerateJaxrs() || isGenerateSpring();
+        return isGenerateJakartaRs() || isGenerateJaxrs() || isGenerateSpring();
     }
 
     public boolean areDefaultStringEnumsOverriddenByExtension() {

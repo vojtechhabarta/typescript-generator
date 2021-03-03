@@ -2767,6 +2767,49 @@
                 <type qualified="java.lang.String"/>
             </field>
         </class>
+        <class name="JakartaRsApplicationTest.PersonResource" qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.PersonResource" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
+            <class qualified="java.lang.Object"/>
+            <constructor name="PersonResource" signature="()" qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.PersonResource" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
+            <method name="getPerson" signature="()" qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.PersonResource.getPerson" scope="public" abstract="false" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false">
+                <comment>Returns person with specified ID.</comment>
+                <return qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.Person"/>
+                <annotation name="GET" qualified="javax.ws.rs.GET"/>
+            </method>
+            <method name="getAddress" signature="(long)" qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.PersonResource.getAddress" scope="public" abstract="false" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="addressId">
+                    <type qualified="long"/>
+                    <annotation name="PathParam" qualified="javax.ws.rs.PathParam">
+                        <argument name="value" primitive="false" array="false">
+                            <type qualified="java.lang.String"/>
+                            <value>address-id</value>
+                        </argument>
+                    </annotation>
+                </parameter>
+                <return qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.Address"/>
+                <annotation name="GET" qualified="javax.ws.rs.GET"/>
+                <annotation name="Path" qualified="javax.ws.rs.Path">
+                    <argument name="value" primitive="false" array="false">
+                        <type qualified="java.lang.String"/>
+                        <value>address/{address-id}</value>
+                    </argument>
+                </annotation>
+            </method>
+            <annotation name="Path" qualified="javax.ws.rs.Path">
+                <argument name="value" primitive="false" array="false">
+                    <type qualified="java.lang.String"/>
+                    <value>people/{personId}</value>
+                </argument>
+            </annotation>
+            <field name="personId" qualified="cz.habarta.typescript.generator.JakartaRsApplicationTest.PersonResource.personId" scope="protected" volatile="false" transient="false" static="false" final="false">
+                <type qualified="long"/>
+                <annotation name="PathParam" qualified="javax.ws.rs.PathParam">
+                    <argument name="value" primitive="false" array="false">
+                        <type qualified="java.lang.String"/>
+                        <value>personId</value>
+                    </argument>
+                </annotation>
+            </field>
+        </class>
         <class name="CustomTypeConversionTest" qualified="cz.habarta.typescript.generator.CustomTypeConversionTest" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
             <class qualified="java.lang.Object"/>
             <constructor name="CustomTypeConversionTest" signature="()" qualified="cz.habarta.typescript.generator.CustomTypeConversionTest" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>

@@ -526,6 +526,18 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private boolean ignoreSwaggerAnnotations;
+    
+    /**
+     * If <code>true</code> interface for Jakarta-RS REST application will be generated.
+     */
+    @Parameter
+    private boolean generateJakartaRsApplicationInterface;
+
+    /**
+     * If <code>true</code> client for Jakarta-RS REST application will be generated.
+     */
+    @Parameter
+    private boolean generateJakartaRsApplicationClient;
 
     /**
      * If <code>true</code> interface for JAX-RS REST application will be generated.
@@ -937,6 +949,8 @@ public class GenerateMojo extends AbstractMojo {
         settings.disableTaggedUnions = disableTaggedUnions;
         settings.generateReadonlyAndWriteonlyJSDocTags = generateReadonlyAndWriteonlyJSDocTags;
         settings.ignoreSwaggerAnnotations = ignoreSwaggerAnnotations;
+        settings.generateJakartaRsApplicationInterface = generateJakartaRsApplicationInterface;
+        settings.generateJakartaRsApplicationClient = generateJakartaRsApplicationClient;
         settings.generateJaxrsApplicationInterface = generateJaxrsApplicationInterface;
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
