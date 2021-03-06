@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -36,8 +35,10 @@ import com.fasterxml.jackson.databind.deser.CreatorProperty;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.SubtypeResolver;
+import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
@@ -67,6 +68,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -297,13 +299,13 @@ public class Jackson2Parser extends ModelParser {
             final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(jsonTypeInfo);
-            discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(jsonTypeInfo, sourceClass.type);
+            discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(sourceClass.type);
         } else if (isTaggedUnion(parentClassWithJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             final JsonTypeInfo parentJsonTypeInfo = parentClassWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(parentJsonTypeInfo);
-            discriminantLiteral = getTypeName(parentJsonTypeInfo, sourceClass.type);
+            discriminantLiteral = getTypeName(sourceClass.type);
         } else {
             // not part of explicit hierarchy
             discriminantProperty = null;
@@ -435,57 +437,51 @@ public class Jackson2Parser extends ModelParser {
                 : jsonTypeInfo.property();
     }
 
-    private String getTypeName(JsonTypeInfo parentJsonTypeInfo, final Class<?> cls) {
-        // Id.CLASS
-        if (parentJsonTypeInfo.use() == JsonTypeInfo.Id.CLASS) {
-            return cls.getName();
-        }
-        // find custom name registered with `registerSubtypes`
-        AnnotatedClass annotatedClass = AnnotatedClassResolver
-            .resolveWithoutSuperTypes(objectMapper.getSerializationConfig(), cls);
-        Collection<NamedType> subtypes = objectMapper.getSubtypeResolver()
-            .collectAndResolveSubtypesByClass(objectMapper.getSerializationConfig(),
-                annotatedClass);
+    private String getTypeName(Class<?> cls) {
+        final List<String> typeNames = getTypeNamesOrEmptyOrNull(cls);
+        return typeNames != null && !typeNames.isEmpty() ? typeNames.get(0) : null;
+    }
 
-        if (subtypes.size() == 1) {
-            NamedType subtype = subtypes.iterator().next();
-
-            if (subtype.getName() != null) {
-                return subtype.getName();
+    private List<String> getTypeNamesOrEmptyOrNull(Class<?> cls) {
+        try {
+            final SerializationConfig config = objectMapper.getSerializationConfig();
+            final JavaType javaType = config.constructType(cls);
+            final TypeSerializer typeSerializer = objectMapper.getSerializerProviderInstance().findTypeSerializer(javaType);
+            final TypeIdResolver typeIdResolver = typeSerializer.getTypeIdResolver();
+            if (typeIdResolver.getMechanism() == JsonTypeInfo.Id.NAME) {
+                final SubtypeResolver subtypeResolver = config.getSubtypeResolver();
+                final BeanDescription beanDescription = config.introspectClassAnnotations(cls);
+                final AnnotatedClass annotatedClass = beanDescription.getClassInfo();
+                final Collection<NamedType> serializationSubtypes = subtypeResolver.collectAndResolveSubtypesByClass(config, annotatedClass);
+                final Collection<NamedType> deserializationSubtypes = subtypeResolver.collectAndResolveSubtypesByTypeId(config, annotatedClass);
+                final List<String> serializationTypeNames = getTypeNamesFromSubtypes(serializationSubtypes, cls);  // 0 or 1
+                final List<String> deserializationTypeNames = getTypeNamesFromSubtypes(deserializationSubtypes, cls);  // 0 or n
+                final LinkedHashSet<String> typeNames = Stream
+                        .concat(serializationTypeNames.stream(), deserializationTypeNames.stream())
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                if (typeNames.isEmpty()) {
+                    return isInterfaceOrAbstract(cls) ? null : Utils.listFromNullable(typeIdResolver.idFromBaseType());
+                } else {
+                    return new ArrayList<>(typeNames);
+                }
+            } else {
+                return Utils.listFromNullable(typeIdResolver.idFromBaseType());
             }
+        } catch (Exception e) {
+            return null;
         }
+    }
 
-        // find @JsonTypeName recursively
-        final JsonTypeName jsonTypeName = getAnnotationRecursive(cls, JsonTypeName.class).getValue2();
-        if (jsonTypeName != null && !jsonTypeName.value().isEmpty()) {
-            return jsonTypeName.value();
-        }
-        // find @JsonSubTypes.Type recursively
-        final JsonSubTypes jsonSubTypes = getAnnotationRecursive(cls, JsonSubTypes.class, (JsonSubTypes types) -> getJsonSubTypeForClass(types, cls) != null).getValue2();
-        if (jsonSubTypes != null) {
-            final JsonSubTypes.Type jsonSubType = getJsonSubTypeForClass(jsonSubTypes, cls);
-            if (!jsonSubType.name().isEmpty()) {
-                return jsonSubType.name();
-            }
-        }
-        // use simplified class name if it's not an interface or abstract
-        if(!isInterfaceOrAbstract(cls)) {
-            return cls.getName().substring(cls.getName().lastIndexOf(".") + 1);
-        }
-        return null;
+    private static List<String> getTypeNamesFromSubtypes(Collection<NamedType> subtypes, Class<?> cls) {
+        return subtypes.stream()
+                .filter(subtype -> Objects.equals(subtype.getType(), cls))
+                .filter(NamedType::hasName)
+                .map(NamedType::getName)
+                .collect(Collectors.toList());
     }
 
     private boolean isInterfaceOrAbstract(Class<?> cls) {
         return cls.isInterface() || Modifier.isAbstract(cls.getModifiers());
-    }
-
-    private static JsonSubTypes.Type getJsonSubTypeForClass(JsonSubTypes types, Class<?> cls) {
-        for (JsonSubTypes.Type type : types.value()) {
-            if (type.value().equals(cls)) {
-                return type;
-            }
-        }
-        return null;
     }
 
     private static <T extends Annotation> Pair<Class<?>, T> getAnnotationRecursive(Class<?> cls, Class<T> annotationClass) {
