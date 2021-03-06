@@ -99,6 +99,8 @@ import java.util.stream.Stream;
  */
 public class ModelCompiler {
 
+    private final boolean multipleDiscriminantLiteralsEnabled = true;
+
     private final Settings settings;
     private final TypeProcessor typeProcessor;
 
@@ -225,7 +227,7 @@ public class ModelCompiler {
     }
 
     public TsType javaToTypeScript(Type type) {
-        final BeanModel beanModel = new BeanModel(Object.class, Object.class, null, null, null, Collections.<Type>emptyList(),
+        final BeanModel beanModel = new BeanModel(Object.class, Object.class, Collections.<Type>emptyList(),
                 Collections.singletonList(new PropertyModel("property", type, false, null, null, null, null, null)), null);
         final Model model = new Model(Collections.singletonList(beanModel), Collections.<EnumModel>emptyList(), null);
         final TsModel tsModel = javaToTypeScript(model);
@@ -309,6 +311,14 @@ public class ModelCompiler {
                 if (descendant.getDiscriminantLiteral() != null) {
                     literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
                 }
+                if (multipleDiscriminantLiteralsEnabled) {
+                    if (descendant.getAdditionalDiscriminantLiterals() != null) {
+                        literals.addAll(descendant.getAdditionalDiscriminantLiterals().stream()
+                                .map(TsType.StringLiteralType::new)
+                                .collect(Collectors.toList())
+                        );
+                    }
+                }
             }
             final List<BeanModel> descendants = selfAndDescendants.subList(1, selfAndDescendants.size());
             for (BeanModel descendant : descendants) {
@@ -339,7 +349,7 @@ public class ModelCompiler {
                 /*methods*/ null,
                 bean.getComments());
         return isTaggedUnion
-                ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral())
+                ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral(), bean.getAdditionalDiscriminantLiterals())
                 : tsBean;
     }
 

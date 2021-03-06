@@ -117,7 +117,7 @@ public class Jackson1Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        return new BeanModel(sourceClass.type, superclass, null, null, null, interfaces, properties, null);
+        return new BeanModel(sourceClass.type, superclass, interfaces, properties, null);
     }
 
     private BeanHelper getBeanHelper(Class<?> beanClass) {

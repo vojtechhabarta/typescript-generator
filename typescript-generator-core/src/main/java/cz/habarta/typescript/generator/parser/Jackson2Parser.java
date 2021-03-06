@@ -285,12 +285,12 @@ public class Jackson2Parser extends ModelParser {
             }
         }
         if (sourceClass.type.isEnum()) {
-            return new BeanModel(sourceClass.type, null, null, null, null, null, properties, classComments);
+            return new BeanModel(sourceClass.type, null, null, properties, classComments);
         }
 
         final String discriminantProperty;
         final boolean syntheticDiscriminantProperty;
-        final String discriminantLiteral;
+        final Pair<String, List<String>> discriminantLiterals;
 
         final Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo = Pair.of(sourceClass.type, sourceClass.type.getAnnotation(JsonTypeInfo.class));
         final Pair<Class<?>, JsonTypeInfo> parentClassWithJsonTypeInfo;
@@ -299,18 +299,18 @@ public class Jackson2Parser extends ModelParser {
             final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(jsonTypeInfo);
-            discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(sourceClass.type);
+            discriminantLiterals = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeNames(sourceClass.type);
         } else if (isTaggedUnion(parentClassWithJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
             // this is child class
             final JsonTypeInfo parentJsonTypeInfo = parentClassWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(parentJsonTypeInfo);
-            discriminantLiteral = getTypeName(sourceClass.type);
+            discriminantLiterals = getTypeNames(sourceClass.type);
         } else {
             // not part of explicit hierarchy
             discriminantProperty = null;
             syntheticDiscriminantProperty = false;
-            discriminantLiteral = null;
+            discriminantLiterals = null;
         }
 
         if (discriminantProperty != null) {
@@ -349,7 +349,9 @@ public class Jackson2Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
-        return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, classComments);
+        return new BeanModel(sourceClass.type, superclass,
+                taggedUnionClasses, discriminantProperty, discriminantLiterals != null ? discriminantLiterals.getValue1() : null, discriminantLiterals != null ? discriminantLiterals.getValue2() : null,
+                interfaces, properties, classComments);
     }
 
     private static Integer getCreatorIndex(BeanProperty beanProperty) {
@@ -437,9 +439,11 @@ public class Jackson2Parser extends ModelParser {
                 : jsonTypeInfo.property();
     }
 
-    private String getTypeName(Class<?> cls) {
+    private Pair<String, List<String>> getTypeNames(Class<?> cls) {
         final List<String> typeNames = getTypeNamesOrEmptyOrNull(cls);
-        return typeNames != null && !typeNames.isEmpty() ? typeNames.get(0) : null;
+        return typeNames != null && !typeNames.isEmpty()
+                ? Pair.of(typeNames.get(0), typeNames.subList(1, typeNames.size()))
+                : null;
     }
 
     private List<String> getTypeNamesOrEmptyOrNull(Class<?> cls) {

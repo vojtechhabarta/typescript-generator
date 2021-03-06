@@ -275,7 +275,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         if (properties.isEmpty()) {
             return null;
         } else {
-            return new BeanModel(paramBean, null, null, null, null, null, properties, null);
+            return new BeanModel(paramBean, null, null, properties, null);
         }
     }
 
