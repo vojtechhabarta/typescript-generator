@@ -7,6 +7,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,7 +47,7 @@ public class ModuleDependenciesTest {
         settings.npmName = "b";
         settings.npmVersion = "1.0.0";
         settings.moduleDependencies = Arrays.asList(
-                new ModuleDependency("../a", "a", new File("target/test-module-dependencies/a/typescript-generator-info.json"), "a", "1.0.0")
+                ModuleDependency.module("../a", "a", new File("target/test-module-dependencies/a/typescript-generator-info.json"), "a", "1.0.0")
         );
         new TypeScriptGenerator(settings).generateTypeScript(
                 Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
@@ -61,6 +63,68 @@ public class ModuleDependenciesTest {
         Assert.assertTrue(output.contains("objectA: a.NS.A2;"));
         Assert.assertTrue(output.contains("interface D1 extends C<a.A1> {"));
         Assert.assertTrue(output.contains("interface D2 extends C<a.NS.A2> {"));
+        Assert.assertTrue(!output.contains("interface A1 {"));
+        Assert.assertTrue(!output.contains("namespace NS {"));
+        Assert.assertTrue(!output.contains("interface A2 {"));
+        Assert.assertTrue(!output.contains("type Enum1 ="));
+    }
+
+    @Test
+    public void testGlobal() {
+        generateGlobalA("global-a");
+        generateGlobalB("global-b", "global-a");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGlobalWithConflict() {
+        generateGlobalA("global-a1");
+        generateGlobalA("global-a2");
+        try {
+            generateGlobalB("global-b-conflict", "global-a1", "global-a2");
+        } catch (Exception e) {
+            System.out.println("Exception (expected): " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private void generateGlobalA(String directory) {
+        final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.global;
+        settings.customTypeNaming = Collections.singletonMap("cz.habarta.typescript.generator.ModuleDependenciesTest$A2", "NS.A2");
+        settings.generateInfoJson = true;
+        new TypeScriptGenerator(settings).generateTypeScript(
+                Input.from(A1.class, A2.class, Enum1.class, ABase.class),
+                Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
+        final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
+        Assert.assertTrue(output.contains("interface A1 {"));
+        Assert.assertTrue(output.contains("namespace NS {"));
+        Assert.assertTrue(output.contains("interface A2 {"));
+        Assert.assertTrue(output.contains("type Enum1 ="));
+    }
+
+    private void generateGlobalB(String directory, String... dependencyDirectories) {
+        final Settings settings = TestUtils.settings();
+        settings.outputKind = TypeScriptOutputKind.global;
+        settings.referencedFiles = Stream.of(dependencyDirectories)
+                .map(depDir -> "../" + depDir + "/global.d.ts")
+                .collect(Collectors.toList());
+        settings.moduleDependencies = Stream.of(dependencyDirectories)
+                .map(depDir -> ModuleDependency.global(new File("target/test-module-dependencies/" + depDir + "/typescript-generator-info.json")))
+                .collect(Collectors.toList());
+        new TypeScriptGenerator(settings).generateTypeScript(
+                Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
+                Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
+        final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
+        Assert.assertTrue(!output.contains("import"));
+        Assert.assertTrue(output.contains("interface B1 extends A1 {"));
+        Assert.assertTrue(output.contains("objectA: A1;"));
+        Assert.assertTrue(output.contains("enum1: Enum1;"));
+        Assert.assertTrue(output.contains("aBase: ABaseUnion<string>;"));
+        Assert.assertTrue(output.contains("aBases: ABaseUnion<string>[];"));
+        Assert.assertTrue(output.contains("interface B2 extends NS.A2 {"));
+        Assert.assertTrue(output.contains("objectA: NS.A2;"));
+        Assert.assertTrue(output.contains("interface D1 extends C<A1> {"));
+        Assert.assertTrue(output.contains("interface D2 extends C<NS.A2> {"));
         Assert.assertTrue(!output.contains("interface A1 {"));
         Assert.assertTrue(!output.contains("namespace NS {"));
         Assert.assertTrue(!output.contains("interface A2 {"));

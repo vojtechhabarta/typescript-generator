@@ -77,7 +77,9 @@ public class Emitter implements EmitterExtension.Writer {
         if (settings.moduleDependencies != null && !settings.moduleDependencies.isEmpty()) {
             writeNewLine();
             for (ModuleDependency dependency : settings.moduleDependencies) {
-                writeIndentedLine("import * as " + dependency.importAs + " from " + quote(dependency.importFrom, settings) + ";");
+                if (!dependency.global) {
+                    writeIndentedLine("import * as " + dependency.importAs + " from " + quote(dependency.importFrom, settings) + ";");
+                }
             }
         }
         if (settings.importDeclarations != null && !settings.importDeclarations.isEmpty()) {

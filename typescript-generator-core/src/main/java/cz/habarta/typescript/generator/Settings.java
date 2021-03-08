@@ -441,8 +441,8 @@ public class Settings {
         if (restOptionsType != null && !isGenerateRest()) {
             throw new RuntimeException("'restOptionsType' parameter can only be used when generating REST client or interface.");
         }
-        if (generateInfoJson && outputKind != TypeScriptOutputKind.module) {
-            throw new RuntimeException("'generateInfoJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
+        if (generateInfoJson && (outputKind != TypeScriptOutputKind.module && outputKind != TypeScriptOutputKind.global)) {
+            throw new RuntimeException("'generateInfoJson' can only be used when 'outputKind' parameter is 'module' or 'global'.");
         }
         if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
