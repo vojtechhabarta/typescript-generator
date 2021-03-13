@@ -24,12 +24,24 @@ public class LoadedModuleDependencies {
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         final Map<String, ModuleDependency> importFromMap = new LinkedHashMap<>();
         final Map<String, ModuleDependency> importAsMap = new LinkedHashMap<>();
+        final Map<String, ModuleDependency> globalTypeNames = new LinkedHashMap<>();
         for (ModuleDependency dependency : dependencies) {
             try {
                 final Function<String, String> reportNullParameter = parameterName ->
                         String.format("Missing required configuration parameter '%s' in module dependency: %s", parameterName, dependency);
-                Objects.requireNonNull(dependency.importFrom, () -> reportNullParameter.apply("importFrom"));
-                Objects.requireNonNull(dependency.importAs, () -> reportNullParameter.apply("importAs"));
+                if (dependency.global) {
+                    if (dependency.importFrom != null) {
+                        throw new RuntimeException(String.format(
+                                "'importFrom' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
+                    }
+                    if (dependency.importAs != null) {
+                        throw new RuntimeException(String.format(
+                                "'importAs' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
+                    }
+                } else {
+                    Objects.requireNonNull(dependency.importFrom, () -> reportNullParameter.apply("importFrom"));
+                    Objects.requireNonNull(dependency.importAs, () -> reportNullParameter.apply("importAs"));
+                }
                 Objects.requireNonNull(dependency.infoJson, () -> reportNullParameter.apply("infoJson"));
                 if (settings.generateNpmPackageJson) {
                     Objects.requireNonNull(dependency.npmPackageName, () -> reportNullParameter.apply("npmPackageName"));
@@ -46,16 +58,18 @@ public class LoadedModuleDependencies {
                 }
 
                 TypeScriptGenerator.getLogger().info(String.format(
-                        "Loading '%s' module info from: %s", dependency.importFrom, dependency.infoJson));
+                        "Loading %s module info from: %s", dependency.toShortString(), dependency.infoJson));
 
-                final ModuleDependency importFromConflict = importFromMap.put(dependency.importFrom, dependency);
-                if (importFromConflict != null) {
-                    throw new RuntimeException(String.format("Duplicate module '%s'", dependency.importFrom));
-                }
+                if (!dependency.global) {
+                    final ModuleDependency importFromConflict = importFromMap.put(dependency.importFrom, dependency);
+                    if (importFromConflict != null) {
+                        throw new RuntimeException(String.format("Duplicate module '%s'", dependency.importFrom));
+                    }
 
-                final ModuleDependency importAsConflict = importAsMap.put(dependency.importAs, dependency);
-                if (importAsConflict != null) {
-                    throw new RuntimeException(String.format("Import identifier '%s' already used for module '%s'", dependency.importAs, importAsConflict.importFrom));
+                    final ModuleDependency importAsConflict = importAsMap.put(dependency.importAs, dependency);
+                    if (importAsConflict != null) {
+                        throw new RuntimeException(String.format("Import identifier '%s' already used for module '%s'", dependency.importAs, importAsConflict.importFrom));
+                    }
                 }
 
                 final InfoJson infoJson = objectMapper.readValue(dependency.infoJson, InfoJson.class);
@@ -63,9 +77,16 @@ public class LoadedModuleDependencies {
                     final Pair<ModuleDependency, String> presentMapping = classMappings.get(classInfo.javaClass);
                     if (presentMapping != null) {
                         TypeScriptGenerator.getLogger().warning(String.format(
-                                "Java class '%s' already present in module '%s'", classInfo.javaClass, presentMapping.getValue1().importFrom));
+                                "Java class '%s' already present in '%s'", classInfo.javaClass, presentMapping.getValue1().infoJson));
                     } else {
                         classMappings.put(classInfo.javaClass, Pair.of(dependency, classInfo.typeName));
+                    }
+                    final ModuleDependency presentTypeName = globalTypeNames.get(classInfo.typeName);
+                    if (presentTypeName != null) {
+                        throw new RuntimeException(String.format(
+                                "Duplicate TypeScript global name '%s', declared in '%s' and also '%s'", classInfo.typeName, presentTypeName.infoJson, dependency.infoJson));
+                    } else {
+                        globalTypeNames.put(classInfo.typeName, dependency);
                     }
                 }
             } catch (IOException e) {
