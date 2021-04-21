@@ -60,6 +60,11 @@
             <version>2.1.1</version>
         </dependency>
         <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
             <version>4.8.102</version>
@@ -229,6 +234,47 @@
                         <configuration>
                             <schemaDirectory>src/main/schema</schemaDirectory>
                             <generatePackage>cz.habarta.typescript.generator.xmldoclet</generatePackage>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>jaxrs-v2-test</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy
+                                    file="src/test/java/cz/habarta/typescript/generator/JaxrsApplicationTest.java"
+                                    tofile="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"/>
+                                <replace
+                                    file="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"
+                                    token="JaxrsApplicationTest"
+                                    value="JaxrsV2ApplicationTest"/>
+                                <replace
+                                    file="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"
+                                    token="jakarta.ws.rs"
+                                    value="javax.ws.rs"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jaxrs-v2-test-delete</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete file="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"/>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

@@ -38,8 +38,10 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -459,6 +461,11 @@ public final class Utils {
         final StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         return writer.toString();
+    }
+
+    public static <T> Supplier<T> memoize(Supplier<T> supplier) {
+        final AtomicReference<T> value = new AtomicReference<>();
+        return () -> value.updateAndGet(current -> current != null ? current : Objects.requireNonNull(supplier.get()));
     }
 
 }
