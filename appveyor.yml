@@ -15,7 +15,7 @@ build_script:
     mvn -version
     mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
-    if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
+    if ($env:APPVEYOR_REPO_BRANCH -eq "main" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
     {
        mvn --batch-mode site-deploy "-Dgithub.site.oauth2Token=$($env:access_token)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     }
@@ -29,7 +29,7 @@ artifacts:
 - path: target\artifacts.zip
 on_success:
 - ps: |-
-    if ($env:APPVEYOR_REPO_BRANCH -eq "master" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
+    if ($env:APPVEYOR_REPO_BRANCH -eq "main" -and -not $env:APPVEYOR_PULL_REQUEST_NUMBER)
     {
         Write-Host -ForegroundColor Cyan "Tagging version v$($env:APPVEYOR_BUILD_VERSION)"
         git tag "v$($env:APPVEYOR_BUILD_VERSION)" $env:APPVEYOR_REPO_COMMIT

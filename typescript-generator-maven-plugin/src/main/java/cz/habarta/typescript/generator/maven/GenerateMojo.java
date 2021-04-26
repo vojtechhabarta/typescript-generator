@@ -227,7 +227,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies Jackson 2 global configuration.
      * Description of individual parameters is in
-     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a>
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a>
      * class on GitHub (latest version).
      */
     @Parameter
@@ -236,7 +236,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies Gson global configuration.
      * Description of individual parameters is in
-     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a>
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a>
      * class on GitHub (latest version).
      */
     @Parameter
@@ -245,7 +245,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Specifies JSON-B global configuration.
      * Description of individual parameters is in
-     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a>
+     * <a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a>
      * class on GitHub (latest version).
      */
     @Parameter
@@ -257,9 +257,9 @@ public class GenerateMojo extends AbstractMojo {
      * Note: specified library must be present in project dependencies (typescript-generator itself doesn't depend on those libraries).
      * Supported libraries are:
      * <ul>
-     * <li><code>guava</code> (<a href="https://github.com/google/guava">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
-     * <li><code>joda</code> (<a href="https://github.com/JodaOrg/joda-time">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
-     * <li><code>vavr</code> (<a href="https://github.com/vavr-io/vavr">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/master/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
+     * <li><code>guava</code> (<a href="https://github.com/google/guava">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
+     * <li><code>joda</code> (<a href="https://github.com/JodaOrg/joda-time">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
+     * <li><code>vavr</code> (<a href="https://github.com/vavr-io/vavr">source</a>) (<a href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
      * </ul>
      */
     @Parameter
