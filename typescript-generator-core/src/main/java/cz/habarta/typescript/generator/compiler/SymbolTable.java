@@ -183,7 +183,7 @@ public class SymbolTable {
         }
     }
 
-    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
+    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec-ARCHIVED.md#221-reserved-words
     private static final Set<String> Keywords = new LinkedHashSet<>(Arrays.asList(
         "break",             "case",              "catch",             "class",
         "const",             "continue",          "debugger",          "default",
