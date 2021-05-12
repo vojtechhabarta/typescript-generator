@@ -695,6 +695,7 @@ public class Settings {
 
     public static Predicate<String> createExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
         final Set<String> names = new LinkedHashSet<>(excludedClasses != null ? excludedClasses : Collections.<String>emptyList());
+        names.add("java.lang.Record");
         final List<Pattern> patterns = Utils.globsToRegexps(excludedClassPatterns != null ? excludedClassPatterns : Collections.<String>emptyList());
         return new Predicate<String>() {
             @Override
