@@ -7,22 +7,23 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
 }
 
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
         classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.+'
         classpath 'cz.habarta.typescript-generator:typescript-generator-spring:2.+'
+        classpath 'javax.validation:validation-api:2.0.1.Final'
     }
 }
 

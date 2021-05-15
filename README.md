@@ -3,7 +3,7 @@
 [![Stars](https://img.shields.io/github/stars/vojtechhabarta/typescript-generator.svg?style=social)](https://github.com/vojtechhabarta/typescript-generator)
 
 Quick links:
-[Configuration parameters](http://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
+[Configuration parameters](https://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
 |
 [Breaking changes](https://github.com/vojtechhabarta/typescript-generator/wiki/Breaking-Changes)
 |
@@ -94,7 +94,6 @@ apply plugin: 'cz.habarta.typescript-generator'
 buildscript {
     repositories {
         mavenCentral()
-   	    jcenter()
     }
     dependencies {
         classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: 'x.y.z'
@@ -138,7 +137,6 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        jcenter()
     }
     resolutionStrategy {
         eachPlugin {
