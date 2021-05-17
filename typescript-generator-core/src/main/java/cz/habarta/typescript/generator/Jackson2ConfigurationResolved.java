@@ -25,6 +25,7 @@ public class Jackson2ConfigurationResolved {
     public Map<Class<? extends JsonSerializer>, String> serializerTypeMappings;
     @SuppressWarnings("rawtypes")
     public Map<Class<? extends JsonDeserializer>, String> deserializerTypeMappings;
+    public Class<?> view;
 
     public static Jackson2ConfigurationResolved from(Jackson2Configuration configuration, ClassLoader classLoader) {
         final Jackson2ConfigurationResolved resolved = new Jackson2ConfigurationResolved();
@@ -42,6 +43,7 @@ public class Jackson2ConfigurationResolved {
             configuration.deserializerTypeMappings, "deserializerTypeMapping", classLoader, JsonDeserializer.class, Function.identity());
         resolved.serializerTypeMappings = resolveClassMappings(
             configuration.serializerTypeMappings, "serializerTypeMapping", classLoader, JsonSerializer.class, Function.identity());
+        resolved.view = configuration.view != null ? Settings.loadClass(classLoader, configuration.view, Object.class) : null;
         return resolved;
     }
 

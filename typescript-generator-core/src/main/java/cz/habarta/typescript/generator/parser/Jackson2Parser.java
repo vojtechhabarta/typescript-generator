@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -251,7 +252,8 @@ public class Jackson2Parser extends ModelParser {
     private BeanModel parseBean(SourceType<Class<?>> sourceClass, List<String> classComments) {
         final List<PropertyModel> properties = new ArrayList<>();
 
-        final BeanHelpers beanHelpers = getBeanHelpers(sourceClass.type);
+        final Class<?> view = settings.jackson2Configuration != null ? settings.jackson2Configuration.view : null;
+        final BeanHelpers beanHelpers = getBeanHelpers(sourceClass.type, view);
         if (beanHelpers != null) {
             for (final Pair<BeanProperty, PropertyAccess> pair : beanHelpers.getPropertiesAndAccess()) {
                 final BeanProperty beanProperty = pair.getValue1();
@@ -384,7 +386,7 @@ public class Jackson2Parser extends ModelParser {
             if (identityInfo.generator() == ObjectIdGenerators.None.class) {
                 return null;
             } else if (identityInfo.generator() == ObjectIdGenerators.PropertyGenerator.class) {
-                final BeanHelpers beanHelpers = getBeanHelpers(cls);
+                final BeanHelpers beanHelpers = getBeanHelpers(cls, null);
                 if (beanHelpers == null) {
                     return null;
                 }
@@ -509,7 +511,7 @@ public class Jackson2Parser extends ModelParser {
         return Pair.of(null, null);
     }
 
-    private BeanHelpers getBeanHelpers(Class<?> beanClass) {
+    private BeanHelpers getBeanHelpers(Class<?> beanClass, Class<?> view) {
         if (beanClass == null) {
             return null;
         }
@@ -520,7 +522,7 @@ public class Jackson2Parser extends ModelParser {
         final BeanSerializerHelper beanSerializerHelper = createBeanSerializerHelper(javaType);
         final BeanDeserializerHelper beanDeserializerHelper = createBeanDeserializerHelper(javaType);
         if (beanSerializerHelper != null || beanDeserializerHelper != null) {
-            return new BeanHelpers(beanClass, beanSerializerHelper, beanDeserializerHelper);
+            return new BeanHelpers(beanClass, view, beanSerializerHelper, beanDeserializerHelper);
         }
         return null;
     }
@@ -558,16 +560,18 @@ public class Jackson2Parser extends ModelParser {
 
     // for tests
     protected List<BeanProperty> getBeanProperties(Class<?> beanClass) {
-        return getBeanHelpers(beanClass).getProperties();
+        return getBeanHelpers(beanClass, null).getProperties();
     }
 
     private static class BeanHelpers {
         public final Class<?> beanClass;
+        public final Class<?> view;
         public final BeanSerializerHelper serializer;
         public final BeanDeserializerHelper deserializer;
 
-        public BeanHelpers(Class<?> beanClass, BeanSerializerHelper serializer, BeanDeserializerHelper deserializer) {
+        public BeanHelpers(Class<?> beanClass, Class<?> view, BeanSerializerHelper serializer, BeanDeserializerHelper deserializer) {
             this.beanClass = beanClass;
+            this.view = view;
             this.serializer = serializer;
             this.deserializer = deserializer;
         }
@@ -593,8 +597,10 @@ public class Jackson2Parser extends ModelParser {
             final List<Pair<BeanProperty, BeanProperty>> properties = Stream
                     .concat(
                             serializableProperties.stream()
+                                    .filter(this::inView)
                                     .map(property -> Pair.of(property, getBeanProperty(deserializableProperties, property.getName()))),
                             deserializableProperties.stream()
+                                    .filter(this::inView)
                                     .filter(property -> getBeanProperty(serializableProperties, property.getName()) == null)
                                     .map(property -> Pair.of((BeanProperty) null, property))
                     )
@@ -618,6 +624,18 @@ public class Jackson2Parser extends ModelParser {
                     .thenComparing(byIndex)
                     .thenComparing(byFieldIndex));
             return properties;
+        }
+
+        private boolean inView(BeanProperty beanProperty) {
+            if (view == null) {
+                return true;
+            }
+            final JsonView annotation = beanProperty.getAnnotation(JsonView.class);
+            if (annotation == null || annotation.value().length == 0) {
+                return true;
+            }
+            return Stream.of(annotation.value())
+                    .anyMatch(v -> v.isAssignableFrom(view));
         }
 
         private static BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
