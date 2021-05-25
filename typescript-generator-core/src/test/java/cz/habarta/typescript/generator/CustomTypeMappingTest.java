@@ -134,4 +134,16 @@ public class CustomTypeMappingTest {
         public D type;
     }
 
+    @Test
+    public void testBigInt() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.customTypeMappings = Collections.singletonMap("long", "BigInt");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BigIntClass.class));
+        Assert.assertTrue(output.contains("bigNumber: BigInt;"));
+    }
+
+    private static class BigIntClass {
+        public long bigNumber = Long.MAX_VALUE;
+    }
+
 }

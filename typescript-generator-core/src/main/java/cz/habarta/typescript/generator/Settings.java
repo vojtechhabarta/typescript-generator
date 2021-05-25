@@ -518,7 +518,7 @@ public class Settings {
                 final GenericName genericTsName = parseGenericName(tsName);
                 validateTypeParameters(genericJavaName.typeParameters);
                 validateTypeParameters(genericTsName.typeParameters);
-                final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, Object.class);
+                final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, null);
                 final int required = cls.getTypeParameters().length;
                 final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
                 if (specified != required) {
@@ -679,7 +679,7 @@ public class Settings {
                 .filter(mapping -> mapping.semanticType == semanticType)
                 .map(mapping -> mapping.className)
                 .collect(Collectors.toList());
-        return loadClasses(classLoader, classNames, Object.class);
+        return loadClasses(classLoader, classNames, null);
     }
 
     public Predicate<String> getExcludeFilter() {
@@ -822,7 +822,6 @@ public class Settings {
     static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
         Objects.requireNonNull(classLoader, "classLoader");
         Objects.requireNonNull(className, "className");
-        Objects.requireNonNull(requiredClassType, "requiredClassType");
         try {
             TypeScriptGenerator.getLogger().verbose("Loading class " + className);
             final Pair<String, Integer> pair = parseArrayClassDimensions(className);
@@ -835,7 +834,7 @@ public class Settings {
             } else {
                 loadedClass = loadPrimitiveOrRegularClass(classLoader, className);
             }
-            if (requiredClassType.isAssignableFrom(loadedClass)) {
+            if (requiredClassType == null || requiredClassType.isAssignableFrom(loadedClass)) {
                 @SuppressWarnings("unchecked")
                 final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
                 return castedClass;
