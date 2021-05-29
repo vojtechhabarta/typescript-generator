@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -59,6 +60,7 @@ public class ImmutablesTest {
 
     @Value.Immutable
     @JsonSerialize(as = ImmutableRectangle.class)
+    @JsonPropertyOrder({"width", "height"})
     @JsonDeserialize(as = ImmutableRectangle.class)
     public static abstract class Rectangle implements Shape {
         public abstract double width();
