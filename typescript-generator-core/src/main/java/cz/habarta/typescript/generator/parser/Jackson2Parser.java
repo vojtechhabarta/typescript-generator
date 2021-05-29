@@ -724,7 +724,6 @@ public class Jackson2Parser extends ModelParser {
                 try {
                     return enumClass.getDeclaredField(e.name());
                 } catch (NoSuchFieldException noSuchFieldException) {
-                    noSuchFieldException.printStackTrace();
                     return null;
                 }
             }).collect(Collectors.toList());
