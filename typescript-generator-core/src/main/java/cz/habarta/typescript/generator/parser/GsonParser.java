@@ -7,8 +7,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.GsonConfiguration;
+import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.util.PropertyMember;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -92,7 +94,10 @@ public class GsonParser extends ModelParser {
                 if (serializedName != null) {
                     name = serializedName.value();
                 }
-                properties.add(new PropertyModel(name, field.getGenericType(), false, null, field, null, null, null));
+                final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
+                        ? true
+                        : isPropertyOptional(new PropertyMember(field, field.getGenericType(), field.getAnnotatedType(), null));
+                properties.add(new PropertyModel(name, field.getGenericType(), optional, null, field, null, null, null));
                 addBeanToQueue(new SourceType<>(field.getGenericType(), sourceClass.type, name));
             }
             cls = cls.getSuperclass();
