@@ -719,9 +719,14 @@ public class Jackson2Parser extends ModelParser {
 
         final List<EnumMemberModel> enumMembers = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
-            final Class<?> enumClass = (Class<?>) sourceClass.type;
-            final Field[] allEnumFields = enumClass.getDeclaredFields();
-            final List<Field> constants = Arrays.stream(allEnumFields).filter(Field::isEnumConstant).collect(Collectors.toList());
+            final Class<Enum> enumClass = (Class<Enum>) sourceClass.type;
+            final List<Field> constants = Arrays.stream(enumClass.getEnumConstants()).map(e -> {
+                try {
+                    return enumClass.getDeclaredField(e.name());
+                } catch (NoSuchFieldException noSuchFieldException) {
+                    return null;
+                }
+            }).collect(Collectors.toList());
             for (Field constant : constants) {
                 Object value;
                 try {
