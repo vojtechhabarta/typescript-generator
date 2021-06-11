@@ -535,7 +535,7 @@ public class ModelCompiler {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
-            final List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+            final List<TsType.BoundedGenericVariableType> typeParameters = getTypeParameters(symbolTable, bean.getOrigin());
             final TsType.ReferenceType dataType = typeParameters.isEmpty()
                     ? new TsType.ReferenceType(beanIdentifier)
                     : new TsType.GenericReferenceType(beanIdentifier, typeParameters);

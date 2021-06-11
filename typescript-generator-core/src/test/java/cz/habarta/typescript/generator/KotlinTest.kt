@@ -89,7 +89,7 @@ class KotlinTest {
         val settings = TestUtils.settings()
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(A2::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("interface A2<S>"))
+        Assert.assertTrue(errorMessage, output.contains("interface A2<S extends Enum<S>>"))
     }
 
     private class A2<S> where S : Enum<S> {
