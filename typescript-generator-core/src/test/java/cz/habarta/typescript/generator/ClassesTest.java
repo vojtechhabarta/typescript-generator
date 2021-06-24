@@ -302,8 +302,8 @@ public class ClassesTest {
         settings.sortDeclarations = false;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
         String unsortedPropertyAssignments = "" +
-                "        this.foo = data.foo;" + settings.newline +
-                "        this.bar = data.bar;";
+                "        this.bar = data.bar;" + settings.newline +
+                "        this.foo = data.foo;";
         Assert.assertTrue(output.contains(unsortedPropertyAssignments));
     }
 

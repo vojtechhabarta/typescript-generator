@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
@@ -112,7 +113,8 @@ public class Jackson2Parser extends ModelParser {
         
     }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+                        .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 
     public Jackson2Parser(Settings settings, TypeProcessor typeProcessor) {
         this(settings, typeProcessor, Collections.emptyList(), false);

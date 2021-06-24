@@ -19,9 +19,9 @@ public class OptionalTest {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(Person.class));
         Assert.assertEquals(
                 "interface Person {\n" +
-                "    name: string;\n" +
-                "    email?: string;\n" +
                 "    age?: number;\n" +
+                "    email?: string;\n" +
+                "    name: string;\n" +
                 "}",
                 output.trim());
     }
@@ -53,9 +53,9 @@ public class OptionalTest {
     public void testDeclarationQuestionMark() {
         testDeclaration(OptionalPropertiesDeclaration.questionMark,
                 "interface Person {\n" +
-                "    name: string;\n" +
-                "    email?: string;\n" +
                 "    age?: number;\n" +
+                "    email?: string;\n" +
+                "    name: string;\n" +
                 "}"
         );
     }
@@ -64,9 +64,9 @@ public class OptionalTest {
     public void testDeclarationNullableType() {
         testDeclaration(OptionalPropertiesDeclaration.nullableType,
                 "interface Person {\n" +
-                "    name: string;\n" +
-                "    email: string | null;\n" +
                 "    age: number | null;\n" +
+                "    email: string | null;\n" +
+                "    name: string;\n" +
                 "}"
         );
     }
@@ -75,9 +75,9 @@ public class OptionalTest {
     public void testDeclarationQuestionMarkAndNullableType() {
         testDeclaration(OptionalPropertiesDeclaration.questionMarkAndNullableType,
                 "interface Person {\n" +
-                "    name: string;\n" +
-                "    email?: string | null;\n" +
                 "    age?: number | null;\n" +
+                "    email?: string | null;\n" +
+                "    name: string;\n" +
                 "}"
         );
     }
@@ -86,9 +86,9 @@ public class OptionalTest {
     public void testDeclarationNullableAndUndefinableType() {
         testDeclaration(OptionalPropertiesDeclaration.nullableAndUndefinableType,
                 "interface Person {\n" +
-                        "    name: string;\n" +
-                        "    email: string | null | undefined;\n" +
                         "    age: number | null | undefined;\n" +
+                        "    email: string | null | undefined;\n" +
+                        "    name: string;\n" +
                         "}"
         );
     }
@@ -97,9 +97,9 @@ public class OptionalTest {
     public void testDeclarationUndefinableType() {
         testDeclaration(OptionalPropertiesDeclaration.undefinableType,
                 "interface Person {\n" +
-                        "    name: string;\n" +
-                        "    email: string | undefined;\n" +
                         "    age: number | undefined;\n" +
+                        "    email: string | undefined;\n" +
+                        "    name: string;\n" +
                         "}"
         );
     }

@@ -206,8 +206,8 @@ public class TaggedUnionsTest {
                 "\n" +
                 "interface Rectangle extends Shape {\n" +
                 "    kind: 'rectangle';\n" +
-                "    width: number;\n" +
                 "    height: number;\n" +
+                "    width: number;\n" +
                 "}\n" +
                 "\n" +
                 "interface Circle extends Shape {\n" +
@@ -238,8 +238,8 @@ public class TaggedUnionsTest {
                 "\n" +
                 "interface CRectangle2 extends IQuadrilateral2 {\n" +
                 "    kind: 'rectangle';\n" +
-                "    width: number;\n" +
                 "    height: number;\n" +
+                "    width: number;\n" +
                 "}\n" +
                 "\n" +
                 "interface CCircle2 extends IShape2 {\n" +
@@ -315,8 +315,8 @@ public class TaggedUnionsTest {
                 "\n" +
                 "interface Rectangle extends Shape {\n" +
                 "    kind: 'rectangle';\n" +
-                "    width: number;\n" +
                 "    height: number;\n" +
+                "    width: number;\n" +
                 "}\n" +
                 "\n" +
                 "interface Circle extends Shape {\n" +
@@ -518,8 +518,8 @@ public class TaggedUnionsTest {
                 "\n" +
                 "interface Rectangle2 extends Shape2 {\n" +
                 "    kind: 'rectangle';\n" +
-                "    width: number;\n" +
                 "    height: number;\n" +
+                "    width: number;\n" +
                 "}\n" +
                 "\n" +
                 "interface Circle2 extends Shape2 {\n" +
@@ -553,8 +553,8 @@ public class TaggedUnionsTest {
                 "}\n" +
                 "\n" +
                 "interface Rectangle2 extends Shape2 {\n" +
-                "    width: number;\n" +
                 "    height: number;\n" +
+                "    width: number;\n" +
                 "}\n" +
                 "\n" +
                 "interface Circle2 extends Shape2 {\n" +
@@ -647,13 +647,9 @@ public class TaggedUnionsTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(RecordUsage.class));
         final String expected = ""
                 + "interface RecordUsage {\n"
-                + "    records: RecordUnion[];\n"
                 + "    formRecords: FormRecordUnion[];\n"
                 + "    listRecords: ListRecordUnion[];\n"
-                + "}\n"
-                + "\n"
-                + "interface Record {\n"
-                + "    '@type': 'order.form' | 'product.form' | 'order.list' | 'product.list';\n"
+                + "    records: RecordUnion[];\n"
                 + "}\n"
                 + "\n"
                 + "interface FormRecord extends Record {\n"
@@ -662,6 +658,10 @@ public class TaggedUnionsTest {
                 + "\n"
                 + "interface ListRecord extends Record {\n"
                 + "    '@type': 'order.list' | 'product.list';\n"
+                + "}\n"
+                + "\n"
+                + "interface Record {\n"
+                + "    '@type': 'order.form' | 'product.form' | 'order.list' | 'product.list';\n"
                 + "}\n"
                 + "\n"
                 + "interface OrderFormRecord extends FormRecord {\n"
@@ -680,11 +680,11 @@ public class TaggedUnionsTest {
                 + "    '@type': 'product.list';\n"
                 + "}\n"
                 + "\n"
-                + "type RecordUnion = FormRecord | ListRecord;\n"
-                + "\n"
                 + "type FormRecordUnion = OrderFormRecord | ProductFormRecord;\n"
                 + "\n"
                 + "type ListRecordUnion = OrderListRecord | ProductListRecord;\n"
+                + "\n"
+                + "type RecordUnion = FormRecord | ListRecord;\n"
                 + "";
         Assert.assertEquals(expected.trim(), output.trim());
     }
