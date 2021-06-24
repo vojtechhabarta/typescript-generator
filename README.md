@@ -1,9 +1,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/cz.habarta.typescript-generator/typescript-generator-core.svg)](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core/)
-[![Appveyor](https://img.shields.io/appveyor/ci/vojtechhabarta/typescript-generator/master.svg)](https://ci.appveyor.com/project/vojtechhabarta/typescript-generator)
+[![Appveyor](https://img.shields.io/appveyor/ci/vojtechhabarta/typescript-generator/main.svg)](https://ci.appveyor.com/project/vojtechhabarta/typescript-generator)
 [![Stars](https://img.shields.io/github/stars/vojtechhabarta/typescript-generator.svg?style=social)](https://github.com/vojtechhabarta/typescript-generator)
 
 Quick links:
-[Configuration parameters](http://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
+[Configuration parameters](https://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
 |
 [Breaking changes](https://github.com/vojtechhabarta/typescript-generator/wiki/Breaking-Changes)
 |
@@ -94,7 +94,6 @@ apply plugin: 'cz.habarta.typescript-generator'
 buildscript {
     repositories {
         mavenCentral()
-   	    jcenter()
     }
     dependencies {
         classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: 'x.y.z'
@@ -138,7 +137,6 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        jcenter()
     }
     resolutionStrategy {
         eachPlugin {
@@ -263,5 +261,5 @@ Contributing
 ### Code formatting
 
 - use 4 spaces for indentation in Java files
-- sort java imports alphabetically (including static imports), do not use wildcards
-- please do not reformat whole files in IDE
+- sort java imports alphabetically (including static imports), do not use wildcard (star) imports
+- please do not reformat whole files in IDE (prevent accidental changes to unrelated lines)

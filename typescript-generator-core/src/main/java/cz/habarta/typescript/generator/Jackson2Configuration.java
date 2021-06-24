@@ -76,4 +76,10 @@ public class Jackson2Configuration {
      */
     public List<String> deserializerTypeMappings;
 
+    /**
+     * Specifies ObjectMapper's active view (as a fully-qualified class name).
+     * Properties can be annotated with <code>@JsonView</code> to indicate which views they are part of.
+     */
+    public String view;
+
 }

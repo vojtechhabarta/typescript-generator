@@ -2,16 +2,15 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.SourceType;
+import cz.habarta.typescript.generator.util.Utils;
 import io.github.classgraph.ScanResult;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
 
 
 public class JaxrsApplicationScanner {
@@ -23,10 +22,18 @@ public class JaxrsApplicationScanner {
             TypeScriptGenerator.getLogger().info("Scanning JAX-RS application: " + jaxrsApplicationClass.getName());
             final Constructor<?> constructor = jaxrsApplicationClass.getDeclaredConstructor();
             constructor.setAccessible(true);
-            final Application application = (Application) constructor.newInstance();
+            final Object instance = constructor.newInstance();
+            final Set<Class<?>> applicationClasses;
+            if (instance instanceof jakarta.ws.rs.core.Application) {
+                applicationClasses = ((jakarta.ws.rs.core.Application) instance).getClasses();
+            } else if (instance instanceof javax.ws.rs.core.Application) {
+                applicationClasses = ((javax.ws.rs.core.Application) instance).getClasses();
+            } else {
+                applicationClasses = Collections.emptySet();
+            }
             final List<Class<?>> resourceClasses = new ArrayList<>();
-            for (Class<?> cls : application.getClasses()) {
-                if (cls.isAnnotationPresent(Path.class)) {
+            for (Class<?> cls : applicationClasses) {
+                if (cls.isAnnotationPresent(jakarta.ws.rs.Path.class) || cls.isAnnotationPresent(javax.ws.rs.Path.class)) {
                     resourceClasses.add(cls);
                 }
             }
@@ -39,7 +46,10 @@ public class JaxrsApplicationScanner {
     }
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
-        final List<String> namesOfResourceClasses = scanResult.getClassesWithAnnotation(Path.class.getName()).getNames();
+        final List<String> namesOfResourceClasses = Utils.concat(
+                scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames(),
+                scanResult.getClassesWithAnnotation(javax.ws.rs.Path.class.getName()).getNames()
+        );
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
         TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));
         return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
@@ -53,19 +63,14 @@ public class JaxrsApplicationScanner {
     }
 
     List<SourceType<Type>> scanJaxrsApplication(Class<?> applicationClass, List<Class<?>> resourceClasses, Predicate<String> isClassNameExcluded) {
-        Collections.sort(resourceClasses, new Comparator<Class<?>>() {
-            @Override
-            public int compare(Class<?> o1, Class<?> o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
+        Collections.sort(resourceClasses, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
         final List<SourceType<Type>> sourceTypes = new ArrayList<>();
         if (applicationClass != null) {
-            sourceTypes.add(new SourceType<Type>(applicationClass));
+            sourceTypes.add(new SourceType<>(applicationClass));
         }
         for (Class<?> resourceClass : resourceClasses) {
             if (isClassNameExcluded == null || !isClassNameExcluded.test(resourceClass.getName())) {
-                sourceTypes.add(new SourceType<Type>(resourceClass));
+                sourceTypes.add(new SourceType<>(resourceClass));
             }
         }
         return sourceTypes;

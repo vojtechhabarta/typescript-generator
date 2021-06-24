@@ -6,9 +6,13 @@ import cz.habarta.typescript.generator.DummyBean;
 import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JsonLibrary;
+import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +87,46 @@ public class GsonParserTest {
         settings.gsonConfiguration.excludeFieldsWithModifiers = "transient";
         final String output = generate(settings, Demo.class);
         Assert.assertTrue(output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
+    }
+
+    @Test
+    public void testOptionalProperties_Default() {
+        final String output = generate(settings, BeanWithOptionalProperty.class);
+        System.out.println(output);
+        Assert.assertTrue(output.contains("property1: string;"));
+    }
+
+    @Test
+    public void testOptionalProperties_All() {
+        settings.optionalProperties = OptionalProperties.all;
+        final String output = generate(settings, BeanWithOptionalProperty.class);
+        System.out.println(output);
+        Assert.assertTrue(output.contains("property1?: string;"));
+    }
+
+    @Test
+    public void testOptionalProperties_UseLibraryDefinition() {
+        settings.optionalProperties = OptionalProperties.useLibraryDefinition;
+        final String output = generate(settings, BeanWithOptionalProperty.class);
+        System.out.println(output);
+        Assert.assertTrue(output.contains("property1?: string;"));
+    }
+
+    @Test
+    public void testOptionalProperties_UseSpecifiedAnnotations() {
+        settings.optionalAnnotations = Arrays.asList(OptionalProperty.class);
+        final String output = generate(settings, BeanWithOptionalProperty.class);
+        System.out.println(output);
+        Assert.assertTrue(output.contains("property1?: string;"));
+    }
+
+    private static class BeanWithOptionalProperty {
+        @OptionalProperty
+        private String property1;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface OptionalProperty {
     }
 
 }

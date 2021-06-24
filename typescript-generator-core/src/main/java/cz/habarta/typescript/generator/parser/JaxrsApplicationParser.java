@@ -10,15 +10,34 @@ import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,24 +45,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+
 
 public class JaxrsApplicationParser extends RestApplicationParser {
 
@@ -88,8 +92,8 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         final Class<?> cls = (Class<?>) sourceType.type;
 
         // application
-        if (Application.class.isAssignableFrom(cls)) {
-            final ApplicationPath applicationPathAnnotation = cls.getAnnotation(ApplicationPath.class);
+        if (Application.class.isAssignableFrom(cls) || javax(Application.class).isAssignableFrom(cls)) {
+            final ApplicationPath applicationPathAnnotation = getRsAnnotation(cls, ApplicationPath.class);
             if (applicationPathAnnotation != null) {
                 model.setApplicationPath(applicationPathAnnotation.value());
             }
@@ -99,7 +103,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
 
         // resource
-        final Path path = cls.getAnnotation(Path.class);
+        final Path path = getRsAnnotation(cls, Path.class);
         if (path != null) {
             TypeScriptGenerator.getLogger().verbose("Parsing JAX-RS resource: " + cls.getName());
             final Result result = new Result();
@@ -114,7 +118,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         // subContext
         final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
         for (Field field : resourceClass.getDeclaredFields()) {
-            final PathParam pathParamAnnotation = field.getAnnotation(PathParam.class);
+            final PathParam pathParamAnnotation = getRsAnnotation(field, PathParam.class);
             if (pathParamAnnotation != null) {
                 pathParamTypes.put(pathParamAnnotation.value(), field.getType());
             }
@@ -129,12 +133,12 @@ public class JaxrsApplicationParser extends RestApplicationParser {
     }
 
     private void parseResourceMethod(Result result, ResourceContext context, Class<?> resourceClass, Method method) {
-        final Path pathAnnotation = method.getAnnotation(Path.class);
+        final Path pathAnnotation = getRsAnnotation(method, Path.class);
         // subContext
         context = context.subPath(pathAnnotation != null ? pathAnnotation.value() : null);
         final Map<String, Type> pathParamTypes = new LinkedHashMap<>();
         for (Parameter parameter : method.getParameters()) {
-            final PathParam pathParamAnnotation = parameter.getAnnotation(PathParam.class);
+            final PathParam pathParamAnnotation = getRsAnnotation(parameter, PathParam.class);
             if (pathParamAnnotation != null) {
                 pathParamTypes.put(pathParamAnnotation.value(), parameter.getParameterizedType());
             }
@@ -173,12 +177,12 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             // query parameters
             final List<RestQueryParam> queryParams = new ArrayList<>();
             for (Parameter param : method.getParameters()) {
-                final QueryParam queryParamAnnotation = param.getAnnotation(QueryParam.class);
+                final QueryParam queryParamAnnotation = getRsAnnotation(param, QueryParam.class);
                 if (queryParamAnnotation != null) {
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()), false));
                     foundType(result, param.getParameterizedType(), resourceClass, method.getName());
                 }
-                final BeanParam beanParamAnnotation = param.getAnnotation(BeanParam.class);
+                final BeanParam beanParamAnnotation = getRsAnnotation(param, BeanParam.class);
                 if (beanParamAnnotation != null) {
                     final Class<?> beanParamClass = param.getType();
                     final BeanModel paramBean = getQueryParameters(beanParamClass);
@@ -204,7 +208,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             final Type modelReturnType;
             if (returnType == void.class) {
                 //for async response also use swagger
-                if (hasAnyAnnotation(method.getParameters(), Collections.singletonList(Suspended.class))) {
+                if (hasAnyAnnotation(method.getParameters(), Arrays.asList(Suspended.class, javax(Suspended.class)))) {
                     if (swaggerOperation.responseType != null) {
                         modelReturnType = swaggerOperation.responseType;
                     } else {
@@ -213,13 +217,13 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 } else {
                     modelReturnType = returnType;
                 }
-            } else if (returnType == Response.class) {
+            } else if (returnType == Response.class || returnType == javax(Response.class)) {
                 if (swaggerOperation.responseType != null) {
                     modelReturnType = swaggerOperation.responseType;
                 } else {
                     modelReturnType = Object.class;
                 }
-            } else if (plainReturnType instanceof ParameterizedType && returnType == GenericEntity.class) {
+            } else if (plainReturnType instanceof ParameterizedType && (returnType == GenericEntity.class || returnType == javax(GenericEntity.class))) {
                 final ParameterizedType parameterizedReturnType = (ParameterizedType) plainReturnType;
                 modelReturnType = parameterizedReturnType.getActualTypeArguments()[0];
             } else {
@@ -241,7 +245,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
 
     private static HttpMethod getHttpMethod(Method method) {
         for (Annotation annotation : method.getAnnotations()) {
-            final HttpMethod httpMethodAnnotation = annotation.annotationType().getAnnotation(HttpMethod.class);
+            final HttpMethod httpMethodAnnotation = getRsAnnotation(annotation.annotationType(), HttpMethod.class);
             if (httpMethodAnnotation != null) {
                 return httpMethodAnnotation;
             }
@@ -253,7 +257,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         final List<PropertyModel> properties = new ArrayList<>();
         final List<Field> fields = Utils.getAllFields(paramBean);
         for (Field field : fields) {
-            final QueryParam annotation = field.getAnnotation(QueryParam.class);
+            final QueryParam annotation = getRsAnnotation(field, QueryParam.class);
             if (annotation != null) {
                 properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, null, field, null, null, null));
             }
@@ -263,7 +267,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
                 final Method writeMethod = propertyDescriptor.getWriteMethod();
                 if (writeMethod != null) {
-                    final QueryParam annotation = writeMethod.getAnnotation(QueryParam.class);
+                    final QueryParam annotation = getRsAnnotation(writeMethod, QueryParam.class);
                     if (annotation != null) {
                         properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, null, writeMethod, null, null, null));
                     }
@@ -282,15 +286,15 @@ public class JaxrsApplicationParser extends RestApplicationParser {
     private MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method, List<Pair<Parameter, Type>> parameters) {
         for (Pair<Parameter, Type> pair : parameters) {
             if (!Utils.hasAnyAnnotation(annotationClass -> pair.getValue1().getAnnotation(annotationClass), Arrays.asList(
-                    MatrixParam.class,
-                    QueryParam.class,
-                    PathParam.class,
-                    CookieParam.class,
-                    HeaderParam.class,
-                    Suspended.class,
-                    Context.class,
-                    FormParam.class,
-                    BeanParam.class
+                    MatrixParam.class, javax(MatrixParam.class),
+                    QueryParam.class, javax(QueryParam.class),
+                    PathParam.class, javax(PathParam.class),
+                    CookieParam.class, javax(CookieParam.class),
+                    HeaderParam.class, javax(HeaderParam.class),
+                    Suspended.class, javax(Suspended.class),
+                    Context.class, javax(Context.class),
+                    FormParam.class, javax(FormParam.class),
+                    BeanParam.class, javax(BeanParam.class)
             ))) {
                 final Type resolvedType = GenericsResolver.resolveType(resourceClass, pair.getValue2(), method.getDeclaringClass());
                 return new MethodParameterModel(pair.getValue1().getName(), resolvedType);
@@ -318,7 +322,9 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             map.put(javax.xml.transform.Source.class, TsType.Any);
             map.put(javax.xml.bind.JAXBElement.class, null);
             map.put(MultivaluedMap.class, TsType.Any);
+            map.put(javax(MultivaluedMap.class), TsType.Any);
             map.put(StreamingOutput.class, TsType.Any);
+            map.put(javax(StreamingOutput.class), TsType.Any);
             map.put(java.lang.Boolean.class, null);
             map.put(java.lang.Character.class, null);
             map.put(java.lang.Number.class, null);
@@ -342,5 +348,64 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 "org.glassfish.jersey.media.multipart.FormDataBodyPart"
         );
     }
+
+    @SuppressWarnings("unchecked")
+    static <A extends Annotation> A getRsAnnotation(AnnotatedElement annotatedElement, Class<A> jakartaAnnotationClass) {
+        final Class<?> javaxAnnotationClass = javax(jakartaAnnotationClass);
+        final A jakartaAnnotation = annotatedElement.getAnnotation(jakartaAnnotationClass);
+        if (jakartaAnnotation != null) {
+            return jakartaAnnotation;
+        } else {
+            final ClassLoader classLoader = jakartaAnnotationClass.getClassLoader();
+            final Object javaxAnnotation = annotatedElement.getAnnotation((Class<Annotation>)javaxAnnotationClass);
+            if (javaxAnnotation != null) {
+                return (A) Proxy.newProxyInstance(
+                        classLoader,
+                        new Class<?>[]{jakartaAnnotationClass},
+                        (proxy, method, args) -> {
+                            try {
+                                final Method javaxMethod = javaxAnnotation.getClass().getMethod(method.getName());
+                                return javaxMethod.invoke(javaxAnnotation);
+                            } catch (ReflectiveOperationException e) {
+                                return null;
+                            }
+                        }
+                );
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private static <T> Class<T> javax(Class<T> jakartaClass) {
+        @SuppressWarnings("unchecked")
+        final Class<T> cls = (Class<T>) javaxClasses.get().get(jakartaClass);
+        if (cls == null) {
+            throw new IllegalArgumentException(jakartaClass.getName());
+        }
+        return cls;
+    }
+
+    private static final Supplier<Map<Class<?>, Class<?>>> javaxClasses = Utils.memoize(() -> {
+        final Map<Class<?>, Class<?>> map = new LinkedHashMap<>();
+        map.put(jakarta.ws.rs.ApplicationPath.class, javax.ws.rs.ApplicationPath.class);
+        map.put(jakarta.ws.rs.BeanParam.class, javax.ws.rs.BeanParam.class);
+        map.put(jakarta.ws.rs.CookieParam.class, javax.ws.rs.CookieParam.class);
+        map.put(jakarta.ws.rs.FormParam.class, javax.ws.rs.FormParam.class);
+        map.put(jakarta.ws.rs.HeaderParam.class, javax.ws.rs.HeaderParam.class);
+        map.put(jakarta.ws.rs.HttpMethod.class, javax.ws.rs.HttpMethod.class);
+        map.put(jakarta.ws.rs.MatrixParam.class, javax.ws.rs.MatrixParam.class);
+        map.put(jakarta.ws.rs.Path.class, javax.ws.rs.Path.class);
+        map.put(jakarta.ws.rs.PathParam.class, javax.ws.rs.PathParam.class);
+        map.put(jakarta.ws.rs.QueryParam.class, javax.ws.rs.QueryParam.class);
+        map.put(jakarta.ws.rs.container.Suspended.class, javax.ws.rs.container.Suspended.class);
+        map.put(jakarta.ws.rs.core.Application.class, javax.ws.rs.core.Application.class);
+        map.put(jakarta.ws.rs.core.Context.class, javax.ws.rs.core.Context.class);
+        map.put(jakarta.ws.rs.core.GenericEntity.class, javax.ws.rs.core.GenericEntity.class);
+        map.put(jakarta.ws.rs.core.MultivaluedMap.class, javax.ws.rs.core.MultivaluedMap.class);
+        map.put(jakarta.ws.rs.core.Response.class, javax.ws.rs.core.Response.class);
+        map.put(jakarta.ws.rs.core.StreamingOutput.class, javax.ws.rs.core.StreamingOutput.class);
+        return map;
+    });
 
 }

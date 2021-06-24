@@ -1308,7 +1308,7 @@ public class ModelCompiler {
         return true;
     }
 
-    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#2.2.2
+    // https://github.com/Microsoft/TypeScript/blob/master/doc/spec-ARCHIVED.md#222-property-names
     // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-names-and-keywords
 
     private static boolean isValidIdentifierStart(char start) {
