@@ -40,6 +40,14 @@ public class TsTypeTest {
     }
 
     @Test
+    public void testRecordType() {
+        final Settings settings = TestUtils.settings();
+        settings.useRecordType = true;
+        assertEquals("Record<string, number>", new IndexedArrayType(String, Number).format(settings));
+
+    }
+
+    @Test
     public void testObjectType() {
         final Settings settings = TestUtils.settings();
         assertEquals("{ a: string; b: string | number; c: {}; d: { x: string; }; }", new TsType.ObjectType(Arrays.asList(

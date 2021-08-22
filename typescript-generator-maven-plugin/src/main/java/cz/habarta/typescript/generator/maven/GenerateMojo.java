@@ -883,6 +883,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter
     private Logger.Level loggingLevel;
 
+    /**
+     * If <code>true</code>, will use <code>Record<T, V></code> instead of
+     * <code>{ [index: T]: V}</code> when typing Maps
+     */
+    @Parameter
+    private boolean useRecordType;
+
     @Parameter(property = "typescript.generator.skip")
     private boolean skip;
 
@@ -980,6 +987,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;
+        settings.useRecordType = useRecordType;
         return settings;
     }
 

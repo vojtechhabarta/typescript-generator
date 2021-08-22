@@ -181,7 +181,11 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return "{ [index: " + indexType.format(settings) + "]: " + elementType.format(settings) + " }";
+            if (settings.useRecordType) {
+                return "Record<" + indexType.format(settings) + ", " + elementType.format(settings) + ">";
+            } else {
+                return "{ [index: " + indexType.format(settings) + "]: " + elementType.format(settings) + " }";
+            }
         }
 
     }
