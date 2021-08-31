@@ -1,4 +1,4 @@
-function uriEncoding(template: TemplateStringsArray, ...substitutions: any[]): string {
+export function uriEncoding(template: TemplateStringsArray, ...substitutions: any[]): string {
 	let result = "";
 	for (let i = 0; i < substitutions.length; i++) {
 		result += template[i];
