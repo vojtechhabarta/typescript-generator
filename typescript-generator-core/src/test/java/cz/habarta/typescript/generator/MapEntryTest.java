@@ -57,6 +57,7 @@ public class MapEntryTest {
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         final ClassWithEntries classWithEntries = new ClassWithEntries();
         final String json = objectMapper.writeValueAsString(classWithEntries);
+        /*
         final String expectedJson = (""
                 + "{\n"
                 + "  'name': 'ClassWithEntries',\n"
@@ -75,7 +76,62 @@ public class MapEntryTest {
                 + "  }\n"
                 + "}")
                 .replace("'", "\"");
+        
+        System.out.println(expectedJson);
         Assert.assertEquals(expectedJson, json);
+        */
+        
+//         System.out.println("This is my print");
+//         System.out.println(json);
+        Assert.assertTrue(json.contains("'name': 'ClassWithEntries'".replace("'", "\"")));
+        Assert.assertTrue(json.contains((""
+                                + "  'entry1': {\n"
+                                + "    'MyBean instance': 'NNN'\n"
+                                + "  }")
+                                .replace("'", "\"")));
+        Assert.assertTrue(json.contains((""
+                                + "  'entry2': {\n"
+                                + "    'key': {\n"
+                                + "      'f0': 'ooo',\n"
+                                + "      'f1': true\n"
+                                + "    },\n"
+                                + "    'value': 'OOO'\n"
+                                + "  }")
+                                .replace("'", "\"")
+                                ) ||
+                        json.contains((""
+                                + "  'entry2': {\n"
+                                + "    'key': {\n"
+                                + "      'f1': true,\n"
+                                + "      'f0': 'ooo'\n"
+                                + "    },\n"
+                                + "    'value': 'OOO'\n"
+                                + "  }")
+                                .replace("'", "\""))||
+                        json.contains((""
+                                + "  'entry2': {\n"
+                                + "    'value': 'OOO',\n"
+                                + "    'key': {\n"
+                                + "      'f0': 'ooo',\n"
+                                + "      'f1': true\n"
+                                + "    }\n"
+                                + "  }")
+                                .replace("'", "\"")) ||
+                         json.contains((""
+                                + "  'entry2': {\n"
+                                + "    'value': 'OOO',\n"
+                                + "    'key': {\n"
+                                + "      'f1': true,\n"
+                                + "      'f0': 'ooo'\n"
+                                + "    }\n"
+                                + "  }")
+                                .replace("'", "\""))
+                        );
+        Assert.assertTrue(json.contains((""
+                                + "  'entry3': {\n"
+                                + "    'MyBean instance': 'EEE'\n"
+                                + "  }")
+                                .replace("'", "\"")));
 
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(
@@ -84,13 +140,20 @@ public class MapEntryTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithEntries.class));
         Assert.assertTrue(output.contains("entry1: { [index: string]: string }"));
         Assert.assertTrue(output.contains("entry2: Entry2<MyBean, string>"));
+
         Assert.assertTrue(output.contains(""
                 + "interface Entry2<K, V> {\n"
                 + "    key: K;\n"
                 + "    value: V;\n"
+                + "}") || output.contains(""
+                + "interface Entry2<K, V> {\n"
+                + "    value: V;\n"
+                + "    key: K;\n"
                 + "}"));
+
         Assert.assertTrue(output.contains("entry3: { [index: string]: string }"));
     }
+
 
     @Test
     public void testOverriddenShapes() throws Exception {
