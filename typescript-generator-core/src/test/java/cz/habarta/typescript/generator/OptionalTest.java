@@ -7,8 +7,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -17,7 +17,7 @@ public class OptionalTest {
     @Test
     public void test() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(Person.class));
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "interface Person {\n" +
                 "    name: string;\n" +
                 "    email?: string;\n" +
@@ -40,13 +40,13 @@ public class OptionalTest {
         final String jsonWithNullEmail = "{'name':'afh','email':null}".replace('\'', '\"');
         final String jsonWithoutEmail = "{'name':'afh'}".replace('\'', '\"');
 
-        Assert.assertEquals(jsonWithEmail, objectMapper.writeValueAsString(personWithEmail));
-        Assert.assertEquals(jsonWithNullEmail, objectMapper.writeValueAsString(personWithEmptyEmail));
-        Assert.assertEquals(jsonWithoutEmail, objectMapper.writeValueAsString(personWithoutEmail));
+        Assertions.assertEquals(jsonWithEmail, objectMapper.writeValueAsString(personWithEmail));
+        Assertions.assertEquals(jsonWithNullEmail, objectMapper.writeValueAsString(personWithEmptyEmail));
+        Assertions.assertEquals(jsonWithoutEmail, objectMapper.writeValueAsString(personWithoutEmail));
 
-        Assert.assertEquals(personWithEmail, objectMapper.readValue(jsonWithEmail, Person.class));
-        Assert.assertEquals(personWithEmptyEmail, objectMapper.readValue(jsonWithNullEmail, Person.class));
-        Assert.assertEquals(personWithoutEmail, objectMapper.readValue(jsonWithoutEmail, Person.class));
+        Assertions.assertEquals(personWithEmail, objectMapper.readValue(jsonWithEmail, Person.class));
+        Assertions.assertEquals(personWithEmptyEmail, objectMapper.readValue(jsonWithNullEmail, Person.class));
+        Assertions.assertEquals(personWithoutEmail, objectMapper.readValue(jsonWithoutEmail, Person.class));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class OptionalTest {
         final Settings settings = TestUtils.settings();
         settings.optionalPropertiesDeclaration = declaration;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Person.class));
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     private static class Person {

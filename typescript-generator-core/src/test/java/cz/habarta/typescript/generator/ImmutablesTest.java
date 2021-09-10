@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ImmutablesTest {
 
@@ -41,7 +41,7 @@ public class ImmutablesTest {
                 "type ShapeUnion = Square | Rectangle | Circle;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
 

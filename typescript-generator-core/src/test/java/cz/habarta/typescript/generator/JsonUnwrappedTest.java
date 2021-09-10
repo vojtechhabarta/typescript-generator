@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.util.StandardJsonPrettyPrinter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class JsonUnwrappedTest {
@@ -45,7 +45,7 @@ public class JsonUnwrappedTest {
                 + "    last: string;\n"
                 + "}\n"
                 + "";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class JsonUnwrappedTest {
                 + "    last: string;\n"
                 + "}\n"
                 + "";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     public static class Person {

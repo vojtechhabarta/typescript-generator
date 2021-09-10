@@ -9,8 +9,8 @@ import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.util.Utils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class BeanPropertyPathExtensionTest {
 
@@ -45,6 +45,6 @@ public class BeanPropertyPathExtensionTest {
         new BeanPropertyPathExtension().emitElements(writer, settings, false, tsModel);
         String dataStr = data.toString();
         final String expected = Utils.readString(getClass().getResourceAsStream("/ext/expected.ts"), "\n");
-        Assert.assertEquals(expected.trim(), dataStr.trim());
+        Assertions.assertEquals(expected.trim(), dataStr.trim());
     }
 }

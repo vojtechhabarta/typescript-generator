@@ -3,9 +3,9 @@ package cz.habarta.typescript.generator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class MapExtensionTest {
 
@@ -45,7 +45,7 @@ public class MapExtensionTest {
     public void testStringList() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(C.class));
-        Assert.assertTrue(output.contains("stringList: string[];"));
+        Assertions.assertTrue(output.contains("stringList: string[];"));
     }
 
     public static interface StringList extends List<String> {}
@@ -58,7 +58,7 @@ public class MapExtensionTest {
     public void testStringKeyMapNumberValue() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(D.class));
-        Assert.assertTrue(output.contains("stringKeyMap: { [index: string]: number };"));
+        Assertions.assertTrue(output.contains("stringKeyMap: { [index: string]: number };"));
     }
 
     public static class D {
@@ -69,7 +69,7 @@ public class MapExtensionTest {
     public void testStringKeyMapGenericValue() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(E.class));
-        Assert.assertTrue(output.contains("stringKeyMap: { [index: string]: T };"));
+        Assertions.assertTrue(output.contains("stringKeyMap: { [index: string]: T };"));
     }
 
     public static class E<T> {

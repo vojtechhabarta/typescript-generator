@@ -4,18 +4,18 @@ package cz.habarta.typescript.generator;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
 public class ClassesTest {
 
-    @Test(expected = Exception.class)
+    @Test
     public void testInvalidSettings() {
         final Settings settings = TestUtils.settings();
         settings.mapClasses = ClassMapping.asClasses;
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from());
+        Assertions.assertThrows(Exception.class, () -> new TypeScriptGenerator(settings).generateTypeScript(Input.from()));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ClassesTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.mapClasses = ClassMapping.asClasses;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(inputClass));
-        Assert.assertEquals(expected.replace('\'', '"'), output.trim());
+        Assertions.assertEquals(expected.replace('\'', '"'), output.trim());
     }
 
     private static abstract class A {
@@ -249,7 +249,7 @@ public class ClassesTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.mapClassesAsClassesPatterns = mapClassesAsClassesPatterns;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Bc.class, Bi.class, Derived1.class, Derived2.class));
-        Assert.assertEquals(expected.replace('\'', '"').trim(), output.trim());
+        Assertions.assertEquals(expected.replace('\'', '"').trim(), output.trim());
     }
 
     private static abstract class Bc {
@@ -274,7 +274,7 @@ public class ClassesTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.generateConstructors = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
-        Assert.assertTrue(output.contains("constructor(data: FooBar)"));
+        Assertions.assertTrue(output.contains("constructor(data: FooBar)"));
     }
 
     @Test
@@ -289,7 +289,7 @@ public class ClassesTest {
         String sortedPropertyAssignments = "" +
                 "        this.bar = data.bar;" + settings.newline +
                 "        this.foo = data.foo;";
-        Assert.assertTrue(output.contains(sortedPropertyAssignments));
+        Assertions.assertTrue(output.contains(sortedPropertyAssignments));
     }
 
     @Test
@@ -304,7 +304,7 @@ public class ClassesTest {
         String unsortedPropertyAssignments = "" +
                 "        this.foo = data.foo;" + settings.newline +
                 "        this.bar = data.bar;";
-        Assert.assertTrue(output.contains(unsortedPropertyAssignments));
+        Assertions.assertTrue(output.contains(unsortedPropertyAssignments));
     }
 
     private static class FooBar {
@@ -320,7 +320,7 @@ public class ClassesTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.generateConstructors = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBarInterface.class));
-        Assert.assertFalse(output.contains("constructor"));
+        Assertions.assertFalse(output.contains("constructor"));
     }
 
     private interface FooBarInterface {
@@ -333,9 +333,9 @@ public class ClassesTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.generateConstructors = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassB.class));
-        Assert.assertTrue(output.contains("constructor(data: ClassA<T>)"));
-        Assert.assertTrue(output.contains("constructor(data: ClassB)"));
-        Assert.assertTrue(output.contains("super(data);"));
+        Assertions.assertTrue(output.contains("constructor(data: ClassA<T>)"));
+        Assertions.assertTrue(output.contains("constructor(data: ClassB)"));
+        Assertions.assertTrue(output.contains("super(data);"));
     }
 
     private static class ClassA<T> {

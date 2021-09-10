@@ -3,8 +3,8 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class Jackson2PolymorphismTest {
@@ -12,7 +12,7 @@ public class Jackson2PolymorphismTest {
     @Test
     public void testPropertyNameQuoting() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(BadFieldClass.class));
-        Assert.assertTrue(output.contains("\"@class\""));
+        Assertions.assertTrue(output.contains("\"@class\""));
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
@@ -25,8 +25,8 @@ public class Jackson2PolymorphismTest {
         final int x = output.indexOf("interface X");
         final int y = output.indexOf("interface Y");
         final int z = output.indexOf("interface Z");
-        Assert.assertTrue(z < x);
-        Assert.assertTrue(z < y);
+        Assertions.assertTrue(z < x);
+        Assertions.assertTrue(z < y);
     }
 
     @JsonSubTypes({

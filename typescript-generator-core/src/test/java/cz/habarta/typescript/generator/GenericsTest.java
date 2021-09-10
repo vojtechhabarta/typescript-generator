@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 
 public class GenericsTest {
@@ -206,12 +206,12 @@ public class GenericsTest {
         settings.outputKind = TypeScriptOutputKind.module;
         settings.mapClasses = ClassMapping.asClasses;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Entity1View.class));
-        Assert.assertTrue(output.contains(""
+        Assertions.assertTrue(output.contains(""
                 + "export class Entity1View implements Entity1IdView {\n"
                 + "    id: MyId;\n"
                 + "    name: string;\n"
                 + "}"));
-        Assert.assertTrue(output.contains("export class MyId"));
+        Assertions.assertTrue(output.contains("export class MyId"));
     }
 
     public static class MyId implements Serializable {
