@@ -75,7 +75,7 @@ public class MapEntryTest {
                 + "  }\n"
                 + "}")
                 .replace("'", "\"");
-        Assert.assertEquals(expectedJson, json);
+        Assert.assertEquals(objectMapper.readTree(expectedJson), objectMapper.readTree(json));
 
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(
@@ -85,6 +85,10 @@ public class MapEntryTest {
         Assert.assertTrue(output.contains("entry1: { [index: string]: string }"));
         Assert.assertTrue(output.contains("entry2: Entry2<MyBean, string>"));
         Assert.assertTrue(output.contains(""
+                + "interface Entry2<K, V> {\n"
+                + "    value: V;\n"
+                + "    key: K;\n"
+                + "}") || output.contains(""
                 + "interface Entry2<K, V> {\n"
                 + "    key: K;\n"
                 + "    value: V;\n"
