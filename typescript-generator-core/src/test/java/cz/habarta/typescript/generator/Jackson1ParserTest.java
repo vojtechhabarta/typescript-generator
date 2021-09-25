@@ -19,7 +19,7 @@ public class Jackson1ParserTest {
         final BeanModel beanModel = model.getBeans().get(0);
         Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
         Assert.assertTrue(beanModel.getProperties().size() > 0);
-        Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
+        Assert.assertEquals("booleanProperty", beanModel.getProperties().get(0).getName());
     }
 
     private static Jackson1Parser getJackson1Parser() {

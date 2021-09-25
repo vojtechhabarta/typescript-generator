@@ -29,7 +29,8 @@ import org.codehaus.jackson.type.JavaType;
 
 public class Jackson1Parser extends ModelParser {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true);
 
     public static class Factory extends ModelParser.Factory {
 
