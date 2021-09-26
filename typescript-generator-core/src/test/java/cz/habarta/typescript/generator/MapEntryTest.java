@@ -59,7 +59,6 @@ public class MapEntryTest {
         final String json = objectMapper.writeValueAsString(classWithEntries);
         final String expectedJson = (""
                 + "{\n"
-                + "  'name': 'ClassWithEntries',\n"
                 + "  'entry1': {\n"
                 + "    'MyBean instance': 'NNN'\n"
                 + "  },\n"
@@ -72,7 +71,8 @@ public class MapEntryTest {
                 + "  },\n"
                 + "  'entry3': {\n"
                 + "    'MyBean instance': 'EEE'\n"
-                + "  }\n"
+                + "  },\n"
+                + "  'name': 'ClassWithEntries'\n"
                 + "}")
                 .replace("'", "\"");
         Assert.assertEquals(expectedJson, json);
@@ -101,7 +101,6 @@ public class MapEntryTest {
         final String json = objectMapper.writeValueAsString(classWithEntries);
         final String expectedJson = (""
                 + "{\n"
-                + "  'name': 'ClassWithEntries',\n"
                 + "  'entry1': {\n"
                 + "    'key': {\n"
                 + "      'f0': 'nnn',\n"
@@ -114,7 +113,8 @@ public class MapEntryTest {
                 + "  },\n"
                 + "  'entry3': {\n"
                 + "    'MyBean instance': 'EEE'\n"
-                + "  }\n"
+                + "  },\n"
+                + "  'name': 'ClassWithEntries'\n"
                 + "}")
                 .replace("'", "\"");
         Assert.assertEquals(expectedJson, json);
