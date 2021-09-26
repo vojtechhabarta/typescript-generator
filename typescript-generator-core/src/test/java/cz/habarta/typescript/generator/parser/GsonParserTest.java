@@ -13,6 +13,9 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +44,8 @@ public class GsonParserTest {
         final BeanModel beanModel = model.getBeans().get(0);
         Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
         Assert.assertTrue(beanModel.getProperties().size() > 0);
-        Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
+        beanModel.getProperties().sort((p1, p2) -> (p1.getName().compareTo(p2.getName())));
+        Assert.assertEquals("booleanProperty", beanModel.getProperties().get(0).getName());
     }
 
     @Test
