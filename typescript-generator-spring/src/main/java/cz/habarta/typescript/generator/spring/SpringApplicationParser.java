@@ -186,7 +186,11 @@ public class SpringApplicationParser extends RestApplicationParser {
         final List<Method> methods = getAllRequestMethods(controllerClass);
         methods.sort(Utils.methodComparator());
         for (Method method : methods) {
-            parseControllerMethod(result, context, controllerClass, method);
+            // Do not use default Method.toString since that will include parameter types
+            String fullMethodName = String.format("%s.%s", method.getDeclaringClass(), method.getName());
+            if (!settings.getExcludeFilter().test(fullMethodName)) {
+                parseControllerMethod(result, context, controllerClass, method);
+            }
         }
     }
 

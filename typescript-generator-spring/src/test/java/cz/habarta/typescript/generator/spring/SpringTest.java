@@ -167,6 +167,28 @@ public class SpringTest {
         Assert.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
+    @Test
+    public void testExclusion1() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.setExcludeFilter(null, Arrays.asList("**.doSomethingElseAgain"));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
+        Assert.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
+        Assert.assertFalse(output.contains("doSomethingElseAgain(): RestResponse<number>"));
+    }
+
+    @Test
+    public void testExclusion2() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.setExcludeFilter(null, Arrays.asList("**Controller6.*Again"));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
+        Assert.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
+        Assert.assertFalse(output.contains("doSomethingElseAgain(): RestResponse<number>"));
+    }
+
     @RestController
     @RequestMapping("/owners/{ownerId}")
     public static class Controller1 {
