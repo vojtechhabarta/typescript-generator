@@ -18,6 +18,9 @@ release.properties
 gradlew*
 gradle-wrapper*
 
+# nodejs
+node/
+
 # npm
 node_modules
 
