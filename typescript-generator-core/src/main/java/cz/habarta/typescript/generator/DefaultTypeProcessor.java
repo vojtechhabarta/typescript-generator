@@ -105,10 +105,31 @@ public class DefaultTypeProcessor implements TypeProcessor {
             // generic structural type used without type arguments
             if (javaClass.getTypeParameters().length > 0) {
                 final List<TsType> tsTypeArguments = new ArrayList<>();
+                final List<Class<?>> discoveredClasses = new ArrayList<>();
                 for (int i = 0; i < javaClass.getTypeParameters().length; i++) {
-                    tsTypeArguments.add(TsType.Any);
+                    TypeVariable<?> typeVariable = javaClass.getTypeParameters()[i];
+                    final List<TsType> bounds = new ArrayList<>();
+                    for (int j = 0; j < typeVariable.getBounds().length; j++) {
+                        Type boundType = typeVariable.getBounds()[j];
+                        if (!Object.class.equals(boundType)) {
+                            Result res = context.processType(boundType);
+                            bounds.add(res.getTsType());
+                            discoveredClasses.addAll(res.getDiscoveredClasses());
+                        }
+                    }
+                    switch (bounds.size()) {
+                        case 0:
+                            tsTypeArguments.add(TsType.Any);
+                            break;
+                        case 1:
+                            tsTypeArguments.add(bounds.get(0));
+                            break;
+                        default:
+                            tsTypeArguments.add(new TsType.IntersectionType(bounds));
+                            break;
+                    }
                 }
-                return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments));
+                return new Result(new TsType.GenericReferenceType(context.getSymbol(javaClass), tsTypeArguments), discoveredClasses);
             }
             // structural type
             return new Result(new TsType.ReferenceType(context.getSymbol(javaClass)), javaClass);

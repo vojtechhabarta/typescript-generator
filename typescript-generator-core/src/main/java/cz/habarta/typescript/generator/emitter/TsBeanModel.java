@@ -12,7 +12,7 @@ public class TsBeanModel extends TsDeclarationModel {
 
     private final boolean isClass;
     private final List<TsDecorator> decorators;
-    private final List<TsType.GenericVariableType> typeParameters;
+    private final List<TsType.BoundedGenericVariableType> typeParameters;
     private final TsType parent;
     private final List<TsType> extendsList;
     private final List<TsType> implementsList;
@@ -29,7 +29,7 @@ public class TsBeanModel extends TsDeclarationModel {
             TsBeanCategory category,
             boolean isClass,
             Symbol name,
-            List<TsType.GenericVariableType> typeParameters,
+            List<TsType.BoundedGenericVariableType> typeParameters,
             TsType parent,
             List<TsType> extendsList,
             List<TsType> implementsList,
@@ -46,7 +46,7 @@ public class TsBeanModel extends TsDeclarationModel {
             boolean isClass,
             List<TsDecorator> decorators,
             Symbol name,
-            List<TsType.GenericVariableType> typeParameters,
+            List<TsType.BoundedGenericVariableType> typeParameters,
             TsType parent,
             List<TsType> extendsList,
             List<TsType> implementsList,
@@ -86,7 +86,7 @@ public class TsBeanModel extends TsDeclarationModel {
         return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
-    public List<TsType.GenericVariableType> getTypeParameters() {
+    public List<TsType.BoundedGenericVariableType> getTypeParameters() {
         return typeParameters;
     }
 

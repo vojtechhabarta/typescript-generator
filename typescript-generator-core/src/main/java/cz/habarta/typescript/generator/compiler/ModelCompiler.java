@@ -133,8 +133,8 @@ public class ModelCompiler {
             final TsType optionsType = settings.restOptionsType != null
                     ? new TsType.VerbatimType(settings.restOptionsType)
                     : null;
-            final TsType.GenericVariableType optionsGenericVariable = settings.restOptionsTypeIsGeneric
-                    ? new TsType.GenericVariableType(settings.restOptionsType)
+            final TsType.BoundedGenericVariableType optionsGenericVariable = settings.restOptionsTypeIsGeneric
+                    ? new TsType.BoundedGenericVariableType(settings.restOptionsType, null)
                     : null;
             final List<RestApplicationModel> restApplicationsWithInterface = model.getRestApplications().stream()
                     .filter(restApplication -> restApplication.getType().generateInterface.apply(settings))
@@ -330,7 +330,7 @@ public class ModelCompiler {
                 TsBeanCategory.Data,
                 isClass,
                 symbolTable.getSymbol(bean.getOrigin()),
-                getTypeParameters(bean.getOrigin()),
+                getTypeParameters(symbolTable, bean.getOrigin()),
                 parentType,
                 extendsList,
                 implementsList,
@@ -347,10 +347,26 @@ public class ModelCompiler {
         return cls != null && !cls.isInterface() && settings.getMapClassesAsClassesFilter().test(cls.getName());
     }
 
-    private static List<TsType.GenericVariableType> getTypeParameters(Class<?> cls) {
-        final List<TsType.GenericVariableType> typeParameters = new ArrayList<>();
+    private List<TsType.BoundedGenericVariableType> getTypeParameters(SymbolTable symbolTable, Class<?> cls) {
+        final List<TsType.BoundedGenericVariableType> typeParameters = new ArrayList<>();
         for (TypeVariable<?> typeParameter : cls.getTypeParameters()) {
-            typeParameters.add(new TsType.GenericVariableType(typeParameter.getName()));
+            final List<TsType> bounds = new ArrayList<>();
+            for (Type bound : typeParameter.getBounds()) {
+                if (!Object.class.equals(bound)) {
+                    bounds.add(typeFromJava(symbolTable, bound));
+                }
+            }
+            switch (bounds.size()) {
+                case 0:
+                    typeParameters.add(new TsType.BoundedGenericVariableType(typeParameter.getName(), null));
+                    break;
+                case 1:
+                    typeParameters.add(new TsType.BoundedGenericVariableType(typeParameter.getName(), bounds.get(0)));
+                    break;
+                default:
+                    typeParameters.add(new TsType.BoundedGenericVariableType(typeParameter.getName(), new TsType.IntersectionType(bounds)));
+                    break;
+            }
         }
         return typeParameters;
     }
@@ -519,7 +535,7 @@ public class ModelCompiler {
         final List<TsBeanModel> beans = new ArrayList<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
-            final List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
+            final List<TsType.BoundedGenericVariableType> typeParameters = getTypeParameters(symbolTable, bean.getOrigin());
             final TsType.ReferenceType dataType = typeParameters.isEmpty()
                     ? new TsType.ReferenceType(beanIdentifier)
                     : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
@@ -598,8 +614,8 @@ public class ModelCompiler {
     }
 
     private void createRestInterfaces(TsModel tsModel, SymbolTable symbolTable, List<RestApplicationModel> restApplications,
-            Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
-        final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
+            Symbol responseSymbol, TsType.BoundedGenericVariableType optionsGenericVariable, TsType optionsType) {
+        final List<TsType.BoundedGenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
         final Map<Symbol, List<TsMethodModel>> groupedMethods = processRestMethods(tsModel, restApplications, symbolTable, null, responseSymbol, optionsType, false);
         for (Map.Entry<Symbol, List<TsMethodModel>> entry : groupedMethods.entrySet()) {
             final TsBeanModel interfaceModel = new TsBeanModel(null, TsBeanCategory.Service, false, entry.getKey(), typeParameters, null, null, null, null, null, entry.getValue(), null);
@@ -608,9 +624,9 @@ public class ModelCompiler {
     }
 
     private void createRestClients(TsModel tsModel, SymbolTable symbolTable, List<RestApplicationModel> restApplications,
-            Symbol responseSymbol, TsType.GenericVariableType optionsGenericVariable, TsType optionsType) {
+            Symbol responseSymbol, TsType.BoundedGenericVariableType optionsGenericVariable, TsType optionsType) {
         final Symbol httpClientSymbol = symbolTable.getSyntheticSymbol("HttpClient");
-        final List<TsType.GenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
+        final List<TsType.BoundedGenericVariableType> typeParameters = Utils.listFromNullable(optionsGenericVariable);
 
         // HttpClient interface
         final TsType.GenericVariableType returnGenericVariable = new TsType.GenericVariableType("R");

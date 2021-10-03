@@ -144,6 +144,21 @@ public abstract class TsType implements Emittable {
 
     }
 
+    public static class BoundedGenericVariableType extends GenericVariableType {
+
+        public final TsType bound;
+
+        public BoundedGenericVariableType(String name, TsType bound) {
+            super(name);
+            this.bound = bound;
+        }
+
+        @Override
+        public String format(Settings settings) {
+            return super.format(settings) + (bound != null ? " extends " + bound.format(settings) : "");
+        }
+    }
+
     public static class EnumReferenceType extends ReferenceType {
         public EnumReferenceType(Symbol symbol) {
             super(symbol);
