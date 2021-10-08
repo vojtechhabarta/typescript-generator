@@ -110,6 +110,8 @@ assertEquals(user1.equals(user2), true);
 user2.name = "name2";
 assertEquals(user1.equals(user2), false);
 
+const serializedData = JSON.stringify(user2);
+require('fs').writeFileSync("./src/test/ts/JsonDeserializationTest/JsonDeserializationTest-expected-test-data-from-ts.json", serializedData);
 
 console.log("Test finished.");
 
