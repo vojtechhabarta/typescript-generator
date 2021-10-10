@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -150,10 +148,10 @@ public class GenericCustomTypeMappingsTest {
         settings.customTypeMappings.put("byte[][]", "DifferentString[]");
         settings.customTypeMappings.put("long[]", "SpecialString");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BinaryData.class));
-        assertThat(output, containsString("data: string"));
-        assertThat(output, containsString("dataArray: DifferentString[]"));
-        assertThat(output, containsString("dataList: string[]"));
-        assertThat(output, containsString("specialData: SpecialString"));
+        Assertions.assertTrue(output.contains("data: string"), output);
+        Assertions.assertTrue(output.contains("dataArray: DifferentString[]"), output);
+        Assertions.assertTrue(output.contains("dataList: string[]"), output);
+        Assertions.assertTrue(output.contains("specialData: SpecialString"), output);
     }
 
 }

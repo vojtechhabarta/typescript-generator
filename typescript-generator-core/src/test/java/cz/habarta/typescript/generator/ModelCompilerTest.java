@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -59,9 +57,9 @@ public class ModelCompilerTest {
 
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
-        MatcherAssert.assertThat(
-                result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType,
-                CoreMatchers.instanceOf(TsType.UnionType.class)
+        Assertions.assertInstanceOf(
+                TsType.UnionType.class,
+                result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType
         );
     }
 
@@ -75,9 +73,9 @@ public class ModelCompilerTest {
 
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
-        MatcherAssert.assertThat(
-                result.getBean(WithTypeParam.class).getProperties().get(0).tsType,
-                CoreMatchers.instanceOf(TsType.UnionType.class)
+        Assertions.assertInstanceOf(
+                TsType.UnionType.class,
+                result.getBean(WithTypeParam.class).getProperties().get(0).tsType
         );
     }
 
