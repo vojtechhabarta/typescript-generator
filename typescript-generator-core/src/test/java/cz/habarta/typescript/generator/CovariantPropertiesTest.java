@@ -2,8 +2,8 @@
 package cz.habarta.typescript.generator;
 
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class CovariantPropertiesTest {
@@ -29,7 +29,7 @@ public class CovariantPropertiesTest {
                 "\n" +
                 "interface Food {\n" +
                 "}";
-        Assert.assertEquals(expected.replace('\'', '"'), output.trim());
+        Assertions.assertEquals(expected.replace('\'', '"'), output.trim());
     }
 
     private static abstract class Animal {

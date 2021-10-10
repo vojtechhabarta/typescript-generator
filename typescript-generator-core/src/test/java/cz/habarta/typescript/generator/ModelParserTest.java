@@ -9,8 +9,8 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class ModelParserTest {
@@ -18,50 +18,50 @@ public class ModelParserTest {
     @Test
     public void testClassDiscovery1() {
         final Model model = parseModel(RootClass1.class);
-        Assert.assertEquals(2, model.getBeans().size());
+        Assertions.assertEquals(2, model.getBeans().size());
         
     }
 
     @Test
     public void testClassDiscovery2() {
         final Model model = parseModel(RootClass2.class);
-        Assert.assertEquals(2, model.getBeans().size());
+        Assertions.assertEquals(2, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscovery3() {
         final Model model = parseModel(RootClass3.class);
-        Assert.assertEquals(3, model.getBeans().size());
+        Assertions.assertEquals(3, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscoveryExcludeNodeClassA() {
         final Model model = parseModel(RootClass1.class, NodeClassA.class.getName());
-        Assert.assertEquals(1, model.getBeans().size());
+        Assertions.assertEquals(1, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscoveryExcludeTag() {
         final Model model = parseModel(RootClass3.class, Tag.class.getName());
-        Assert.assertEquals(2, model.getBeans().size());
+        Assertions.assertEquals(2, model.getBeans().size());
     }
 
     @Test
     public void testClassDiscoveryExcludeNodeClassB() {
         final Model model = parseModel(RootClass3.class, NodeClassB.class.getName());
-        Assert.assertEquals(1, model.getBeans().size());
+        Assertions.assertEquals(1, model.getBeans().size());
     }
 
     @Test
     public void testExcludedInputDirectly() {
         final Model model = parseModel(RootClass3.class, RootClass3.class.getName());
-        Assert.assertEquals(0, model.getBeans().size());
+        Assertions.assertEquals(0, model.getBeans().size());
     }
 
     @Test
     public void testExcludedInputInList() {
         final Model model = parseModel(new TypeReference<List<RootClass3>>() {}.getType(), RootClass3.class.getName());
-        Assert.assertEquals(0, model.getBeans().size());
+        Assertions.assertEquals(0, model.getBeans().size());
     }
 
     private Model parseModel(Type type, String... excludedClassNames) {

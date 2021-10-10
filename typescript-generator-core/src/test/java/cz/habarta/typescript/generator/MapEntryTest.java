@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class MapEntryTest {
 
@@ -75,21 +75,21 @@ public class MapEntryTest {
                 + "  }\n"
                 + "}")
                 .replace("'", "\"");
-        Assert.assertEquals(expectedJson, json);
+        Assertions.assertEquals(expectedJson, json);
 
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(
                 Arrays.asList(Serializable.class.getName(), AbstractMap.SimpleEntry.class.getName()),
                 null);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithEntries.class));
-        Assert.assertTrue(output.contains("entry1: { [index: string]: string }"));
-        Assert.assertTrue(output.contains("entry2: Entry2<MyBean, string>"));
-        Assert.assertTrue(output.contains(""
+        Assertions.assertTrue(output.contains("entry1: { [index: string]: string }"));
+        Assertions.assertTrue(output.contains("entry2: Entry2<MyBean, string>"));
+        Assertions.assertTrue(output.contains(""
                 + "interface Entry2<K, V> {\n"
                 + "    key: K;\n"
                 + "    value: V;\n"
                 + "}"));
-        Assert.assertTrue(output.contains("entry3: { [index: string]: string }"));
+        Assertions.assertTrue(output.contains("entry3: { [index: string]: string }"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class MapEntryTest {
                 + "  }\n"
                 + "}")
                 .replace("'", "\"");
-        Assert.assertEquals(expectedJson, json);
+        Assertions.assertEquals(expectedJson, json);
 
         final Settings settings = TestUtils.settings();
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
@@ -128,14 +128,14 @@ public class MapEntryTest {
                 Arrays.asList(Serializable.class.getName(), AbstractMap.SimpleEntry.class.getName()),
                 null);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithEntries.class));
-        Assert.assertTrue(output.contains("entry1: Entry1<MyBean, string>"));
-        Assert.assertTrue(output.contains("entry2: { [index: string]: string }"));
-        Assert.assertTrue(output.contains(""
+        Assertions.assertTrue(output.contains("entry1: Entry1<MyBean, string>"));
+        Assertions.assertTrue(output.contains("entry2: { [index: string]: string }"));
+        Assertions.assertTrue(output.contains(""
                 + "interface Entry1<K, V> {\n"
                 + "    key: K;\n"
                 + "    value: V;\n"
                 + "}"));
-        Assert.assertTrue(output.contains("entry3: { [index: string]: string }"));
+        Assertions.assertTrue(output.contains("entry3: { [index: string]: string }"));
     }
 
     public static class ClassWithListOfEntries {
@@ -174,12 +174,12 @@ public class MapEntryTest {
                 + "  ]\n"
                 + "}")
                 .replace("'", "\"");
-        Assert.assertEquals(expectedJson, json);
+        Assertions.assertEquals(expectedJson, json);
 
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithListOfEntries.class));
-        Assert.assertTrue(output.contains("entries1: { [index: string]: string }[]"));
-        Assert.assertTrue(output.contains("entries2: Entry2<string, string>[]"));
+        Assertions.assertTrue(output.contains("entries1: { [index: string]: string }[]"));
+        Assertions.assertTrue(output.contains("entries2: Entry2<string, string>[]"));
     }
 
 }

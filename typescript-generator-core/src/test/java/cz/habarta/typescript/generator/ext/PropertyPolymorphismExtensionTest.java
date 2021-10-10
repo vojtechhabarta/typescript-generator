@@ -10,8 +10,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class PropertyPolymorphismExtensionTest {
 
@@ -52,9 +52,9 @@ public class PropertyPolymorphismExtensionTest {
 
         final String output = new TypeScriptGenerator(settings)
                 .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
-        assertTrue(output, output.contains("interface TestA {\n" + "    b: TestBRef;\n" + "}"));
-        assertTrue(output, output.contains("interface TestBRef {"));
-        assertTrue(output, output.contains("testBSub2: TestBSub2;"));
+        assertTrue(output.contains("interface TestA {\n" + "    b: TestBRef;\n" + "}"), output);
+        assertTrue(output.contains("interface TestBRef {"), output);
+        assertTrue(output.contains("testBSub2: TestBSub2;"), output);
     }
 
     @Test
@@ -72,9 +72,9 @@ public class PropertyPolymorphismExtensionTest {
 
         final String output = new TypeScriptGenerator(settings)
                 .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
-        assertTrue(output, output.contains("b: TestBRef;"));
-        assertTrue(output, output.contains("interface TestBRef {"));
-        assertTrue(output, output.contains("foo: TestBSub2;"));
-        assertTrue(output, output.contains("testBSub1: TestBSub1;"));
+        assertTrue(output.contains("b: TestBRef;"), output);
+        assertTrue(output.contains("interface TestBRef {"), output);
+        assertTrue(output.contains("foo: TestBSub2;"), output);
+        assertTrue(output.contains("testBSub1: TestBSub1;"), output);
     }
 }

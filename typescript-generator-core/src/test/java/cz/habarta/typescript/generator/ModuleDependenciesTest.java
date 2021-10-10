@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -34,10 +34,10 @@ public class ModuleDependenciesTest {
                 Input.from(A1.class, A2.class, Enum1.class, ABase.class),
                 Output.to(new File("target/test-module-dependencies/a/a.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/a/a.d.ts");
-        Assert.assertTrue(output.contains("interface A1 {"));
-        Assert.assertTrue(output.contains("namespace NS {"));
-        Assert.assertTrue(output.contains("interface A2 {"));
-        Assert.assertTrue(output.contains("type Enum1 ="));
+        Assertions.assertTrue(output.contains("interface A1 {"));
+        Assertions.assertTrue(output.contains("namespace NS {"));
+        Assertions.assertTrue(output.contains("interface A2 {"));
+        Assertions.assertTrue(output.contains("type Enum1 ="));
     }
 
     private void generateModuleB() {
@@ -53,20 +53,20 @@ public class ModuleDependenciesTest {
                 Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
                 Output.to(new File("target/test-module-dependencies/b/b.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/b/b.d.ts");
-        Assert.assertTrue(output.contains("import * as a from \"../a\""));
-        Assert.assertTrue(output.contains("interface B1 extends a.A1 {"));
-        Assert.assertTrue(output.contains("objectA: a.A1;"));
-        Assert.assertTrue(output.contains("enum1: a.Enum1;"));
-        Assert.assertTrue(output.contains("aBase: a.ABaseUnion<string>;"));
-        Assert.assertTrue(output.contains("aBases: a.ABaseUnion<string>[];"));
-        Assert.assertTrue(output.contains("interface B2 extends a.NS.A2 {"));
-        Assert.assertTrue(output.contains("objectA: a.NS.A2;"));
-        Assert.assertTrue(output.contains("interface D1 extends C<a.A1> {"));
-        Assert.assertTrue(output.contains("interface D2 extends C<a.NS.A2> {"));
-        Assert.assertTrue(!output.contains("interface A1 {"));
-        Assert.assertTrue(!output.contains("namespace NS {"));
-        Assert.assertTrue(!output.contains("interface A2 {"));
-        Assert.assertTrue(!output.contains("type Enum1 ="));
+        Assertions.assertTrue(output.contains("import * as a from \"../a\""));
+        Assertions.assertTrue(output.contains("interface B1 extends a.A1 {"));
+        Assertions.assertTrue(output.contains("objectA: a.A1;"));
+        Assertions.assertTrue(output.contains("enum1: a.Enum1;"));
+        Assertions.assertTrue(output.contains("aBase: a.ABaseUnion<string>;"));
+        Assertions.assertTrue(output.contains("aBases: a.ABaseUnion<string>[];"));
+        Assertions.assertTrue(output.contains("interface B2 extends a.NS.A2 {"));
+        Assertions.assertTrue(output.contains("objectA: a.NS.A2;"));
+        Assertions.assertTrue(output.contains("interface D1 extends C<a.A1> {"));
+        Assertions.assertTrue(output.contains("interface D2 extends C<a.NS.A2> {"));
+        Assertions.assertTrue(!output.contains("interface A1 {"));
+        Assertions.assertTrue(!output.contains("namespace NS {"));
+        Assertions.assertTrue(!output.contains("interface A2 {"));
+        Assertions.assertTrue(!output.contains("type Enum1 ="));
     }
 
     @Test
@@ -75,16 +75,13 @@ public class ModuleDependenciesTest {
         generateGlobalB("global-b", "global-a");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testGlobalWithConflict() {
         generateGlobalA("global-a1");
         generateGlobalA("global-a2");
-        try {
-            generateGlobalB("global-b-conflict", "global-a1", "global-a2");
-        } catch (Exception e) {
-            System.out.println("Exception (expected): " + e.getMessage());
-            throw e;
-        }
+
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> generateGlobalB("global-b-conflict", "global-a1", "global-a2"));
+        System.out.println("Exception (expected): " + e.getMessage());
     }
 
     private void generateGlobalA(String directory) {
@@ -96,10 +93,10 @@ public class ModuleDependenciesTest {
                 Input.from(A1.class, A2.class, Enum1.class, ABase.class),
                 Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
-        Assert.assertTrue(output.contains("interface A1 {"));
-        Assert.assertTrue(output.contains("namespace NS {"));
-        Assert.assertTrue(output.contains("interface A2 {"));
-        Assert.assertTrue(output.contains("type Enum1 ="));
+        Assertions.assertTrue(output.contains("interface A1 {"));
+        Assertions.assertTrue(output.contains("namespace NS {"));
+        Assertions.assertTrue(output.contains("interface A2 {"));
+        Assertions.assertTrue(output.contains("type Enum1 ="));
     }
 
     private void generateGlobalB(String directory, String... dependencyDirectories) {
@@ -115,20 +112,20 @@ public class ModuleDependenciesTest {
                 Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
                 Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
-        Assert.assertTrue(!output.contains("import"));
-        Assert.assertTrue(output.contains("interface B1 extends A1 {"));
-        Assert.assertTrue(output.contains("objectA: A1;"));
-        Assert.assertTrue(output.contains("enum1: Enum1;"));
-        Assert.assertTrue(output.contains("aBase: ABaseUnion<string>;"));
-        Assert.assertTrue(output.contains("aBases: ABaseUnion<string>[];"));
-        Assert.assertTrue(output.contains("interface B2 extends NS.A2 {"));
-        Assert.assertTrue(output.contains("objectA: NS.A2;"));
-        Assert.assertTrue(output.contains("interface D1 extends C<A1> {"));
-        Assert.assertTrue(output.contains("interface D2 extends C<NS.A2> {"));
-        Assert.assertTrue(!output.contains("interface A1 {"));
-        Assert.assertTrue(!output.contains("namespace NS {"));
-        Assert.assertTrue(!output.contains("interface A2 {"));
-        Assert.assertTrue(!output.contains("type Enum1 ="));
+        Assertions.assertTrue(!output.contains("import"));
+        Assertions.assertTrue(output.contains("interface B1 extends A1 {"));
+        Assertions.assertTrue(output.contains("objectA: A1;"));
+        Assertions.assertTrue(output.contains("enum1: Enum1;"));
+        Assertions.assertTrue(output.contains("aBase: ABaseUnion<string>;"));
+        Assertions.assertTrue(output.contains("aBases: ABaseUnion<string>[];"));
+        Assertions.assertTrue(output.contains("interface B2 extends NS.A2 {"));
+        Assertions.assertTrue(output.contains("objectA: NS.A2;"));
+        Assertions.assertTrue(output.contains("interface D1 extends C<A1> {"));
+        Assertions.assertTrue(output.contains("interface D2 extends C<NS.A2> {"));
+        Assertions.assertTrue(!output.contains("interface A1 {"));
+        Assertions.assertTrue(!output.contains("namespace NS {"));
+        Assertions.assertTrue(!output.contains("interface A2 {"));
+        Assertions.assertTrue(!output.contains("type Enum1 ="));
     }
 
     /// module "a"

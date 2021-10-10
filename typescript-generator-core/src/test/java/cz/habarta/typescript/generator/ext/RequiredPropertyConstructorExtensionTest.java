@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RequiredPropertyConstructorExtensionTest {
 
@@ -81,7 +81,7 @@ public class RequiredPropertyConstructorExtensionTest {
 
         String expected = readResource("basicWithReadOnly.ts");
 
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class RequiredPropertyConstructorExtensionTest {
 
         String expected = readResource("basicWithConfiguration.ts");
 
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class RequiredPropertyConstructorExtensionTest {
 
         String expected = readResource("basicWithoutReadOnly.ts");
 
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class RequiredPropertyConstructorExtensionTest {
         String result = generateTypeScript(settings, MultipleEnumContainerClass.class, SingleEnumContainerClass.class);
 
         String expected = readResource("enums.ts");
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class RequiredPropertyConstructorExtensionTest {
         String result = generateTypeScript(settings, SecondClass.class);
 
         String expected = readResource("inheritance.ts");
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class RequiredPropertyConstructorExtensionTest {
         String result = generateTypeScript(settings, SecondOptionalClass.class);
 
         String expected = readResource("optionalParameters.ts");
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     private static String generateTypeScript(Settings settings, Type... types) {

@@ -4,69 +4,59 @@ package cz.habarta.typescript.generator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 
 @SuppressWarnings("unused")
-@RunWith(Parameterized.class)
 public class IncludeExcludePropertyTest {
 
-    @Parameterized.Parameters(name = "{index} - {0}")
-    public static Collection<Object[]> data() {
+    public static Stream<JsonLibrary> data() {
         return Arrays.stream(JsonLibrary.values())
-                .filter(library -> library != JsonLibrary.jackson1 && library != JsonLibrary.jsonb)
-                .map(library -> new Object[]{library})
-                .collect(Collectors.toList());
+                .filter(library -> library != JsonLibrary.jackson1 && library != JsonLibrary.jsonb);
     }
 
-    private final JsonLibrary library;
-
-    public IncludeExcludePropertyTest(JsonLibrary library) {
-        this.library = library;
-    }
-
-
-    @Test
-    public void testInclude() {
+    @ParameterizedTest(name = "{index} - {0}")
+    @MethodSource("data")
+    public void testInclude(JsonLibrary library) {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = library;
         settings.includePropertyAnnotations = Arrays.asList(MyInclude.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithAnnotatedProperties.class));
-        Assert.assertTrue(!output.contains("property1"));
-        Assert.assertTrue(output.contains("property2"));
-        Assert.assertTrue(!output.contains("property3"));
-        Assert.assertTrue(output.contains("property4"));
+        Assertions.assertTrue(!output.contains("property1"));
+        Assertions.assertTrue(output.contains("property2"));
+        Assertions.assertTrue(!output.contains("property3"));
+        Assertions.assertTrue(output.contains("property4"));
     }
 
-    @Test
-    public void testExclude() {
+    @ParameterizedTest(name = "{index} - {0}")
+    @MethodSource("data")
+    public void testExclude(JsonLibrary library) {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = library;
         settings.excludePropertyAnnotations = Arrays.asList(MyExclude.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithAnnotatedProperties.class));
-        Assert.assertTrue(output.contains("property1"));
-        Assert.assertTrue(output.contains("property2"));
-        Assert.assertTrue(!output.contains("property3"));
-        Assert.assertTrue(!output.contains("property4"));
+        Assertions.assertTrue(output.contains("property1"));
+        Assertions.assertTrue(output.contains("property2"));
+        Assertions.assertTrue(!output.contains("property3"));
+        Assertions.assertTrue(!output.contains("property4"));
     }
 
-    @Test
-    public void testBoth() {
+    @ParameterizedTest(name = "{index} - {0}")
+    @MethodSource("data")
+    public void testBoth(JsonLibrary library) {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = library;
 
         settings.includePropertyAnnotations = Arrays.asList(MyInclude.class);
         settings.excludePropertyAnnotations = Arrays.asList(MyExclude.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithAnnotatedProperties.class));
-        Assert.assertTrue(!output.contains("property1"));
-        Assert.assertTrue(output.contains("property2"));
-        Assert.assertTrue(!output.contains("property3"));
-        Assert.assertTrue(!output.contains("property4"));
+        Assertions.assertTrue(!output.contains("property1"));
+        Assertions.assertTrue(output.contains("property2"));
+        Assertions.assertTrue(!output.contains("property3"));
+        Assertions.assertTrue(!output.contains("property4"));
     }
 
     @Retention(RetentionPolicy.RUNTIME)

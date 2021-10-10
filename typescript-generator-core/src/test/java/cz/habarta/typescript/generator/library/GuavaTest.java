@@ -27,8 +27,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -49,20 +49,20 @@ public class GuavaTest {
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
         settings.additionalDataLibraries = Arrays.asList("guava");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(GuavaSerializedClasses.class));
-        Assert.assertTrue(output.contains("rangeSet: GuavaRangeSet<string>"));
-        Assert.assertTrue(output.contains("type GuavaRangeSet<C>"));
-        Assert.assertTrue(output.contains("range: GuavaRange<Named>"));
-        Assert.assertTrue(output.contains("type GuavaRange<C>"));
-        Assert.assertTrue(output.contains("table: GuavaTable<boolean>"));
-        Assert.assertTrue(output.contains("type GuavaTable<V>"));
-        Assert.assertTrue(output.contains("hostAndPort: string"));
-        Assert.assertTrue(output.contains("internetDomainName: string"));
-        Assert.assertTrue(output.contains("cacheBuilderSpec: string"));
-        Assert.assertTrue(output.contains("cacheBuilder: string"));
-        Assert.assertTrue(output.contains("hashCode: string"));
-        Assert.assertTrue(output.contains("fluentIterable: string[]"));
-        Assert.assertTrue(output.contains("multimap: GuavaMultimap<number>"));
-        Assert.assertTrue(output.contains("type GuavaMultimap<V>"));
+        Assertions.assertTrue(output.contains("rangeSet: GuavaRangeSet<string>"));
+        Assertions.assertTrue(output.contains("type GuavaRangeSet<C>"));
+        Assertions.assertTrue(output.contains("range: GuavaRange<Named>"));
+        Assertions.assertTrue(output.contains("type GuavaRange<C>"));
+        Assertions.assertTrue(output.contains("table: GuavaTable<boolean>"));
+        Assertions.assertTrue(output.contains("type GuavaTable<V>"));
+        Assertions.assertTrue(output.contains("hostAndPort: string"));
+        Assertions.assertTrue(output.contains("internetDomainName: string"));
+        Assertions.assertTrue(output.contains("cacheBuilderSpec: string"));
+        Assertions.assertTrue(output.contains("cacheBuilder: string"));
+        Assertions.assertTrue(output.contains("hashCode: string"));
+        Assertions.assertTrue(output.contains("fluentIterable: string[]"));
+        Assertions.assertTrue(output.contains("multimap: GuavaMultimap<number>"));
+        Assertions.assertTrue(output.contains("type GuavaMultimap<V>"));
     }
 
     private static class GuavaSerializedClasses {

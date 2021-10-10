@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class DuplicatePropertyTest {
@@ -37,8 +37,8 @@ public class DuplicatePropertyTest {
         object.kind = "kind_invalid";
         final String json = new ObjectMapper().writeValueAsString(object);
         // {"kind":"kind_1","kind":"kind_invalid"}
-        Assert.assertTrue(json.contains("\"kind\":\"kind_1\""));
-        Assert.assertTrue(json.contains("\"kind\":\"kind_invalid\""));
+        Assertions.assertTrue(json.contains("\"kind\":\"kind_1\""));
+        Assertions.assertTrue(json.contains("\"kind\":\"kind_invalid\""));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class DuplicatePropertyTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.mapClasses = ClassMapping.asClasses;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DuplicateKindUsage.class));
-        Assert.assertTrue(!output.contains("DuplicateKindUnion"));
+        Assertions.assertTrue(!output.contains("DuplicateKindUnion"));
     }
 
 }

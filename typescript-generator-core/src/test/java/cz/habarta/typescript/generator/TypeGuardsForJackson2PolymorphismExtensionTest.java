@@ -12,8 +12,8 @@ import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -33,11 +33,11 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
         final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(Point.class);
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
         new TypeGuardsForJackson2PolymorphismExtension().emitElements(writer, settings, false, tsModel);
-        Assert.assertEquals(8, lines.size());
-        Assert.assertEquals("", lines.get(0));
-        Assert.assertEquals("function isCartesianPoint(point: Point): point is CartesianPoint {", lines.get(1));
-        Assert.assertEquals("    return point.type === \"cartesian\";", lines.get(2));
-        Assert.assertEquals("}", lines.get(3));
+        Assertions.assertEquals(8, lines.size());
+        Assertions.assertEquals("", lines.get(0));
+        Assertions.assertEquals("function isCartesianPoint(point: Point): point is CartesianPoint {", lines.get(1));
+        Assertions.assertEquals("    return point.type === \"cartesian\";", lines.get(2));
+        Assertions.assertEquals("}", lines.get(3));
     }
 
     @Test
@@ -47,8 +47,8 @@ public class TypeGuardsForJackson2PolymorphismExtensionTest {
         settings.addTypeNamePrefix = "Json";
         settings.extensions.add(new TypeGuardsForJackson2PolymorphismExtension());
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Point.class));
-        Assert.assertTrue(actual.contains("type: \"cartesian\" | \"polar\";"));
-        Assert.assertTrue(actual.contains("function isJsonCartesianPoint(jsonPoint: JsonPoint): jsonPoint is JsonCartesianPoint {"));
+        Assertions.assertTrue(actual.contains("type: \"cartesian\" | \"polar\";"));
+        Assertions.assertTrue(actual.contains("function isJsonCartesianPoint(jsonPoint: JsonPoint): jsonPoint is JsonCartesianPoint {"));
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

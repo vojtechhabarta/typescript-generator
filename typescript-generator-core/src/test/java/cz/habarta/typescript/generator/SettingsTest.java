@@ -2,17 +2,17 @@
 package cz.habarta.typescript.generator;
 
 import java.lang.reflect.Modifier;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class SettingsTest {
 
     @Test
     public void testParseModifiers() {
-        Assert.assertEquals(0, Settings.parseModifiers("", Modifier.fieldModifiers()));
-        Assert.assertEquals(Modifier.STATIC, Settings.parseModifiers("static", Modifier.fieldModifiers()));
-        Assert.assertEquals(Modifier.STATIC | Modifier.TRANSIENT, Settings.parseModifiers("static | transient", Modifier.fieldModifiers()));
+        Assertions.assertEquals(0, Settings.parseModifiers("", Modifier.fieldModifiers()));
+        Assertions.assertEquals(Modifier.STATIC, Settings.parseModifiers("static", Modifier.fieldModifiers()));
+        Assertions.assertEquals(Modifier.STATIC | Modifier.TRANSIENT, Settings.parseModifiers("static | transient", Modifier.fieldModifiers()));
     }
     
     @Test
@@ -26,8 +26,8 @@ public class SettingsTest {
             settings.generateNpmPackageJson = false;
             settings.npmPackageDependencies.put("dependencies", "version");
             
-            RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> settings.validate());
-            Assert.assertEquals(exceptionMessage, exception.getMessage());
+            RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
+            Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }
 
         {
@@ -37,8 +37,8 @@ public class SettingsTest {
             settings.generateNpmPackageJson = false;
             settings.npmDevDependencies.put("dependencies", "version");
             
-            RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> settings.validate());
-            Assert.assertEquals(exceptionMessage, exception.getMessage());
+            RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
+            Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }
 
         {
@@ -48,8 +48,8 @@ public class SettingsTest {
             settings.generateNpmPackageJson = false;
             settings.npmPeerDependencies.put("dependencies", "version");
             
-            RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> settings.validate());
-            Assert.assertEquals(exceptionMessage, exception.getMessage());
+            RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
+            Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }
     }
 }

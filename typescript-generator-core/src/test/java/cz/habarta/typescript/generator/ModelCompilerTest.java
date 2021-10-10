@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -24,21 +24,21 @@ public class ModelCompilerTest {
     public void testEnum() throws Exception {
         final Settings settings = getTestSettings();
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: Direction }[]", TestUtils.compileType(settings, javaType).toString());
+        Assertions.assertEquals("{ [index: string]: Direction }[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test
     public void testDate() throws Exception {
         final Settings settings = getTestSettings();
         final Type javaType = A.class.getField("timestamp").getGenericType();
-        Assert.assertEquals("DateAsString", TestUtils.compileType(settings, javaType).toString());
+        Assertions.assertEquals("DateAsString", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test
     public void testExclusion() throws Exception {
         final Settings settings = getTestSettings(Direction.class.getName());
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
+        Assertions.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ModelCompilerTest {
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(null, Arrays.asList("**Direction"));
         final Type javaType = A.class.getField("directions").getGenericType();
-        Assert.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
+        Assertions.assertEquals("{ [index: string]: any }[]", TestUtils.compileType(settings, javaType).toString());
     }
 
     @Test

@@ -7,8 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -19,7 +19,7 @@ public class InputTest {
         final ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("cz.habarta").scan();
         final List<String> allClassNames = scanResult.getAllClasses().getNames();
         final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
-        Assert.assertTrue("Typescript-generator must have at least 20 tests :-)", testClassNames.size() > 20);
+        Assertions.assertTrue(testClassNames.size() > 20, "Typescript-generator must have at least 20 tests :-)");
     }
 
     @Test
@@ -33,10 +33,10 @@ public class InputTest {
                 ),
                 Arrays.asList("**Json")
         );
-        Assert.assertTrue(result1.contains("com.example.Json"));
-        Assert.assertTrue(result1.contains("com.example.AAAJson"));
-        Assert.assertTrue(!result1.contains("com.example.AAA"));
-        Assert.assertTrue(result1.contains("com.example.aaa$Json"));
+        Assertions.assertTrue(result1.contains("com.example.Json"));
+        Assertions.assertTrue(result1.contains("com.example.AAAJson"));
+        Assertions.assertTrue(!result1.contains("com.example.AAA"));
+        Assertions.assertTrue(result1.contains("com.example.aaa$Json"));
 
         final List<String> result2 = Input.filterClassNames(
                 Arrays.asList(
@@ -48,11 +48,11 @@ public class InputTest {
                 ),
                 Arrays.asList("cz.habarta.test.*")
         );
-        Assert.assertTrue(!result2.contains("com.example.Json"));
-        Assert.assertTrue(result2.contains("cz.habarta.test.Json"));
-        Assert.assertTrue(result2.contains("cz.habarta.test.BBBJson"));
-        Assert.assertTrue(!result2.contains("cz.habarta.test.aaa.BBBJson"));
-        Assert.assertTrue(!result2.contains("cz.habarta.test.CCC$Json"));
+        Assertions.assertTrue(!result2.contains("com.example.Json"));
+        Assertions.assertTrue(result2.contains("cz.habarta.test.Json"));
+        Assertions.assertTrue(result2.contains("cz.habarta.test.BBBJson"));
+        Assertions.assertTrue(!result2.contains("cz.habarta.test.aaa.BBBJson"));
+        Assertions.assertTrue(!result2.contains("cz.habarta.test.CCC$Json"));
 
         final List<String> result3 = Input.filterClassNames(
                 Arrays.asList(
@@ -62,9 +62,9 @@ public class InputTest {
                 ),
                 Arrays.asList("cz.habarta.*.*$*")
         );
-        Assert.assertTrue(!result3.contains("cz.habarta.test.BBBJson"));
-        Assert.assertTrue(result3.contains("cz.habarta.ddd.CCC$Json"));
-        Assert.assertTrue(!result3.contains("cz.habarta.CCC$Json"));
+        Assertions.assertTrue(!result3.contains("cz.habarta.test.BBBJson"));
+        Assertions.assertTrue(result3.contains("cz.habarta.ddd.CCC$Json"));
+        Assertions.assertTrue(!result3.contains("cz.habarta.CCC$Json"));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class InputTest {
         parameters.classesWithAnnotations = Arrays.asList(MyJsonClass.class.getName());
         parameters.scanningAcceptedPackages = Arrays.asList("cz.habarta");
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
-        Assert.assertTrue(output.contains("name: string;"));
+        Assertions.assertTrue(output.contains("name: string;"));
     }
 
     @Test
@@ -81,8 +81,8 @@ public class InputTest {
         final Input.Parameters parameters = new Input.Parameters();
         parameters.classesImplementingInterfaces = Arrays.asList(MyJsonInterface.class.getName());
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
-        Assert.assertTrue(output.contains("firstName: string;"));
-        Assert.assertTrue(output.contains("lastName: string;"));
+        Assertions.assertTrue(output.contains("firstName: string;"));
+        Assertions.assertTrue(output.contains("lastName: string;"));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class InputTest {
         final Input.Parameters parameters = new Input.Parameters();
         parameters.classesExtendingClasses = Arrays.asList(MyJsonInterfaceImpl.class.getName());
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
-        Assert.assertTrue(output.contains("lastName: string;"));
+        Assertions.assertTrue(output.contains("lastName: string;"));
     }
 
     @Retention(RetentionPolicy.RUNTIME)

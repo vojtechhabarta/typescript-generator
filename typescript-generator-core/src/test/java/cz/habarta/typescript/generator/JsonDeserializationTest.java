@@ -14,8 +14,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -51,7 +51,7 @@ public class JsonDeserializationTest {
         for (String notFoundLine : notFoundLines) {
             System.out.println(notFoundLine);
         }
-        Assert.assertEquals(0, notFoundLines.size());
+        Assertions.assertEquals(0, notFoundLines.size());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class JsonDeserializationTest {
         for (String notFoundLine : notFoundLines) {
             System.out.println(notFoundLine);
         }
-        Assert.assertEquals(0, notFoundLines.size());
+        Assertions.assertEquals(0, notFoundLines.size());
     }
 
     @Test
@@ -99,9 +99,9 @@ public class JsonDeserializationTest {
 //        final File actualFile = new File("target/JaxrsWithJsonDeserialization-actual.ts");
 //        new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class), Output.to(actualFile));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
-        Assert.assertTrue(output.contains("copyFn: Organization.fromData"));
-        Assert.assertTrue(output.contains("copyFn: undefined"));
-        Assert.assertTrue(output.contains("copyFn: __getCopyArrayFn(Organization.fromData)"));
+        Assertions.assertTrue(output.contains("copyFn: Organization.fromData"));
+        Assertions.assertTrue(output.contains("copyFn: undefined"));
+        Assertions.assertTrue(output.contains("copyFn: __getCopyArrayFn(Organization.fromData)"));
     }
 
     private static class User {

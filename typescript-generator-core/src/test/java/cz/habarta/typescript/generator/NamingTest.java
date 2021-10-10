@@ -5,17 +5,17 @@ import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.yield.KeywordInPackage;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
 public class NamingTest {
 
-    @Test(expected = SymbolTable.NameConflictException.class)
+    @Test
     public void testConflictReport() {
         final Settings settings = TestUtils.settings();
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.ConflictingClass.class, B.ConflictingClass.class));
+        Assertions.assertThrows(SymbolTable.NameConflictException.class, () -> new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.ConflictingClass.class, B.ConflictingClass.class)));
     }
 
     @Test
@@ -25,8 +25,8 @@ public class NamingTest {
         settings.customTypeNaming.put("cz.habarta.typescript.generator.NamingTest$A$ConflictingClass", "A$ConflictingClass");
         settings.customTypeNaming.put("cz.habarta.typescript.generator.NamingTest$B$ConflictingClass", "B$ConflictingClass");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.ConflictingClass.class, B.ConflictingClass.class));
-        Assert.assertTrue(output.contains("A$ConflictingClass"));
-        Assert.assertTrue(output.contains("B$ConflictingClass"));
+        Assertions.assertTrue(output.contains("A$ConflictingClass"));
+        Assertions.assertTrue(output.contains("B$ConflictingClass"));
     }
 
     @Test
@@ -34,8 +34,8 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.mapPackagesToNamespaces = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.ConflictingClass.class, B.ConflictingClass.class));
-        Assert.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.A {"));
-        Assert.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.B {"));
+        Assertions.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.A {"));
+        Assertions.assertTrue(output.contains("namespace cz.habarta.typescript.generator.NamingTest.B {"));
     }
 
     private static class A {
@@ -56,7 +56,7 @@ public class NamingTest {
         settings.customTypeNamingFunction = "function(name, simpleName) { if (name.indexOf('cz.') === 0) return 'Test' + simpleName; }";
         final SymbolTable symbolTable = new SymbolTable(settings);
         final String name = symbolTable.getMappedNamespacedName(A.class);
-        Assert.assertEquals("TestA", name);
+        Assertions.assertEquals("TestA", name);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class NamingTest {
         settings.customTypeNamingFunction = "function() {}";
         final SymbolTable symbolTable = new SymbolTable(settings);
         final String name = symbolTable.getMappedNamespacedName(A.class);
-        Assert.assertEquals("A", name);
+        Assertions.assertEquals("A", name);
     }
 
     @Test
@@ -75,8 +75,8 @@ public class NamingTest {
         settings.addTypeNamePrefix = "Conf";
         settings.mapPackagesToNamespaces = true;
         final SymbolTable symbolTable = new SymbolTable(settings);
-        Assert.assertEquals("FuncA", symbolTable.getMappedNamespacedName(A.class));
-        Assert.assertEquals("java.lang.ConfObject", symbolTable.getMappedNamespacedName(Object.class));
+        Assertions.assertEquals("FuncA", symbolTable.getMappedNamespacedName(A.class));
+        Assertions.assertEquals("java.lang.ConfObject", symbolTable.getMappedNamespacedName(Object.class));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class NamingTest {
         settings.mapPackagesToNamespaces = true;
         final SymbolTable symbolTable = new SymbolTable(settings);
         final String name = symbolTable.getMappedNamespacedName(KeywordInPackage.class);
-        Assert.assertEquals("cz.habarta.typescript.generator._yield.KeywordInPackage", name);
+        Assertions.assertEquals("cz.habarta.typescript.generator._yield.KeywordInPackage", name);
     }
 
     @Test
@@ -93,10 +93,10 @@ public class NamingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeNaming = Collections.singletonMap("cz.habarta.typescript.generator.NamingTest$C", "NS.C");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(C.class, D.class));
-        Assert.assertTrue(output.contains("namespace NS"));
-        Assert.assertTrue(output.contains("interface C"));
-        Assert.assertTrue(output.contains("interface D extends NS.C"));
-        Assert.assertTrue(output.contains("objectC: NS.C"));
+        Assertions.assertTrue(output.contains("namespace NS"));
+        Assertions.assertTrue(output.contains("interface C"));
+        Assertions.assertTrue(output.contains("interface D extends NS.C"));
+        Assertions.assertTrue(output.contains("objectC: NS.C"));
     }
 
     private static class C {

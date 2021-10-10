@@ -25,8 +25,8 @@ import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
 import org.joda.time.Period;
 import org.joda.time.YearMonth;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class JodaTest {
@@ -36,10 +36,10 @@ public class JodaTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings.put("org.joda.time.DateTime", "Date");
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: Date;"));
-        Assert.assertTrue(dts.contains("dateList: Date[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
-        Assert.assertTrue(dts.contains("dates: Date[];"));
+        Assertions.assertTrue(dts.contains("date: Date;"));
+        Assertions.assertTrue(dts.contains("dateList: Date[];"));
+        Assertions.assertTrue(dts.contains("datesMap: { [index: string]: Date[] };"));
+        Assertions.assertTrue(dts.contains("dates: Date[];"));
     }
 
     @Test
@@ -47,11 +47,11 @@ public class JodaTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings.put("org.joda.time.DateTime", "number");
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: number;"));
-        Assert.assertTrue(dts.contains("dateList: number[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: number[] };"));
-        Assert.assertTrue(dts.contains("dates: number[];"));
-        Assert.assertTrue(!dts.contains("type DateAsNumber = number;"));
+        Assertions.assertTrue(dts.contains("date: number;"));
+        Assertions.assertTrue(dts.contains("dateList: number[];"));
+        Assertions.assertTrue(dts.contains("datesMap: { [index: string]: number[] };"));
+        Assertions.assertTrue(dts.contains("dates: number[];"));
+        Assertions.assertTrue(!dts.contains("type DateAsNumber = number;"));
     }
 
     @Test
@@ -59,11 +59,11 @@ public class JodaTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings.put("org.joda.time.DateTime", "string");
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: string;"));
-        Assert.assertTrue(dts.contains("dateList: string[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: string[] };"));
-        Assert.assertTrue(dts.contains("dates: string[];"));
-        Assert.assertTrue(!dts.contains("type DateAsString = string;"));
+        Assertions.assertTrue(dts.contains("date: string;"));
+        Assertions.assertTrue(dts.contains("dateList: string[];"));
+        Assertions.assertTrue(dts.contains("datesMap: { [index: string]: string[] };"));
+        Assertions.assertTrue(dts.contains("dates: string[];"));
+        Assertions.assertTrue(!dts.contains("type DateAsString = string;"));
     }
 
     @Test
@@ -72,11 +72,11 @@ public class JodaTest {
         settings.additionalDataLibraries = Arrays.asList("joda");
         settings.mapDate = DateMapping.asString;
         final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaDates.class));
-        Assert.assertTrue(dts.contains("date: DateAsString;"));
-        Assert.assertTrue(dts.contains("dateList: DateAsString[];"));
-        Assert.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
-        Assert.assertTrue(dts.contains("dates: DateAsString[];"));
-        Assert.assertTrue(dts.contains("type DateAsString = string;"));
+        Assertions.assertTrue(dts.contains("date: DateAsString;"));
+        Assertions.assertTrue(dts.contains("dateList: DateAsString[];"));
+        Assertions.assertTrue(dts.contains("datesMap: { [index: string]: DateAsString[] };"));
+        Assertions.assertTrue(dts.contains("dates: DateAsString[];"));
+        Assertions.assertTrue(dts.contains("type DateAsString = string;"));
     }
 
     @Test
@@ -94,18 +94,18 @@ public class JodaTest {
         settings.additionalDataLibraries = Arrays.asList("joda");
         settings.mapDate = DateMapping.asString;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JodaSerializedClasses.class));
-        Assert.assertTrue(output.contains("dateTime: DateAsString;"));
-        Assert.assertTrue(output.contains("dateTimeZone: string;"));
-        Assert.assertTrue(output.contains("duration: number;"));
-        Assert.assertTrue(output.contains("instant: DateAsString;"));
-        Assert.assertTrue(output.contains("localDateTime: DateAsString;"));
-        Assert.assertTrue(output.contains("localDate: DateAsString;"));
-        Assert.assertTrue(output.contains("localTime: DateAsString;"));
-        Assert.assertTrue(output.contains("period: string;"));
-        Assert.assertTrue(output.contains("interval: string;"));
-        Assert.assertTrue(output.contains("monthDay: string;"));
-        Assert.assertTrue(output.contains("yearMonth: string;"));
-        Assert.assertTrue(output.contains("dateMidnight: DateAsString;"));
+        Assertions.assertTrue(output.contains("dateTime: DateAsString;"));
+        Assertions.assertTrue(output.contains("dateTimeZone: string;"));
+        Assertions.assertTrue(output.contains("duration: number;"));
+        Assertions.assertTrue(output.contains("instant: DateAsString;"));
+        Assertions.assertTrue(output.contains("localDateTime: DateAsString;"));
+        Assertions.assertTrue(output.contains("localDate: DateAsString;"));
+        Assertions.assertTrue(output.contains("localTime: DateAsString;"));
+        Assertions.assertTrue(output.contains("period: string;"));
+        Assertions.assertTrue(output.contains("interval: string;"));
+        Assertions.assertTrue(output.contains("monthDay: string;"));
+        Assertions.assertTrue(output.contains("yearMonth: string;"));
+        Assertions.assertTrue(output.contains("dateMidnight: DateAsString;"));
     }
 
 }

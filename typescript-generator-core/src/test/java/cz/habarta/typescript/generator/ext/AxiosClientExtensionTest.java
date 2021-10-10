@@ -9,8 +9,8 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class AxiosClientExtensionTest {
@@ -26,20 +26,20 @@ public class AxiosClientExtensionTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
 
-        Assert.assertTrue(errorMessage, output.contains("interface Organization"));
-        Assert.assertTrue(errorMessage, output.contains("interface Address"));
-        Assert.assertTrue(errorMessage, output.contains("interface Person"));
-        Assert.assertTrue(errorMessage, output.contains("interface HttpClient"));
+        Assertions.assertTrue(output.contains("interface Organization"), errorMessage);
+        Assertions.assertTrue(output.contains("interface Address"), errorMessage);
+        Assertions.assertTrue(output.contains("interface Person"), errorMessage);
+        Assertions.assertTrue(output.contains("interface HttpClient"), errorMessage);
 
-        Assert.assertTrue(errorMessage, output.contains("class OrganizationsResourceClient<O>"));
-        Assert.assertTrue(errorMessage, output.contains("class PersonResourceClient<O>"));
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<Axios.GenericAxiosResponse<R>>"));
+        Assertions.assertTrue(output.contains("class OrganizationsResourceClient<O>"), errorMessage);
+        Assertions.assertTrue(output.contains("class PersonResourceClient<O>"), errorMessage);
+        Assertions.assertTrue(output.contains("type RestResponse<R> = Promise<Axios.GenericAxiosResponse<R>>"), errorMessage);
 
-        Assert.assertTrue(errorMessage, output.contains("class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig>"));
-        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: Axios.AxiosRequestConfig; }): RestResponse<R>"));
-        Assert.assertTrue(errorMessage, output.contains("class AxiosOrganizationsResourceClient extends OrganizationsResourceClient<Axios.AxiosRequestConfig>"));
-        Assert.assertTrue(errorMessage, output.contains("class AxiosPersonResourceClient extends PersonResourceClient<Axios.AxiosRequestConfig>"));
-        Assert.assertTrue(errorMessage, output.contains("constructor(baseURL: string, axiosInstance: Axios.AxiosInstance = axios.create())"));
+        Assertions.assertTrue(output.contains("class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig>"), errorMessage);
+        Assertions.assertTrue(output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: Axios.AxiosRequestConfig; }): RestResponse<R>"), errorMessage);
+        Assertions.assertTrue(output.contains("class AxiosOrganizationsResourceClient extends OrganizationsResourceClient<Axios.AxiosRequestConfig>"), errorMessage);
+        Assertions.assertTrue(output.contains("class AxiosPersonResourceClient extends PersonResourceClient<Axios.AxiosRequestConfig>"), errorMessage);
+        Assertions.assertTrue(output.contains("constructor(baseURL: string, axiosInstance: Axios.AxiosInstance = axios.create())"), errorMessage);
     }
 
 }

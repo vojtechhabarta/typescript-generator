@@ -58,8 +58,8 @@ import javax.xml.transform.dom.DOMSource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -80,7 +80,7 @@ public class JaxrsApplicationTest {
     public void testReturnedTypesFromResource() {
         JaxrsApplicationParser jaxrsApplicationParser = createJaxrsApplicationParser(TestUtils.settings());
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
         List<Type> types = getTypes(result.discoveredTypes);
         final List<Type> expectedTypes = Arrays.asList(
                 A.class,
@@ -133,7 +133,7 @@ public class JaxrsApplicationTest {
         if (exactMatch) {
             assertHasSameItems(expectedClasses, classes);
         } else {
-            Assert.assertTrue(classes.containsAll(expectedClasses));
+            Assertions.assertTrue(classes.containsAll(expectedClasses));
         }
     }
 
@@ -144,8 +144,8 @@ public class JaxrsApplicationTest {
         ), null);
         final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class, excludeFilter);
         final List<Type> types = getTypes(sourceTypes);
-        Assert.assertEquals(1, types.size());
-        Assert.assertTrue(getTypes(sourceTypes).contains(TestApplication.class));
+        Assertions.assertEquals(1, types.size());
+        Assertions.assertTrue(getTypes(sourceTypes).contains(TestApplication.class));
     }
 
     @Test
@@ -157,9 +157,9 @@ public class JaxrsApplicationTest {
         ), null);
         final JaxrsApplicationParser jaxrsApplicationParser = createJaxrsApplicationParser(settings);
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
-        Assert.assertNotNull(result);
-        Assert.assertTrue(!getTypes(result.discoveredTypes).contains(A.class));
-        Assert.assertTrue(getTypes(result.discoveredTypes).contains(JGenericArrayType.of(J[].class)));
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(!getTypes(result.discoveredTypes).contains(A.class));
+        Assertions.assertTrue(getTypes(result.discoveredTypes).contains(JGenericArrayType.of(J[].class)));
     }
 
     private static JaxrsApplicationParser createJaxrsApplicationParser(Settings settings) {
@@ -178,10 +178,10 @@ public class JaxrsApplicationTest {
 
     private static <T> void assertHasSameItems(Collection<? extends T> expected, Collection<? extends T> actual) {
         for (T value : expected) {
-            Assert.assertTrue("Value '" + value + "' is missing in " + actual, actual.contains(value));
+            Assertions.assertTrue(actual.contains(value), "Value '" + value + "' is missing in " + actual);
         }
         for (T value : actual) {
-            Assert.assertTrue("Value '" + value + "' not expected.", expected.contains(value));
+            Assertions.assertTrue(expected.contains(value), "Value '" + value + "' not expected.");
         }
     }
 
@@ -319,11 +319,11 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TestResource1.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, output.contains("interface RestApplication"));
-        Assert.assertTrue(errorMessage, output.contains("getA(): RestResponse<A>;"));
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
-        Assert.assertTrue(errorMessage, !output.contains("function uriEncoding"));
-        Assert.assertTrue(errorMessage, output.contains("setAsync(): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("interface RestApplication"), errorMessage);
+        Assertions.assertTrue(output.contains("getA(): RestResponse<A>;"), errorMessage);
+        Assertions.assertTrue(output.contains("type RestResponse<R> = Promise<R>;"), errorMessage);
+        Assertions.assertTrue(!output.contains("function uriEncoding"), errorMessage);
+        Assertions.assertTrue(output.contains("setAsync(): RestResponse<string>"), errorMessage);
     }
 
     @Test
@@ -332,17 +332,17 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
-        Assert.assertTrue(errorMessage, output.contains("interface Organization"));
-        Assert.assertTrue(errorMessage, output.contains("interface OrganizationApplication"));
-        Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/organizations/{ organizationCode : [a-z]+ }/{organizationId}"));
-        Assert.assertTrue(errorMessage, output.contains("getOrganization(organizationCode: string, organizationId: number): RestResponse<Organization>;"));
-        Assert.assertTrue(errorMessage, output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }): RestResponse<Organization[]>;"));
-        Assert.assertTrue(errorMessage, output.replace("arg1", "organization").contains("setOrganization(organizationCode: string, organizationId: number, organization: Organization): RestResponse<void>;"));
-        Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/people/{personId}/address/{address-id}"));
-        Assert.assertTrue(errorMessage, output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>;"));
-        Assert.assertTrue(errorMessage, output.contains("HTTP GET /api/people/{personId}"));
-        Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>;"));
+        Assertions.assertTrue(output.contains("type RestResponse<R> = Promise<R>;"), errorMessage);
+        Assertions.assertTrue(output.contains("interface Organization"), errorMessage);
+        Assertions.assertTrue(output.contains("interface OrganizationApplication"), errorMessage);
+        Assertions.assertTrue(output.contains("HTTP GET /api/organizations/{ organizationCode : [a-z]+ }/{organizationId}"), errorMessage);
+        Assertions.assertTrue(output.contains("getOrganization(organizationCode: string, organizationId: number): RestResponse<Organization>;"), errorMessage);
+        Assertions.assertTrue(output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }): RestResponse<Organization[]>;"), errorMessage);
+        Assertions.assertTrue(output.replace("arg1", "organization").contains("setOrganization(organizationCode: string, organizationId: number, organization: Organization): RestResponse<void>;"), errorMessage);
+        Assertions.assertTrue(output.contains("HTTP GET /api/people/{personId}/address/{address-id}"), errorMessage);
+        Assertions.assertTrue(output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>;"), errorMessage);
+        Assertions.assertTrue(output.contains("HTTP GET /api/people/{personId}"), errorMessage);
+        Assertions.assertTrue(output.contains("getPerson(personId: number): RestResponse<Person>;"), errorMessage);
     }
 
     @Test
@@ -351,11 +351,11 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(NameConflictResource.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, output.contains("interface RestApplication"));
-        Assert.assertTrue(errorMessage, output.replace("arg0", "person").contains("person$POST$conflict(person: Person): RestResponse<Person>;"));
-        Assert.assertTrue(errorMessage, output.contains("person$GET$conflict(): RestResponse<Person>;"));
-        Assert.assertTrue(errorMessage, output.contains("person$GET$conflict_search(queryParams?: { search?: string; }): RestResponse<Person>;"));
-        Assert.assertTrue(errorMessage, output.contains("person$GET$conflict_personId(personId: number): RestResponse<Person>;"));
+        Assertions.assertTrue(output.contains("interface RestApplication"), errorMessage);
+        Assertions.assertTrue(output.replace("arg0", "person").contains("person$POST$conflict(person: Person): RestResponse<Person>;"), errorMessage);
+        Assertions.assertTrue(output.contains("person$GET$conflict(): RestResponse<Person>;"), errorMessage);
+        Assertions.assertTrue(output.contains("person$GET$conflict_search(queryParams?: { search?: string; }): RestResponse<Person>;"), errorMessage);
+        Assertions.assertTrue(output.contains("person$GET$conflict_personId(personId: number): RestResponse<Person>;"), errorMessage);
     }
 
     @Test
@@ -366,8 +366,8 @@ public class JaxrsApplicationTest {
         settings.restOptionsType = "AxiosRequestConfig";
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
-        Assert.assertTrue(errorMessage, output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }, options?: AxiosRequestConfig): RestResponse<Organization[]>;"));
+        Assertions.assertTrue(output.contains("type RestResponse<R> = AxiosPromise;"), errorMessage);
+        Assertions.assertTrue(output.contains("searchOrganizations(queryParams?: { name?: string; \"search-limit\"?: number; }, options?: AxiosRequestConfig): RestResponse<Organization[]>;"), errorMessage);
     }
 
     @Test
@@ -378,17 +378,17 @@ public class JaxrsApplicationTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         // HttpClient
-        Assert.assertTrue(errorMessage, output.contains("interface HttpClient"));
-        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; }): RestResponse<R>;"));
+        Assertions.assertTrue(output.contains("interface HttpClient"), errorMessage);
+        Assertions.assertTrue(output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; }): RestResponse<R>;"), errorMessage);
         // application client
-        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
-        Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number): RestResponse<Person>"));
-        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}` });"));
-        Assert.assertTrue(errorMessage, output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>"));
-        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}/address/${addressId}` });"));
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = Promise<R>;"));
+        Assertions.assertTrue(output.contains("class OrganizationApplicationClient"), errorMessage);
+        Assertions.assertTrue(output.contains("getPerson(personId: number): RestResponse<Person>"), errorMessage);
+        Assertions.assertTrue(output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}` });"), errorMessage);
+        Assertions.assertTrue(output.contains("getAddress(personId: number, addressId: number): RestResponse<Address>"), errorMessage);
+        Assertions.assertTrue(output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}/address/${addressId}` });"), errorMessage);
+        Assertions.assertTrue(output.contains("type RestResponse<R> = Promise<R>;"), errorMessage);
         // helper
-        Assert.assertTrue(errorMessage, output.contains("function uriEncoding"));
+        Assertions.assertTrue(output.contains("function uriEncoding"), errorMessage);
     }
 
     @Test
@@ -401,12 +401,12 @@ public class JaxrsApplicationTest {
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
         // HttpClient
-        Assert.assertTrue(errorMessage, output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: AxiosRequestConfig; }): RestResponse<R>;"));
+        Assertions.assertTrue(output.contains("request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: AxiosRequestConfig; }): RestResponse<R>;"), errorMessage);
         // application client
-        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient"));
-        Assert.assertTrue(errorMessage, output.contains("getPerson(personId: number, options?: AxiosRequestConfig): RestResponse<Person>"));
-        Assert.assertTrue(errorMessage, output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}`, options: options });"));
-        Assert.assertTrue(errorMessage, output.contains("type RestResponse<R> = AxiosPromise;"));
+        Assertions.assertTrue(output.contains("class OrganizationApplicationClient"), errorMessage);
+        Assertions.assertTrue(output.contains("getPerson(personId: number, options?: AxiosRequestConfig): RestResponse<Person>"), errorMessage);
+        Assertions.assertTrue(output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`api/people/${personId}`, options: options });"), errorMessage);
+        Assertions.assertTrue(output.contains("type RestResponse<R> = AxiosPromise;"), errorMessage);
     }
 
     @Test
@@ -418,10 +418,10 @@ public class JaxrsApplicationTest {
         settings.restNamespacing = RestNamespacing.perResource;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, !output.contains("class OrganizationApplicationClient"));
-        Assert.assertTrue(errorMessage, output.contains("class OrganizationsResourceClient implements OrganizationsResource "));
-        Assert.assertTrue(errorMessage, !output.contains("class OrganizationResourceClient"));
-        Assert.assertTrue(errorMessage, output.contains("class PersonResourceClient implements PersonResource "));
+        Assertions.assertTrue(!output.contains("class OrganizationApplicationClient"), errorMessage);
+        Assertions.assertTrue(output.contains("class OrganizationsResourceClient implements OrganizationsResource "), errorMessage);
+        Assertions.assertTrue(!output.contains("class OrganizationResourceClient"), errorMessage);
+        Assertions.assertTrue(output.contains("class PersonResourceClient implements PersonResource "), errorMessage);
     }
 
     @Test
@@ -434,11 +434,11 @@ public class JaxrsApplicationTest {
         settings.restNamespacingAnnotation = Api.class;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
         final String errorMessage = "Unexpected output: " + output;
-        Assert.assertTrue(errorMessage, output.contains("class OrgApiClient implements OrgApi "));
-        Assert.assertTrue(errorMessage, output.contains("class OrganizationApplicationClient implements OrganizationApplication "));
-        Assert.assertTrue(errorMessage, !output.contains("class OrganizationsResourceClient"));
-        Assert.assertTrue(errorMessage, !output.contains("class OrganizationResourceClient"));
-        Assert.assertTrue(errorMessage, !output.contains("class PersonResourceClient"));
+        Assertions.assertTrue(output.contains("class OrgApiClient implements OrgApi "), errorMessage);
+        Assertions.assertTrue(output.contains("class OrganizationApplicationClient implements OrganizationApplication "), errorMessage);
+        Assertions.assertTrue(!output.contains("class OrganizationsResourceClient"), errorMessage);
+        Assertions.assertTrue(!output.contains("class OrganizationResourceClient"), errorMessage);
+        Assertions.assertTrue(!output.contains("class PersonResourceClient"), errorMessage);
     }
 
     @Test
@@ -448,7 +448,7 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationInterface = true;
         settings.javadocXmlFiles = Arrays.asList(new File("src/test/javadoc/test-javadoc.xml"));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
-        Assert.assertTrue(output.contains("Returns person with specified ID."));
+        Assertions.assertTrue(output.contains("Returns person with specified ID."));
     }
 
     @Test
@@ -457,9 +457,9 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
-        Assert.assertTrue(output.contains("Comment in swagger annotation"));
-        Assert.assertTrue(output.contains("Response code 200 - ok"));
-        Assert.assertTrue(output.contains("Response code 400 - not ok"));
+        Assertions.assertTrue(output.contains("Comment in swagger annotation"));
+        Assertions.assertTrue(output.contains("Response code 200 - ok"));
+        Assertions.assertTrue(output.contains("Response code 400 - not ok"));
     }
 
     @Test
@@ -468,7 +468,7 @@ public class JaxrsApplicationTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(OrganizationApplication.class));
-        Assert.assertTrue(output.contains("@deprecated"));
+        Assertions.assertTrue(output.contains("@deprecated"));
     }
 
     @ApplicationPath("api")
@@ -576,13 +576,13 @@ public class JaxrsApplicationTest {
 
     @Test
     public void testGettingValidIdentifierName() {
-        Assert.assertEquals("foo", ModelCompiler.getValidIdentifierName("foo"));
-        Assert.assertEquals("personId", ModelCompiler.getValidIdentifierName("person-id"));
-        Assert.assertEquals("veryLongParameterName", ModelCompiler.getValidIdentifierName("very-long-parameter-name"));
-        Assert.assertEquals("$nameWithDollar", ModelCompiler.getValidIdentifierName("$nameWithDollar"));
-        Assert.assertEquals("NameWithManyDashes", ModelCompiler.getValidIdentifierName("-name--with-many---dashes-"));
-        Assert.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("1a2b3c4"));
-        Assert.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("111a2b3c4"));
+        Assertions.assertEquals("foo", ModelCompiler.getValidIdentifierName("foo"));
+        Assertions.assertEquals("personId", ModelCompiler.getValidIdentifierName("person-id"));
+        Assertions.assertEquals("veryLongParameterName", ModelCompiler.getValidIdentifierName("very-long-parameter-name"));
+        Assertions.assertEquals("$nameWithDollar", ModelCompiler.getValidIdentifierName("$nameWithDollar"));
+        Assertions.assertEquals("NameWithManyDashes", ModelCompiler.getValidIdentifierName("-name--with-many---dashes-"));
+        Assertions.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("1a2b3c4"));
+        Assertions.assertEquals("a2b3c4", ModelCompiler.getValidIdentifierName("111a2b3c4"));
     }
 
     @Test
@@ -590,8 +590,8 @@ public class JaxrsApplicationTest {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EnumQueryParamResource.class));
-        Assert.assertTrue(output.contains("queryParams?: { target?: TargetEnum; }"));
-        Assert.assertTrue(output.contains("type TargetEnum = \"Target1\" | \"Target2\""));
+        Assertions.assertTrue(output.contains("queryParams?: { target?: TargetEnum; }"));
+        Assertions.assertTrue(output.contains("type TargetEnum = \"Target1\" | \"Target2\""));
     }
 
     @Path("enum-query-param")
@@ -614,9 +614,9 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanParamResource.class));
-        Assert.assertTrue(output.contains("interface SearchParams1QueryParams"));
-        Assert.assertTrue(output.contains("interface SearchParams2QueryParams"));
-        Assert.assertTrue(output.contains("queryParams?: SearchParams1QueryParams & SearchParams2QueryParams & { message?: string; }"));
+        Assertions.assertTrue(output.contains("interface SearchParams1QueryParams"));
+        Assertions.assertTrue(output.contains("interface SearchParams2QueryParams"));
+        Assertions.assertTrue(output.contains("queryParams?: SearchParams1QueryParams & SearchParams2QueryParams & { message?: string; }"));
     }
 
     public static class SearchParams1 {
@@ -642,9 +642,9 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ResourceWithReservedWord.class));
-        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>;"));
-        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]> {"));
-        Assert.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
+        Assertions.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>;"));
+        Assertions.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]> {"));
+        Assertions.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
     }
 
     @Path("")
@@ -679,8 +679,8 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(RegExpResource.class));
-        Assert.assertTrue(output.contains("getWithId(id: number)"));
-        Assert.assertTrue(output.contains("url: uriEncoding`objects/${id}`"));
+        Assertions.assertTrue(output.contains("getWithId(id: number)"));
+        Assertions.assertTrue(output.contains("url: uriEncoding`objects/${id}`"));
     }
 
     @Path("objects")
@@ -699,9 +699,9 @@ public class JaxrsApplicationTest {
         settings.generateJaxrsApplicationClient = true;
         settings.outputFileType = TypeScriptFileType.implementationFile;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AccountResource.class));
-        Assert.assertTrue(!output.contains("get(id: ID): RestResponse<ENTITY>"));
-        Assert.assertTrue(output.contains("get(id: number): RestResponse<AccountDto>"));
-        Assert.assertTrue(output.contains("interface AccountDto"));
+        Assertions.assertTrue(!output.contains("get(id: ID): RestResponse<ENTITY>"));
+        Assertions.assertTrue(output.contains("get(id: number): RestResponse<AccountDto>"));
+        Assertions.assertTrue(output.contains("interface AccountDto"));
     }
 
     public static class AccountDto {

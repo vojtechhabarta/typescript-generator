@@ -3,8 +3,8 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class JsonViewTest {
@@ -50,11 +50,11 @@ public class JsonViewTest {
     }
 
     private static void assertOutput(String output) {
-        Assert.assertTrue(output.contains("id:"));
-        Assert.assertTrue(output.contains("parentID:"));
-        Assert.assertTrue(!output.contains("parent:"));
-        Assert.assertTrue(output.contains("someProperty:"));
-        Assert.assertTrue(!output.contains("anotherProperty:"));
+        Assertions.assertTrue(output.contains("id:"));
+        Assertions.assertTrue(output.contains("parentID:"));
+        Assertions.assertTrue(!output.contains("parent:"));
+        Assertions.assertTrue(output.contains("someProperty:"));
+        Assertions.assertTrue(!output.contains("anotherProperty:"));
     }
 
     public static class Views {

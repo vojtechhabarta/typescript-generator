@@ -10,8 +10,8 @@ import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class EnumConstantsExtensionTest {
@@ -32,14 +32,14 @@ public class EnumConstantsExtensionTest {
         final TsModel tsModel = new ModelCompiler(settings, typeProcessor).javaToTypeScript(model);
         new EnumConstantsExtension().emitElements(writer, settings, false, tsModel);
         String indent = settings.indentString;
-        Assert.assertEquals(7, lines.size());
-        Assert.assertEquals("", lines.get(0));
-        Assert.assertEquals("const Direction = {", lines.get(1));
-        Assert.assertEquals(indent + "North: <Direction>\"North\",", lines.get(2));
-        Assert.assertEquals(indent + "East: <Direction>\"East\",", lines.get(3));
-        Assert.assertEquals(indent + "South: <Direction>\"South\",", lines.get(4));
-        Assert.assertEquals(indent + "West: <Direction>\"West\",", lines.get(5));
-        Assert.assertEquals("}", lines.get(6));
+        Assertions.assertEquals(7, lines.size());
+        Assertions.assertEquals("", lines.get(0));
+        Assertions.assertEquals("const Direction = {", lines.get(1));
+        Assertions.assertEquals(indent + "North: <Direction>\"North\",", lines.get(2));
+        Assertions.assertEquals(indent + "East: <Direction>\"East\",", lines.get(3));
+        Assertions.assertEquals(indent + "South: <Direction>\"South\",", lines.get(4));
+        Assertions.assertEquals(indent + "West: <Direction>\"West\",", lines.get(5));
+        Assertions.assertEquals("}", lines.get(6));
     }
 
     @Test
@@ -51,8 +51,8 @@ public class EnumConstantsExtensionTest {
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.extensions.add(new EnumConstantsExtension());
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
-        Assert.assertTrue(actual.contains("const Direction"));
-        Assert.assertTrue(actual.contains("North"));
+        Assertions.assertTrue(actual.contains("const Direction"));
+        Assertions.assertTrue(actual.contains("North"));
     }
 
     @Test
@@ -64,10 +64,10 @@ public class EnumConstantsExtensionTest {
         settings.outputKind = TypeScriptOutputKind.global;
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.extensions.add(new EnumConstantsExtension());
-        Assert.assertNotEquals(new TypeScriptGenerator(settings).generateTypeScript(Input.from(Emotions.class, Direction.class)),
+        Assertions.assertNotEquals(new TypeScriptGenerator(settings).generateTypeScript(Input.from(Emotions.class, Direction.class)),
                                new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class, Emotions.class)));
         settings.sortDeclarations = true;
-        Assert.assertEquals(new TypeScriptGenerator(settings).generateTypeScript(Input.from(Emotions.class, Direction.class)),
+        Assertions.assertEquals(new TypeScriptGenerator(settings).generateTypeScript(Input.from(Emotions.class, Direction.class)),
                             new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class, Emotions.class)));
     }
 
