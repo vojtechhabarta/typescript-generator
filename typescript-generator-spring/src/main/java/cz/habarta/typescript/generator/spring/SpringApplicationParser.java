@@ -121,6 +121,10 @@ public class SpringApplicationParser extends RestApplicationParser {
         // controller
         final Component component = AnnotationUtils.findAnnotation(cls, Component.class);
         if (component != null) {
+            if (isClassNameExcluded != null && isClassNameExcluded.test(sourceType.toString())) {
+                return null;
+            }
+
             TypeScriptGenerator.getLogger().verbose("Parsing Spring component: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
             final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(cls, RequestMapping.class);
