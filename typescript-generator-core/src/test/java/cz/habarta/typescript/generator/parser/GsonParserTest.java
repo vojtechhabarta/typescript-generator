@@ -13,9 +13,9 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
 public class GsonParserTest {
@@ -26,7 +26,7 @@ public class GsonParserTest {
         private int privateField;
     }
 
-    @Before
+    @BeforeEach
     public void before() {
         settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.gson;
@@ -37,17 +37,17 @@ public class GsonParserTest {
         final GsonParser gsonParser = getGsonParser();
         final Class<?> bean = DummyBean.class;
         final Model model = gsonParser.parseModel(bean);
-        Assert.assertTrue(model.getBeans().size() > 0);
+        Assertions.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
-        Assert.assertTrue(beanModel.getProperties().size() > 0);
-        Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
+        Assertions.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
+        Assertions.assertTrue(beanModel.getProperties().size() > 0);
+        Assertions.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
     }
 
     @Test
     public void testPrivateFieldGenerated() {
         final String output = generate(settings, DummyBeanGson.class);
-        Assert.assertTrue(output, output.contains("privateField"));
+        Assertions.assertTrue(output.contains("privateField"), output);
     }
 
     private static class DummyBeanSerializedName {
@@ -58,7 +58,7 @@ public class GsonParserTest {
     @Test
     public void testSerializedName() {
         final String output = generate(settings, DummyBeanSerializedName.class);
-        Assert.assertTrue(output, output.contains("bar"));
+        Assertions.assertTrue(output.contains("bar"), output);
     }
 
     private String generate(final Settings settings, Class<?> cls) {
@@ -78,7 +78,7 @@ public class GsonParserTest {
     @Test
     public void testStaticFieldNotIncluded() {
         final String output = generate(settings, Demo.class);
-        Assert.assertTrue(!output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
+        Assertions.assertTrue(!output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
     }
 
     @Test
@@ -86,14 +86,14 @@ public class GsonParserTest {
         settings.gsonConfiguration = new GsonConfiguration();
         settings.gsonConfiguration.excludeFieldsWithModifiers = "transient";
         final String output = generate(settings, Demo.class);
-        Assert.assertTrue(output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
+        Assertions.assertTrue(output.contains("THIS_FIELD_SHOULD_NOT_BE_INCLUDED"));
     }
 
     @Test
     public void testOptionalProperties_Default() {
         final String output = generate(settings, BeanWithOptionalProperty.class);
         System.out.println(output);
-        Assert.assertTrue(output.contains("property1: string;"));
+        Assertions.assertTrue(output.contains("property1: string;"));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class GsonParserTest {
         settings.optionalProperties = OptionalProperties.all;
         final String output = generate(settings, BeanWithOptionalProperty.class);
         System.out.println(output);
-        Assert.assertTrue(output.contains("property1?: string;"));
+        Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class GsonParserTest {
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = generate(settings, BeanWithOptionalProperty.class);
         System.out.println(output);
-        Assert.assertTrue(output.contains("property1?: string;"));
+        Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class GsonParserTest {
         settings.optionalAnnotations = Arrays.asList(OptionalProperty.class);
         final String output = generate(settings, BeanWithOptionalProperty.class);
         System.out.println(output);
-        Assert.assertTrue(output.contains("property1?: string;"));
+        Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
     private static class BeanWithOptionalProperty {

@@ -2,8 +2,8 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.p2.D;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -57,7 +57,7 @@ public class FullyQualifiedNamesTest {
                 + "    export type E = \"Left\" | \"Right\";\n"
                 + "\n"
                 + "}";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class FullyQualifiedNamesTest {
                 + "    }\n"
                 + "\n"
                 + "}\n";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     private static class Outer {

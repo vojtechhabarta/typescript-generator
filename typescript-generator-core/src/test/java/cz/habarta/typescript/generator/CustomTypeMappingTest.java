@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import org.junit.Assert;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
 public class CustomTypeMappingTest {
@@ -127,7 +127,7 @@ public class CustomTypeMappingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$GenericClass<D>", "CustomGenericClass<D>");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(GenericClass.class));
-        Assert.assertEquals("", output);
+        Assertions.assertEquals("", output);
     }
 
     static class GenericClass<D> {
@@ -139,7 +139,7 @@ public class CustomTypeMappingTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("long", "BigInt");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BigIntClass.class));
-        Assert.assertTrue(output.contains("bigNumber: BigInt;"));
+        Assertions.assertTrue(output.contains("bigNumber: BigInt;"));
     }
 
     private static class BigIntClass {

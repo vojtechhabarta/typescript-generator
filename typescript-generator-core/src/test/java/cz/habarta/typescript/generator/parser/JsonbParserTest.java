@@ -17,15 +17,15 @@ import java.util.UUID;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JsonbParserTest {
 
     private Settings settings;
 
-    @Before
+    @BeforeEach
     public void before() {
         settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.jsonb;
@@ -168,21 +168,21 @@ public class JsonbParserTest {
     public void testNullabilityField() {
         settings.nullableAnnotations.add(Nullable.class);
         final String output = generate(settings, ListOfNullableElementsField.class);
-        Assert.assertTrue(output, output.contains(" foos?: (string | null)[];"));
+        Assertions.assertTrue(output.contains(" foos?: (string | null)[];"), output);
     }
 
     @Test
     public void testNullabilityGetter() {
         settings.nullableAnnotations.add(Nullable.class);
         final String output = generate(settings, ListOfNullableElementsGetter.class);
-        Assert.assertTrue(output, output.contains(" foos?: (string | null)[];"));
+        Assertions.assertTrue(output.contains(" foos?: (string | null)[];"), output);
     }
 
     @Test
     public void testNullabilityConstructor() {
         settings.nullableAnnotations.add(Nullable.class);
         final String output = generate(settings, ListOfNullableElementsConstructor.class);
-        Assert.assertTrue(output, output.contains(" foos: (string | null)[];"));
+        Assertions.assertTrue(output.contains(" foos: (string | null)[];"), output);
     }
 
     @Test
@@ -190,8 +190,8 @@ public class JsonbParserTest {
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.requiredAnnotations.add(RequiredAnnotation.class);
         final String output = generate(settings, ObjecWithRequiredProperty.class);
-        Assert.assertTrue(output, output.contains(" foo:"));
-        Assert.assertTrue(output, output.contains(" bar?:"));
+        Assertions.assertTrue(output.contains(" foo:"), output);
+        Assertions.assertTrue(output.contains(" bar?:"), output);
     }
 
     @Test
@@ -199,8 +199,8 @@ public class JsonbParserTest {
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.requiredAnnotations.add(RequiredAnnotation.class);
         final String output = generate(settings, ObjectWithRequiredPropertyAndConstructor.class);
-        Assert.assertTrue(output, output.contains(" foo:"));
-        Assert.assertTrue(output, output.contains(" bar?:"));
+        Assertions.assertTrue(output.contains(" foo:"), output);
+        Assertions.assertTrue(output.contains(" bar?:"), output);
     }
 
     @Test
@@ -209,71 +209,71 @@ public class JsonbParserTest {
         settings.requiredAnnotations.add(RequiredAnnotation.class);
         settings.primitivePropertiesRequired = true;
         final String output = generate(settings, PrimitiveObjectWithTheOtherObject.class);
-        Assert.assertTrue(output.contains("charVar1: string;"));
-        Assert.assertTrue(output.contains("byteVar1: number;"));
-        Assert.assertTrue(output.contains("shortVar1: number;"));
-        Assert.assertTrue(output.contains("intVar1: number;"));
-        Assert.assertTrue(output.contains("longVar1: number;"));
-        Assert.assertTrue(output.contains("floatVar1: number;"));
-        Assert.assertTrue(output.contains("doubleVar1: number;"));
-        Assert.assertTrue(output.contains("booleanVar1: boolean;"));
-        Assert.assertTrue(output.contains("stringVar?: string;"));
-        Assert.assertTrue(output.contains("charVar2?: string;"));
-        Assert.assertTrue(output.contains("byteVar2?: number;"));
-        Assert.assertTrue(output.contains("shortVar2?: number;"));
-        Assert.assertTrue(output.contains("intVar2?: number;"));
-        Assert.assertTrue(output.contains("longVar2?: number;"));
-        Assert.assertTrue(output.contains("floatVar2?: number;"));
-        Assert.assertTrue(output.contains("doubleVar2?: number;"));
-        Assert.assertTrue(output.contains("booleanVar2?: boolean;"));
-        Assert.assertTrue(output.contains("uuidVar?: string;"));
-        Assert.assertTrue(output.contains("dateVar?: Date;"));
-        Assert.assertTrue(output.contains("collectionVar?: string[];"));
-        Assert.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
+        Assertions.assertTrue(output.contains("charVar1: string;"));
+        Assertions.assertTrue(output.contains("byteVar1: number;"));
+        Assertions.assertTrue(output.contains("shortVar1: number;"));
+        Assertions.assertTrue(output.contains("intVar1: number;"));
+        Assertions.assertTrue(output.contains("longVar1: number;"));
+        Assertions.assertTrue(output.contains("floatVar1: number;"));
+        Assertions.assertTrue(output.contains("doubleVar1: number;"));
+        Assertions.assertTrue(output.contains("booleanVar1: boolean;"));
+        Assertions.assertTrue(output.contains("stringVar?: string;"));
+        Assertions.assertTrue(output.contains("charVar2?: string;"));
+        Assertions.assertTrue(output.contains("byteVar2?: number;"));
+        Assertions.assertTrue(output.contains("shortVar2?: number;"));
+        Assertions.assertTrue(output.contains("intVar2?: number;"));
+        Assertions.assertTrue(output.contains("longVar2?: number;"));
+        Assertions.assertTrue(output.contains("floatVar2?: number;"));
+        Assertions.assertTrue(output.contains("doubleVar2?: number;"));
+        Assertions.assertTrue(output.contains("booleanVar2?: boolean;"));
+        Assertions.assertTrue(output.contains("uuidVar?: string;"));
+        Assertions.assertTrue(output.contains("dateVar?: Date;"));
+        Assertions.assertTrue(output.contains("collectionVar?: string[];"));
+        Assertions.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
     }
 
     @Test
     public void tesJsonbProperty() {
         final String output = generate(settings, OverridenPropertyName.class);
-        Assert.assertTrue(output, output.contains(" $foo?:"));
+        Assertions.assertTrue(output.contains(" $foo?:"), output);
     }
 
     @Test
     public void tesJsonbPropertyOnMethod() {
         final String output = generate(settings, OverridenPropertyNameOnGetter.class);
-        Assert.assertTrue(output, output.contains(" $foo?:"));
-        Assert.assertFalse(output, output.contains(" foo?:"));
+        Assertions.assertTrue(output.contains(" $foo?:"), output);
+        Assertions.assertFalse(output.contains(" foo?:"), output);
     }
     @Test
     public void tesImplicitName() {
         final String output = generate(settings, DirectName.class);
-        Assert.assertTrue(output, output.contains(" foo?:"));
+        Assertions.assertTrue(output.contains(" foo?:"), output);
     }
     @Test
     public void optionality() {
         {
             final String output = generate(settings, DirectName.class);
-            Assert.assertTrue(output, output.contains(" foo?: number"));
+            Assertions.assertTrue(output.contains(" foo?: number"), output);
         }
         {
             final String output = generate(settings, OptionalWithGetter.class);
-            Assert.assertTrue(output, output.contains(" foo?: number"));
+            Assertions.assertTrue(output.contains(" foo?: number"), output);
         }
         {
             final String output = generate(settings, Required.class);
-            Assert.assertTrue(output, output.contains(" foo: number"));
+            Assertions.assertTrue(output.contains(" foo: number"), output);
         }
         {
             final String output = generate(settings, RequiredWithGetter.class);
-            Assert.assertTrue(output, output.contains(" foo: number"));
+            Assertions.assertTrue(output.contains(" foo: number"), output);
         }
         {
             final String output = generate(settings, RequiredOptional.class);
-            Assert.assertTrue(output, output.contains(" foo?: number"));
+            Assertions.assertTrue(output.contains(" foo?: number"), output);
         }
         {
             final String output = generate(settings, NillableConstructorParameter.class);
-            Assert.assertTrue(output, output.contains(" foo?: number"));
+            Assertions.assertTrue(output.contains(" foo?: number"), output);
         }
     }
 

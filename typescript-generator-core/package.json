@@ -7,5 +7,9 @@
     "ModulesAndNamespacesTest": "tsc -p src/test/ts/tsconfig.json",
     "JsonDeserializationTest": "tsc -p src/test/ts/JsonDeserializationTest/tsconfig.json && node src/test/ts/JsonDeserializationTest/JsonDeserializationTest-expected-test.js"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.3.2",
+    "@types/node": "^14.17.0"
+  }
 }

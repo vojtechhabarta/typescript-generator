@@ -5,10 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
 public class GenericCustomTypeMappingsTest {
@@ -19,8 +17,8 @@ public class GenericCustomTypeMappingsTest {
         settings.customTypeNaming = Collections.singletonMap(ListWrapper1.class.getName(), "ListWrapper");
         settings.customTypeMappings = Collections.singletonMap(ListWrapper2.class.getName() + "<T>", "ListWrapper<T>");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Class1.class));
-        Assert.assertTrue(output.contains("list1: ListWrapper<string>"));
-        Assert.assertTrue(output.contains("list2: ListWrapper<number>"));
+        Assertions.assertTrue(output.contains("list1: ListWrapper<string>"));
+        Assertions.assertTrue(output.contains("list2: ListWrapper<number>"));
     }
 
     private static class Class1 {
@@ -42,8 +40,8 @@ public class GenericCustomTypeMappingsTest {
         settings.customTypeMappings = Collections.singletonMap("java.util.Map<K, V>", "Map<K, V>");
         settings.mapDate = DateMapping.asString;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Class2.class));
-        Assert.assertTrue(output.contains("someMap: Map<string, any>"));
-        Assert.assertTrue(output.contains("dateMap: Map<string, DateAsString>"));
+        Assertions.assertTrue(output.contains("someMap: Map<string, any>"));
+        Assertions.assertTrue(output.contains("dateMap: Map<string, DateAsString>"));
     }
 
     private static class Class2 {
@@ -56,8 +54,8 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$IdRepresentation<T>", "string");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(MyEntityRepresentation.class));
-        Assert.assertTrue(output.contains("id: string;"));
-        Assert.assertTrue(!output.contains("IdRepresentation"));
+        Assertions.assertTrue(output.contains("id: string;"));
+        Assertions.assertTrue(!output.contains("IdRepresentation"));
     }
 
     private static class MyEntityRepresentation {
@@ -81,7 +79,7 @@ public class GenericCustomTypeMappingsTest {
             final Settings settings = TestUtils.settings();
             settings.customTypeMappings = Collections.singletonMap(javaName, tsName);
             new TypeScriptGenerator(settings).generateTypeScript(Input.from());
-            Assert.fail();
+            Assertions.fail();
         } catch (RuntimeException e) {
             // expected
         }
@@ -92,7 +90,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2<T1, T2>", "Test<T2, T1>");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Usage.class));
-        Assert.assertTrue(output.contains("generic: Test<number, string>"));
+        Assertions.assertTrue(output.contains("generic: Test<number, string>"));
     }
 
     @Test
@@ -100,7 +98,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2<T1, T2>", "T2");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Usage.class));
-        Assert.assertTrue(output.contains("generic: number"));
+        Assertions.assertTrue(output.contains("generic: number"));
     }
 
     @Test
@@ -108,7 +106,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$NonGeneric", "Map<string, string>");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(NonGenericUsage.class));
-        Assert.assertTrue(output.contains("nonGeneric: Map<string, string>"));
+        Assertions.assertTrue(output.contains("nonGeneric: Map<string, string>"));
     }
 
     private static class NonGeneric {}
@@ -125,7 +123,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2[T1, T2]", "Test[T2, T1]");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Usage.class));
-        Assert.assertTrue(output.contains("generic: Test<number, string>"));
+        Assertions.assertTrue(output.contains("generic: Test<number, string>"));
     }
 
     @Test
@@ -133,7 +131,7 @@ public class GenericCustomTypeMappingsTest {
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.GenericCustomTypeMappingsTest$Generic2[T1, T2]", "string[]");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Usage.class));
-        Assert.assertTrue(output.contains("generic: string[]"));
+        Assertions.assertTrue(output.contains("generic: string[]"));
     }
 
     private static class BinaryData {
@@ -150,10 +148,10 @@ public class GenericCustomTypeMappingsTest {
         settings.customTypeMappings.put("byte[][]", "DifferentString[]");
         settings.customTypeMappings.put("long[]", "SpecialString");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BinaryData.class));
-        assertThat(output, containsString("data: string"));
-        assertThat(output, containsString("dataArray: DifferentString[]"));
-        assertThat(output, containsString("dataList: string[]"));
-        assertThat(output, containsString("specialData: SpecialString"));
+        Assertions.assertTrue(output.contains("data: string"), output);
+        Assertions.assertTrue(output.contains("dataArray: DifferentString[]"), output);
+        Assertions.assertTrue(output.contains("dataList: string[]"), output);
+        Assertions.assertTrue(output.contains("specialData: SpecialString"), output);
     }
 
 }

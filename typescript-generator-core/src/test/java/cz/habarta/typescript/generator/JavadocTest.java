@@ -9,8 +9,8 @@ import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.io.File;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class JavadocTest {
@@ -23,43 +23,43 @@ public class JavadocTest {
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithJavadoc.class);
             final BeanModel bean = model.getBeans().get(0);
-            Assert.assertEquals("Documentation for ClassWithJavadoc. First line.", bean.getComments().get(0));
-            Assert.assertEquals("Second line.", bean.getComments().get(1));
+            Assertions.assertEquals("Documentation for ClassWithJavadoc. First line.", bean.getComments().get(0));
+            Assertions.assertEquals("Second line.", bean.getComments().get(1));
             final PropertyModel property1 = bean.getProperties().get(0);
-            Assert.assertEquals("Documentation for documentedField.", property1.getComments().get(0));
+            Assertions.assertEquals("Documentation for documentedField.", property1.getComments().get(0));
             final PropertyModel property2 = bean.getProperties().get(1);
-            Assert.assertEquals("Documentation for documentedEnumField.", property2.getComments().get(0));
+            Assertions.assertEquals("Documentation for documentedEnumField.", property2.getComments().get(0));
             final EnumModel enumModel = model.getEnums().get(0);
-            Assert.assertEquals("Documentation for DummyEnum.", enumModel.getComments().get(0));
+            Assertions.assertEquals("Documentation for DummyEnum.", enumModel.getComments().get(0));
         }
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithoutJavadoc.class);
             final BeanModel bean = model.getBeans().get(0);
-            Assert.assertNull(bean.getComments());
+            Assertions.assertNull(bean.getComments());
             final PropertyModel property = bean.getProperties().get(0);
-            Assert.assertNull(property.getComments());
+            Assertions.assertNull(property.getComments());
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(
                     Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
 
-            Assert.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
-            Assert.assertTrue(generated.contains("Second line."));
-            Assert.assertTrue(generated.contains("Documentation for documentedField."));
-            Assert.assertTrue(generated.contains("Documentation for documentedEnumField."));
-            Assert.assertTrue(generated.contains("Documentation for DummyEnum."));
-            Assert.assertTrue(generated.contains("Documentation for getter property."));
-            Assert.assertTrue(generated.contains("Documentation for renamed field."));
-            Assert.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
-            Assert.assertTrue(generated.contains("Documentation for interface getter property."));
-            Assert.assertTrue(generated.contains("@return value of getterPropery"));
-            Assert.assertTrue(generated.contains("@deprecated replaced by something else\n"));
-            Assert.assertTrue(!generated.contains("@deprecated\n"));
-            Assert.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
-            Assert.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
-            Assert.assertTrue(generated.contains("ff0000"));
-            Assert.assertTrue(generated.contains("00ff00"));
-            Assert.assertTrue(generated.contains("0000ff"));
+            Assertions.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
+            Assertions.assertTrue(generated.contains("Second line."));
+            Assertions.assertTrue(generated.contains("Documentation for documentedField."));
+            Assertions.assertTrue(generated.contains("Documentation for documentedEnumField."));
+            Assertions.assertTrue(generated.contains("Documentation for DummyEnum."));
+            Assertions.assertTrue(generated.contains("Documentation for getter property."));
+            Assertions.assertTrue(generated.contains("Documentation for renamed field."));
+            Assertions.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
+            Assertions.assertTrue(generated.contains("Documentation for interface getter property."));
+            Assertions.assertTrue(generated.contains("@return value of getterPropery"));
+            Assertions.assertTrue(generated.contains("@deprecated replaced by something else\n"));
+            Assertions.assertTrue(!generated.contains("@deprecated\n"));
+            Assertions.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
+            Assertions.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
+            Assertions.assertTrue(generated.contains("ff0000"));
+            Assertions.assertTrue(generated.contains("00ff00"));
+            Assertions.assertTrue(generated.contains("0000ff"));
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedClassWithoutJavadoc.class));
@@ -73,7 +73,7 @@ public class JavadocTest {
                     + "     */\n"
                     + "    deprecatedField: string;\n"
                     + "}";
-            Assert.assertEquals(expected.trim(), generated.trim());
+            Assertions.assertEquals(expected.trim(), generated.trim());
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumWithoutJavadoc.class));
@@ -89,21 +89,21 @@ public class JavadocTest {
                     + " */\n"
                     + "type DeprecatedEnumWithoutJavadoc = \"North\" | \"East\" | \"South\" | \"West\";\n"
                     + "";
-            Assert.assertEquals(expected.trim(), generated.trim());
+            Assertions.assertEquals(expected.trim(), generated.trim());
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithBrElements.class));
-            Assert.assertTrue(!generated.contains("<br>"));
-            Assert.assertTrue(!generated.contains("<br/>"));
-            Assert.assertTrue(!generated.contains("<br />"));
-            Assert.assertTrue(generated.contains("Class documentation\n * \n"));
-            Assert.assertTrue(generated.contains("Some documentation\n * \n * for this class."));
+            Assertions.assertTrue(!generated.contains("<br>"));
+            Assertions.assertTrue(!generated.contains("<br/>"));
+            Assertions.assertTrue(!generated.contains("<br />"));
+            Assertions.assertTrue(generated.contains("Class documentation\n * \n"));
+            Assertions.assertTrue(generated.contains("Some documentation\n * \n * for this class."));
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPElements.class));
-            Assert.assertTrue(!generated.contains("<p>"));
-            Assert.assertTrue(!generated.contains("</p>"));
-            Assert.assertTrue(generated.contains("Long\n * paragraph\n * \n * Second\n * paragraph"));
+            Assertions.assertTrue(!generated.contains("<p>"));
+            Assertions.assertTrue(!generated.contains("</p>"));
+            Assertions.assertTrue(generated.contains("Long\n * paragraph\n * \n * Second\n * paragraph"));
         }
     }
 

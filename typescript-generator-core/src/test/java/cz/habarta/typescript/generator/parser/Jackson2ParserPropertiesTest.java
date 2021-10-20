@@ -10,8 +10,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class Jackson2ParserPropertiesTest {
@@ -76,13 +76,13 @@ public class Jackson2ParserPropertiesTest {
 
     @Test
     public void testPropertyOrder() {
-        Assert.assertEquals(Arrays.asList("password1", "id2", "name", "id1", "password2"), getProperties(UserOrdered.class));
-        Assert.assertEquals(Arrays.asList("id1", "id2", "name", "password1", "password2"), getProperties(UserAlphabetic.class));
-        Assert.assertEquals(Arrays.asList("password2", "password1", "id2", "id1", "name"), getProperties(UserIndexed.class));
-        Assert.assertEquals(Arrays.asList("name", "id1", "id2", "password1", "password2"), getProperties(User1.class));
-        Assert.assertEquals(Arrays.asList("name", "id1", "id2", "password1", "password2"), getProperties(User2.class));
-        Assert.assertEquals(Arrays.asList("name", "password1", "password2", "id1", "id2"), getProperties(User3.class));
-        Assert.assertEquals(Arrays.asList("password1", "id1", "password2", "id2", "name"), getProperties(User4.class));
+        Assertions.assertEquals(Arrays.asList("password1", "id2", "name", "id1", "password2"), getProperties(UserOrdered.class));
+        Assertions.assertEquals(Arrays.asList("id1", "id2", "name", "password1", "password2"), getProperties(UserAlphabetic.class));
+        Assertions.assertEquals(Arrays.asList("password2", "password1", "id2", "id1", "name"), getProperties(UserIndexed.class));
+        Assertions.assertEquals(Arrays.asList("name", "id1", "id2", "password1", "password2"), getProperties(User1.class));
+        Assertions.assertEquals(Arrays.asList("name", "id1", "id2", "password1", "password2"), getProperties(User2.class));
+        Assertions.assertEquals(Arrays.asList("name", "password1", "password2", "id1", "id2"), getProperties(User3.class));
+        Assertions.assertEquals(Arrays.asList("password1", "id1", "password2", "id2", "name"), getProperties(User4.class));
     }
 
     private List<String> getProperties(Class<?> beanClass) {

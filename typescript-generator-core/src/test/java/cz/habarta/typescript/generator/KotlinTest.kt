@@ -1,7 +1,7 @@
 package cz.habarta.typescript.generator
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 
@@ -15,7 +15,7 @@ class KotlinTest {
         settings.nullabilityDefinition = NullabilityDefinition.undefinedInlineUnion
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("doSomething(arg0?: (A<string> | undefined)[]): RestResponse<(string | undefined)[] | undefined>;"))
+        Assertions.assertTrue(output.contains("doSomething(arg0?: (A<string> | undefined)[]): RestResponse<(string | undefined)[] | undefined>;"), errorMessage)
     }
 
     @Test
@@ -81,7 +81,7 @@ class KotlinTest {
         settings.nullabilityDefinition = NullabilityDefinition.undefinedInlineUnion
         settings.sortDeclarations = true
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(inputClass))
-        Assert.assertEquals(expected.replace('\'', '"'), output.trim { it <= ' ' })
+        Assertions.assertEquals(expected.replace('\'', '"'), output.trim { it <= ' ' })
     }
 
     @Test
@@ -89,7 +89,7 @@ class KotlinTest {
         val settings = TestUtils.settings()
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(A2::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("interface A2<S>"))
+        Assertions.assertTrue(output.contains("interface A2<S>"), errorMessage)
     }
 
     private class A2<S> where S : Enum<S> {

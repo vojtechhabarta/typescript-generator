@@ -12,10 +12,8 @@ import cz.habarta.typescript.generator.parser.Model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ExtensionTest {
 
@@ -61,8 +59,8 @@ public class ExtensionTest {
 
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
-        Assert.assertEquals(1, result.getBean(Implementation.class).getComments().size());
-        MatcherAssert.assertThat(result.getBean(Implementation.class).getComments().get(0), CoreMatchers.containsString("My new comment"));
+        Assertions.assertEquals(1, result.getBean(Implementation.class).getComments().size());
+        Assertions.assertTrue(result.getBean(Implementation.class).getComments().get(0).contains("My new comment"));
     }
 
     private static class Implementation { }

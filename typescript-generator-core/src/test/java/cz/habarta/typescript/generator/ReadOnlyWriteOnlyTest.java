@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class ReadOnlyWriteOnlyTest {
@@ -51,10 +51,10 @@ public class ReadOnlyWriteOnlyTest {
         user.password1 = "password1";
         user.password2 = "password2";
         final String json = new ObjectMapper().writeValueAsString(user);
-        Assert.assertTrue(json.contains("id1"));
-        Assert.assertTrue(json.contains("id2"));
-        Assert.assertTrue(!json.contains("password1"));
-        Assert.assertTrue(!json.contains("password2"));
+        Assertions.assertTrue(json.contains("id1"));
+        Assertions.assertTrue(json.contains("id2"));
+        Assertions.assertTrue(!json.contains("password1"));
+        Assertions.assertTrue(!json.contains("password2"));
     }
 
     @Test
@@ -62,10 +62,10 @@ public class ReadOnlyWriteOnlyTest {
         final String json = "{'name':'name','id1':'id1','id2':'id2','password1':'password1','password2':'password2'}"
                 .replace("'", "\"");
         final ReadOnlyWriteOnlyUser user = new ObjectMapper().readValue(json, ReadOnlyWriteOnlyUser.class);
-        Assert.assertNull(user.id1);
-        Assert.assertNull(user._id2);
-        Assert.assertNotNull(user.password1);
-        Assert.assertNotNull(user.password2);
+        Assertions.assertNull(user.id1);
+        Assertions.assertNull(user._id2);
+        Assertions.assertNotNull(user.password1);
+        Assertions.assertNotNull(user.password2);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ReadOnlyWriteOnlyTest {
                 + "     */\n"
                 + "    password2: string;\n"
                 + "}\n";
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
 }

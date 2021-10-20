@@ -25,8 +25,8 @@ import io.vavr.jackson.datatype.VavrModule;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -47,16 +47,16 @@ public class VavrTest {
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
         settings.additionalDataLibraries = Arrays.asList("vavr");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(VavrSerializedClasses.class));
-        Assert.assertTrue(output.contains("lazy: number"));
-        Assert.assertTrue(output.contains("option?: number"));
-        Assert.assertTrue(output.contains("charSeq: string"));
-        Assert.assertTrue(output.contains("list: string[]"));
-        Assert.assertTrue(output.contains("set: string[]"));
-        Assert.assertTrue(output.contains("priorityQueue: number[]"));
-        Assert.assertTrue(output.contains("map: { [index: string]: number }"));
-        Assert.assertTrue(output.contains("multimap: VavrMultimap<number>"));
-        Assert.assertTrue(output.contains("multimap2: VavrMultimap<Value>"));
-        Assert.assertTrue(output.contains("type VavrMultimap<V>"));
+        Assertions.assertTrue(output.contains("lazy: number"));
+        Assertions.assertTrue(output.contains("option?: number"));
+        Assertions.assertTrue(output.contains("charSeq: string"));
+        Assertions.assertTrue(output.contains("list: string[]"));
+        Assertions.assertTrue(output.contains("set: string[]"));
+        Assertions.assertTrue(output.contains("priorityQueue: number[]"));
+        Assertions.assertTrue(output.contains("map: { [index: string]: number }"));
+        Assertions.assertTrue(output.contains("multimap: VavrMultimap<number>"));
+        Assertions.assertTrue(output.contains("multimap2: VavrMultimap<Value>"));
+        Assertions.assertTrue(output.contains("type VavrMultimap<V>"));
     }
 
     private static final Key aKey = new Key("a");

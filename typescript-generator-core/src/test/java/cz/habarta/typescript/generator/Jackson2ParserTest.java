@@ -42,8 +42,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -54,53 +54,53 @@ public class Jackson2ParserTest {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Class<?> bean = DummyBean.class;
         final Model model = jacksonParser.parseModel(bean);
-        Assert.assertTrue(model.getBeans().size() > 0);
+        Assertions.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
-        Assert.assertTrue(beanModel.getProperties().size() > 0);
-        Assert.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
+        Assertions.assertEquals("DummyBean", beanModel.getOrigin().getSimpleName());
+        Assertions.assertTrue(beanModel.getProperties().size() > 0);
+        Assertions.assertEquals("firstProperty", beanModel.getProperties().get(0).getName());
     }
 
     @Test
     public void testChangedNameProperty() {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(DummyBeanJackson2.class);
-        Assert.assertTrue(model.getBeans().size() > 0);
+        Assertions.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals("DummyBeanJackson2", beanModel.getOrigin().getSimpleName());
-        Assert.assertTrue(beanModel.getProperties().size() > 0);
-        Assert.assertEquals("changedNameProperty", beanModel.getProperties().get(0).getName());
+        Assertions.assertEquals("DummyBeanJackson2", beanModel.getOrigin().getSimpleName());
+        Assertions.assertTrue(beanModel.getProperties().size() > 0);
+        Assertions.assertEquals("changedNameProperty", beanModel.getProperties().get(0).getName());
     }
 
     @Test
     public void testConflictingJsonTypeInfoProperty() {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(InheritedClass.class);
-        Assert.assertTrue(model.getBeans().size() > 0);
+        Assertions.assertTrue(model.getBeans().size() > 0);
         final BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals(1, beanModel.getProperties().size());
+        Assertions.assertEquals(1, beanModel.getProperties().size());
     }
 
     @Test
     public void testTaggedUnion() {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName1.class);
-        Assert.assertEquals(5, model.getBeans().size());
+        Assertions.assertEquals(5, model.getBeans().size());
         final BeanModel bean0 = model.getBean(ParentWithNameDiscriminant.class);
         final BeanModel bean1 = model.getBean(SubTypeDiscriminatedByName1.class);
         final BeanModel bean2 = model.getBean(SubTypeDiscriminatedByName2.class);
         final BeanModel bean3 = model.getBean(SubTypeDiscriminatedByName3.class);
         final BeanModel bean4 = model.getBean(SubTypeDiscriminatedByName4.class);
         final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
-        Assert.assertEquals(4, bean0.getTaggedUnionClasses().size());
-        Assert.assertNull(bean1.getTaggedUnionClasses());
-        Assert.assertNull(bean2.getTaggedUnionClasses());
-        Assert.assertNull(bean3.getTaggedUnionClasses());
-        Assert.assertEquals("kind", bean0.getDiscriminantProperty());
-        Assert.assertEquals("explicit-name1", bean1.getDiscriminantLiteral());
-        Assert.assertEquals("SubType2", bean2.getDiscriminantLiteral());
-        Assert.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName3", bean3.getDiscriminantLiteral());
-        Assert.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName4", bean4.getDiscriminantLiteral());
+        Assertions.assertEquals(4, bean0.getTaggedUnionClasses().size());
+        Assertions.assertNull(bean1.getTaggedUnionClasses());
+        Assertions.assertNull(bean2.getTaggedUnionClasses());
+        Assertions.assertNull(bean3.getTaggedUnionClasses());
+        Assertions.assertEquals("kind", bean0.getDiscriminantProperty());
+        Assertions.assertEquals("explicit-name1", bean1.getDiscriminantLiteral());
+        Assertions.assertEquals("SubType2", bean2.getDiscriminantLiteral());
+        Assertions.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName3", bean3.getDiscriminantLiteral());
+        Assertions.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName4", bean4.getDiscriminantLiteral());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class Jackson2ParserTest {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName5.class);
         final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
-        Assert.assertEquals("NamedByModule", bean5.getDiscriminantLiteral());
+        Assertions.assertEquals("NamedByModule", bean5.getDiscriminantLiteral());
     }
 
     static Jackson2Parser getJackson2Parser() {
@@ -169,16 +169,16 @@ public class Jackson2ParserTest {
         final Settings settings = TestUtils.settings();
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
-        Assert.assertTrue(output.contains("oname1?: string"));
-        Assert.assertTrue(output.contains("oname2?: string"));
-        Assert.assertTrue(output.contains("jname1?: string"));
-        Assert.assertTrue(output.contains("jname2?: string"));
-        Assert.assertTrue(output.contains("jname3: string"));
-        Assert.assertTrue(output.contains("jname4: string"));
-        Assert.assertTrue(output.contains("xname1?: string"));
-        Assert.assertTrue(output.contains("xname2?: string"));
-        Assert.assertTrue(output.contains("xname3?: string"));
-        Assert.assertTrue(output.contains("xname4?: string"));
+        Assertions.assertTrue(output.contains("oname1?: string"));
+        Assertions.assertTrue(output.contains("oname2?: string"));
+        Assertions.assertTrue(output.contains("jname1?: string"));
+        Assertions.assertTrue(output.contains("jname2?: string"));
+        Assertions.assertTrue(output.contains("jname3: string"));
+        Assertions.assertTrue(output.contains("jname4: string"));
+        Assertions.assertTrue(output.contains("xname1?: string"));
+        Assertions.assertTrue(output.contains("xname2?: string"));
+        Assertions.assertTrue(output.contains("xname3?: string"));
+        Assertions.assertTrue(output.contains("xname4?: string"));
     }
 
     @Test
@@ -187,16 +187,16 @@ public class Jackson2ParserTest {
         settings.jsonLibrary = JsonLibrary.jaxb;
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
-        Assert.assertTrue(output.contains("oname1?: string"));
-        Assert.assertTrue(output.contains("oname2?: string"));
-        Assert.assertTrue(output.contains("jname1?: string"));
-        Assert.assertTrue(output.contains("jname2?: string"));
-        Assert.assertTrue(output.contains("jname3?: string"));
-        Assert.assertTrue(output.contains("jname4?: string"));
-        Assert.assertTrue(output.contains("xname1?: string"));
-        Assert.assertTrue(output.contains("xname2?: string"));
-        Assert.assertTrue(output.contains("xname3: string"));
-        Assert.assertTrue(output.contains("xname4: string"));
+        Assertions.assertTrue(output.contains("oname1?: string"));
+        Assertions.assertTrue(output.contains("oname2?: string"));
+        Assertions.assertTrue(output.contains("jname1?: string"));
+        Assertions.assertTrue(output.contains("jname2?: string"));
+        Assertions.assertTrue(output.contains("jname3?: string"));
+        Assertions.assertTrue(output.contains("jname4?: string"));
+        Assertions.assertTrue(output.contains("xname1?: string"));
+        Assertions.assertTrue(output.contains("xname2?: string"));
+        Assertions.assertTrue(output.contains("xname3: string"));
+        Assertions.assertTrue(output.contains("xname4: string"));
     }
 
     public static class ClassWithOptionals {
@@ -271,11 +271,11 @@ public class Jackson2ParserTest {
     private void testEnumByType(Class<? extends Enum<?>> type, Object... expectedValues) {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(type);
-        Assert.assertEquals(1, model.getEnums().size());
+        Assertions.assertEquals(1, model.getEnums().size());
         final EnumModel enumModel = model.getEnums().get(0);
-        Assert.assertEquals(expectedValues.length, enumModel.getMembers().size());
+        Assertions.assertEquals(expectedValues.length, enumModel.getMembers().size());
         for (int i = 0; i < expectedValues.length; i++) {
-            Assert.assertEquals(expectedValues[i], enumModel.getMembers().get(i).getEnumValue());
+            Assertions.assertEquals(expectedValues[i], enumModel.getMembers().get(i).getEnumValue());
         }
     }
 
@@ -283,8 +283,8 @@ public class Jackson2ParserTest {
     public void testIgnoredProperty() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithIgnoredProperty.class));
-        Assert.assertTrue(output.contains("name1: string"));
-        Assert.assertTrue(!output.contains("name2: string"));
+        Assertions.assertTrue(output.contains("name1: string"));
+        Assertions.assertTrue(!output.contains("name2: string"));
     }
 
     private static class ClassWithIgnoredProperty {
@@ -306,16 +306,16 @@ public class Jackson2ParserTest {
         {
             final Settings settings = TestUtils.settings();
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
-            Assert.assertTrue(!output.contains("property1: string"));
-            Assert.assertTrue(output.contains("property2: string"));
+            Assertions.assertTrue(!output.contains("property1: string"));
+            Assertions.assertTrue(output.contains("property2: string"));
         }
         {
             final Settings settings = TestUtils.settings();
             settings.jackson2Configuration = new Jackson2ConfigurationResolved();
             settings.jackson2Configuration.setVisibility(ANY, NONE, NONE, NONE, NONE);
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
-            Assert.assertTrue(output.contains("property1: string"));
-            Assert.assertTrue(!output.contains("property2: string"));
+            Assertions.assertTrue(output.contains("property1: string"));
+            Assertions.assertTrue(!output.contains("property2: string"));
         }
     }
 
@@ -330,8 +330,8 @@ public class Jackson2ParserTest {
     public void testJsonNode() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonNode.class));
-        Assert.assertTrue(output.contains("node: any"));
-        Assert.assertTrue(output.contains("nodes: any[]"));
+        Assertions.assertTrue(output.contains("node: any"));
+        Assertions.assertTrue(output.contains("nodes: any[]"));
     }
 
     private static class ClassWithJsonNode {
@@ -344,11 +344,11 @@ public class Jackson2ParserTest {
         final Settings settings = TestUtils.settings();
         settings.mapEnum = EnumMapping.asEnum;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDescriptions.class, EnumWithDescriptions.class));
-        Assert.assertTrue(output.contains("Class description"));
-        Assert.assertTrue(output.contains("Property description"));
-        Assert.assertTrue(output.contains("second line"));
-        Assert.assertTrue(output.contains("Enum description"));
-        Assert.assertTrue(output.contains("Enum constant description"));
+        Assertions.assertTrue(output.contains("Class description"));
+        Assertions.assertTrue(output.contains("Property description"));
+        Assertions.assertTrue(output.contains("second line"));
+        Assertions.assertTrue(output.contains("Enum description"));
+        Assertions.assertTrue(output.contains("Enum constant description"));
     }
 
     @JsonClassDescription("Class description\nsecond line")
@@ -436,17 +436,17 @@ public class Jackson2ParserTest {
         contract.projects = Collections.singletonList(new Project());
         contract.projectMap = Collections.singletonMap("p1", new Project());
         final String output = new ObjectMapper().writeValueAsString(contract);
-        Assert.assertTrue(output.contains(q("'project':{'id':")));
-        Assert.assertTrue(output.contains(q("'projects':[{'id':")));
-        Assert.assertTrue(output.contains(q("'projectMap':{'p1':{'id'")));
-        Assert.assertFalse(output.contains("name"));
+        Assertions.assertTrue(output.contains(q("'project':{'id':")));
+        Assertions.assertTrue(output.contains(q("'projects':[{'id':")));
+        Assertions.assertTrue(output.contains(q("'projectMap':{'p1':{'id'")));
+        Assertions.assertFalse(output.contains("name"));
     }
 
     @Test
     public void testJacksonLocalDateTimeDeserializer() throws JsonProcessingException {
         final String json = q("{ 'localDateTime': 'TODAY' }");
         final Contract contract = new ObjectMapper().readValue(json, Contract.class);
-        Assert.assertEquals(LocalDate.parse("2020-07-17"), contract.localDateTime.toLocalDate());
+        Assertions.assertEquals(LocalDate.parse("2020-07-17"), contract.localDateTime.toLocalDate());
     }
 
     private static String q(String json) {
@@ -460,10 +460,10 @@ public class Jackson2ParserTest {
         settings.jackson2Configuration.serializerTypeMappings = Collections.singletonMap(IdSerializer.class, "{ id: string }");
         settings.jackson2Configuration.deserializerTypeMappings = Collections.singletonMap(LocalDateTimeJsonDeserializer.class, "\"TODAY\" | string");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Contract.class));
-        Assert.assertTrue(output.contains("project: { id: string }"));
-        Assert.assertTrue(output.contains("projects: { id: string }[]"));
-        Assert.assertTrue(output.contains("projectMap: { [index: string]: { id: string } }"));
-        Assert.assertTrue(output.contains("localDateTime: \"TODAY\" | string"));
+        Assertions.assertTrue(output.contains("project: { id: string }"));
+        Assertions.assertTrue(output.contains("projects: { id: string }[]"));
+        Assertions.assertTrue(output.contains("projectMap: { [index: string]: { id: string } }"));
+        Assertions.assertTrue(output.contains("localDateTime: \"TODAY\" | string"));
     }
 
     @Test
@@ -473,9 +473,9 @@ public class Jackson2ParserTest {
         final Settings settings = TestUtils.settings();
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonCreatorConstructor.class));
-        Assert.assertTrue(output.contains("a: string;"));
-        Assert.assertTrue(output.contains("b: string;"));
-        Assert.assertTrue(output.contains("@writeonly"));
+        Assertions.assertTrue(output.contains("a: string;"));
+        Assertions.assertTrue(output.contains("b: string;"));
+        Assertions.assertTrue(output.contains("@writeonly"));
     }
 
     public static class ClassWithJsonCreatorConstructor {
@@ -503,9 +503,9 @@ public class Jackson2ParserTest {
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.optionalAnnotations = Arrays.asList(MyOptional.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonCreatorFactoryMethod.class));
-        Assert.assertTrue(output.contains("a: string;"));
-        Assert.assertTrue(output.contains("b?: string;"));
-        Assert.assertTrue(output.contains("@writeonly"));
+        Assertions.assertTrue(output.contains("a: string;"));
+        Assertions.assertTrue(output.contains("b?: string;"));
+        Assertions.assertTrue(output.contains("@writeonly"));
     }
 
     public static class ClassWithJsonCreatorFactoryMethod {

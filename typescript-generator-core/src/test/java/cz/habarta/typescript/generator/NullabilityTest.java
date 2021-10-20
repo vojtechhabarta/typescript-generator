@@ -4,8 +4,8 @@ package cz.habarta.typescript.generator;
 import java.util.Date;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -34,7 +34,7 @@ public class NullabilityTest {
                 "    test: string;\n" +
                 "    testNullable?: string;\n" +
                 "}";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
     private static class A<T> {
@@ -80,7 +80,7 @@ public class NullabilityTest {
         settings.nullabilityDefinition = nullabilityDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(B.class));
         for (String s : expected) {
-            Assert.assertTrue(output.contains(s));
+            Assertions.assertTrue(output.contains(s));
         }
     }
 
@@ -119,14 +119,14 @@ public class NullabilityTest {
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
         settings.nullabilityDefinition = nullabilityDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(B.class));
-        Assert.assertTrue("Unexpected actual output: " + output, output.contains(expected));
+        Assertions.assertTrue(output.contains(expected), "Unexpected actual output: " + output);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testNullableAnnotationTarget() {
         final Settings settings = TestUtils.settings();
         settings.nullableAnnotations.add(javax.annotation.Nullable.class);
-        new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class));
+        Assertions.assertThrows(RuntimeException.class, () -> new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class)));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class NullabilityTest {
         settings.nullabilityDefinition = NullabilityDefinition.nullAndUndefinedUnion;
         settings.mapDate = DateMapping.asString;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDate.class));
-        Assert.assertTrue(output.contains("date?: Nullable<DateAsString>"));
+        Assertions.assertTrue(output.contains("date?: Nullable<DateAsString>"));
     }
 
     private static class ClassWithDate {

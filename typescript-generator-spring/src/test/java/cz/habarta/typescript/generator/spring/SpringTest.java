@@ -15,8 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,10 +40,10 @@ public class SpringTest {
     public void testAnnotationUtils() {
         final Method greetingMethod = getMethod(SpringTestApplication.GreetingController.class, "greeting");
         final RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(greetingMethod, RequestMapping.class);
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(0, mapping.method().length);
-        Assert.assertEquals(1, mapping.path().length);
-        Assert.assertEquals("/greeting", mapping.path()[0]);
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(0, mapping.method().length);
+        Assertions.assertEquals(1, mapping.path().length);
+        Assertions.assertEquals("/greeting", mapping.path()[0]);
     }
 
     private static Method getMethod(Class<?> cls, String methodName) {
@@ -61,9 +61,9 @@ public class SpringTest {
         settings.scanSpringApplication = true;
         settings.classLoader = Thread.currentThread().getContextClassLoader();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SpringTestApplication.class));
-        Assert.assertTrue(output.contains("interface RestApplication"));
-        Assert.assertTrue(output.contains("greeting(queryParams?: { name?: string; count?: number; unnamed?: string; }): RestResponse<Greeting>"));
-        Assert.assertTrue(output.contains("interface Greeting"));
+        Assertions.assertTrue(output.contains("interface RestApplication"));
+        Assertions.assertTrue(output.contains("greeting(queryParams?: { name?: string; count?: number; unnamed?: string; }): RestResponse<Greeting>"));
+        Assertions.assertTrue(output.contains("interface Greeting"));
     }
 
     @Test
@@ -72,9 +72,9 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller1.class));
-        Assert.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
-        Assert.assertTrue(output.contains("uriEncoding`owners/${ownerId}/pets/${petId}`"));
-        Assert.assertTrue(output.contains("interface Pet"));
+        Assertions.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
+        Assertions.assertTrue(output.contains("uriEncoding`owners/${ownerId}/pets/${petId}`"));
+        Assertions.assertTrue(output.contains("interface Pet"));
     }
 
     @Test
@@ -83,9 +83,9 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller5.class));
-        Assert.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
-        Assert.assertTrue(output.contains("uriEncoding`owners2/${ownerId}/pets2/${petId}`"));
-        Assert.assertTrue(output.contains("interface Pet"));
+        Assertions.assertTrue(output.contains("findPet(ownerId: number, petId: number): RestResponse<Pet>"));
+        Assertions.assertTrue(output.contains("uriEncoding`owners2/${ownerId}/pets2/${petId}`"));
+        Assertions.assertTrue(output.contains("interface Pet"));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithReservedWord.class));
-        Assert.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>"));
-        Assert.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
+        Assertions.assertTrue(output.contains("getLogs(_class: string): RestResponse<string[]>"));
+        Assertions.assertTrue(output.contains("uriEncoding`logs/${_class}`"));
     }
 
     @RestController
@@ -113,7 +113,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
-        Assert.assertTrue(output.contains("echo(queryParams: { message: string; count?: number; optionalRequestParam?: number; }): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("echo(queryParams: { message: string; count?: number; optionalRequestParam?: number; }): RestResponse<string>"));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller7.class));
-        Assert.assertTrue(output.contains("echo(queryParams?: { message?: string; }): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("echo(queryParams?: { message?: string; }): RestResponse<string>"));
     }
 
     @Test
@@ -131,8 +131,8 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller3.class));
-        Assert.assertTrue(output.contains("setEntity(data: Data1): RestResponse<void>"));
-        Assert.assertTrue(output.contains("interface Data1"));
+        Assertions.assertTrue(output.contains("setEntity(data: Data1): RestResponse<void>"));
+        Assertions.assertTrue(output.contains("interface Data1"));
     }
 
     @Test
@@ -141,8 +141,8 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller4.class));
-        Assert.assertTrue(output.contains("getEntity(): RestResponse<Data2>"));
-        Assert.assertTrue(output.contains("interface Data2"));
+        Assertions.assertTrue(output.contains("getEntity(): RestResponse<Data2>"));
+        Assertions.assertTrue(output.contains("interface Data2"));
     }
 
     @Test
@@ -151,8 +151,8 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
-        Assert.assertTrue(output.contains("doSomething(input: number[]): RestResponse<{ [P in Controller6Enum]?: any }[]>"));
-        Assert.assertTrue(output.contains("type Controller6Enum"));
+        Assertions.assertTrue(output.contains("doSomething(input: number[]): RestResponse<{ [P in Controller6Enum]?: any }[]>"));
+        Assertions.assertTrue(output.contains("type Controller6Enum"));
     }
 
     @Test
@@ -161,10 +161,10 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
-        Assert.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
-        Assert.assertTrue(output.contains("doSomethingElseAgain(): RestResponse<number>"));
-        Assert.assertTrue(output.contains("uriEncoding`test/c`"));
-        Assert.assertFalse(output.contains("uriEncoding`test/b`"));
+        Assertions.assertTrue(output.contains("doSomethingElse(id: number): RestResponse<number>"));
+        Assertions.assertTrue(output.contains("doSomethingElseAgain(): RestResponse<number>"));
+        Assertions.assertTrue(output.contains("uriEncoding`test/c`"));
+        Assertions.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
     @Test
@@ -217,7 +217,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithModelAttribute.class));
-        Assert.assertTrue(output.contains("echoWithModelAttribute(queryParams?: { message?: string; }): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("echoWithModelAttribute(queryParams?: { message?: string; }): RestResponse<string>"));
     }
 
     @RestController
@@ -316,7 +316,7 @@ public class SpringTest {
         settings.customTypeMappings.put("cz.habarta.typescript.generator.spring.SpringTest$Wrapper<T>", "Unwrap<T>");
         settings.importDeclarations.add("import { Unwrap } from './unwrap'");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithWrapper.class));
-        Assert.assertTrue(output.contains("getEntity(): RestResponse<Unwrap<string>>"));
+        Assertions.assertTrue(output.contains("getEntity(): RestResponse<Unwrap<string>>"));
     }
 
     @Test
@@ -326,7 +326,7 @@ public class SpringTest {
         settings.generateSpringApplicationClient = true;
         settings.customTypeMappings.put("cz.habarta.typescript.generator.spring.SpringTest$Wrapper<T>", "T");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithWrapper.class));
-        Assert.assertTrue(output.contains("getEntity(): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("getEntity(): RestResponse<string>"));
     }
 
     @RestController
@@ -347,7 +347,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ConcreteGenerticController.class));
-        Assert.assertTrue(output.contains("post(input: string): RestResponse<number>"));
+        Assertions.assertTrue(output.contains("post(input: string): RestResponse<number>"));
     }
 
     @RestController
@@ -372,7 +372,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(PageableController.class));
-        Assert.assertTrue(output.contains(" post(queryParams?: { page?: number; size?: number; sort?: string; }): RestResponse<Page<string>>"));
+        Assertions.assertTrue(output.contains(" post(queryParams?: { page?: number; size?: number; sort?: string; }): RestResponse<Page<string>>"));
     }
 
     @RestController
@@ -389,7 +389,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DoubleGenericController.class));
-        Assert.assertTrue(output.contains(" get(): RestResponse<string[]>"));
+        Assertions.assertTrue(output.contains(" get(): RestResponse<string[]>"));
     }
 
     @RestController
@@ -406,7 +406,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomAnnotatedController.class));
-        Assert.assertTrue(output.contains("getText(): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("getText(): RestResponse<string>"));
     }
 
     @MyRestController
@@ -428,8 +428,8 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TestUrlTrailingSlashController.class));
-        Assert.assertTrue(Pattern.compile("response\\(\\):.*\\n.*uriEncoding`controller/`").matcher(output).find());
-        Assert.assertTrue(Pattern.compile("response2\\(\\):.*\\n.*uriEncoding`controller`").matcher(output).find());
+        Assertions.assertTrue(Pattern.compile("response\\(\\):.*\\n.*uriEncoding`controller/`").matcher(output).find());
+        Assertions.assertTrue(Pattern.compile("response2\\(\\):.*\\n.*uriEncoding`controller`").matcher(output).find());
     }
 
     @RestController
@@ -449,7 +449,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithMultiValueMap.class));
-        Assert.assertTrue(output.contains("search(queryParams?: { [index: string]: any }): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("search(queryParams?: { [index: string]: any }): RestResponse<string>"));
     }
 
     @RestController

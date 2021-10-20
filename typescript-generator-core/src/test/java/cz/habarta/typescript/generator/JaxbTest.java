@@ -6,8 +6,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class JaxbTest {
@@ -17,8 +17,8 @@ public class JaxbTest {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.jaxb;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(MyJaxbBean.class));
-        Assert.assertTrue(output.contains("king"));
-        Assert.assertFalse(output.contains("age"));
+        Assertions.assertTrue(output.contains("king"));
+        Assertions.assertFalse(output.contains("age"));
     }
 
     @XmlRootElement
@@ -37,10 +37,10 @@ public class JaxbTest {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.jaxb;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJAXBElements.class));
-        Assert.assertTrue(output.contains("ExternalReference: string"));
-        Assert.assertTrue(output.contains("UserInformation: UserType"));
-        Assert.assertTrue(output.contains("Source: EndPointType"));
-        Assert.assertTrue(output.contains("AdditionalContextInfo: AdditionalContextType"));
+        Assertions.assertTrue(output.contains("ExternalReference: string"));
+        Assertions.assertTrue(output.contains("UserInformation: UserType"));
+        Assertions.assertTrue(output.contains("Source: EndPointType"));
+        Assertions.assertTrue(output.contains("AdditionalContextInfo: AdditionalContextType"));
     }
 
     @XmlRootElement

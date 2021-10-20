@@ -10,8 +10,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
@@ -218,7 +218,7 @@ public class TaggedUnionsTest {
                 "type ShapeUnion = Square | Rectangle | Circle;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -254,7 +254,7 @@ public class TaggedUnionsTest {
                 "type IShape2Union = CSquare2 | CRectangle2 | CCircle2;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class TaggedUnionsTest {
                 "\n" +
                 "type IShape3Union = IRectangle3 | ICircle3;\n"
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -325,7 +325,7 @@ public class TaggedUnionsTest {
                 "}\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -357,7 +357,7 @@ public class TaggedUnionsTest {
                 "type DiamondAUnion = DiamondB1 | DiamondB2 | DiamondC;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -384,15 +384,15 @@ public class TaggedUnionsTest {
                 "type CarUnion = DieselCar | ElectricCar;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
     public void testWithTypeParameter() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Earth.class));
-        Assert.assertTrue(output.contains("EngineUnion"));
-        Assert.assertTrue(output.contains("VehiculeUnion<M>"));
+        Assertions.assertTrue(output.contains("EngineUnion"));
+        Assertions.assertTrue(output.contains("VehiculeUnion<M>"));
     }
 
     public static void main(String[] args) throws Exception {
@@ -432,8 +432,8 @@ public class TaggedUnionsTest {
         final Settings settings = TestUtils.settings();
         settings.outputKind = TypeScriptOutputKind.module;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AsyncUsage.class));
-        Assert.assertTrue(output.contains("result: AsyncOperationResultUnion<string>"));
-        Assert.assertTrue(output.contains("type AsyncOperationResultUnion<T> = InProgressResult<T> | FinishedResult<T> | FailedResult<T>"));
+        Assertions.assertTrue(output.contains("result: AsyncOperationResultUnion<string>"));
+        Assertions.assertTrue(output.contains("type AsyncOperationResultUnion<T> = InProgressResult<T> | FinishedResult<T> | FailedResult<T>"));
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -461,8 +461,8 @@ public class TaggedUnionsTest {
         final Settings settings = TestUtils.settings();
         settings.outputKind = TypeScriptOutputKind.module;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BaseUsage.class));
-        Assert.assertTrue(output.contains("result: BaseUnion<string, number>"));
-        Assert.assertTrue(output.contains("type BaseUnion<A, B> = FlippedGenericParameters<B, A>"));
+        Assertions.assertTrue(output.contains("result: BaseUnion<string, number>"));
+        Assertions.assertTrue(output.contains("type BaseUnion<A, B> = FlippedGenericParameters<B, A>"));
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
@@ -494,7 +494,7 @@ public class TaggedUnionsTest {
         settings.nonConstEnums = true;
         settings.mapPackagesToNamespaces = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EntityCollection.class));
-        Assert.assertTrue(output.contains("type EntityUnion<T> = cz.habarta.typescript.generator.TaggedUnionsTest.Foo | cz.habarta.typescript.generator.TaggedUnionsTest.Bar"));
+        Assertions.assertTrue(output.contains("type EntityUnion<T> = cz.habarta.typescript.generator.TaggedUnionsTest.Foo | cz.habarta.typescript.generator.TaggedUnionsTest.Bar"));
     }
 
     @Test
@@ -530,7 +530,7 @@ public class TaggedUnionsTest {
                 "type Shape2Union = Square2 | Rectangle2 | Circle2;\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Test
@@ -562,7 +562,7 @@ public class TaggedUnionsTest {
                 "}\n" +
                 ""
                 ).replace('\'', '"');
-        Assert.assertEquals(expected, output);
+        Assertions.assertEquals(expected, output);
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -686,7 +686,7 @@ public class TaggedUnionsTest {
                 + "\n"
                 + "type ListRecordUnion = OrderListRecord | ProductListRecord;\n"
                 + "";
-        Assert.assertEquals(expected.trim(), output.trim());
+        Assertions.assertEquals(expected.trim(), output.trim());
     }
 
 }

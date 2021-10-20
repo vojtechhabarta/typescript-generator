@@ -1,8 +1,8 @@
 
 package cz.habarta.typescript.generator;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class InterfaceTest {
@@ -11,9 +11,9 @@ public class InterfaceTest {
     public void test() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Book.class));
-        Assert.assertTrue(output.contains("interface Book"));
-        Assert.assertTrue(output.contains("title: string;"));
-        Assert.assertTrue(output.contains("interface Author"));
+        Assertions.assertTrue(output.contains("interface Book"));
+        Assertions.assertTrue(output.contains("title: string;"));
+        Assertions.assertTrue(output.contains("interface Author"));
     }
 
     @Test
@@ -21,9 +21,9 @@ public class InterfaceTest {
         final Settings settings = TestUtils.settings();
         settings.declarePropertiesAsReadOnly = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Book.class));
-        Assert.assertTrue(output.contains("readonly author: Author;"));
-        Assert.assertTrue(output.contains("readonly title: string;"));
-        Assert.assertTrue(output.contains("readonly name: string;"));
+        Assertions.assertTrue(output.contains("readonly author: Author;"));
+        Assertions.assertTrue(output.contains("readonly title: string;"));
+        Assertions.assertTrue(output.contains("readonly name: string;"));
     }
 
     static interface Book {

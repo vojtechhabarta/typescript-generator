@@ -8,9 +8,9 @@ import static cz.habarta.typescript.generator.TsType.String;
 import cz.habarta.typescript.generator.TsType.UnionType;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.Arrays;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import org.junit.jupiter.api.Test;
 
 public class TsTypeTest {
 

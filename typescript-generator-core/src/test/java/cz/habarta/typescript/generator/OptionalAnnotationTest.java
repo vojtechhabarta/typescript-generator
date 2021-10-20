@@ -15,8 +15,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class OptionalAnnotationTest {
@@ -52,11 +52,11 @@ public class OptionalAnnotationTest {
     }
 
     private void testModel(Model model, boolean optional) {
-        Assert.assertEquals(1, model.getBeans().size());
+        Assertions.assertEquals(1, model.getBeans().size());
         BeanModel beanModel = model.getBeans().get(0);
-        Assert.assertEquals(2, beanModel.getProperties().size());
+        Assertions.assertEquals(2, beanModel.getProperties().size());
         for (PropertyModel propertyModel : beanModel.getProperties()) {
-            Assert.assertEquals(optional, propertyModel.isOptional());
+            Assertions.assertEquals(optional, propertyModel.isOptional());
         }
     }
 
@@ -75,7 +75,7 @@ public class OptionalAnnotationTest {
         settings.jsonLibrary = jsonLibrary;
         settings.optionalAnnotations.add(javax.annotation.Nullable.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanWithJavaxNullable.class));
-        Assert.assertTrue(output.contains("property1?: string;"));
+        Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
     @org.codehaus.jackson.annotate.JacksonAnnotation
@@ -118,8 +118,8 @@ public class OptionalAnnotationTest {
         Settings settings = TestUtils.settings();
         settings.optionalAnnotations.add(NullableType.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BeanWithNullableType.class));
-        Assert.assertTrue(output.contains("property1?: string;"));
-        Assert.assertTrue(output.contains("property2?: string;"));
+        Assertions.assertTrue(output.contains("property1?: string;"));
+        Assertions.assertTrue(output.contains("property2?: string;"));
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -142,7 +142,7 @@ public class OptionalAnnotationTest {
         final Settings settings = TestUtils.settings();
         settings.optionalAnnotations.add(TypescriptOptional.class);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SearchDTO.class));
-        Assert.assertTrue(output.contains("selectedId?: number;"));
+        Assertions.assertTrue(output.contains("selectedId?: number;"));
     }
 
     public class SearchDTO {
@@ -173,31 +173,31 @@ public class OptionalAnnotationTest {
             settings.optionalAnnotations = Arrays.asList();
             settings.requiredAnnotations = Arrays.asList();
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
-            Assert.assertTrue(output.contains("a: string;"));
-            Assert.assertTrue(output.contains("b: string;"));
+            Assertions.assertTrue(output.contains("a: string;"));
+            Assertions.assertTrue(output.contains("b: string;"));
         }
         {
             final Settings settings = TestUtils.settings();
             settings.optionalAnnotations = Arrays.asList(MarkerAnnotation.class);
             settings.requiredAnnotations = Arrays.asList();
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
-            Assert.assertTrue(output.contains("a: string;"));
-            Assert.assertTrue(output.contains("b?: string;"));
+            Assertions.assertTrue(output.contains("a: string;"));
+            Assertions.assertTrue(output.contains("b?: string;"));
         }
         {
             final Settings settings = TestUtils.settings();
             settings.optionalAnnotations = Arrays.asList();
             settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
-            Assert.assertTrue(output.contains("a?: string;"));
-            Assert.assertTrue(output.contains("b: string;"));
+            Assertions.assertTrue(output.contains("a?: string;"));
+            Assertions.assertTrue(output.contains("b: string;"));
         }
         try {
             final Settings settings = TestUtils.settings();
             settings.optionalAnnotations = Arrays.asList(MarkerAnnotation.class);
             settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
             new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithMarkedField.class));
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
             // expected - optionalAnnotations and requiredAnnotations cannot be used together
         }
@@ -219,34 +219,34 @@ public class OptionalAnnotationTest {
             settings.requiredAnnotations = Arrays.asList(MarkerAnnotation.class);
             settings.primitivePropertiesRequired = true;
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
-            Assert.assertTrue(output.contains("charVar1: string;"));
-            Assert.assertTrue(output.contains("byteVar1: number;"));
-            Assert.assertTrue(output.contains("shortVar1: number;"));
-            Assert.assertTrue(output.contains("intVar1: number;"));
-            Assert.assertTrue(output.contains("longVar1: number;"));
-            Assert.assertTrue(output.contains("floatVar1: number;"));
-            Assert.assertTrue(output.contains("doubleVar1: number;"));
-            Assert.assertTrue(output.contains("booleanVar1: boolean;"));
-            Assert.assertTrue(output.contains("stringVar?: string;"));
-            Assert.assertTrue(output.contains("charVar2?: string;"));
-            Assert.assertTrue(output.contains("byteVar2?: number;"));
-            Assert.assertTrue(output.contains("shortVar2?: number;"));
-            Assert.assertTrue(output.contains("intVar2?: number;"));
-            Assert.assertTrue(output.contains("longVar2?: number;"));
-            Assert.assertTrue(output.contains("floatVar2?: number;"));
-            Assert.assertTrue(output.contains("doubleVar2?: number;"));
-            Assert.assertTrue(output.contains("booleanVar2?: boolean;"));
-            Assert.assertTrue(output.contains("uuidVar?: string;"));
-            Assert.assertTrue(output.contains("dateVar?: Date;"));
-            Assert.assertTrue(output.contains("collectionVar?: string[];"));
-            Assert.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
+            Assertions.assertTrue(output.contains("charVar1: string;"));
+            Assertions.assertTrue(output.contains("byteVar1: number;"));
+            Assertions.assertTrue(output.contains("shortVar1: number;"));
+            Assertions.assertTrue(output.contains("intVar1: number;"));
+            Assertions.assertTrue(output.contains("longVar1: number;"));
+            Assertions.assertTrue(output.contains("floatVar1: number;"));
+            Assertions.assertTrue(output.contains("doubleVar1: number;"));
+            Assertions.assertTrue(output.contains("booleanVar1: boolean;"));
+            Assertions.assertTrue(output.contains("stringVar?: string;"));
+            Assertions.assertTrue(output.contains("charVar2?: string;"));
+            Assertions.assertTrue(output.contains("byteVar2?: number;"));
+            Assertions.assertTrue(output.contains("shortVar2?: number;"));
+            Assertions.assertTrue(output.contains("intVar2?: number;"));
+            Assertions.assertTrue(output.contains("longVar2?: number;"));
+            Assertions.assertTrue(output.contains("floatVar2?: number;"));
+            Assertions.assertTrue(output.contains("doubleVar2?: number;"));
+            Assertions.assertTrue(output.contains("booleanVar2?: boolean;"));
+            Assertions.assertTrue(output.contains("uuidVar?: string;"));
+            Assertions.assertTrue(output.contains("dateVar?: Date;"));
+            Assertions.assertTrue(output.contains("collectionVar?: string[];"));
+            Assertions.assertTrue(output.contains("mapVar?: { [index: string]: string };"));
         }
         try {
             final Settings settings = TestUtils.settings();
             settings.requiredAnnotations = Arrays.asList();
             settings.primitivePropertiesRequired = true;
             new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPrimitiveField.class));
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
             // expected - 'primitivePropertiesRequired' parameter can only be used with 'requiredAnnotations' parameter
         }

@@ -7,9 +7,9 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.UUID;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
 public class DefaultTypeProcessorTest {
@@ -58,8 +58,8 @@ public class DefaultTypeProcessorTest {
     @Test
     public void testRawTypes() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(DummyBean.class));
-        Assert.assertTrue(output.contains("rawListProperty: any[]"));
-        Assert.assertTrue(output.contains("rawMapProperty: { [index: string]: any }"));
+        Assertions.assertTrue(output.contains("rawListProperty: any[]"));
+        Assertions.assertTrue(output.contains("rawMapProperty: { [index: string]: any }"));
     }
 
 }

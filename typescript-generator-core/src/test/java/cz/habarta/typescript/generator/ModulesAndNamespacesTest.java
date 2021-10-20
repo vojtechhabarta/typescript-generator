@@ -6,7 +6,7 @@ import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import java.io.File;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 // run `tsc` compiler from `src/test/ts` directory after this test
 public class ModulesAndNamespacesTest {

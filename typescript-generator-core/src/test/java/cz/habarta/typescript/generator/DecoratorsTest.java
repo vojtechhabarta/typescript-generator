@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class DecoratorsTest {
@@ -36,8 +36,8 @@ public class DecoratorsTest {
         settings.extensions.add(new ClassNameDecoratorExtension());
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(City.class));
-        Assert.assertTrue(output.contains("@JsonObject(\"City\")"));
-        Assert.assertTrue(output.contains("@JsonProperty(\"name\", String)"));
+        Assertions.assertTrue(output.contains("@JsonObject(\"City\")"));
+        Assertions.assertTrue(output.contains("@JsonProperty(\"name\", String)"));
     }
 
     private static class ClassNameDecoratorExtension extends Extension {
@@ -124,8 +124,8 @@ public class DecoratorsTest {
                 ));
         final TsModel tsModel2 = tsModel.withBeans(Arrays.asList(bean2));
         final String output = emit(typeScriptGenerator.getEmitter(), tsModel2);
-        Assert.assertTrue(output.contains("@Inject(\"token\")"));
-        Assert.assertTrue(output.contains("@enumerable(false)"));
+        Assertions.assertTrue(output.contains("@Inject(\"token\")"));
+        Assertions.assertTrue(output.contains("@enumerable(false)"));
     }
 
     private static String emit(Emitter emitter, TsModel model) {

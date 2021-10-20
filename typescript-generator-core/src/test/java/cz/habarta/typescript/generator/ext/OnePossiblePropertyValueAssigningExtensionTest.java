@@ -11,8 +11,8 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class OnePossiblePropertyValueAssigningExtensionTest {
     private static final String BASE_PATH = "/ext/OnePossiblePropertyValueAssigningExtensionTest-";
@@ -61,7 +61,7 @@ public class OnePossiblePropertyValueAssigningExtensionTest {
 
         String expected = readResource("all.ts");
 
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     private static Settings createBaseSettings(OnePossiblePropertyValueAssigningExtension extension) {

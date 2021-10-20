@@ -13,8 +13,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class SwaggerTest {
@@ -24,14 +24,14 @@ public class SwaggerTest {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(TestApplication.class));
-        Assert.assertTrue(output.contains("interface TestResponse"));
-        Assert.assertTrue(output.contains("interface TestError"));
-        Assert.assertTrue(output.contains("testOperationError(): RestResponse<any>;"));
-        Assert.assertTrue(output.contains("testOperation1(): RestResponse<TestResponse>;"));
-        Assert.assertTrue(output.contains("testOperation2(): RestResponse<TestResponse[]>;"));
-        Assert.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
-        Assert.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
-        Assert.assertTrue(!output.contains("testHiddenOperation"));
+        Assertions.assertTrue(output.contains("interface TestResponse"));
+        Assertions.assertTrue(output.contains("interface TestError"));
+        Assertions.assertTrue(output.contains("testOperationError(): RestResponse<any>;"));
+        Assertions.assertTrue(output.contains("testOperation1(): RestResponse<TestResponse>;"));
+        Assertions.assertTrue(output.contains("testOperation2(): RestResponse<TestResponse[]>;"));
+        Assertions.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
+        Assertions.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
+        Assertions.assertTrue(!output.contains("testHiddenOperation"));
     }
 
     @Test
@@ -39,13 +39,13 @@ public class SwaggerTest {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
-        Assert.assertTrue(output.contains("Documentation for operation 1."));
-        Assert.assertTrue(output.contains("Bad Request"));
-        Assert.assertTrue(output.contains("Not Found"));
-        Assert.assertTrue(output.contains("Documentation for the bean."));
-        Assert.assertTrue(output.contains("Documentation for property 1."));
-        Assert.assertTrue(output.contains("Documentation for property 2."));
-        Assert.assertTrue(output.contains("Documentation for property 3."));
+        Assertions.assertTrue(output.contains("Documentation for operation 1."));
+        Assertions.assertTrue(output.contains("Bad Request"));
+        Assertions.assertTrue(output.contains("Not Found"));
+        Assertions.assertTrue(output.contains("Documentation for the bean."));
+        Assertions.assertTrue(output.contains("Documentation for property 1."));
+        Assertions.assertTrue(output.contains("Documentation for property 2."));
+        Assertions.assertTrue(output.contains("Documentation for property 3."));
     }
 
     @Test
@@ -53,9 +53,9 @@ public class SwaggerTest {
         final Settings settings = TestUtils.settings();
         settings.generateJaxrsApplicationInterface = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
-        Assert.assertTrue(output.contains("property1: string"));
-        Assert.assertTrue(output.contains("property2?: string"));
-        Assert.assertTrue(output.contains("property3: string"));
+        Assertions.assertTrue(output.contains("property1: string"));
+        Assertions.assertTrue(output.contains("property2?: string"));
+        Assertions.assertTrue(output.contains("property3: string"));
     }
 
     @Test
@@ -64,16 +64,16 @@ public class SwaggerTest {
         settings.generateJaxrsApplicationInterface = true;
         settings.ignoreSwaggerAnnotations = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DocumentedApplication.class));
-        Assert.assertTrue(!output.contains("Documentation for operation 1."));
-        Assert.assertTrue(!output.contains("Bad Request"));
-        Assert.assertTrue(!output.contains("Not Found"));
-        Assert.assertTrue(!output.contains("Documentation for the bean."));
-        Assert.assertTrue(!output.contains("Documentation for property 1."));
-        Assert.assertTrue(!output.contains("Documentation for property 2."));
-        Assert.assertTrue(!output.contains("Documentation for property 3."));
-        Assert.assertTrue(output.contains("property1: string"));
-        Assert.assertTrue(output.contains("property2: number"));
-        Assert.assertTrue(output.contains("property3: number"));
+        Assertions.assertTrue(!output.contains("Documentation for operation 1."));
+        Assertions.assertTrue(!output.contains("Bad Request"));
+        Assertions.assertTrue(!output.contains("Not Found"));
+        Assertions.assertTrue(!output.contains("Documentation for the bean."));
+        Assertions.assertTrue(!output.contains("Documentation for property 1."));
+        Assertions.assertTrue(!output.contains("Documentation for property 2."));
+        Assertions.assertTrue(!output.contains("Documentation for property 3."));
+        Assertions.assertTrue(output.contains("property1: string"));
+        Assertions.assertTrue(output.contains("property2: number"));
+        Assertions.assertTrue(output.contains("property3: number"));
     }
 
     private static class TestApplication extends Application {

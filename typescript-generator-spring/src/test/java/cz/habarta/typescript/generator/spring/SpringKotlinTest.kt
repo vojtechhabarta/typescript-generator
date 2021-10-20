@@ -5,8 +5,8 @@ import cz.habarta.typescript.generator.NullabilityDefinition
 import cz.habarta.typescript.generator.TestUtils
 import cz.habarta.typescript.generator.TypeScriptFileType
 import cz.habarta.typescript.generator.TypeScriptGenerator
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,7 +23,7 @@ class SpringKotlinTest {
         settings.nullabilityDefinition = NullabilityDefinition.undefinedInlineUnion
         val output = TypeScriptGenerator(settings).generateTypeScript(Input.from(B::class.java))
         val errorMessage = "Unexpected output: $output"
-        Assert.assertTrue(errorMessage, output.contains("doSomething(arg0?: (A<string> | undefined)[]): RestResponse<(string | undefined)[] | undefined>"))
+        Assertions.assertTrue(output.contains("doSomething(arg0?: (A<string> | undefined)[]): RestResponse<(string | undefined)[] | undefined>"), errorMessage)
     }
 
     private class A<T> {
