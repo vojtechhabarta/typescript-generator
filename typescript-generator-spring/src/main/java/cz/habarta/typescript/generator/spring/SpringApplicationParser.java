@@ -14,6 +14,9 @@ import cz.habarta.typescript.generator.parser.RestApplicationType;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.parser.SourceType;
+import cz.habarta.typescript.generator.parser.Swagger;
+import cz.habarta.typescript.generator.parser.SwaggerOperation;
+import cz.habarta.typescript.generator.parser.SwaggerResponse;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
@@ -245,6 +248,21 @@ public class SpringApplicationParser extends RestApplicationParser {
     private void parseControllerMethod(JaxrsApplicationParser.Result result, JaxrsApplicationParser.ResourceContext context, Class<?> controllerClass, Method method) {
         final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
         if (requestMapping != null) {
+
+            // swagger
+            final SwaggerOperation swaggerOperation = settings.ignoreSwaggerAnnotations
+                    ? new SwaggerOperation()
+                    : Swagger.parseSwaggerAnnotations(method);
+            if (swaggerOperation.possibleResponses != null) {
+                for (SwaggerResponse response : swaggerOperation.possibleResponses) {
+                    if (response.responseType != null) {
+                        foundType(result, response.responseType, controllerClass, method.getName());
+                    }
+                }
+            }
+            if (swaggerOperation.hidden) {
+                return;
+            }
 
             // subContext
             context = context.subPath(requestMapping.path().length == 0 ? "" : requestMapping.path()[0]);

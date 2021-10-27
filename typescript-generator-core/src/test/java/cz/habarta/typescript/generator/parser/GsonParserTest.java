@@ -92,7 +92,6 @@ public class GsonParserTest {
     @Test
     public void testOptionalProperties_Default() {
         final String output = generate(settings, BeanWithOptionalProperty.class);
-        System.out.println(output);
         Assertions.assertTrue(output.contains("property1: string;"));
     }
 
@@ -100,7 +99,6 @@ public class GsonParserTest {
     public void testOptionalProperties_All() {
         settings.optionalProperties = OptionalProperties.all;
         final String output = generate(settings, BeanWithOptionalProperty.class);
-        System.out.println(output);
         Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
@@ -108,7 +106,6 @@ public class GsonParserTest {
     public void testOptionalProperties_UseLibraryDefinition() {
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = generate(settings, BeanWithOptionalProperty.class);
-        System.out.println(output);
         Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
@@ -116,7 +113,6 @@ public class GsonParserTest {
     public void testOptionalProperties_UseSpecifiedAnnotations() {
         settings.optionalAnnotations = Arrays.asList(OptionalProperty.class);
         final String output = generate(settings, BeanWithOptionalProperty.class);
-        System.out.println(output);
         Assertions.assertTrue(output.contains("property1?: string;"));
     }
 

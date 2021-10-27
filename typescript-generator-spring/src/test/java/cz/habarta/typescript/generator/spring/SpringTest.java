@@ -7,6 +7,8 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
@@ -446,6 +448,42 @@ public class SpringTest {
     public class ControllerWithMultiValueMap {
         @GetMapping("/search")
         public String search(@RequestParam MultiValueMap<String, String> params) {
+            return "";
+        }
+    }
+
+    @Test
+    public void testSwaggerExclude() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithSwaggerIgnore.class));
+        Assertions.assertTrue(!output.contains("shouldBeExcluded"));
+    }
+
+    @RestController
+    public class ControllerWithSwaggerIgnore {
+        @ApiOperation(value = "", hidden = true)
+        @GetMapping("/test")
+        public String shouldBeExcluded() {
+            return "";
+        }
+    }
+
+    @Test
+    public void testSwagger3Exclude() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithSwagger3Ignore.class));
+        Assertions.assertTrue(!output.contains("shouldBeExcluded"));
+    }
+
+    @RestController
+    public class ControllerWithSwagger3Ignore {
+        @Operation(hidden = true)
+        @GetMapping("/test")
+        public String shouldBeExcluded() {
             return "";
         }
     }

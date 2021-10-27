@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 
 
 public class SwaggerResponse {
-    public int code;
+    public String code;
     public String comment;
     public Type responseType;
 }

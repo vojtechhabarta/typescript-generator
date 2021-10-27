@@ -212,6 +212,18 @@ public final class Utils {
         }
     }
 
+    public static List<Annotation> getRepeatableAnnotation(Annotation directAnnotation, Annotation containerAnnotation) {
+        final List<Annotation> repeatableAnnotations = new ArrayList<>();
+        if (directAnnotation != null) {
+            repeatableAnnotations.add(directAnnotation);
+        }
+        if (containerAnnotation != null) {
+            final Annotation[] annotations = Utils.getAnnotationElementValue(containerAnnotation, "value", Annotation[].class);
+            Stream.of(annotations).forEach(repeatableAnnotations::add);
+        }
+        return repeatableAnnotations;
+    }
+
     public static Type replaceRawClassInType(Type type, Class<?> newClass) {
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
