@@ -16,7 +16,7 @@
         <javax.activation.version>1.2.0</javax.activation.version>
         <jaxb.version>2.3.2</jaxb.version>
         <jackson1.version>1.9.13</jackson1.version>
-        <jackson2.version>2.12.3</jackson2.version>
+        <jackson2.version>2.13.0</jackson2.version>
         <jersey.version>3.0.2</jersey.version>
         <graalvm.version>21.1.0</graalvm.version>
         <vavr.version>0.10.3</vavr.version>
