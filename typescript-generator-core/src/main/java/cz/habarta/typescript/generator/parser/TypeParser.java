@@ -266,7 +266,7 @@ public class TypeParser {
                             typeVariable != null ? getTypeVariableGenericDeclaration(typeVariable) : null,
                             kTypeParameter.getName(),
                             /*bounds*/ null,
-                            typeVariable != null ? typeVariable.getAnnotatedBounds() : null,
+                            typeVariable != null ? getTypeVariableAnnotatedBounds(typeVariable) : null,
                             typeVariable != null ? typeVariable.getAnnotations() : null,
                             typeVariable != null ? typeVariable.getDeclaredAnnotations() : null
                     );
@@ -283,6 +283,14 @@ public class TypeParser {
             try {
                 return typeVariable.getGenericDeclaration();
             } catch (NotImplementedError e) {
+                return null;
+            }
+        }
+
+        private <D extends GenericDeclaration> AnnotatedType[] getTypeVariableAnnotatedBounds(TypeVariable<D> typeVariable) {
+            try {
+                return typeVariable.getAnnotatedBounds();
+            } catch (AbstractMethodError e) {
                 return null;
             }
         }
