@@ -174,7 +174,17 @@ public class SpringTest {
         settings.generateSpringApplicationClient = true;
         settings.setExcludeFilter(null, Arrays.asList("**Controller6"));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
-        Assert.assertFalse(output.contains("Controller6"));
+        Assertions.assertFalse(output.contains("Controller6"));
+    }
+
+    @Test
+    public void testExclusion2() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.setExcludeFilter(null, Arrays.asList("cz.habarta.typescript.generator.spring.SpringTest**"));
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller6.class));
+        Assertions.assertFalse(output.contains("Controller6"));
     }
 
     @RestController

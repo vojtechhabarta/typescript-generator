@@ -121,7 +121,7 @@ public class SpringApplicationParser extends RestApplicationParser {
         // controller
         final Component component = AnnotationUtils.findAnnotation(cls, Component.class);
         if (component != null) {
-            if (isClassNameExcluded != null && isClassNameExcluded.test(sourceType.toString())) {
+            if (isClassNameExcluded != null && isClassNameExcluded.test(cls.getName())) {
                 return null;
             }
 
