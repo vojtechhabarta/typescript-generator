@@ -5,7 +5,7 @@
     <groupId>cz.habarta.typescript-generator</groupId>
     <artifactId>typescript-generator</artifactId>
     <packaging>pom</packaging>
-    <version>2.32-SNAPSHOT</version>
+    <version>2.33-SNAPSHOT</version>
     <name>typescript-generator</name>
     <description>Generates TypeScript declaration file from specified java classes.</description>
     <url>https://github.com/vojtechhabarta/typescript-generator</url>
