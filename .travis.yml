@@ -1,0 +1,22 @@
+language: java
+jdk:
+  - openjdk8
+before_install:
+  - pip install --user codecov
+before_script:
+  - if [ -z $TRAVIS_COMMIT_RANGE ]; then TRAVIS_COMMIT_RANGE=$(git rev-parse master)...$(git rev-parse HEAD); fi
+  - nondexTests=$(git diff --name-status $TRAVIS_COMMIT_RANGE | grep /test/ | sed -e 's;.*test/java/;;' -e 's/.java//' -e 's;/;.;g' | tr '\n' ',');
+script: >
+    if [ ! -z $nondexTests ]; then
+      printf "Running NonDex on tests:\n$nondexTests \n" ;
+   mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test;
+ fi
+
+    if [ -d ".nondex" ]; then flakyTests=$(awk ' !x[$0]++' .nondex/*/failures); fi
+
+    if [ ! -z "$flakyTests" ]; then printf "Found flaky tests:\n$flakyTests \n" ; exit 1 ; fi
+after_success:
+  - codecov
+branches:
+  except:
+    - appveyor
