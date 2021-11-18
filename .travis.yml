@@ -10,7 +10,7 @@ script: >
     if [ ! -z $nondexTests ]; then
       printf "Running NonDex on tests:\n$nondexTests \n" ;
    mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test;
- fi
+    fi
 
     if [ -d ".nondex" ]; then flakyTests=$(awk ' !x[$0]++' .nondex/*/failures); fi
 
