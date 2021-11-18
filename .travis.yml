@@ -10,7 +10,7 @@ script:
   # - echo $TRAVIS_COMMIT_RANGE
   # - echo $TRAVIS_EVENT_TYPE
   # - echo $nondextests
-  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ ! -z $nondextests ]; then travis_wait 30 mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn edu.illinois:nondex-maven-plugin:1.1.2:nondex -DnondexSeed=$RANDOM -DnondexRuns=10 -DfailIfNoTests=false -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test > /dev/null 2>&1 ; fi  
+  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ ! -z $nondextests ]; then travis_wait 30 mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn edu.illinois:nondex-maven-plugin:1.1.2:nondex -DnondexSeed=$RANDOM -DnondexRuns=100 -DfailIfNoTests=false -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test > /dev/null 2>&1 ; fi  
   - if [ -d ".nondex" ]; then flakyTests=$(awk ' !x[$0]++' .nondex/*/failures); fi
   # - echo $flakyTests
   - if [ ! -z "$flakyTests" ]; then printf "Found flaky tests:\n$flakyTests \n" ; exit 1 ; fi
