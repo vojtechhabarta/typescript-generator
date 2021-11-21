@@ -99,6 +99,8 @@ public class Settings {
     public boolean generateSpringApplicationInterface = false;
     public boolean generateSpringApplicationClient = false;
     public boolean scanSpringApplication;
+    public List<Class<? extends Annotation>> springCustomQueryParameterAnnotations = new ArrayList<>();
+    public List<Class<? extends Annotation>> springCustomRequestBodyAnnotations = new ArrayList<>();
     @Deprecated public RestNamespacing jaxrsNamespacing;
     @Deprecated public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
     @Deprecated public String jaxrsNamespacingAnnotationElement;  // default is "value"
@@ -254,6 +256,14 @@ public class Settings {
         this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
     }
 
+    public void loadSpringCustomQueryParameterAnnotations(ClassLoader classLoader, List<String> springCustomQueryParameterAnnotations) {
+        this.springCustomQueryParameterAnnotations = loadClasses(classLoader, springCustomQueryParameterAnnotations, Annotation.class);
+    }
+
+    public void loadSpringCustomRequestBodyAnnotations(ClassLoader classLoader, List<String> springCustomRequestBodyAnnotations) {
+        this.springCustomRequestBodyAnnotations = loadClasses(classLoader, springCustomRequestBodyAnnotations, Annotation.class);
+    }
+
     public void loadExcludePropertyAnnotations(ClassLoader classLoader, List<String> excludePropertyAnnotations) {
         this.excludePropertyAnnotations = loadClasses(classLoader, excludePropertyAnnotations, Annotation.class);
     }
@@ -291,7 +301,7 @@ public class Settings {
         }
         return result;
     }
-    
+
     public void validate() {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();

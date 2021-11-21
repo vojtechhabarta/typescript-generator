@@ -9,8 +9,10 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 
 public class SpringTest {
 
@@ -169,6 +170,27 @@ public class SpringTest {
         Assertions.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
+    @Test
+    public void testCustomQueryParameters() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.springCustomQueryParameterAnnotations = Arrays.asList(CustomRequestParam.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller8.class));
+        Assertions.assertTrue(output.contains("echo(queryParams?: { message?: string; }): RestResponse<string>"));
+    }
+
+    @Test
+    public void testCustomRequestBody() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.springCustomRequestBodyAnnotations = Arrays.asList(CustomRequestBody.class);
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller9.class));
+        Assertions.assertTrue(output.contains("setEntity(data: Data1): RestResponse<void>"));
+        Assertions.assertTrue(output.contains("interface Data1"));
+    }
+
     @RestController
     @RequestMapping("/owners/{ownerId}")
     public static class Controller1 {
@@ -200,6 +222,23 @@ public class SpringTest {
                 @RequestParam(required = false) String message
         ) {
             return message;
+        }
+    }
+
+    @RestController
+    public static class Controller8 {
+        @RequestMapping("/echo3")
+        public String echo(
+                @CustomRequestParam String message
+        ) {
+            return message;
+        }
+    }
+
+    @RestController
+    public static class Controller9 {
+        @RequestMapping(path = "/data2", method = RequestMethod.PUT)
+        public void setEntity(@CustomRequestBody Data1 data) {
         }
     }
 
@@ -486,6 +525,18 @@ public class SpringTest {
         public String shouldBeExcluded() {
             return "";
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.PARAMETER)
+    public @interface CustomRequestParam {
+
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.PARAMETER)
+    public @interface CustomRequestBody {
+
     }
 
 }

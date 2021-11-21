@@ -26,6 +26,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -304,6 +305,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class), false));
                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class), false));
                 } else {
+                    boolean queryParamAdded = false;
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
                     if (requestParamAnnotation != null) {
                         if (parameter.getType() == MultiValueMap.class) {
@@ -315,6 +317,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                                 parameter.getName()
                             ), parameter.getParameterizedType()), isRequired));
                             foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                            queryParamAdded = true;
                         }
                     }
 
@@ -330,10 +333,24 @@ public class SpringApplicationParser extends RestApplicationParser {
                                             propertyDescriptor.getPropertyType()
                                     ), false));
                                     foundType(result, propertyDescriptor.getPropertyType(), controllerClass, method.getName());
+                                    queryParamAdded = true;
                                 }
                             }
                         } catch (IntrospectionException e) {
                             TypeScriptGenerator.getLogger().warning(String.format("Cannot introspect '%s' class: " + e.getMessage(), parameter.getAnnotatedType()));
+                        }
+                    }
+
+                    if(!queryParamAdded){
+                        for(Class<? extends Annotation> customRequestParamAnnotationClass : settings.springCustomQueryParameterAnnotations){
+                            Annotation customRequestParamAnnotation = AnnotationUtils.findAnnotation(parameter, customRequestParamAnnotationClass);
+                            if(customRequestParamAnnotation != null){
+                                queryParams.add(new RestQueryParam.Single(new MethodParameterModel(
+                                        parameter.getName(),
+                                        parameter.getParameterizedType()), false));
+                                foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                                break;
+                            }
                         }
                     }
                 }
@@ -373,8 +390,16 @@ public class SpringApplicationParser extends RestApplicationParser {
         final List<Type> parameterTypes = settings.getTypeParser().getMethodParameterTypes(method);
         final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(method.getParameters()), parameterTypes);
         for (Pair<Parameter, Type> pair : parameters) {
-            final RequestBody requestBodyAnnotation = AnnotationUtils.findAnnotation(pair.getValue1(), RequestBody.class);
-            if (requestBodyAnnotation != null) {
+            boolean hasRequestBody = AnnotationUtils.findAnnotation(pair.getValue1(), RequestBody.class) != null;
+            if(!hasRequestBody){
+                for(Class<? extends Annotation> customRequestBodyAnnotationClass : settings.springCustomRequestBodyAnnotations){
+                    if(AnnotationUtils.findAnnotation(pair.getValue1(), customRequestBodyAnnotationClass) != null){
+                        hasRequestBody = true;
+                        break;
+                    }
+                }
+            }
+            if (hasRequestBody) {
                 final Type resolvedType = GenericsResolver.resolveType(controller, pair.getValue2(), method.getDeclaringClass());
                 return new MethodParameterModel(pair.getValue1().getName(), resolvedType);
             }

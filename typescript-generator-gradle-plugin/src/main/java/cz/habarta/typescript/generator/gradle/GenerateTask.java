@@ -58,6 +58,8 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
     public List<String> excludePropertyAnnotations;
+    public List<String> springCustomQueryParameterAnnotations;
+    public List<String> springCustomRequestBodyAnnotations;
     public JsonLibrary jsonLibrary;
     public Jackson2Configuration jackson2Configuration;
     public GsonConfiguration gsonConfiguration;
@@ -201,6 +203,8 @@ public class GenerateTask extends DefaultTask {
         settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadExcludePropertyAnnotations(classLoader, excludePropertyAnnotations);
+        settings.loadSpringCustomQueryParameterAnnotations(classLoader, springCustomQueryParameterAnnotations);
+        settings.loadSpringCustomRequestBodyAnnotations(classLoader, springCustomRequestBodyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
         settings.loadRequiredAnnotations(classLoader, requiredAnnotations);
         settings.loadNullableAnnotations(classLoader, nullableAnnotations);
