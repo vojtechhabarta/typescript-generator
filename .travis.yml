@@ -1,6 +1,8 @@
 language: java
 jdk:
   - openjdk8
+before_install:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 #before_install:
  # - pip install --user codecov
 #before_script:
@@ -23,8 +25,8 @@ jdk:
     #-git clone https://github.com/vojtechhabarta/typescript-generator
     #-cd typescript-generator
     #-git rev-parse HEAD
-    #-mvn test-compile -pl typescript-generator-core -am
-    -mvn -B typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    - mvn test-compile -pl typescript-generator-core -am
+    - mvn typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test -B
     #echo "executed test"
     #mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
     #echo "executed nondex"
