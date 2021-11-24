@@ -11,14 +11,14 @@ jdk:
   #- c
   #- |
     #!/usr/bin/env bash -e
-    git clone https://github.com/vojtechhabarta/typescript-generator
-    cd typescript-generator
-    git rev-parse HEAD
-    mvn test-compile -pl typescript-generator-core -am
-    mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
-    echo "executed test"
-    mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
-    echo "executed nondex"
+    #git clone https://github.com/vojtechhabarta/typescript-generator
+    #cd typescript-generator
+    #git rev-parse HEAD
+    #mvn test-compile -pl typescript-generator-core -am
+    #mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    #echo "executed test"
+    #mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    #echo "executed nondex"
   script:
     -git clone https://github.com/vojtechhabarta/typescript-generator
     -cd typescript-generator
