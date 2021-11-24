@@ -26,7 +26,7 @@ before_install:
     #-cd typescript-generator
     #-git rev-parse HEAD
    # - mvn test-compile -pl typescript-generator-core -am
-    - mvn test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test -B
+    - mvn test -B
     #echo "executed test"
     #mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
     #echo "executed nondex"
