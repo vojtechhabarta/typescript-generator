@@ -14,8 +14,8 @@ command:
     #cd typescript-generator
     git rev-parse HEAD
     mvn test-compile -pl typescript-generator-core -am
-    mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
-    mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test  -DnondexRuns=100 
+    #mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test   
   # - echo $flakyTests
   #- if [ ! -z "$flakyTests" ]; then printf "Found flaky tests:\n$flakyTests \n" ; exit 1 ; fi
 after_success:
