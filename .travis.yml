@@ -6,7 +6,7 @@ jdk:
 #before_script:
  # - if [[ -z $TRAVIS_COMMIT_RANGE ]]; then TRAVIS_COMMIT_RANGE=$(git rev-parse master)...$(git rev-parse HEAD); fi
   #- if [[ "$TRAVIS_EVENT_TYPE" == "cron" ]]; then nondextests=""; else nondextests=$(git diff --name-status $TRAVIS_COMMIT_RANGE | grep /test/ | sed -e 's;.*test/java/;;' -e 's/.java//' -e 's;/;.;g' | tr '\n' ','); fi
-command:
+#command:
   #- sh
   #- c
   #- |
@@ -19,6 +19,16 @@ command:
     echo "executed test"
     mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
     echo "executed nondex"
+  script:
+    -git clone https://github.com/vojtechhabarta/typescript-generator
+    -cd typescript-generator
+    -git rev-parse HEAD
+    -mvn test-compile -pl typescript-generator-core -am
+    -mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    #echo "executed test"
+    #mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
+    #echo "executed nondex"
+    
   # - echo $flakyTests
   #- if [ ! -z "$flakyTests" ]; then printf "Found flaky tests:\n$flakyTests \n" ; exit 1 ; fi
 #after_success:
