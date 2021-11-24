@@ -18,8 +18,8 @@ command:
     mvn -pl typescript-generator-core edu.illinois:nondex-maven-plugin:1.1.2:nondex -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test   
   # - echo $flakyTests
   #- if [ ! -z "$flakyTests" ]; then printf "Found flaky tests:\n$flakyTests \n" ; exit 1 ; fi
-after_success:
-  - codecov
-branches:
-  except:
-    - appveyor
+#after_success:
+ # - codecov
+#branches:
+ # except:
+  #  - appveyor
