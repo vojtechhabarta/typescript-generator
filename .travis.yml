@@ -11,7 +11,7 @@ command:
   #- c
   #- |
     #!/usr/bin/env bash -e
-    cd typescript-generator
+    #cd typescript-generator
     git rev-parse HEAD
     mvn test-compile -pl typescript-generator-core -am
     mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.Jackson1ParserTest#test 
