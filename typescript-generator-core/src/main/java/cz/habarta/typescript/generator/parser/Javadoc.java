@@ -14,11 +14,11 @@ import cz.habarta.typescript.generator.xmldoclet.Method;
 import cz.habarta.typescript.generator.xmldoclet.Package;
 import cz.habarta.typescript.generator.xmldoclet.Root;
 import cz.habarta.typescript.generator.xmldoclet.TagInfo;
+import jakarta.xml.bind.JAXB;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.xml.bind.JAXB;
 
 
 public class Javadoc {

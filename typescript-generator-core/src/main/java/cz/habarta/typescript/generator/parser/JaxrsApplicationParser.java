@@ -320,6 +320,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             map.put(java.io.File.class, TsType.Any);
             map.put(javax.activation.DataSource.class, TsType.Any);
             map.put(javax.xml.transform.Source.class, TsType.Any);
+            map.put(jakarta.xml.bind.JAXBElement.class, null);
             map.put(javax.xml.bind.JAXBElement.class, null);
             map.put(MultivaluedMap.class, TsType.Any);
             map.put(javax(MultivaluedMap.class), TsType.Any);

@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.deser.CreatorProperty;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.jsontype.SubtypeResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
@@ -45,6 +46,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
@@ -132,8 +134,10 @@ public class Jackson2Parser extends ModelParser {
             }
         }
         if (useJaxbAnnotations) {
-            AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
-            objectMapper.setAnnotationIntrospector(introspector);
+            final AnnotationIntrospector jakartaIntrospector = new JakartaXmlBindAnnotationIntrospector(objectMapper.getTypeFactory());
+            final AnnotationIntrospector javaxIntrospector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
+            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jakartaIntrospector, javaxIntrospector);
+            objectMapper.setAnnotationIntrospector(pair);
         }
         final Jackson2ConfigurationResolved config = settings.jackson2Configuration;
         if (config != null) {

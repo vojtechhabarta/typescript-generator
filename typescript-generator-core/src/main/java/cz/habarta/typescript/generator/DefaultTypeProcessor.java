@@ -27,7 +27,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.xml.bind.JAXBElement;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
@@ -235,7 +234,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             Arrays.asList(Collection.class),
             Arrays.asList(Map.class),
             Arrays.asList(Optional.class),
-            Arrays.asList(JAXBElement.class),
+            Arrays.asList(jakarta.xml.bind.JAXBElement.class, javax.xml.bind.JAXBElement.class),
             Arrays.asList(),
             Arrays.asList()
         );
