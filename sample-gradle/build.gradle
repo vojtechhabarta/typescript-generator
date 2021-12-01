@@ -14,10 +14,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.12.1'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.7'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.3.72'
-    implementation 'org.scala-lang:scala-library:2.13.4'
+    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.0'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.9'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.32'
+    implementation 'org.scala-lang:scala-library:2.13.7'
 }
 
 buildscript {
@@ -27,9 +27,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.+'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72'
-        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.12.1'
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.32'
+        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.0'
     }
 }
 
@@ -44,6 +44,7 @@ generateTypeScript {
     outputKind = 'module'
     excludeClasses = [
         'groovy.lang.GroovyObject',
+        'groovy.lang.MetaClass',
         'java.io.Serializable',
         'scala.Equals',
         'scala.Product',

@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
 }
 
 buildscript {
@@ -21,9 +21,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.+'
-        classpath 'cz.habarta.typescript-generator:typescript-generator-spring:2.+'
-        classpath 'javax.validation:validation-api:2.0.1.Final'
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION'
+        classpath 'cz.habarta.typescript-generator:typescript-generator-spring:FILL_VERSION'
     }
 }
 
