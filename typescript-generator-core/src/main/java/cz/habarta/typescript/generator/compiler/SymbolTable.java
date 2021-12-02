@@ -17,6 +17,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
 
 
@@ -206,7 +207,10 @@ public class SymbolTable {
 
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
         if (customTypeNamingFunction == null) {
-            final ScriptEngine engine = GraalJSScriptEngine.create(null, Context.newBuilder("js").allowHostAccess(HostAccess.ALL));
+            final ScriptEngine engine = GraalJSScriptEngine.create(
+                    Engine.newBuilder().option("engine.WarnInterpreterOnly", "false").build(),
+                    Context.newBuilder("js").allowHostAccess(HostAccess.ALL)
+            );
             engine.eval("var getName = " + settings.customTypeNamingFunction);
             final Invocable invocable = (Invocable) engine;
             customTypeNamingFunction = invocable.getInterface(CustomTypeNamingFunction.class);
