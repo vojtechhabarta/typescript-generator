@@ -252,7 +252,7 @@
                     </execution>
                     <execution>
                         <id>jaxrs-v2-test-delete</id>
-                        <phase>prepare-package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
