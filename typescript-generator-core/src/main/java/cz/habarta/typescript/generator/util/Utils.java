@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -222,6 +223,33 @@ public final class Utils {
             Stream.of(annotations).forEach(repeatableAnnotations::add);
         }
         return repeatableAnnotations;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <A extends Annotation> A getMigratedAnnotation(AnnotatedElement annotatedElement, Class<A> annotationClass, Class<?> fallbackAnnotationClass) {
+        final A annotation = annotatedElement.getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
+        }
+        if (fallbackAnnotationClass != null) {
+            final ClassLoader classLoader = annotationClass.getClassLoader();
+            final Object fallbackAnnotation = annotatedElement.getAnnotation((Class<Annotation>)fallbackAnnotationClass);
+            if (fallbackAnnotation != null) {
+                return (A) Proxy.newProxyInstance(
+                        classLoader,
+                        new Class<?>[]{annotationClass},
+                        (proxy, method, args) -> {
+                            try {
+                                final Method fallbackMethod = fallbackAnnotation.getClass().getMethod(method.getName());
+                                return fallbackMethod.invoke(fallbackAnnotation);
+                            } catch (ReflectiveOperationException e) {
+                                return null;
+                            }
+                        }
+                );
+            }
+        }
+        return null;
     }
 
     public static Type replaceRawClassInType(Type type, Class<?> newClass) {
