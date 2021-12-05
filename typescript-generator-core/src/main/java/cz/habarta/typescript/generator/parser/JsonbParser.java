@@ -7,6 +7,12 @@ import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
+import jakarta.json.bind.annotation.JsonbVisibility;
+import jakarta.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -27,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,12 +47,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
-import javax.json.bind.annotation.JsonbVisibility;
-import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.config.PropertyVisibilityStrategy;
 
 // simplified+dependency free version of apache johnzon JsonbAccessMode
 public class JsonbParser extends ModelParser {
@@ -142,7 +143,7 @@ public class JsonbParser extends ModelParser {
 
         private List<PropertyModel> visit(final Class<?> clazz) {
             return Stream.of(clazz.getConstructors())
-                    .filter(it -> it.isAnnotationPresent(JsonbCreator.class))
+                    .filter(it -> getJsonbAnnotation(it, JsonbCreator.class) != null)
                     .findFirst()
                     .map(it -> new ArrayList<>(Stream.concat(visitConstructor(it), visitClass(clazz).stream())
                             .collect(Collectors.toMap(PropertyModel::getName, Function.identity(), (a, b) -> a)) // merge models
@@ -161,7 +162,7 @@ public class JsonbParser extends ModelParser {
                         final Type type = it.getValue2();
                         final Parameter parameter = it.getValue1();
                         final Optional<JsonbProperty> property = Optional.ofNullable(
-                                parameter.getAnnotation(JsonbProperty.class));
+                                getJsonbAnnotation(parameter, JsonbProperty.class));
                         final PropertyMember propertyMember = new PropertyMember(
                                 parameter, it.getValue2(), parameter.getAnnotatedType(), parameter::getAnnotation);
                         return JsonbParser.this.processTypeAndCreateProperty(
@@ -561,7 +562,7 @@ public class JsonbParser extends ModelParser {
 
         @Override
         public boolean isVisible(final Field field) {
-            if (field.getAnnotation(JsonbProperty.class) != null) {
+            if (getJsonbAnnotation(field, JsonbProperty.class) != null) {
                 return true;
             }
             final PropertyVisibilityStrategy strategy = strategies.computeIfAbsent(
@@ -577,7 +578,7 @@ public class JsonbParser extends ModelParser {
         }
 
         private PropertyVisibilityStrategy visibilityStrategy(final Class<?> type) {
-            JsonbVisibility visibility = type.getAnnotation(JsonbVisibility.class);
+            JsonbVisibility visibility = getJsonbAnnotation(type, JsonbVisibility.class);
             if (visibility != null) {
                 try {
                     return visibility.value().getConstructor().newInstance();
@@ -587,7 +588,7 @@ public class JsonbParser extends ModelParser {
             }
             Package p = type.getPackage();
             while (p != null) {
-                visibility = p.getAnnotation(JsonbVisibility.class);
+                visibility = getJsonbAnnotation(p, JsonbVisibility.class);
                 if (visibility != null) {
                     try {
                         return visibility.value().getConstructor().newInstance();
@@ -734,7 +735,7 @@ public class JsonbParser extends ModelParser {
         }
 
         private static <T extends Annotation> T getDirectAnnotation(final AnnotatedElement holder, final Class<T> api) {
-            final T annotation = holder.getAnnotation(api);
+            final T annotation = getJsonbAnnotation(holder, api);
             if (annotation != null) {
                 return annotation;
             }
@@ -744,13 +745,13 @@ public class JsonbParser extends ModelParser {
         private static <T extends Annotation> T getIndirectAnnotation(final Class<T> api,
                                                                       final Supplier<Class<?>> ownerSupplier,
                                                                       final Supplier<Package> packageSupplier) {
-            final T ownerAnnotation = ownerSupplier.get().getAnnotation(api);
+            final T ownerAnnotation = getJsonbAnnotation(ownerSupplier.get(), api);
             if (ownerAnnotation != null) {
                 return ownerAnnotation;
             }
             final Package pck = packageSupplier.get();
             if (pck != null) {
-                return pck.getAnnotation(api);
+                return getJsonbAnnotation(pck, api);
             }
             return null;
         }
@@ -758,7 +759,7 @@ public class JsonbParser extends ModelParser {
         public static <T extends Annotation> T findMeta(final Annotation[] annotations, final Class<T> api) {
             for (final Annotation a : annotations) {
                 final Class<? extends Annotation> userType = a.annotationType();
-                final T aa = userType.getAnnotation(api);
+                final T aa = getJsonbAnnotation(userType, api);
                 if (aa != null) {
                     boolean overriden = false;
                     final Map<String, Method> mapping = new HashMap<String, Method>();
@@ -836,4 +837,27 @@ public class JsonbParser extends ModelParser {
             return parameter.getDeclaredAnnotations();
         }
     }
+
+    static <A extends Annotation> A getJsonbAnnotation(AnnotatedElement annotatedElement, Class<A> jakartaAnnotationClass) {
+        final Class<?> javaxAnnotationClass = javax(jakartaAnnotationClass);
+        return Utils.getMigratedAnnotation(annotatedElement, jakartaAnnotationClass, javaxAnnotationClass);
+    }
+
+    private static <T> Class<T> javax(Class<T> jakartaClass) {
+        @SuppressWarnings("unchecked")
+        final Class<T> cls = (Class<T>) javaxClasses.get().get(jakartaClass);
+        return cls;
+    }
+
+    private static final Supplier<Map<Class<?>, Class<?>>> javaxClasses = Utils.memoize(() -> {
+        final Map<Class<?>, Class<?>> map = new LinkedHashMap<>();
+        map.put(jakarta.json.bind.annotation.JsonbCreator.class, javax.json.bind.annotation.JsonbCreator.class);
+        map.put(jakarta.json.bind.annotation.JsonbProperty.class, javax.json.bind.annotation.JsonbProperty.class);
+        map.put(jakarta.json.bind.annotation.JsonbTransient.class, javax.json.bind.annotation.JsonbTransient.class);
+        map.put(jakarta.json.bind.annotation.JsonbVisibility.class, javax.json.bind.annotation.JsonbVisibility.class);
+        map.put(jakarta.json.bind.config.PropertyNamingStrategy.class, javax.json.bind.config.PropertyNamingStrategy.class);
+        map.put(jakarta.json.bind.config.PropertyVisibilityStrategy.class, javax.json.bind.config.PropertyVisibilityStrategy.class);
+        return map;
+    });
+
 }

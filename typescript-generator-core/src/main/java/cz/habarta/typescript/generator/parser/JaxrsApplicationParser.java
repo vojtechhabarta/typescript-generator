@@ -37,7 +37,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -350,32 +349,9 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         );
     }
 
-    @SuppressWarnings("unchecked")
     static <A extends Annotation> A getRsAnnotation(AnnotatedElement annotatedElement, Class<A> jakartaAnnotationClass) {
         final Class<?> javaxAnnotationClass = javax(jakartaAnnotationClass);
-        final A jakartaAnnotation = annotatedElement.getAnnotation(jakartaAnnotationClass);
-        if (jakartaAnnotation != null) {
-            return jakartaAnnotation;
-        } else {
-            final ClassLoader classLoader = jakartaAnnotationClass.getClassLoader();
-            final Object javaxAnnotation = annotatedElement.getAnnotation((Class<Annotation>)javaxAnnotationClass);
-            if (javaxAnnotation != null) {
-                return (A) Proxy.newProxyInstance(
-                        classLoader,
-                        new Class<?>[]{jakartaAnnotationClass},
-                        (proxy, method, args) -> {
-                            try {
-                                final Method javaxMethod = javaxAnnotation.getClass().getMethod(method.getName());
-                                return javaxMethod.invoke(javaxAnnotation);
-                            } catch (ReflectiveOperationException e) {
-                                return null;
-                            }
-                        }
-                );
-            } else {
-                return null;
-            }
-        }
+        return Utils.getMigratedAnnotation(annotatedElement, jakartaAnnotationClass, javaxAnnotationClass);
     }
 
     private static <T> Class<T> javax(Class<T> jakartaClass) {

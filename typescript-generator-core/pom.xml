@@ -72,9 +72,12 @@
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.json.bind</groupId>
+            <artifactId>javax.json.bind-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
@@ -247,6 +250,17 @@
                                     file="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"
                                     token="jakarta.ws.rs"
                                     value="javax.ws.rs"/>
+                                <copy
+                                    file="src/test/java/cz/habarta/typescript/generator/parser/JsonbParserTest.java"
+                                    tofile="src/test/java/cz/habarta/typescript/generator/parser/JsonbV1ParserTest.java"/>
+                                <replace
+                                    file="src/test/java/cz/habarta/typescript/generator/parser/JsonbV1ParserTest.java"
+                                    token="JsonbParserTest"
+                                    value="JsonbV1ParserTest"/>
+                                <replace
+                                    file="src/test/java/cz/habarta/typescript/generator/parser/JsonbV1ParserTest.java"
+                                    token="jakarta.json.bind"
+                                    value="javax.json.bind"/>
                             </target>
                         </configuration>
                     </execution>
@@ -259,6 +273,7 @@
                         <configuration>
                             <target>
                                 <delete file="src/test/java/cz/habarta/typescript/generator/JaxrsV2ApplicationTest.java"/>
+                                <delete file="src/test/java/cz/habarta/typescript/generator/parser/JsonbV1ParserTest.java"/>
                             </target>
                         </configuration>
                     </execution>
