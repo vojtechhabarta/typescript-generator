@@ -348,24 +348,14 @@
                                             <version>1.0.5</version>
                                         </docletArtifact>
                                         <docletArtifact>
-                                            <groupId>jakarta.xml.bind</groupId>
-                                            <artifactId>jakarta.xml.bind-api</artifactId>
-                                            <version>${jaxb.version}</version>
-                                        </docletArtifact>
-                                        <docletArtifact>
-                                            <groupId>com.sun.xml.bind</groupId>
-                                            <artifactId>jaxb-impl</artifactId>
-                                            <version>${jaxb.version}</version>
+                                            <groupId>javax.xml.bind</groupId>
+                                            <artifactId>jaxb-api</artifactId>
+                                            <version>2.3.1</version>
                                         </docletArtifact>
                                         <docletArtifact>
                                             <groupId>org.glassfish.jaxb</groupId>
                                             <artifactId>jaxb-runtime</artifactId>
-                                            <version>${jaxb.version}</version>
-                                        </docletArtifact>
-                                        <docletArtifact>
-                                            <groupId>javax.activation</groupId>
-                                            <artifactId>javax.activation-api</artifactId>
-                                            <version>${javax.activation.version}</version>
+                                            <version>3.0.2</version>
                                         </docletArtifact>
                                     </docletArtifacts>
                                 </configuration>
