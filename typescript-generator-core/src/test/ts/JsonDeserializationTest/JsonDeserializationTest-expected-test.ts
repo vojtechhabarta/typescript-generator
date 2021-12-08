@@ -1,4 +1,4 @@
-import { Address, Order, PagedList, Rectangle, ShapeMetadata, Square, User } from "../../resources/cz/habarta/typescript/generator/JsonDeserializationTest-expected";
+import { Address, Order, PagedList, Rectangle, ShapeMetadata, Square, User, Authentication } from "../../resources/cz/habarta/typescript/generator/JsonDeserializationTest-expected";
 
 // load JSON data
 const data = require("./JsonDeserializationTest-expected-test-data");
@@ -110,6 +110,14 @@ assertEquals(user1.equals(user2), true);
 user2.name = "name2";
 assertEquals(user1.equals(user2), false);
 
+const serializedData = JSON.stringify(user2);
+require('fs').writeFileSync("./target/JsonDeserializationTest-actual-test-data-2.json", serializedData);
+
+const data2 = require("../../../../target/JsonDeserializationTest-actual-test-data");
+const actualUser2 = User.fromData(data2);
+
+assertEquals(actualUser2.name, "user1");
+assertEquals(actualUser2.authentication, "Password");
 
 console.log("Test finished.");
 

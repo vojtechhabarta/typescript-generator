@@ -195,6 +195,7 @@
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                     <trimStackTrace>false</trimStackTrace>
+                    <excludedGroups>typescript2java</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>

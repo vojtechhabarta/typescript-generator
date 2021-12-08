@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.ext.AxiosClientExtension;
 import cz.habarta.typescript.generator.ext.JsonDeserializationExtension;
 import cz.habarta.typescript.generator.util.Utils;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 
@@ -102,6 +104,23 @@ public class JsonDeserializationTest {
         Assertions.assertTrue(output.contains("copyFn: Organization.fromData"));
         Assertions.assertTrue(output.contains("copyFn: undefined"));
         Assertions.assertTrue(output.contains("copyFn: __getCopyArrayFn(Organization.fromData)"));
+    }
+
+    @Test
+    public void serializationJavaToTypescript() throws IOException {
+        User data = new User();
+        data.name = "user1";
+        data.authentication = Authentication.Password;
+
+        new ObjectMapper().writeValue(new File("target/JsonDeserializationTest-actual-test-data.json"), data);
+    }
+
+    @Test
+    @Tag("typescript2java")
+    public void deserializationTypescriptToJava() throws IOException {
+        User data = new ObjectMapper().readValue(new File("target/JsonDeserializationTest-actual-test-data-2.json"), User.class);
+        Assertions.assertEquals("name2", data.name);
+        Assertions.assertEquals(Authentication.Password, data.authentication);
     }
 
     private static class User {
