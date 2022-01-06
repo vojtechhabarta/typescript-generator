@@ -113,6 +113,7 @@ public class Settings {
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
     public boolean noFileComment = false;
+    public boolean noTimestampInFileComment = false;
     public boolean noTslintDisable = false;
     public boolean noEslintDisable = false;
     public boolean tsNoCheck = false;

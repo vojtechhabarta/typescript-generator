@@ -105,6 +105,7 @@ public class GenerateTask extends DefaultTask {
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
+    public boolean noTimestampInFileComment;
     public boolean noTslintDisable;
     public boolean noEslintDisable;
     public boolean tsNoCheck;
@@ -194,6 +195,7 @@ public class GenerateTask extends DefaultTask {
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
+        settings.noTimestampInFileComment = noTimestampInFileComment;
         settings.noTslintDisable = noTslintDisable;
         settings.noEslintDisable = noEslintDisable;
         settings.tsNoCheck = tsNoCheck;

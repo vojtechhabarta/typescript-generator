@@ -646,6 +646,15 @@ public class GenerateMojo extends AbstractMojo {
     private boolean noFileComment;
 
     /**
+     * If <code>true</code> the generated file's top comment will not contain a timestamp.
+     * By default there is a comment with a timestamp and the typescript-generator version.
+     * If the file is in source control, but one still wants to have the 'auto-generated file' comment,
+     * it might be useful to suppress the timestamp.
+     */
+    @Parameter
+    private boolean noTimestampInFileComment;
+
+    /**
      * If <code>true</code> generated file will not be prevented from linting by TSLint.
      * By default there is a {@code tslint:disable} comment that will force TSLint to ignore the generated file.
      * This can be enabled to suppress this comment so that the file can be linted by TSLint.
