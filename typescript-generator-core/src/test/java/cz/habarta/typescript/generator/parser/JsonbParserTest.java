@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
@@ -275,6 +276,17 @@ public class JsonbParserTest {
             final String output = generate(settings, NillableConstructorParameter.class);
             Assertions.assertTrue(output.contains(" foo?: number"), output);
         }
+    }
+
+    public static class TransientField {
+        @JsonbTransient
+        public String foo;
+    }
+
+    @Test
+    public void testTransientField() {
+        final String output = generate(settings, TransientField.class);
+        Assertions.assertFalse(output.contains("foo"), output);
     }
 
     private String generate(final Settings settings, Class<?> cls) {
