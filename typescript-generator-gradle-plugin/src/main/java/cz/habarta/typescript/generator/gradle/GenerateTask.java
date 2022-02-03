@@ -101,6 +101,7 @@ public class GenerateTask extends DefaultTask {
     public String restNamespacingAnnotation;
     public String restResponseType;
     public String restOptionsType;
+    public String customRestMethodBuilder;
     public String customTypeProcessor;
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
@@ -190,6 +191,7 @@ public class GenerateTask extends DefaultTask {
         settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
         settings.restResponseType = restResponseType;
         settings.setRestOptionsType(restOptionsType);
+        settings.loadCustomRestMethodBuilder(classLoader, customRestMethodBuilder);
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
