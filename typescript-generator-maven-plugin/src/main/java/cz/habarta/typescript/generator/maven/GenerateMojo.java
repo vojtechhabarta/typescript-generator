@@ -559,6 +559,25 @@ public class GenerateMojo extends AbstractMojo {
     private boolean scanSpringApplication;
 
     /**
+     * If <code>true</code> it will generate client application methods as service methods, meaning that they will
+     * accept all arguments as unfolded arguments. Otherwise, REST query parameters will be wrapped into an object <code>queryParams</code>.
+     * This parameter can be used only when <code>generateSpringApplicationClient</code> or <code>generateJaxrsApplicationClient</code> are set to <code>true</code>.
+     * Notice, currently only simple (non-bean) parameters will be detected. Currently, beans won't work for this type of client generation.
+     * If you need for beans to work as well, please, set this option to <code>false</code>. This flow is intended to be fixed in the future releases.
+     */
+    @Parameter
+    private boolean generateClientAsService;
+
+    /**
+     * If <code>true</code> it will not pass optional parameters to the <code>HttpClient</code> if those parameters
+     * are set to <code>null</code>. Otherwise, only <code>undefined</code> parameters will be skipped.
+     * Notice, mandatory parameters which are set to <code>null</code> will still be passed.
+     * This parameter can be used only when <code>generateClientAsService</code> is set to <code>true</code>.
+     */
+    @Parameter
+    private boolean skipNullValuesForOptionalServiceArguments;
+
+    /**
      * Deprecated, use {@link #restNamespacing}.
      */
     @Deprecated
@@ -942,6 +961,8 @@ public class GenerateMojo extends AbstractMojo {
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
         settings.generateSpringApplicationClient = generateSpringApplicationClient;
         settings.scanSpringApplication = scanSpringApplication;
+        settings.generateClientAsService = generateClientAsService;
+        settings.skipNullValuesForOptionalServiceArguments = skipNullValuesForOptionalServiceArguments;
         settings.jaxrsNamespacing = jaxrsNamespacing;
         settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
         settings.restNamespacing = restNamespacing;

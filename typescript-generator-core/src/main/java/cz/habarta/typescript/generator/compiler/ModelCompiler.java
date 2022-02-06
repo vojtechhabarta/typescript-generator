@@ -20,6 +20,8 @@ import cz.habarta.typescript.generator.emitter.TsAliasModel;
 import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
 import cz.habarta.typescript.generator.emitter.TsBeanCategory;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
+import cz.habarta.typescript.generator.emitter.TsBinaryExpression;
+import cz.habarta.typescript.generator.emitter.TsBinaryOperator;
 import cz.habarta.typescript.generator.emitter.TsCallExpression;
 import cz.habarta.typescript.generator.emitter.TsConstructorModel;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
@@ -27,6 +29,7 @@ import cz.habarta.typescript.generator.emitter.TsExpression;
 import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
 import cz.habarta.typescript.generator.emitter.TsHelper;
 import cz.habarta.typescript.generator.emitter.TsIdentifierReference;
+import cz.habarta.typescript.generator.emitter.TsIfStatement;
 import cz.habarta.typescript.generator.emitter.TsMemberExpression;
 import cz.habarta.typescript.generator.emitter.TsMethodModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
@@ -42,6 +45,7 @@ import cz.habarta.typescript.generator.emitter.TsSuperExpression;
 import cz.habarta.typescript.generator.emitter.TsTaggedTemplateLiteral;
 import cz.habarta.typescript.generator.emitter.TsTemplateLiteral;
 import cz.habarta.typescript.generator.emitter.TsThisExpression;
+import cz.habarta.typescript.generator.emitter.TsVariableDeclarationStatement;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.MethodModel;
@@ -729,9 +733,11 @@ public class ModelCompiler {
         }
         // query params
         final List<RestQueryParam> queryParams = method.getQueryParams();
+        final List<TsProperty> allSingles;
         final TsParameterModel queryParameter;
         if (queryParams != null && !queryParams.isEmpty()) {
             final List<TsType> types = new ArrayList<>();
+            allSingles = new ArrayList<>(queryParams.size());
             if (queryParams.stream().anyMatch(param -> param instanceof RestQueryParam.Map)) {
                 types.add(new TsType.IndexedArrayType(TsType.String, TsType.Any));
             } else {
@@ -746,7 +752,12 @@ public class ModelCompiler {
                     if (restQueryParam instanceof RestQueryParam.Single) {
                         final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
                         final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                        currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
+                        TsProperty property = new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type));
+                        currentSingles.add(property);
+                        allSingles.add(property);
+                        if(settings.generateClientAsService) {
+                            parameters.add(new TsParameterModel(property.getName(), property.getTsType()));
+                        }
                     }
                     if (restQueryParam instanceof RestQueryParam.Bean) {
                         final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
@@ -776,9 +787,12 @@ public class ModelCompiler {
             boolean allQueryParamsOptional = queryParams.stream().noneMatch(queryParam -> queryParam.required);
             TsType.IntersectionType queryParamType = new TsType.IntersectionType(types);
             queryParameter = new TsParameterModel("queryParams", allQueryParamsOptional ? new TsType.OptionalType(queryParamType) : queryParamType);
-            parameters.add(queryParameter);
+            if(!settings.generateClientAsService){
+                parameters.add(queryParameter);
+            }
         } else {
             queryParameter = null;
+            allSingles = null;
         }
         if (optionsType != null) {
             final TsParameterModel optionsParameter = new TsParameterModel("options", new TsType.OptionalType(optionsType));
@@ -800,6 +814,9 @@ public class ModelCompiler {
         final List<TsStatement> body;
         if (implement) {
             body = new ArrayList<>();
+            if(settings.generateClientAsService && allSingles != null && !allSingles.isEmpty()){
+                initQueryParameters(body, allSingles);
+            }
             body.add(new TsReturnStatement(
                     new TsCallExpression(
                             new TsMemberExpression(new TsMemberExpression(new TsThisExpression(), "httpClient"), "request"),
@@ -815,9 +832,59 @@ public class ModelCompiler {
         } else {
             body = null;
         }
+        List<TsParameterModel> orderedParameters = new ArrayList<>(parameters.size());
+        List<TsParameterModel> optionalParameters = new ArrayList<>(parameters.size());
+        for(TsParameterModel parameter : parameters){
+            if(parameter.getTsType() instanceof TsType.OptionalType){
+                optionalParameters.add(parameter);
+            } else {
+                orderedParameters.add(parameter);
+            }
+        }
+        orderedParameters.addAll(optionalParameters);
         // method
-        final TsMethodModel tsMethodModel = new TsMethodModel(method.getName() + nameSuffix, TsModifierFlags.None, null, parameters, wrappedReturnType, body, comments);
+        final TsMethodModel tsMethodModel = new TsMethodModel(method.getName() + nameSuffix, TsModifierFlags.None, null, orderedParameters, wrappedReturnType, body, comments);
         return tsMethodModel;
+    }
+
+    private void initQueryParameters(List<TsStatement> body, List<TsProperty> singleQueryParams){
+        body.add(new TsVariableDeclarationStatement(
+                false,
+                "queryParams",
+                TsType.Any,
+                new TsObjectLiteral()
+        ));
+        for(TsProperty property : singleQueryParams){
+
+            TsExpressionStatement assignmentExpressionStatement = new TsExpressionStatement(
+                    new TsAssignmentExpression(
+                            new TsMemberExpression(
+                                    new TsIdentifierReference("queryParams"),
+                                    property.getName()),
+                            new TsIdentifierReference(property.getName())
+                    )
+            );
+
+            if(property.getTsType() instanceof TsType.OptionalType){
+
+                body.add(
+                        new TsIfStatement(
+                                new TsBinaryExpression(
+                                        new TsIdentifierReference(property.getName()),
+                                        TsBinaryOperator.NEQ,
+                                        settings.skipNullValuesForOptionalServiceArguments ?
+                                                TsIdentifierReference.Null : TsIdentifierReference.Undefined
+                                ),
+                                Collections.singletonList(assignmentExpressionStatement)
+                        )
+                );
+
+            } else {
+
+                body.add(assignmentExpressionStatement);
+
+            }
+        }
     }
 
     private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {

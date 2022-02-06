@@ -98,6 +98,8 @@ public class Settings {
     public boolean generateJaxrsApplicationClient = false;
     public boolean generateSpringApplicationInterface = false;
     public boolean generateSpringApplicationClient = false;
+    public boolean generateClientAsService = false;
+    public boolean skipNullValuesForOptionalServiceArguments = false;
     public boolean scanSpringApplication;
     @Deprecated public RestNamespacing jaxrsNamespacing;
     @Deprecated public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
@@ -414,6 +416,15 @@ public class Settings {
         if (generateSpringApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateSpringApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
+
+        if(generateClientAsService && !(generateSpringApplicationClient || generateJaxrsApplicationClient)){
+            throw new RuntimeException("'generateClientAsService' can only be used when application client generation is enabled via 'generateSpringApplicationClient' or 'generateJaxrsApplicationClient'.");
+        }
+
+        if(skipNullValuesForOptionalServiceArguments && !generateClientAsService){
+            throw new RuntimeException("'skipNullValuesForOptionalServiceArguments' can only be used when application client as a service generation is enabled via 'generateClientAsService'.");
+        }
+
         if (jaxrsNamespacing != null) {
             TypeScriptGenerator.getLogger().warning("Parameter 'jaxrsNamespacing' is deprecated. Use 'restNamespacing' parameter.");
             if (restNamespacing == null) {

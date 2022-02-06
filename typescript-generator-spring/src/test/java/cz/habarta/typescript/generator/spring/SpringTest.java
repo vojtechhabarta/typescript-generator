@@ -119,6 +119,51 @@ public class SpringTest {
     }
 
     @Test
+    public void testUnfoldedQueryParameters() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.generateClientAsService = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
+        Assertions.assertTrue(output.contains("echo(message: string, count?: number, optionalRequestParam?: number): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("let queryParams: any = {};"));
+        Assertions.assertTrue(output.contains("queryParams.message = message;"));
+        Assertions.assertTrue(output.contains("if (count != undefined) {"));
+        Assertions.assertTrue(output.contains("queryParams.count = count;"));
+        Assertions.assertTrue(output.contains("if (optionalRequestParam != undefined)"));
+        Assertions.assertTrue(output.contains("queryParams.optionalRequestParam = optionalRequestParam;"));
+        Assertions.assertTrue(output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`echo`, queryParams: queryParams });"));
+    }
+
+    @Test
+    public void testUnfoldedQueryParametersWithSkipOptionalParams() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.generateClientAsService = true;
+        settings.skipNullValuesForOptionalServiceArguments = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller2.class));
+        Assertions.assertTrue(output.contains("echo(message: string, count?: number, optionalRequestParam?: number): RestResponse<string>"));
+        Assertions.assertTrue(output.contains("let queryParams: any = {};"));
+        Assertions.assertTrue(output.contains("queryParams.message = message;"));
+        Assertions.assertTrue(output.contains("if (count != null) {"));
+        Assertions.assertTrue(output.contains("queryParams.count = count;"));
+        Assertions.assertTrue(output.contains("if (optionalRequestParam != null)"));
+        Assertions.assertTrue(output.contains("queryParams.optionalRequestParam = optionalRequestParam;"));
+        Assertions.assertTrue(output.contains("return this.httpClient.request({ method: \"GET\", url: uriEncoding`echo`, queryParams: queryParams });"));
+    }
+
+    @Test
+    public void testUnfoldedOptionalQueryParametersGeneratedAfterRequired() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.generateClientAsService = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithMultipleOptionalUnorderedParameters.class));
+        Assertions.assertTrue(output.contains("unorderedOptionalParamsMethod(requiredParam1: string, requiredParam4: number, optionalParam0?: number, optionalParam2?: string, optionalParam3?: number, optionalParam5?: number): RestResponse<string>"));
+    }
+
+    @Test
     public void testAllOptionalQueryParameters() {
         final Settings settings = TestUtils.settings();
         settings.outputFileType = TypeScriptFileType.implementationFile;
@@ -200,6 +245,21 @@ public class SpringTest {
                 @RequestParam(required = false) String message
         ) {
             return message;
+        }
+    }
+
+    @RestController
+    public static class ControllerWithMultipleOptionalUnorderedParameters {
+        @RequestMapping("/unorderedOptionalParamsMethod")
+        public String unorderedOptionalParamsMethod(
+                @RequestParam(required = false) Integer optionalParam0,
+                @RequestParam("requiredParam1") String requiredParam1,
+                @RequestParam(required = false) String optionalParam2,
+                @RequestParam(name = "optionalParam3", defaultValue = "1") Integer optionalParam3,
+                @RequestParam Integer requiredParam4,
+                @RequestParam(required = false) Integer optionalParam5
+        ) {
+            return requiredParam1;
         }
     }
 
