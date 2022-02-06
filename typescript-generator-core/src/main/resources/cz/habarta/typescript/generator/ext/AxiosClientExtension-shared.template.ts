@@ -13,7 +13,7 @@ class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig> {
     constructor(private axios: Axios.AxiosInstance) {
     }
 
-    request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; options?: Axios.AxiosRequestConfig; }): RestResponse<R> {
+    request<R>(requestConfig: { method: string; url: string; queryParams?: any; data?: any; copyFn?: (data: R) => R; headers?: any; options?: Axios.AxiosRequestConfig; }): RestResponse<R> {
         function assign(target: any, source?: any) {
             if (source != undefined) {
                 for (const key in source) {
@@ -30,6 +30,7 @@ class AxiosHttpClient implements HttpClient<Axios.AxiosRequestConfig> {
         config.url = requestConfig.url;
         config.params = requestConfig.queryParams;
         config.data = requestConfig.data;
+        assign(config, requestConfig.headers);
         assign(config, requestConfig.options);
         const copyFn = requestConfig.copyFn;
 

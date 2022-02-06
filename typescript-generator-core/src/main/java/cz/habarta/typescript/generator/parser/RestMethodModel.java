@@ -12,12 +12,13 @@ public class RestMethodModel extends MethodModel {
     private final String httpMethod;
     private final String path;
     private final List<MethodParameterModel> pathParams;
-    private final List<RestQueryParam> queryParams;
+    private final List<RestParam> queryParams;
     private final MethodParameterModel entityParam;
+    private final List<RestParam> headers;
 
     public RestMethodModel(Class<?> originClass, String name, Type returnType, Method originalMethod,
-            Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<RestQueryParam> queryParams, MethodParameterModel entityParam,
-            List<String> comments) {
+                           Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<RestParam> queryParams, MethodParameterModel entityParam,
+                           List<String> comments, List<RestParam> headers) {
         super(originClass, name, null, returnType, originalMethod, comments);
         this.rootResource = rootResource;
         this.httpMethod = httpMethod;
@@ -25,6 +26,7 @@ public class RestMethodModel extends MethodModel {
         this.pathParams = pathParams;
         this.queryParams = queryParams;
         this.entityParam = entityParam;
+        this.headers = headers;
     }
 
     public Class<?> getRootResource() {
@@ -43,7 +45,7 @@ public class RestMethodModel extends MethodModel {
         return pathParams;
     }
 
-    public List<RestQueryParam> getQueryParams() {
+    public List<RestParam> getQueryParams() {
         return queryParams;
     }
 
@@ -51,9 +53,13 @@ public class RestMethodModel extends MethodModel {
         return entityParam;
     }
 
+    public List<RestParam> getHeaders() {
+        return headers;
+    }
+
     @Override
     public RestMethodModel withComments(List<String> comments) {
-        return new RestMethodModel(originClass, name, returnType, originalMethod, rootResource, httpMethod, path, pathParams, queryParams, entityParam, comments);
+        return new RestMethodModel(originClass, name, returnType, originalMethod, rootResource, httpMethod, path, pathParams, queryParams, entityParam, comments, headers);
     }
 
 }

@@ -108,6 +108,7 @@ public class Settings {
     public String restResponseType = null;
     public String restOptionsType = null;
     public boolean restOptionsTypeIsGeneric;
+    public boolean restHeaderArgumentsParsed;
     private List<RestApplicationParser.Factory> restApplicationParserFactories;
     public TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
@@ -757,6 +758,10 @@ public class Settings {
                 this.restOptionsTypeIsGeneric = false;
             }
         }
+    }
+
+    public void setRestHeaderArgumentsParsed(boolean restHeaderArgumentsParsed) {
+        this.restHeaderArgumentsParsed = restHeaderArgumentsParsed;
     }
 
     public List<RestApplicationParser.Factory> getRestApplicationParserFactories() {
