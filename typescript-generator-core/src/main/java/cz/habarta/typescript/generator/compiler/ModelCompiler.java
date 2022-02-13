@@ -306,8 +306,10 @@ public class ModelCompiler {
                     isTaggedUnion = false;
                     isDisciminantProperty = false;
                 }
-                if (descendant.getDiscriminantLiteral() != null) {
-                    literals.add(new TsType.StringLiteralType(descendant.getDiscriminantLiteral()));
+                if (descendant.getDiscriminantLiterals() != null && !descendant.getDiscriminantLiterals().isEmpty()) {
+                    for (String discriminantLiteral : descendant.getDiscriminantLiterals()) {
+                        literals.add(new TsType.StringLiteralType(discriminantLiteral));
+                    }
                 }
             }
             final List<BeanModel> descendants = selfAndDescendants.subList(1, selfAndDescendants.size());
@@ -339,7 +341,7 @@ public class ModelCompiler {
                 /*methods*/ null,
                 bean.getComments());
         return isTaggedUnion
-                ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiteral())
+                ? tsBean.withTaggedUnion(bean.getTaggedUnionClasses(), bean.getDiscriminantProperty(), bean.getDiscriminantLiterals())
                 : tsBean;
     }
 

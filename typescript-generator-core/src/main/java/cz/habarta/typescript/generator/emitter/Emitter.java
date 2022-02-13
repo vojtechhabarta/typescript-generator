@@ -367,7 +367,9 @@ public class Emitter implements EmitterExtension.Writer {
         writeIndentedLine("switch (" + switchStatement.getExpression().format(settings) + ") {");
         indent++;
         for (TsSwitchCaseClause caseClause : switchStatement.getCaseClauses()) {
-            writeIndentedLine("case " + caseClause.getExpression().format(settings) + ":");
+            for (TsExpression expression : caseClause.getExpressions()) {
+                writeIndentedLine("case " + expression.format(settings) + ":");
+            }
             indent++;
             emitStatements(caseClause.getStatements());
             indent--;

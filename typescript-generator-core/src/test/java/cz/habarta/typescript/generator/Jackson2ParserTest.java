@@ -97,10 +97,10 @@ public class Jackson2ParserTest {
         Assertions.assertNull(bean2.getTaggedUnionClasses());
         Assertions.assertNull(bean3.getTaggedUnionClasses());
         Assertions.assertEquals("kind", bean0.getDiscriminantProperty());
-        Assertions.assertEquals("explicit-name1", bean1.getDiscriminantLiteral());
-        Assertions.assertEquals("SubType2", bean2.getDiscriminantLiteral());
-        Assertions.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName3", bean3.getDiscriminantLiteral());
-        Assertions.assertEquals("Jackson2ParserTest$SubTypeDiscriminatedByName4", bean4.getDiscriminantLiteral());
+        Assertions.assertEquals(Arrays.asList("explicit-name1", "SubType1"), bean1.getDiscriminantLiterals());
+        Assertions.assertEquals(Arrays.asList("SubType2"), bean2.getDiscriminantLiterals());
+        Assertions.assertEquals(Arrays.asList("Jackson2ParserTest$SubTypeDiscriminatedByName3"), bean3.getDiscriminantLiterals());
+        Assertions.assertEquals(Arrays.asList("Jackson2ParserTest$SubTypeDiscriminatedByName4"), bean4.getDiscriminantLiterals());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class Jackson2ParserTest {
         final Jackson2Parser jacksonParser = getJackson2Parser();
         final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName5.class);
         final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
-        Assertions.assertEquals("NamedByModule", bean5.getDiscriminantLiteral());
+        Assertions.assertEquals(Arrays.asList("NamedByModule"), bean5.getDiscriminantLiterals());
     }
 
     static Jackson2Parser getJackson2Parser() {
@@ -132,7 +132,7 @@ public class Jackson2ParserTest {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
     @JsonSubTypes({
-        @JsonSubTypes.Type(value = SubTypeDiscriminatedByName1.class, name = "SubType1"), // value from @JsonTypeName is used
+        @JsonSubTypes.Type(value = SubTypeDiscriminatedByName1.class, name = "SubType1"),
         @JsonSubTypes.Type(value = SubTypeDiscriminatedByName2.class, name = "SubType2"),
         @JsonSubTypes.Type(value = SubTypeDiscriminatedByName3.class),
         @JsonSubTypes.Type(value = SubTypeDiscriminatedByName4.class),

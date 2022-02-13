@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class JsonDeserializationExtension extends Extension {
@@ -321,7 +322,7 @@ public class JsonDeserializationExtension extends Extension {
         for (Class<?> cls : bean.getTaggedUnionClasses()) {
             final TsBeanModel tuBean = tsModel.getBean(cls);
             caseClauses.add(new TsSwitchCaseClause(
-                    new TsStringLiteral(tuBean.getDiscriminantLiteral()),
+                    tuBean.getDiscriminantLiterals().stream().map(TsStringLiteral::new).collect(Collectors.toList()),
                     Arrays.<TsStatement>asList(new TsReturnStatement(
                             new TsCallExpression(
                                     new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(symbolTable.getSymbol(cls))), "fromData"),

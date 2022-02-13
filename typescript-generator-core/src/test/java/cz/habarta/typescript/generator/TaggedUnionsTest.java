@@ -689,4 +689,44 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = LongDto.class, names = {"Long1", "Long2"}),
+            @JsonSubTypes.Type(value = BoolDto.class, names = {"Bool1", "Bool2"}),
+    })
+    private static abstract class AbstractDto {
+        public String type;
+    }
+
+    private static class LongDto extends AbstractDto {
+        public long value;
+    }
+
+    private static class BoolDto extends AbstractDto {
+        public boolean value;
+    }
+
+    @Test
+    public void testMultipleDiscriminantLiterals() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AbstractDto.class));
+        final String expected = ""
+                + "interface AbstractDto {\n"
+                + "    type: \"Long1\" | \"Long2\" | \"Bool1\" | \"Bool2\";\n"
+                + "}\n"
+                + "\n"
+                + "interface LongDto extends AbstractDto {\n"
+                + "    type: \"Long1\" | \"Long2\";\n"
+                + "    value: number;\n"
+                + "}\n"
+                + "\n"
+                + "interface BoolDto extends AbstractDto {\n"
+                + "    type: \"Bool1\" | \"Bool2\";\n"
+                + "    value: boolean;\n"
+                + "}\n"
+                + "\n"
+                + "type AbstractDtoUnion = LongDto | BoolDto;\n"
+                + "";
+        Assertions.assertEquals(expected.trim(), output.trim());
+    }
 }
