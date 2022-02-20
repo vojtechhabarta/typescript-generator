@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptFileType;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import java.lang.annotation.Retention;
@@ -488,4 +489,27 @@ public class SpringTest {
         }
     }
 
+    @Api(value = "customer")
+    public interface OpenApiGeneratorCreatedApi {
+
+        @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/generated/api",
+            produces = {"application/json"}
+        )
+        ResponseEntity<String> getGeneratedApi();
+    }
+
+    @Test
+    void testOpenApiGeneratorCreatedInterfacesAreIncluded() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(
+            Input.from(OpenApiGeneratorCreatedApi.class));
+        Assertions.assertTrue(output.contains(
+            "getGeneratedApi(): RestResponse<string> {\n"
+                + "        return this.httpClient.request({ method: \"GET\", url: uriEncoding`generated/api` });\n"
+                + "    }"));
+    }
 }

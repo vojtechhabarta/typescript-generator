@@ -22,6 +22,7 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import static cz.habarta.typescript.generator.util.Utils.getInheritanceChain;
+import io.swagger.annotations.Api;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -123,7 +124,8 @@ public class SpringApplicationParser extends RestApplicationParser {
 
         // controller
         final Component component = AnnotationUtils.findAnnotation(cls, Component.class);
-        if (component != null) {
+        final Api api = AnnotationUtils.findAnnotation(cls, Api.class);
+        if (component != null || api != null) {
             TypeScriptGenerator.getLogger().verbose("Parsing Spring component: " + cls.getName());
             final JaxrsApplicationParser.Result result = new JaxrsApplicationParser.Result();
             final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(cls, RequestMapping.class);
