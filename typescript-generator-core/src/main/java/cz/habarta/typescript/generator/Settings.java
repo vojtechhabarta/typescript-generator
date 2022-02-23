@@ -82,6 +82,7 @@ public class Settings {
     public Map<String, String> customTypeAliases = new LinkedHashMap<>();
     private List<CustomTypeAlias> validatedCustomTypeAliases = null;
     public DateMapping mapDate; // default is DateMapping.asDate
+    public MapMapping mapMap; // default is MapMapping.asIndexedArray
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
     public IdentifierCasing enumMemberCasing; // default is IdentifierCasing.keepOriginal
     public boolean nonConstEnums = false;

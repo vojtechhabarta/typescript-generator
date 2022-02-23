@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.EnumMapping;
 import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.IdentifierCasing;
+import cz.habarta.typescript.generator.MapMapping;
 import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.RestNamespacing;
@@ -149,6 +150,9 @@ public class ModelCompiler {
                 createRestClients(tsModel, symbolTable, restApplicationsWithClient, responseSymbol, optionsGenericVariable, optionsType);
             }
         }
+
+        // dates
+        tsModel = transformMaps(symbolTable, tsModel);
 
         // dates
         tsModel = transformDates(symbolTable, tsModel);
@@ -839,6 +843,23 @@ public class ModelCompiler {
             }
         }
         return new TsTaggedTemplateLiteral(new TsIdentifierReference("uriEncoding"), spans);
+    }
+
+    private TsModel transformMaps(SymbolTable symbolTable, TsModel tsModel) {
+        if (settings.mapMap != MapMapping.asRecord) {
+            return tsModel;
+        }
+        final TsModel model = transformBeanPropertyTypes(tsModel, new TsType.Transformer() {
+            @Override
+            public TsType transform(TsType.Context context, TsType type) {
+                if (type instanceof TsType.IndexedArrayType) {
+                    final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
+                    return new TsType.GenericBasicType("Record", indexedArrayType.indexType, indexedArrayType.elementType);
+                }
+                return type;
+            }
+        });
+        return model;
     }
 
     private TsModel transformDates(SymbolTable symbolTable, TsModel tsModel) {

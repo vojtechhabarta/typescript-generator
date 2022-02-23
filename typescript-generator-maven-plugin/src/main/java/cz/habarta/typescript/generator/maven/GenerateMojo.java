@@ -11,6 +11,7 @@ import cz.habarta.typescript.generator.Jackson2Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.JsonbConfiguration;
 import cz.habarta.typescript.generator.Logger;
+import cz.habarta.typescript.generator.MapMapping;
 import cz.habarta.typescript.generator.ModuleDependency;
 import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalProperties;
@@ -420,6 +421,18 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private DateMapping mapDate;
+
+    /**
+     * Specifies how {@link java.util.Map} and similar types will be mapped.
+     * Supported values are:
+     * <ul>
+     * <li><code>asIndexedArray</code> - creates <a href="https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures">indexed array type</a>, example: <code>{ [index: string]: Person }</code> (original way)</li>
+     * <li><code>asRecord</code> - creates <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type">Record type</a>, example: <code>Record&lt;string, Person&gt;</code> (from TypeScript 2.1)</li>
+     * </ul>
+     * Default value is <code>asIndexedArray</code>.<br>
+     */
+    @Parameter
+    private MapMapping mapMap;
 
     /**
      * Specifies how enums will be mapped.
@@ -926,6 +939,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.customTypeMappings = Settings.convertToMap(customTypeMappings, "customTypeMapping");
         settings.customTypeAliases = Settings.convertToMap(customTypeAliases, "customTypeAlias");
         settings.mapDate = mapDate;
+        settings.mapMap = mapMap;
         settings.mapEnum = mapEnum;
         settings.enumMemberCasing = enumMemberCasing;
         settings.nonConstEnums = nonConstEnums;
