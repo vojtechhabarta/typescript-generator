@@ -56,7 +56,7 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.138</version>
+            <version>4.8.143</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -329,7 +329,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.3.2</version>
                         <executions>
                             <execution>
                                 <id>test-xml-doclet</id>
