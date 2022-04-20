@@ -118,7 +118,11 @@ public class TypeScriptGenerator {
             npmPackageJson.peerDependencies = new LinkedHashMap<>();
             if (settings.moduleDependencies != null) {
                 for (ModuleDependency dependency : settings.moduleDependencies) {
-                    npmPackageJson.dependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
+                    if (dependency.usePeerDeps) {
+                        npmPackageJson.peerDependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
+                    } else {
+                        npmPackageJson.dependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
+                    }
                 }
             }
             if (settings.outputFileType == TypeScriptFileType.implementationFile) {
