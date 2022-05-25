@@ -393,6 +393,13 @@ public class Settings {
                         "Suggestion: annotation '%s' supports 'TYPE_PARAMETER' or 'TYPE_USE' target. Consider using 'nullableAnnotations' parameter instead of 'optionalAnnotations'.",
                         annotation.getName()));
             }
+           Retention retention = annotation.getAnnotation(Retention.class);
+           if (retention == null) {
+              throw new RuntimeException(annotation + " has no specified retention policy");
+           }
+           if (retention.value() != RetentionPolicy.RUNTIME) {
+              throw new RuntimeException(annotation + " is not marked as runtime annotation");
+           }
         }
         if (!optionalAnnotations.isEmpty() && !requiredAnnotations.isEmpty()) {
             throw new RuntimeException("Only one of 'optionalAnnotations' and 'requiredAnnotations' can be used at the same time.");
