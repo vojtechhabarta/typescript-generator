@@ -232,25 +232,30 @@ public final class Utils {
             return annotation;
         }
         if (fallbackAnnotationClass != null) {
-            final ClassLoader classLoader = annotationClass.getClassLoader();
             final Object fallbackAnnotation = annotatedElement.getAnnotation((Class<Annotation>)fallbackAnnotationClass);
             if (fallbackAnnotation != null) {
-                return (A) Proxy.newProxyInstance(
-                        classLoader,
-                        new Class<?>[]{annotationClass},
-                        (proxy, method, args) -> {
-                            try {
-                                final Method fallbackMethod = fallbackAnnotation.getClass().getMethod(method.getName());
-                                return fallbackMethod.invoke(fallbackAnnotation);
-                            } catch (ReflectiveOperationException e) {
-                                return null;
-                            }
-                        }
-                );
+                return asMigrationProxy((A) fallbackAnnotation, annotationClass);
             }
         }
         return null;
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T asMigrationProxy(T object, Class<T> clazz) {
+        return (T) Proxy.newProxyInstance(
+                clazz.getClassLoader(),
+                new Class<?>[]{clazz},
+                (proxy, method, args) -> {
+                    try {
+                        final Method fallbackMethod = object.getClass().getMethod(method.getName(), method.getParameterTypes());
+                        return fallbackMethod.invoke(object, args);
+                    } catch (ReflectiveOperationException e) {
+                        return null;
+                    }
+                }
+        );
+    }
+
 
     public static Type replaceRawClassInType(Type type, Class<?> newClass) {
         if (type instanceof ParameterizedType) {

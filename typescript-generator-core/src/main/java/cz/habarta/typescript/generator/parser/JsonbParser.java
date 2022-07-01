@@ -580,21 +580,13 @@ public class JsonbParser extends ModelParser {
         private PropertyVisibilityStrategy visibilityStrategy(final Class<?> type) {
             JsonbVisibility visibility = getJsonbAnnotation(type, JsonbVisibility.class);
             if (visibility != null) {
-                try {
-                    return visibility.value().getConstructor().newInstance();
-                } catch (final ReflectiveOperationException e) {
-                    throw new IllegalArgumentException(e);
-                }
+                return newVisibilityStrategy(visibility);
             }
             Package p = type.getPackage();
             while (p != null) {
                 visibility = getJsonbAnnotation(p, JsonbVisibility.class);
                 if (visibility != null) {
-                    try {
-                        return visibility.value().getConstructor().newInstance();
-                    } catch (final ReflectiveOperationException e) {
-                        throw new IllegalArgumentException(e);
-                    }
+                    return newVisibilityStrategy(visibility);
                 }
                 final String name = p.getName();
                 final int end = name.lastIndexOf('.');
@@ -612,6 +604,14 @@ public class JsonbParser extends ModelParser {
                 }
             }
             return this;
+        }
+
+        private PropertyVisibilityStrategy newVisibilityStrategy(JsonbVisibility visibility) {
+            try {
+                return Utils.asMigrationProxy(visibility.value().getConstructor().newInstance(), PropertyVisibilityStrategy.class);
+            } catch (final ReflectiveOperationException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
     }
 
