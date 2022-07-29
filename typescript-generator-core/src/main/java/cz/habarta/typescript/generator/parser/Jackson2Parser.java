@@ -347,7 +347,7 @@ public class Jackson2Parser extends ModelParser {
         } else {
             taggedUnionClasses = null;
         }
-        final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null : sourceClass.type.getGenericSuperclass();
+        final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class | sourceClass.type.getGenericSuperclass() == Record.class ? null : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
