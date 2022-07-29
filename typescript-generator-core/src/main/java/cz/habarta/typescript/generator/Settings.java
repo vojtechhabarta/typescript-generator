@@ -91,6 +91,7 @@ public class Settings {
     public List<String> mapClassesAsClassesPatterns;
     private Predicate<String> mapClassesAsClassesFilter = null;
     public boolean generateConstructors = false;
+    public boolean allowNullableConstructorParameter = false;
     public List<Class<? extends Annotation>> disableTaggedUnionAnnotations = new ArrayList<>();
     public boolean disableTaggedUnions = false;
     public boolean generateReadonlyAndWriteonlyJSDocTags = false;

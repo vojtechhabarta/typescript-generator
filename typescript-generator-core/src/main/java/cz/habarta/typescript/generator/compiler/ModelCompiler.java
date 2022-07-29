@@ -541,7 +541,7 @@ public class ModelCompiler {
                 if (!inheritedProperties.containsKey(property.getName())) {
                     body.add(new TsExpressionStatement(new TsAssignmentExpression(
                             new TsMemberExpression(new TsThisExpression(), property.name),
-                            new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+                            new TsMemberExpression(new TsIdentifierReference("data" + (settings.allowNullableConstructorParameter ? "?" : "")), property.name)
                     )));
                 }
             }

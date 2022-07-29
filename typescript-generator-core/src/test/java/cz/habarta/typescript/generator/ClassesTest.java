@@ -275,6 +275,22 @@ public class ClassesTest {
         settings.generateConstructors = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
         Assertions.assertTrue(output.contains("constructor(data: FooBar)"));
+        Assertions.assertTrue(output.contains("this.foo = data.foo;"));
+        Assertions.assertTrue(output.contains("this.bar = data.bar;"));
+    }
+
+    @Test
+    public void testConstructorWithNullableParameter() {
+        final Settings settings = TestUtils.settings();
+        settings.optionalAnnotations = Arrays.asList(Nullable.class);
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.mapClasses = ClassMapping.asClasses;
+        settings.generateConstructors = true;
+        settings.allowNullableConstructorParameter = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
+        Assertions.assertTrue(output.contains("constructor(data: FooBar)"));
+        Assertions.assertTrue(output.contains("this.foo = data?.foo;"));
+        Assertions.assertTrue(output.contains("this.bar = data?.bar;"));
     }
 
     @Test
