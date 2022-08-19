@@ -4,9 +4,15 @@ import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
+import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonNumber;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
@@ -196,10 +202,11 @@ public class JsonbParser extends ModelParser {
 
                         final JsonbProperty property = decoratedType.getAnnotation(JsonbProperty.class);
                         final String key = property == null || property.value().isEmpty() ? naming.translateName(e.getKey()) : property.value();
+                        final Type type = Field.class.isInstance(member) ?
+                                settings.getTypeParser().getFieldType(Field.class.cast(member)) :
+                                settings.getTypeParser().getMethodReturnType(Method.class.cast(member));
                         return JsonbParser.this.processTypeAndCreateProperty(
-                                key, Field.class.isInstance(member) ?
-                                        settings.getTypeParser().getFieldType(Field.class.cast(member)) :
-                                        settings.getTypeParser().getMethodReturnType(Method.class.cast(member)),
+                                key, replaceType(type),
                                 null, settings.optionalProperties == OptionalProperties.useLibraryDefinition ||
                                         JsonbParser.this.isPropertyOptional(propertyMember),
                                 null, clazz, member, null, null);
@@ -207,6 +214,25 @@ public class JsonbParser extends ModelParser {
                     .filter(Objects::nonNull)
                     .sorted(Comparator.comparing(PropertyModel::getName))
                     .collect(Collectors.toList());
+        }
+
+        private Type replaceType(final Type type) {
+            if (type == JsonValue.class || type == javax.json.JsonValue.class) {
+                return Object.class;
+            }
+            if (type == JsonObject.class || type == javax.json.JsonObject.class) {
+                return new JParameterizedType(Map.class, new Type[]{String.class, Object.class}, null);
+            }
+            if (type == JsonArray.class || type == javax.json.JsonArray.class) {
+                return new JParameterizedType(List.class, new Type[]{Object.class}, null);
+            }
+            if (type == JsonString.class || type == javax.json.JsonString.class) {
+                return String.class;
+            }
+            if (type == JsonNumber.class || type == javax.json.JsonNumber.class) {
+                return Double.class;
+            }
+            return type;
         }
 
         private Member findMember(final DecoratedType value) {
