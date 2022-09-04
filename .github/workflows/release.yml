@@ -1,0 +1,32 @@
+
+name: Release to Maven Central
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout workflow
+        uses: actions/checkout@v2
+      - name: Setup GPG signing key
+        run: |
+          if (-not $env:GPG_SIGNING_KEY) {
+            Write-Error "Please set GPG_SIGNING_KEY environment variable"
+            exit 1
+          }
+          mkdir target -Force | Out-Null
+          $gpg_signing_key = [Convert]::FromBase64String($env:GPG_SIGNING_KEY)
+          [System.IO.File]::WriteAllBytes("target/gpg_signing_key.bin", $gpg_signing_key)
+          gpg --import target/gpg_signing_key.bin
+          gpg --list-secret-keys
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+      - name: Sign and upload
+        run: |
+          ./build/release-build.ps1
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
