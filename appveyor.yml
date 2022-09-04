@@ -2,6 +2,14 @@ version: 2.36.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
+cache:
+- '%USERPROFILE%\.m2\repository -> appveyor.yml'
+init:
+- ps: |-
+    if ($env:APPVEYOR_REPO_BRANCH -ne "main" -or $env:APPVEYOR_PULL_REQUEST_NUMBER)
+    {
+        $env:APPVEYOR_CACHE_SKIP_SAVE = "true"
+    }
 install:
 - ps: |-
     git remote set-url origin https://github.com/vojtechhabarta/typescript-generator.git
