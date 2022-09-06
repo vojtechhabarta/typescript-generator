@@ -1,5 +1,5 @@
 
-/*export*/ class $$AxiosRestApplicationClient$$ extends $$RestApplicationClient$$<Axios.AxiosRequestConfig> {
+/*export*/ class $$AxiosRestApplicationClient$$ extends $$RestApplicationClientFullName$$<Axios.AxiosRequestConfig> {
 
     constructor(baseURL: string, axiosInstance: Axios.AxiosInstance = axios.create()) {
         axiosInstance.defaults.baseURL = baseURL;

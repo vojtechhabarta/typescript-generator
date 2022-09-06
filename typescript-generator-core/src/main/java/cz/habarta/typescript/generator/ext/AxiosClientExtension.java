@@ -45,7 +45,8 @@ public class AxiosClientExtension extends Extension {
         for (TsBeanModel bean : model.getBeans()) {
             if (bean.isJaxrsApplicationClientBean()) {
                 final String clientName = bean.getName().getSimpleName();
-                emitClient(writer, settings, exportKeyword, clientName);
+                final String clientFullName = settings.mapPackagesToNamespaces ? bean.getName().getFullName(): bean.getName().getSimpleName();
+                emitClient(writer, settings, exportKeyword, clientName, clientFullName);
             }
         }
     }
@@ -55,12 +56,13 @@ public class AxiosClientExtension extends Extension {
         Emitter.writeTemplate(writer, settings, template, null);
     }
 
-    private void emitClient(Writer writer, Settings settings, boolean exportKeyword, String clientName) {
+    private void emitClient(Writer writer, Settings settings, boolean exportKeyword, String clientName, String clientFullName) {
         final List<String> template = Utils.readLines(getClass().getResourceAsStream("AxiosClientExtension-client.template.ts"));
         final Map<String, String> replacements = new LinkedHashMap<>();
         replacements.put("\"", settings.quotes);
         replacements.put("/*export*/ ", exportKeyword ? "export " : "");
         replacements.put("$$RestApplicationClient$$", clientName);
+        replacements.put("$$RestApplicationClientFullName$$", clientFullName);
         replacements.put("$$AxiosRestApplicationClient$$", "Axios" + clientName);
         Emitter.writeTemplate(writer, settings, template, replacements);
     }
