@@ -13,18 +13,12 @@
     <name>typescript-generator-core</name>
 
     <properties>
-        <jackson1.version>1.9.13</jackson1.version>
         <graalvm.version>22.2.0</graalvm.version>
         <vavr.version>0.10.3</vavr.version>
     </properties>
 
     <dependencies>
         <!--compile dependencies-->
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson1.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
