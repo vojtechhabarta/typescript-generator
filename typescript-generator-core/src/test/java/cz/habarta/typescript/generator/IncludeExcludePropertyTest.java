@@ -15,7 +15,7 @@ public class IncludeExcludePropertyTest {
 
     public static Stream<JsonLibrary> data() {
         return Arrays.stream(JsonLibrary.values())
-                .filter(library -> library != JsonLibrary.jackson1 && library != JsonLibrary.jsonb);
+                .filter(library -> library != JsonLibrary.jsonb);
     }
 
     @ParameterizedTest(name = "{index} - {0}")

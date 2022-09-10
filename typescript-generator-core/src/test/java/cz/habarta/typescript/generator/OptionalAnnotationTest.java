@@ -1,7 +1,7 @@
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.habarta.typescript.generator.parser.BeanModel;
-import cz.habarta.typescript.generator.parser.Jackson1Parser;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.ModelParser;
@@ -20,21 +20,6 @@ import org.junit.jupiter.api.Test;
 
 
 public class OptionalAnnotationTest {
-
-    @Test
-    public void testJackson1OptionalAnnotation() {
-        Settings settings = new Settings();
-        settings.optionalAnnotations.add(Nullable.class);
-        ModelParser parser = new Jackson1Parser(settings, new DefaultTypeProcessor());
-        testModel(parser.parseModel(Jackson1Bean.class), true);
-    }
-
-    @Test
-    public void testJackson1NoAnnotation() {
-        Settings settings = new Settings();
-        ModelParser parser = new Jackson1Parser(settings, new DefaultTypeProcessor());
-        testModel(parser.parseModel(Jackson1Bean.class), false);
-    }
 
     @Test
     public void testJackson2OptionalAnnotation() {
@@ -61,11 +46,6 @@ public class OptionalAnnotationTest {
     }
 
     @Test
-    public void testJavaxNullableWithJackson1() {
-        testJavaxNullableUsingTypeScriptGenerator(JsonLibrary.jackson1);
-    }
-
-    @Test
     public void testJavaxNullableWithJackson2() {
         testJavaxNullableUsingTypeScriptGenerator(JsonLibrary.jackson2);
     }
@@ -78,31 +58,18 @@ public class OptionalAnnotationTest {
         Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
-    @org.codehaus.jackson.annotate.JacksonAnnotation
     @Retention(RetentionPolicy.RUNTIME)
     static @interface Nullable {
         // marker
     }
 
-    static class Jackson1Bean {
-        @Nullable
-        @org.codehaus.jackson.annotate.JsonProperty
-        private String fieldProperty;
-
-        @Nullable
-        @org.codehaus.jackson.annotate.JsonProperty
-        public String getMethodProperty() {
-            return fieldProperty;
-        }
-    }
-
     static class Jackson2Bean {
         @Nullable
-        @com.fasterxml.jackson.annotation.JsonProperty
+        @JsonProperty
         private String fieldProperty;
 
         @Nullable
-        @com.fasterxml.jackson.annotation.JsonProperty
+        @JsonProperty
         public String getMethodProperty() {
             return fieldProperty;
         }

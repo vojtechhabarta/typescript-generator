@@ -8,7 +8,6 @@ import cz.habarta.typescript.generator.emitter.NpmPackageJson;
 import cz.habarta.typescript.generator.emitter.NpmPackageJsonEmitter;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.parser.GsonParser;
-import cz.habarta.typescript.generator.parser.Jackson1Parser;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.JsonbParser;
 import cz.habarta.typescript.generator.parser.Model;
@@ -194,8 +193,6 @@ public class TypeScriptGenerator {
 
     private ModelParser.Factory getModelParserFactory() {
         switch (settings.jsonLibrary) {
-            case jackson1:
-                return new Jackson1Parser.Factory();
             case jackson2:
                 return new Jackson2Parser.Jackson2ParserFactory();
             case jaxb:
