@@ -51,7 +51,7 @@ public abstract class TsType implements Emittable {
     public String toString() {
         return format(new Settings());
     }
-    
+
     public static class BasicType extends TsType {
 
         public final String name;
@@ -112,7 +112,7 @@ public abstract class TsType implements Emittable {
 
         @Override
         public String format(Settings settings) {
-            return symbol.getFullName();
+            return settings.outputMultipleFiles ? symbol.getSimpleName() : symbol.getFullName();
         }
 
     }
@@ -135,7 +135,7 @@ public abstract class TsType implements Emittable {
             return super.format(settings) + "<" + Emitter.formatList(settings, typeArguments) + ">";
         }
     }
-    
+
     public static class GenericVariableType extends TsType.BasicType {
 
         public GenericVariableType(String name) {
@@ -223,7 +223,7 @@ public abstract class TsType implements Emittable {
             public String toString() {
                 return token;
             }
-            
+
         }
 
     }
@@ -481,8 +481,8 @@ public abstract class TsType implements Emittable {
         // currently not needed
     }
 
-    public static interface Transformer {
-        public TsType transform(Context context, TsType tsType);
+    public interface Transformer {
+        TsType transform(Context context, TsType tsType);
     }
 
 }
