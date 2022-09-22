@@ -96,6 +96,8 @@ public class GenerateTask extends DefaultTask {
     public boolean generateJaxrsApplicationClient;
     public boolean generateSpringApplicationInterface;
     public boolean generateSpringApplicationClient;
+    public boolean generateClientAsService;
+    public boolean skipNullValuesForOptionalServiceArguments;
     public boolean scanSpringApplication;
     @Deprecated public RestNamespacing jaxrsNamespacing;
     @Deprecated public String jaxrsNamespacingAnnotation;
@@ -186,6 +188,8 @@ public class GenerateTask extends DefaultTask {
         settings.generateJaxrsApplicationClient = generateJaxrsApplicationClient;
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
         settings.generateSpringApplicationClient = generateSpringApplicationClient;
+        settings.generateClientAsService = generateClientAsService;
+        settings.skipNullValuesForOptionalServiceArguments = skipNullValuesForOptionalServiceArguments;
         settings.scanSpringApplication = scanSpringApplication;
         settings.jaxrsNamespacing = jaxrsNamespacing;
         settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
