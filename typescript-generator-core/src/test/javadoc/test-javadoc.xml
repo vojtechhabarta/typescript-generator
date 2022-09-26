@@ -2551,7 +2551,7 @@
             <comment>Documentation for ClassWithExternalLinks
 
  This sentence has a &lt;a href="https://github.com/vojtechhabarta/typescript-generator"&gt;link&lt;/a&gt;!</comment>
-            <tag name="@see" text="&lt;a href=&quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;the wiki&lt;/a&gt;"/>
+            <tag name="@see" text="&lt;a href=&#10;      &quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;&#10;      the wiki&lt;/a&gt;"/>
             <class qualified="java.lang.Object"/>
             <constructor name="ClassWithExternalLinks" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
         </class>
@@ -8225,7 +8225,7 @@
             <comment>Documentation for ClassWithExternalLinks
 
  This sentence has a &lt;a href="https://github.com/vojtechhabarta/typescript-generator"&gt;link&lt;/a&gt;!</comment>
-            <tag name="@see" text="&lt;a href=&quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;the wiki&lt;/a&gt;"/>
+            <tag name="@see" text="&lt;a href=&#10;      &quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;&#10;      the wiki&lt;/a&gt;"/>
             <class qualified="java.lang.Object"/>
             <constructor name="ClassWithExternalLinks" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
         </class>

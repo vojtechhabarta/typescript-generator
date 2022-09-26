@@ -107,10 +107,10 @@ public class JavadocTest {
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithExternalLinks.class));
-            Assertions.assertFalse(generated.contains("<a"));
-            Assertions.assertFalse(generated.contains("</a>"));
-            Assertions.assertTrue(generated.contains("{@link https://github.com/vojtechhabarta/typescript-generator link}"));
-            Assertions.assertTrue(generated.contains("{@link https://github.com/vojtechhabarta/typescript-generator/wiki the wiki}"));
+            Assertions.assertFalse(generated.contains("<a"), "Anchor tags should be removed");
+            Assertions.assertFalse(generated.contains("</a>"), "Anchor tags should be removed");
+            Assertions.assertTrue(generated.contains("{@link https://github.com/vojtechhabarta/typescript-generator link}"), "Links should be converted to TSDoc");
+            Assertions.assertTrue(generated.contains("{@link https://github.com/vojtechhabarta/typescript-generator/wiki the wiki}"), "Links should be converted to TSDoc");
         }
     }
 
@@ -228,7 +228,9 @@ public class JavadocTest {
      * Documentation for ClassWithExternalLinks
      *
      * This sentence has a <a href="https://github.com/vojtechhabarta/typescript-generator">link</a>!
-     * @see <a href="https://github.com/vojtechhabarta/typescript-generator/wiki">the wiki</a>
+     * @see <a href=
+     *      "https://github.com/vojtechhabarta/typescript-generator/wiki">
+     *      the wiki</a>
      */
     public static class ClassWithExternalLinks {
     }

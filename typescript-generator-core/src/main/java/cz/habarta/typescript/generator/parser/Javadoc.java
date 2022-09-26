@@ -278,7 +278,7 @@ public class Javadoc {
      * @return comment with Javadoc anchor tags converted to TSdoc links
      */
     private static String convertAnchorToLink(String comment) {
-        return comment.replaceAll("<a href=\"([^\"]+)\">([^<]+)</a>", "{@link $1 $2}");
+        return comment.replaceAll("<a.*?href=(?:\\s+)?\"(.*)\">(?:\\s+)?(.*)</a>", "{@link $1 $2}");
     }
 
 }
