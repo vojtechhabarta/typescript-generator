@@ -1,0 +1,40 @@
+
+plugins {
+    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'java-library'
+}
+
+group = 'cz.habarta.typescript-generator'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    api "cz.habarta.typescript-generator:typescript-generator-gradle-plugin:${version}"
+    api "cz.habarta.typescript-generator:typescript-generator-spring:${version}"
+}
+
+task printVersion {
+    doLast {
+        println "Releasing 'cz.habarta.typescript-generator' Gradle plugin version ${project.version}..."
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/vojtechhabarta/typescript-generator'
+    vcsUrl = 'https://github.com/vojtechhabarta/typescript-generator'
+    tags = ['java', 'kotlin', 'json', 'typescript', 'typescript-generator', 'jackson', 'jakarta', 'rest', 'client', 'spring']
+}
+
+gradlePlugin {
+    plugins {
+        typescriptGeneratorPlugin {
+            id = 'cz.habarta.typescript-generator'
+            displayName = 'Typescript-generator Gradle plugin'
+            description = 'Generates TypeScript from Java - JSON declarations, REST service client'
+            implementationClass = 'cz.habarta.typescript.generator.gradle.TypeScriptGeneratorPublishedPlugin'
+        }
+    }
+}
