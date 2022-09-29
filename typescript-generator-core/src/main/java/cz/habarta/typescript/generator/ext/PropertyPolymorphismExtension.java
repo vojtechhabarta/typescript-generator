@@ -4,9 +4,8 @@ import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.TsType.ReferenceType;
 import cz.habarta.typescript.generator.compiler.ModelCompiler.TransformationPhase;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.Symbol;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanCategory;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
@@ -177,9 +176,9 @@ public class PropertyPolymorphismExtension extends Extension {
     @Override
     public List<TransformerDefinition> getTransformers() {
         return Arrays
-                .asList(new TransformerDefinition(TransformationPhase.BeforeSymbolResolution, new ModelTransformer() {
+                .asList(new TransformerDefinition(TransformationPhase.BeforeSymbolResolution, new TsModelTransformer() {
                     @Override
-                    public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
+                    public TsModel transformModel(Context context, TsModel model) {
                         List<TsBeanModel> newBeans = new ArrayList<>();
 
                         for (TsBeanModel bean : model.getBeans()) {
@@ -190,7 +189,7 @@ public class PropertyPolymorphismExtension extends Extension {
                                     ReferenceType type = (ReferenceType) property.tsType;
                                     TsBeanModel referencedBean = model.getBean(type.symbol);
                                     if (isPolymorphicBase.test(referencedBean.getOrigin())) {
-                                        Symbol refSymbol = symbolTable.addSuffixToSymbol(type.symbol, "Ref");
+                                        Symbol refSymbol = context.getSymbolTable().addSuffixToSymbol(type.symbol, "Ref");
                                         newProperties.add(property.withTsType(new TsType.ReferenceType(refSymbol)));
                                         continue;
                                     }
@@ -223,10 +222,10 @@ public class PropertyPolymorphismExtension extends Extension {
                                 for (Class<?> subType : subTypes.getOrDefault(base.getOrigin(),
                                         Collections.emptySet())) {
                                     refProperties.add(new TsPropertyModel(getPropertyName.apply(subType),
-                                            new ReferenceType(symbolTable.getSymbol(subType)), null, true, null));
+                                            new ReferenceType(context.getSymbolTable().getSymbol(subType)), null, true, null));
                                 }
                                 newBeans.add(new TsBeanModel(base.getOrigin(), TsBeanCategory.Data, false,
-                                        symbolTable.addSuffixToSymbol(base.getName(), "Ref"), null, null, null, null,
+                                context.getSymbolTable().addSuffixToSymbol(base.getName(), "Ref"), null, null, null, null,
                                         refProperties, null, null, null));
                             }
                         }

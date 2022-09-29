@@ -5,7 +5,7 @@ import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.Symbol;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer.Context;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
@@ -55,7 +55,7 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
         );
     }
 
-    private static TsModel transformModel(SymbolTable symbolTable, TsModel model) {
+    private static TsModel transformModel(Context context, TsModel model) {
         List<TsBeanModel> beans = model.getBeans().stream()
                 .map(bean -> transformBean(bean, model))
                 .collect(Collectors.toList());

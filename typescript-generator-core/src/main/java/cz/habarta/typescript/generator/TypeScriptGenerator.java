@@ -70,24 +70,15 @@ public class TypeScriptGenerator {
     }
 
     public void generateTypeScript(Input input, Output output) {
-        generateTypeScript(input, output, false, 0);
-    }
-
-    @Deprecated
-    public void generateEmbeddableTypeScript(Input input, Output output, boolean addExportKeyword, int initialIndentationLevel) {
-        generateTypeScript(input, output, addExportKeyword, initialIndentationLevel);
-    }
-
-    private void generateTypeScript(Input input, Output output, boolean forceExportKeyword, int initialIndentationLevel) {
         final Model model = getModelParser().parseModel(input.getSourceTypes());
         final TsModel tsModel = getModelCompiler().javaToTypeScript(model);
-        generateTypeScript(tsModel, output, forceExportKeyword, initialIndentationLevel);
+        generateTypeScript(tsModel, output);
         generateInfoJson(tsModel, output);
         generateNpmPackageJson(output);
     }
 
-    private void generateTypeScript(TsModel tsModel, Output output, boolean forceExportKeyword, int initialIndentationLevel) {
-        getEmitter().emit(tsModel, output.getWriter(), output.getName(), output.shouldCloseWriter(), forceExportKeyword, initialIndentationLevel);
+    private void generateTypeScript(TsModel tsModel, Output output) {
+        getEmitter().emit(tsModel, output.getWriter(), output.getName(), output.shouldCloseWriter());
     }
 
     private void generateInfoJson(TsModel tsModel, Output output) {

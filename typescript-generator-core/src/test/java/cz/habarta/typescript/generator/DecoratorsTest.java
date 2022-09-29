@@ -2,8 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.Emitter;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
@@ -52,9 +51,9 @@ public class DecoratorsTest {
         @Override
         public List<TransformerDefinition> getTransformers() {
             return Arrays.asList(
-                    new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeEnums, new ModelTransformer() {
+                    new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeEnums, new TsModelTransformer() {
                         @Override
-                        public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
+                        public TsModel transformModel(Context context, TsModel model) {
                             return model.withBeans(model.getBeans().stream()
                                     .map(ClassNameDecoratorExtension.this::decorateClass)
                                     .collect(Collectors.toList())
@@ -130,7 +129,7 @@ public class DecoratorsTest {
 
     private static String emit(Emitter emitter, TsModel model) {
         final StringWriter writer = new StringWriter();
-        emitter.emit(model, writer, "test", true, false, 0);
+        emitter.emit(model, writer, "test", true);
         return writer.toString();
     }
 

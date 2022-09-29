@@ -1,34 +1,9 @@
 package cz.habarta.typescript.generator;
 
-import java.io.ByteArrayOutputStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 public class StyleConfigurationTest {
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testOutputWithCustomStyle() {
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        final Settings settings = TestUtils.settings();
-        settings.addTypeNamePrefix = "I";
-        settings.sortDeclarations = true;
-
-        String expected = ""    +
-""                              + settings.newline +
-"    export interface IA {"     + settings.newline +
-"        b: IB;"                + settings.newline +
-"        x: number;"            + settings.newline +
-"    }"                         + settings.newline +
-""                              + settings.newline +
-"    export interface IB {"     + settings.newline +
-"        s: string;"            + settings.newline +
-"    }"                         + settings.newline +
-"";
-        new TypeScriptGenerator(settings).generateEmbeddableTypeScript(Input.from(A.class), Output.to(output), true, 1);
-
-        assertEquals(expected, new String(output.toByteArray()));
-    }
 
     public static class A {
         public int getX() {

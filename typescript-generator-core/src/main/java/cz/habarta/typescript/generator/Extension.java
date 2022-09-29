@@ -25,12 +25,18 @@ public abstract class Extension extends EmitterExtension {
         public final TsModelTransformer tsTransformer;
 
         public TransformerDefinition(ModelCompiler.TransformationPhase phase, ModelTransformer transformer) {
+            if (phase != ModelCompiler.TransformationPhase.BeforeTsModel) {
+                throw new IllegalArgumentException("ModelTransformer can only be applied in phase 'BeforeTsModel'");
+            }
             this.phase = phase;
             this.transformer = transformer;
-            this.tsTransformer = (context, model) -> transformer.transformModel(context.getSymbolTable(), model);
+            this.tsTransformer = null;
         }
 
         public TransformerDefinition(ModelCompiler.TransformationPhase phase, TsModelTransformer transformer) {
+            if (phase == ModelCompiler.TransformationPhase.BeforeTsModel) {
+                throw new IllegalArgumentException("TsModelTransformer cannot be applied in phase 'BeforeTsModel'");
+            }
             this.phase = phase;
             this.transformer = null;
             this.tsTransformer = transformer;

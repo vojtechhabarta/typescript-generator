@@ -62,7 +62,6 @@ public class Settings {
     public List<String> additionalDataLibraries = new ArrayList<>();
     private LoadedDataLibraries loadedDataLibrariesClasses = null;
     private Predicate<String> excludeFilter = null;
-    @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration; // default is OptionalPropertiesDeclaration.questionMark
     public NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullInlineUnion
@@ -100,9 +99,6 @@ public class Settings {
     public boolean generateSpringApplicationInterface = false;
     public boolean generateSpringApplicationClient = false;
     public boolean scanSpringApplication;
-    @Deprecated public RestNamespacing jaxrsNamespacing;
-    @Deprecated public Class<? extends Annotation> jaxrsNamespacingAnnotation = null;
-    @Deprecated public String jaxrsNamespacingAnnotationElement;  // default is "value"
     public RestNamespacing restNamespacing;
     public Class<? extends Annotation> restNamespacingAnnotation = null;
     public String restNamespacingAnnotationElement;  // default is "value"
@@ -135,9 +131,6 @@ public class Settings {
     public String typescriptVersion = "^2.4";
     public String npmTypescriptVersion = null;
     public String npmBuildScript = null;
-    @Deprecated public boolean displaySerializerWarning;
-    @Deprecated public boolean debug;
-    @Deprecated public boolean disableJackson2ModuleDiscovery = false;
     public boolean jackson2ModuleDiscovery = false;
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
@@ -415,18 +408,6 @@ public class Settings {
         if (generateSpringApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
             throw new RuntimeException("'generateSpringApplicationClient' can only be used when generating implementation file ('outputFileType' parameter is 'implementationFile').");
         }
-        if (jaxrsNamespacing != null) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'jaxrsNamespacing' is deprecated. Use 'restNamespacing' parameter.");
-            if (restNamespacing == null) {
-                restNamespacing = jaxrsNamespacing;
-            }
-        }
-        if (jaxrsNamespacingAnnotation != null) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'jaxrsNamespacingAnnotation' is deprecated. Use 'restNamespacingAnnotation' parameter.");
-            if (restNamespacingAnnotation == null) {
-                restNamespacingAnnotation = jaxrsNamespacingAnnotation;
-            }
-        }
         if (restNamespacing != null && !isGenerateRest()) {
             throw new RuntimeException("'restNamespacing' parameter can only be used when generating REST client or interface.");
         }
@@ -472,21 +453,6 @@ public class Settings {
         }
         getModuleDependencies();
         getLoadedDataLibraries();
-        if (declarePropertiesAsOptional) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
-            if (optionalProperties == null) {
-                optionalProperties = OptionalProperties.all;
-            }
-        }
-        if (disableJackson2ModuleDiscovery) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'disableJackson2ModuleDiscovery' was removed. See 'jackson2ModuleDiscovery' and 'jackson2Modules' parameters.");
-        }
-        if (displaySerializerWarning) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'displaySerializerWarning' was removed.");
-        }
-        if (debug) {
-            TypeScriptGenerator.getLogger().warning("Parameter 'debug' was removed. Please set 'loggingLevel' parameter to 'Debug'.");
-        }
     }
 
     public NullabilityDefinition getNullabilityDefinition() {
@@ -718,15 +684,6 @@ public class Settings {
             };
         }
         return mapClassesAsClassesFilter;
-    }
-
-    @Deprecated
-    public void setJaxrsNamespacingAnnotation(ClassLoader classLoader, String jaxrsNamespacingAnnotation) {
-        final Pair<Class<? extends Annotation>, String> pair = resolveRestNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
-        if (pair != null) {
-            this.jaxrsNamespacingAnnotation = pair.getValue1();
-            this.jaxrsNamespacingAnnotationElement = pair.getValue2();
-        }
     }
 
     public void setRestNamespacingAnnotation(ClassLoader classLoader, String restNamespacingAnnotation) {

@@ -31,12 +31,6 @@ public class ExtensionTest {
             @Override
             public List<TransformerDefinition> getTransformers() {
                 return Collections.singletonList(new TransformerDefinition(TransformationPhase.BeforeTsModel, new ModelTransformer() {
-
-                    @Override
-                    public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
-                        return model;
-                    }
-
                     @Override
                     public Model transformModel(SymbolTable symbolTable, Model model) {
                         List<BeanModel> beans = new ArrayList<>(model.getBeans());

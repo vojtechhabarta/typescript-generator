@@ -39,35 +39,6 @@ public class Input {
         return new Input(sourceTypes);
     }
 
-    @Deprecated
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames, List<String> classNamePatterns, String jaxrsApplicationClassName,
-            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded, URLClassLoader classLoader, boolean debug) {
-        return fromClassNamesAndJaxrsApplication(classNames, classNamePatterns, null, null, null,
-                jaxrsApplicationClassName, automaticJaxrsApplication, isClassNameExcluded, classLoader,
-                debug);
-    }
-
-    @Deprecated
-    public static Input fromClassNamesAndJaxrsApplication(List<String> classNames,
-            List<String> classNamePatterns, List<String> classesWithAnnotations,
-            List<String> classesImplementingInterfaces, List<String> classesExtendingClasses,
-            String jaxrsApplicationClassName,
-            boolean automaticJaxrsApplication, Predicate<String> isClassNameExcluded,
-            URLClassLoader classLoader, boolean debug) {
-        final Parameters parameters = new Parameters();
-        parameters.classNames = classNames;
-        parameters.classNamePatterns = classNamePatterns;
-        parameters.classesWithAnnotations = classesWithAnnotations;
-        parameters.classesImplementingInterfaces = classesImplementingInterfaces;
-        parameters.classesExtendingClasses = classesExtendingClasses;
-        parameters.jaxrsApplicationClassName = jaxrsApplicationClassName;
-        parameters.automaticJaxrsApplication = automaticJaxrsApplication;
-        parameters.isClassNameExcluded = isClassNameExcluded;
-        parameters.classLoader = classLoader;
-        parameters.debug = debug;
-        return from(parameters);
-    }
-
     public static class Parameters {
         public List<String> classNames;
         public List<String> classNamePatterns;

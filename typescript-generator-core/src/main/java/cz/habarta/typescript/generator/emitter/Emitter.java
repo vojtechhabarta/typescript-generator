@@ -24,17 +24,15 @@ public class Emitter implements EmitterExtension.Writer {
 
     private final Settings settings;
     private Writer writer;
-    private boolean forceExportKeyword;
     private int indent;
 
     public Emitter(Settings settings) {
         this.settings = settings;
     }
 
-    public void emit(TsModel model, Writer output, String outputName, boolean closeOutput, boolean forceExportKeyword, int initialIndentationLevel) {
+    public void emit(TsModel model, Writer output, String outputName, boolean closeOutput) {
         this.writer = output;
-        this.forceExportKeyword = forceExportKeyword;
-        this.indent = initialIndentationLevel;
+        this.indent = 0;
         if (outputName != null) {
             TypeScriptGenerator.getLogger().info("Writing declarations to: " + outputName);
         }
@@ -129,7 +127,6 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     private void emitElements(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        exportKeyword = exportKeyword || forceExportKeyword;
         emitBeans(model, exportKeyword, declareKeyword);
         emitTypeAliases(model, exportKeyword, declareKeyword);
         emitLiteralEnums(model, exportKeyword, declareKeyword);

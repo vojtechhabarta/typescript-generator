@@ -266,13 +266,6 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> additionalDataLibraries;
 
     /**
-     * <b>Deprecated</b>, use {@link #optionalProperties} parameter.
-     */
-    @Deprecated
-    @Parameter
-    private boolean declarePropertiesAsOptional;
-
-    /**
      * Specifies how properties are defined to be optional.
      * Supported values are:
      * <ul>
@@ -571,20 +564,6 @@ public class GenerateMojo extends AbstractMojo {
     private boolean scanSpringApplication;
 
     /**
-     * Deprecated, use {@link #restNamespacing}.
-     */
-    @Deprecated
-    @Parameter
-    private RestNamespacing jaxrsNamespacing;
-
-    /**
-     * Deprecated, use {@link #restNamespacingAnnotation}.
-     */
-    @Deprecated
-    @Parameter
-    private String jaxrsNamespacingAnnotation;
-
-    /**
      * Specifies how JAX-RS REST operations will be grouped into objects.
      * Supported values are:
      * <ul>
@@ -848,20 +827,6 @@ public class GenerateMojo extends AbstractMojo {
     private String indentString;
 
     /**
-     * <b>Deprecated</b>.
-     */
-    @Parameter
-    @Deprecated
-    private boolean displaySerializerWarning;
-
-    /**
-     * <b>Deprecated</b>, see {@link #jackson2ModuleDiscovery} and {@link #jackson2Modules} parameters.
-     */
-    @Deprecated
-    @Parameter
-    private boolean disableJackson2ModuleDiscovery;
-
-    /**
      * Turns on Jackson2 automatic module discovery.
      */
     @Parameter
@@ -872,13 +837,6 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> jackson2Modules;
-
-    /**
-     * <b>Deprecated</b>, use {@link #loggingLevel} parameter.
-     */
-    @Parameter
-    @Deprecated
-    private boolean debug;
 
     /**
      * Specifies level of logging output.
@@ -904,7 +862,6 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private String projectBuildDirectory;
 
-    @SuppressWarnings("deprecation")
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
         if (outputFileType != null) {
@@ -922,7 +879,6 @@ public class GenerateMojo extends AbstractMojo {
         settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
         settings.additionalDataLibraries = additionalDataLibraries;
-        settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
         settings.nullabilityDefinition = nullabilityDefinition;
@@ -955,8 +911,6 @@ public class GenerateMojo extends AbstractMojo {
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
         settings.generateSpringApplicationClient = generateSpringApplicationClient;
         settings.scanSpringApplication = scanSpringApplication;
-        settings.jaxrsNamespacing = jaxrsNamespacing;
-        settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
         settings.restNamespacing = restNamespacing;
         settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
         settings.restResponseType = restResponseType;
@@ -987,9 +941,6 @@ public class GenerateMojo extends AbstractMojo {
         settings.npmPeerDependencies = Settings.convertToMap(npmPeerDependencies, "npmPeerDependencies");
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
-        settings.displaySerializerWarning = displaySerializerWarning;
-        settings.debug = debug;
-        settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;

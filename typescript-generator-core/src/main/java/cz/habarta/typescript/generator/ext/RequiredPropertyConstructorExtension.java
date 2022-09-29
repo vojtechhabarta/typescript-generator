@@ -4,9 +4,8 @@ import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.Symbol;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
@@ -57,9 +56,9 @@ public class RequiredPropertyConstructorExtension extends Extension {
 
     @Override
     public List<TransformerDefinition> getTransformers() {
-        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.AfterDeclarationSorting, new ModelTransformer() {
+        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.AfterDeclarationSorting, new TsModelTransformer() {
             @Override
-            public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
+            public TsModel transformModel(Context context, TsModel model) {
                 List<TsBeanModel> beans = new ArrayList<>();
                 Map<String, TsConstructorModel> generatedConstructors = new HashMap<>();
                 for (TsBeanModel bean : model.getBeans()) {

@@ -64,7 +64,6 @@ public class GenerateTask extends DefaultTask {
     public GsonConfiguration gsonConfiguration;
     public JsonbConfiguration jsonbConfiguration;
     public List<String> additionalDataLibraries;
-    @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
     public NullabilityDefinition nullabilityDefinition;
@@ -97,8 +96,6 @@ public class GenerateTask extends DefaultTask {
     public boolean generateSpringApplicationInterface;
     public boolean generateSpringApplicationClient;
     public boolean scanSpringApplication;
-    @Deprecated public RestNamespacing jaxrsNamespacing;
-    @Deprecated public String jaxrsNamespacingAnnotation;
     public RestNamespacing restNamespacing;
     public String restNamespacingAnnotation;
     public String restResponseType;
@@ -129,14 +126,10 @@ public class GenerateTask extends DefaultTask {
     public List<String> npmPeerDependencies;
     public StringQuotes stringQuotes;
     public String indentString;
-    @Deprecated public boolean displaySerializerWarning;
-    @Deprecated public boolean disableJackson2ModuleDiscovery;
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
-    @Deprecated public boolean debug;
     public Logger.Level loggingLevel;
 
-    @SuppressWarnings("deprecation")
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
         if (outputFileType != null) {
@@ -154,7 +147,6 @@ public class GenerateTask extends DefaultTask {
         settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
         settings.additionalDataLibraries = additionalDataLibraries;
-        settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
         settings.nullabilityDefinition = nullabilityDefinition;
@@ -187,8 +179,6 @@ public class GenerateTask extends DefaultTask {
         settings.generateSpringApplicationInterface = generateSpringApplicationInterface;
         settings.generateSpringApplicationClient = generateSpringApplicationClient;
         settings.scanSpringApplication = scanSpringApplication;
-        settings.jaxrsNamespacing = jaxrsNamespacing;
-        settings.setJaxrsNamespacingAnnotation(classLoader, jaxrsNamespacingAnnotation);
         settings.restNamespacing = restNamespacing;
         settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
         settings.restResponseType = restResponseType;
@@ -219,9 +209,6 @@ public class GenerateTask extends DefaultTask {
         settings.npmPeerDependencies = Settings.convertToMap(npmPeerDependencies, "npmPeerDependencies");
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
-        settings.displaySerializerWarning = displaySerializerWarning;
-        settings.debug = debug;
-        settings.disableJackson2ModuleDiscovery = disableJackson2ModuleDiscovery;
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
         settings.classLoader = classLoader;

@@ -5,8 +5,7 @@ import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
-import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsEnumModel;
@@ -38,9 +37,9 @@ public class ClassEnumExtension extends Extension {
 
     @Override
     public List<TransformerDefinition> getTransformers() {
-        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeEnums, new ModelTransformer() {
+        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeEnums, new TsModelTransformer() {
             @Override
-            public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
+            public TsModel transformModel(Context context, TsModel model) {
                 List<TsBeanModel> beans = model.getBeans();
                 List<TsBeanModel> classEnums = new ArrayList<>();
                 for (TsBeanModel bean : beans) {

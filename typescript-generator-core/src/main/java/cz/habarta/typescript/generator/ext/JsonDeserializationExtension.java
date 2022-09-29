@@ -5,9 +5,9 @@ import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsParameter;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsArrowFunction;
 import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
@@ -79,12 +79,12 @@ public class JsonDeserializationExtension extends Extension {
 
     @Override
     public List<TransformerDefinition> getTransformers() {
-        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeSymbolResolution, new ModelTransformer() {
+        return Arrays.asList(new TransformerDefinition(ModelCompiler.TransformationPhase.BeforeSymbolResolution, new TsModelTransformer() {
             @Override
-            public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
-                model = createDeserializationMethods(symbolTable, model);
+            public TsModel transformModel(Context context, TsModel model) {
+                model = createDeserializationMethods(context.getSymbolTable(), model);
                 if (useJsonDeserializationInJaxrsApplicationClient) {
-                    model = useDeserializationMethodsInJaxrs(symbolTable, model);
+                    model = useDeserializationMethodsInJaxrs(context.getSymbolTable(), model);
                 }
                 return model;
             }
