@@ -8,9 +8,8 @@ public final class DeprecationUtils {
     public static final String DEPRECATED = "@deprecated";
 
     public static String convertToComment(Deprecated deprecated) {
-        // support for java 9+ syntax
-        String since = Utils.getAnnotationElementValue(deprecated, "since", String.class);
-        Boolean forRemoval = Utils.getAnnotationElementValue(deprecated, "forRemoval", Boolean.class);
+        String since = deprecated.since();
+        Boolean forRemoval = deprecated.forRemoval();
 
         List<String> additional = new ArrayList<>();
         if (since != null && !since.isEmpty()) {
@@ -21,4 +20,5 @@ public final class DeprecationUtils {
         }
         return additional.isEmpty() ? DEPRECATED : (DEPRECATED + " " + String.join(", ", additional));
     }
+
 }

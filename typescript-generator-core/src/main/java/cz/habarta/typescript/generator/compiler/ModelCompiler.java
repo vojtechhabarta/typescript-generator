@@ -151,7 +151,7 @@ public class ModelCompiler {
             }
         }
 
-        // dates
+        // maps
         tsModel = transformMaps(symbolTable, tsModel);
 
         // dates

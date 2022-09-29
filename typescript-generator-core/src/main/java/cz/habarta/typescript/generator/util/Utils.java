@@ -30,26 +30,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 public final class Utils {
@@ -122,7 +116,7 @@ public final class Utils {
     }
 
     public static Stream<Class<?>> getInheritanceChain(Class<?> cls) {
-        return generateStream(cls, c -> c != null, (Class<?> c) -> c.getSuperclass())
+        return Stream.iterate(cls, c -> c != null, (Class<?> c) -> c.getSuperclass())
                 .collect(toReversedCollection())
                 .stream();
     }
@@ -147,27 +141,6 @@ public final class Utils {
                 },
                 LinkedHashMap::new
         );
-    }
-
-    // remove on Java 9 and replace with Stream.iterate
-    private static <T> Stream<T> generateStream(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
-        final Spliterator<T> spliterator = Spliterators.spliteratorUnknownSize(new Iterator<T>() {
-            private T last = seed;
-
-            @Override
-            public boolean hasNext() {
-                return hasNext.test(last);
-            }
-
-            @Override
-            public T next() {
-                final T current = last;
-                last = next.apply(last);
-                return current;
-            }
-        }, Spliterator.ORDERED);
-
-        return StreamSupport.stream(spliterator, false);
     }
 
     public static boolean hasAnyAnnotation(

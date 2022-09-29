@@ -724,7 +724,7 @@ public class Jackson2Parser extends ModelParser {
         final List<EnumMemberModel> enumMembers = new ArrayList<>();
         if (sourceClass.type.isEnum()) {
             @SuppressWarnings("unchecked")
-            final Class<Enum> enumClass = (Class<Enum>) sourceClass.type;
+            final Class<Enum<?>> enumClass = (Class<Enum<?>>) sourceClass.type;
             final List<Field> constants = Arrays.stream(enumClass.getEnumConstants()).map(e -> {
                 try {
                     return enumClass.getDeclaredField(e.name());
