@@ -1,29 +1,19 @@
 
-apply plugin: 'java'
-apply plugin: 'cz.habarta.typescript-generator'
+plugins {
+    id 'java'
+    id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
+}
 
-version = '2.0'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+version = '3.0'
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
-}
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION'
-        classpath 'cz.habarta.typescript-generator:typescript-generator-spring:FILL_VERSION'
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.4'
 }
 
 generateTypeScript {

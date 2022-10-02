@@ -1,36 +1,31 @@
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'kotlin'
-apply plugin: 'scala'
-apply plugin: 'cz.habarta.typescript-generator'
+buildscript {
+    dependencies {
+        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.4'
+    }
+}
 
-version = '2.0'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+plugins {
+    id 'java'
+    id 'groovy'
+    id "org.jetbrains.kotlin.jvm" version "1.4.32"
+    id 'scala'
+    id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
+}
+
+version = '3.0'
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.0'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.9'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.32'
-    implementation 'org.scala-lang:scala-library:2.13.7'
-}
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.32'
-        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.0'
-    }
+    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.4'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.13'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.32'
+    implementation 'org.scala-lang:scala-library:2.13.9'
 }
 
 generateTypeScript {
