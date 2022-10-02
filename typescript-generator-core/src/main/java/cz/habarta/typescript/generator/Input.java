@@ -189,8 +189,9 @@ public class Input {
                 final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 classes.add(cls);
             } catch (ReflectiveOperationException e) {
-                TypeScriptGenerator.getLogger().error(String.format("Cannot load class '%s'", className));
-                e.printStackTrace(System.out);
+                final String errorMessage = String.format("Cannot load class '%s'", className);
+                TypeScriptGenerator.getLogger().error(errorMessage);
+                throw new RuntimeException(errorMessage, e);
             }
         }
         return classes;
