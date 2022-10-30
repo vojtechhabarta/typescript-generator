@@ -273,8 +273,11 @@ public class ModelCompiler {
         final List<TsType> extendsList = new ArrayList<>();
         final List<TsType> implementsList = new ArrayList<>();
 
-        final TsType parentType = typeFromJava(symbolTable, bean.getParent());
-        if (parentType != null && !parentType.equals(TsType.Any)) {
+        final TsType parentTypeFromJava = typeFromJava(symbolTable, bean.getParent());
+        final TsType parentType = parentTypeFromJava != null && !parentTypeFromJava.equals(TsType.Any)
+                ? parentTypeFromJava
+                : null;
+        if (parentType != null) {
             final boolean isParentMappedToClass = mappedToClass(getOriginClass(symbolTable, parentType));
             if (isClass && !isParentMappedToClass) {
                 implementsList.add(parentType);
