@@ -60,6 +60,19 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                    <!-- was version 13.0 -->
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- transitive dependency pulled by kotlin-stdlib -->
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -185,6 +198,12 @@
             <version>${vavr.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>21.0.1</version>
+            <scope>test</scope>
+        </dependency> -->
     </dependencies>
 
     <build>
