@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.TypeVariable;
 import java.net.URL;
@@ -792,15 +794,28 @@ public class Settings {
             } else {
                 loadedClass = loadPrimitiveOrRegularClass(classLoader, className);
             }
-            if (requiredClassType == null || requiredClassType.isAssignableFrom(loadedClass)) {
-                @SuppressWarnings("unchecked")
-                final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
-                return castedClass;
-            } else {
+            if (requiredClassType != null && !requiredClassType.isAssignableFrom(loadedClass)) {
                 throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
             }
+            @SuppressWarnings("unchecked")
+            final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
+            if (requiredClassType != null && Annotation.class.isAssignableFrom(requiredClassType)) {
+                @SuppressWarnings("unchecked")
+                final Class<? extends Annotation> loadedAnnotationClass = (Class<? extends Annotation>) castedClass;
+                checkAnnotationHasRuntimeRetention(loadedAnnotationClass);
+            }
+            return castedClass;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void checkAnnotationHasRuntimeRetention(Class<? extends Annotation> annotationClass) {
+        final Retention retention = annotationClass.getAnnotation(Retention.class);
+        if (retention.value() != RetentionPolicy.RUNTIME) {
+            TypeScriptGenerator.getLogger().warning(String.format(
+                "Annotation '%s' has no effect because it doesn't have 'RUNTIME' retention.",
+                annotationClass.getName()));
         }
     }
 
