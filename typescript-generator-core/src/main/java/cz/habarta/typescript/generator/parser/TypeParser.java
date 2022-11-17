@@ -35,6 +35,7 @@ import kotlin.reflect.KClassifier;
 import kotlin.reflect.KFunction;
 import kotlin.reflect.KParameter;
 import kotlin.reflect.KProperty;
+import kotlin.reflect.KProperty1;
 import kotlin.reflect.KType;
 import kotlin.reflect.KTypeParameter;
 import kotlin.reflect.KTypeProjection;
@@ -186,15 +187,14 @@ public class TypeParser {
             if (kFunction != null) {
                 return getType(kFunction.getReturnType(), new LinkedHashMap<>());
             } else {
-                // `method` might be a getter so try to find a corresponding field and pass it to Kotlin reflection
+                // `method` might be a getter so try to find a corresponding kotlin property and use its return type
                 final KClass<?> kClass = JvmClassMappingKt.getKotlinClass(method.getDeclaringClass());
-                final Optional<Field> field = KClasses.getMemberProperties(kClass).stream()
+                final Optional<KType> kType = KClasses.getMemberProperties(kClass).stream()
                         .filter(kProperty -> Objects.equals(ReflectJvmMapping.getJavaGetter(kProperty), method))
-                        .map(kProperty -> ReflectJvmMapping.getJavaField(kProperty))
-                        .filter(Objects::nonNull)
+                        .map(KProperty1::getReturnType)
                         .findFirst();
-                if (field.isPresent()) {
-                    return getFieldType(field.get());
+                if (kType.isPresent()) {
+                    return getType(kType.get(), new LinkedHashMap<>());
                 }
             }
             return javaTypeParser.getMethodReturnType(method);
