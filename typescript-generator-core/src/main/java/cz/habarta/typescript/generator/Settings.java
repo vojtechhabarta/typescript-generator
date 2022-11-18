@@ -380,6 +380,14 @@ public class Settings {
         if (generateConstructors && mapClasses != ClassMapping.asClasses) {
             throw new RuntimeException("'generateConstructors' parameter can only be used when 'mapClasses' parameter is set to 'asClasses'.");
         }
+        checkAnnotationsHaveRuntimeRetention(this.nonConstEnumAnnotations);
+        checkAnnotationsHaveRuntimeRetention(this.disableTaggedUnionAnnotations);
+        checkAnnotationHasRuntimeRetention(this.restNamespacingAnnotation);
+        checkAnnotationsHaveRuntimeRetention(this.includePropertyAnnotations);
+        checkAnnotationsHaveRuntimeRetention(this.excludePropertyAnnotations);
+        checkAnnotationsHaveRuntimeRetention(this.optionalAnnotations);
+        checkAnnotationsHaveRuntimeRetention(this.requiredAnnotations);
+        checkAnnotationsHaveRuntimeRetention(this.nullableAnnotations);
         for (Class<? extends Annotation> annotation : optionalAnnotations) {
             final Target target = annotation.getAnnotation(Target.class);
             final List<ElementType> elementTypes = target != null ? Arrays.asList(target.value()) : Arrays.asList();
@@ -797,22 +805,24 @@ public class Settings {
             if (requiredClassType != null && !requiredClassType.isAssignableFrom(loadedClass)) {
                 throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
             }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") 
             final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
-            if (requiredClassType != null && Annotation.class.isAssignableFrom(requiredClassType)) {
-                @SuppressWarnings("unchecked")
-                final Class<? extends Annotation> loadedAnnotationClass = (Class<? extends Annotation>) castedClass;
-                checkAnnotationHasRuntimeRetention(loadedAnnotationClass);
-            }
             return castedClass;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static void checkAnnotationsHaveRuntimeRetention(List<Class<? extends Annotation>> annotationClasses) {
+        annotationClasses.forEach(Settings::checkAnnotationHasRuntimeRetention);
+    }
+
     private static void checkAnnotationHasRuntimeRetention(Class<? extends Annotation> annotationClass) {
+        if (annotationClass == null) {
+            return;
+        }
         final Retention retention = annotationClass.getAnnotation(Retention.class);
-        if (retention.value() != RetentionPolicy.RUNTIME) {
+        if (retention == null || retention.value() != RetentionPolicy.RUNTIME) {
             TypeScriptGenerator.getLogger().warning(String.format(
                 "Annotation '%s' has no effect because it doesn't have 'RUNTIME' retention.",
                 annotationClass.getName()));
