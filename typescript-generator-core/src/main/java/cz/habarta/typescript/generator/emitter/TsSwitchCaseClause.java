@@ -6,16 +6,16 @@ import java.util.List;
 
 public class TsSwitchCaseClause extends TsStatement {
 
-    private final TsExpression expression;
+    private final List<TsExpression> expressions;
     private final List<TsStatement> statements;
 
-    public TsSwitchCaseClause(TsExpression expression, List<TsStatement> statements) {
-        this.expression = expression;
+    public TsSwitchCaseClause(List<TsExpression> expressions, List<TsStatement> statements) {
+        this.expressions = expressions;
         this.statements = statements;
     }
 
-    public TsExpression getExpression() {
-        return expression;
+    public List<TsExpression> getExpressions() {
+        return expressions;
     }
 
     public List<TsStatement> getStatements() {

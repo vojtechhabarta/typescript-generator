@@ -126,7 +126,7 @@ export class Order {
 }
 
 export class Shape {
-    kind: "square" | "rectangle" | "circle";
+    kind: "square" | "rectangle" | "circle" | "circle2";
     metadata: ShapeMetadata;
 
     constructor(data: Shape) {
@@ -154,6 +154,7 @@ export class Shape {
             case "rectangle":
                 return Rectangle.fromData(data);
             case "circle":
+            case "circle2":
                 return Circle.fromData(data);
         }
     }
@@ -220,7 +221,7 @@ export class Rectangle extends Shape {
 }
 
 export class Circle extends Shape {
-    kind: "circle";
+    kind: "circle" | "circle2";
     radius: number;
 
     constructor(data: Circle) {

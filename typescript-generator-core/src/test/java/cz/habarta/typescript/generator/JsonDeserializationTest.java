@@ -165,7 +165,7 @@ public class JsonDeserializationTest {
     @JsonSubTypes({
         @JsonSubTypes.Type(Square.class),
         @JsonSubTypes.Type(Rectangle.class),
-        @JsonSubTypes.Type(Circle.class),
+        @JsonSubTypes.Type(value = Circle.class, name = "circle2"),
     })
     private abstract static class Shape {
         public ShapeMetadata metadata;
