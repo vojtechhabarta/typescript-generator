@@ -13,7 +13,7 @@
     <name>typescript-generator-core</name>
 
     <properties>
-        <graalvm.version>22.2.0</graalvm.version>
+        <graalvm.version>22.3.0</graalvm.version>
         <vavr.version>0.10.3</vavr.version>
     </properties>
 
