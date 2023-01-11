@@ -1280,7 +1280,23 @@ public class ModelCompiler {
                 final TsType newReturnType = TsType.transformTsType(context, method.getReturnType(), transformer);
                 newMethods.add(new TsMethodModel(method.getName(), method.getModifiers(), method.getTypeParameters(), newParameters, newReturnType, method.getBody(), method.getComments()));
             }
-            newBeans.add(bean.withProperties(newProperties).withMethods(newMethods));
+            final List<TsType> newImplements = new ArrayList<>();
+            for (TsType type: bean.getImplementsList()) {
+                if (type instanceof TsType.GenericBasicType || type instanceof TsType.GenericReferenceType) {
+                    newImplements.add(TsType.transformTsType(context, type, transformer));
+                } else {
+                    newImplements.add(type);
+                }
+            }
+            final List<TsType> newExtends = new ArrayList<>();
+            for (TsType type: bean.getExtendsList()) {
+                if (type instanceof TsType.GenericBasicType || type instanceof TsType.GenericReferenceType) {
+                    newExtends.add(TsType.transformTsType(context, type, transformer));
+                } else {
+                    newExtends.add(type);
+                }
+            }
+            newBeans.add(bean.withProperties(newProperties).withMethods(newMethods).withImplements(newImplements).withExtends(newExtends));
         }
         return tsModel.withBeans(newBeans);
     }

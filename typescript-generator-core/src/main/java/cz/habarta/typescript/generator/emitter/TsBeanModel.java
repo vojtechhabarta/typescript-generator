@@ -160,9 +160,17 @@ public class TsBeanModel extends TsDeclarationModel {
     public boolean isJaxrsApplicationClientBean() {
         return category == TsBeanCategory.Service && isClass;
     }
-    
+
     public boolean isDataClass() {
         return category == TsBeanCategory.Data && isClass;
     }
-    
+
+    public TsBeanModel withImplements(List<TsType> implementsList) {
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+    }
+
+    public TsBeanModel withExtends(List<TsType> extendsList) {
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList, taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+    }
+
 }
