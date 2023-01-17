@@ -93,9 +93,9 @@ public class Jackson2ParserTest {
         final BeanModel bean4 = model.getBean(SubTypeDiscriminatedByName4.class);
         final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
         Assertions.assertEquals(4, bean0.getTaggedUnionClasses().size());
-        Assertions.assertNull(bean1.getTaggedUnionClasses());
-        Assertions.assertNull(bean2.getTaggedUnionClasses());
-        Assertions.assertNull(bean3.getTaggedUnionClasses());
+        Assertions.assertTrue(bean1.getTaggedUnionClasses().isEmpty());
+        Assertions.assertTrue(bean2.getTaggedUnionClasses().isEmpty());
+        Assertions.assertTrue(bean3.getTaggedUnionClasses().isEmpty());
         Assertions.assertEquals("kind", bean0.getDiscriminantProperty());
         Assertions.assertEquals("explicit-name1", bean1.getDiscriminantLiteral());
         Assertions.assertEquals("SubType2", bean2.getDiscriminantLiteral());
@@ -492,7 +492,7 @@ public class Jackson2ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
     @Test
     public void testFactoryMethod() throws JsonProcessingException {
@@ -526,7 +526,7 @@ public class Jackson2ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
 
     @Retention(RetentionPolicy.RUNTIME)

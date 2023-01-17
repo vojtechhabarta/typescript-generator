@@ -82,21 +82,21 @@ public class TaggedUnionsTest {
     })
     interface IShape3 {
     }
-    
+
     interface IQuadrilateral3 extends IShape3 {
     }
-    
+
     interface INamedShape3 extends IShape3 {
         String getName();
     }
-    
+
     interface INamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {
     }
-    
+
     @JsonTypeName("rectangle")
     interface IRectangle3 extends INamedQuadrilateral3 {
     }
-    
+
     @JsonTypeName("circle")
     interface ICircle3 extends INamedShape3 {
     }
@@ -689,4 +689,60 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    public interface SealedInterface {
+        @JsonTypeName("a")
+        final class SealedInterfaceA implements SealedInterface {
+        }
+        @JsonTypeName
+        final class SealedInterfaceB implements SealedInterface {
+        }
+        final class SealedInterfaceC_ShouldBeMissing{}
+    }
+    @Test
+    public void testSealedInterfaceDetection() {
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(SealedInterface.class));
+        Assertions.assertEquals("\n" +
+                "interface SealedInterface {\n" +
+                "    \"@type\": \"TaggedUnionsTest$SealedInterface$SealedInterfaceB\" | \"a\";\n" +
+                "}\n" +
+                "\n" +
+                "interface SealedInterfaceB extends SealedInterface {\n" +
+                "    \"@type\": \"TaggedUnionsTest$SealedInterface$SealedInterfaceB\";\n" +
+                "}\n" +
+                "\n" +
+                "interface SealedInterfaceA extends SealedInterface {\n" +
+                "    \"@type\": \"a\";\n" +
+                "}\n" +
+                "\n" +
+                "type SealedInterfaceUnion = SealedInterfaceB | SealedInterfaceA;\n", output);
+    }
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    public class SealedClass {
+        @JsonTypeName("a")
+        final class SealedClassA extends SealedClass {
+        }
+        @JsonTypeName
+        final class SealedClassB extends SealedClass {
+        }
+        final class SealedClassC_ShouldBeMissing{}
+    }
+    @Test
+    public void testSealedClassDetection() {
+        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(SealedClass.class));
+        Assertions.assertEquals("\n" +
+                "interface SealedClass {\n" +
+                "    \"@type\": \"TaggedUnionsTest$SealedClass\" | \"TaggedUnionsTest$SealedClass$SealedClassB\" | \"a\";\n" +
+                "}\n" +
+                "\n" +
+                "interface SealedClassB extends SealedClass {\n" +
+                "    \"@type\": \"TaggedUnionsTest$SealedClass$SealedClassB\";\n" +
+                "}\n" +
+                "\n" +
+                "interface SealedClassA extends SealedClass {\n" +
+                "    \"@type\": \"a\";\n" +
+                "}\n" +
+                "\n" +
+                "type SealedClassUnion = SealedClassB | SealedClassA;\n", output);
+    }
 }

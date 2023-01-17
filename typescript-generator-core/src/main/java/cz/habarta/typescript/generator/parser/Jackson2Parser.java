@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -108,11 +109,11 @@ public class Jackson2Parser extends ModelParser {
     }
 
     public static class JaxbParserFactory extends Jackson2ParserFactory {
-        
+
         public JaxbParserFactory() {
             super(true);
         }
-        
+
     }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -336,16 +337,23 @@ public class Jackson2Parser extends ModelParser {
             }
         }
 
-        final List<Class<?>> taggedUnionClasses;
+        final List<Class<?>> taggedUnionClasses = new ArrayList();
         final JsonSubTypes jsonSubTypes = sourceClass.type.getAnnotation(JsonSubTypes.class);
         if (jsonSubTypes != null) {
-            taggedUnionClasses = new ArrayList<>();
             for (JsonSubTypes.Type type : jsonSubTypes.value()) {
                 addBeanToQueue(new SourceType<>(type.value(), sourceClass.type, "<subClass>"));
                 taggedUnionClasses.add(type.value());
             }
         } else {
-            taggedUnionClasses = null;
+            for (Class<?> cls: sourceClass.type.getDeclaredClasses()){
+                if(sourceClass.type.isAssignableFrom(cls)){
+                    JsonTypeName jsonTypeName = cls.getAnnotation(JsonTypeName.class);
+                    if(jsonTypeName != null){
+                        addBeanToQueue(new SourceType<>(cls, sourceClass.type, "<subClass>"));
+                        taggedUnionClasses.add(cls);
+                    }
+                }
+            }
         }
         final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
