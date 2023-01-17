@@ -5,6 +5,7 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+/.mvn/wrapper/maven-wrapper.jar
 
 # Gradle
 /sample-gradle/.gradle/
