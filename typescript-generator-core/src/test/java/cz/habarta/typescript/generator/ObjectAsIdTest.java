@@ -26,6 +26,7 @@ public class ObjectAsIdTest {
     @Test
     public void testJackson() throws JsonProcessingException {
         final TestObjectA testObjectA = new TestObjectA();
+        final TestObjectSubA testObjectSubA = new TestObjectSubA();
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
         final TestObjectD testObjectD = new TestObjectD();
@@ -33,6 +34,7 @@ public class ObjectAsIdTest {
         final Wrapper wrapper = new Wrapper();
         wrapper.testObjectA1 = testObjectA;
         wrapper.testObjectA2 = testObjectA;
+        wrapper.testObjectSubA = testObjectSubA;
         wrapper.testObjectB1 = testObjectB;
         wrapper.testObjectB2 = testObjectB;
         wrapper.testObjectC1 = testObjectC;
@@ -47,6 +49,7 @@ public class ObjectAsIdTest {
         final String json = objectMapper.writeValueAsString(wrapper);
         Assertions.assertTrue(json.contains("\"testObjectA1\": \"id1\""));
         Assertions.assertTrue(json.contains("\"testObjectA2\": \"id1\""));
+        Assertions.assertTrue(json.contains("\"testObjectSubA\": \"id1\""));
         Assertions.assertTrue(json.contains("\"testObjectB1\": {"));
         Assertions.assertTrue(json.contains("\"testObjectB2\": \"id2\""));
         Assertions.assertTrue(json.contains("\"testObjectC1\": {"));
@@ -121,13 +124,14 @@ public class ObjectAsIdTest {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Wrapper.class));
         Assertions.assertTrue(output.contains("testObjectA1: string"));
+        Assertions.assertTrue(output.contains("testObjectSubA: TestObjectSubA"));
         Assertions.assertTrue(output.contains("testObjectB1: TestObjectB | string"));
         Assertions.assertTrue(output.contains("testObjectC1: TestObjectC<string> | string"));
         Assertions.assertTrue(output.contains("testObjectD1: string"));
         Assertions.assertTrue(output.contains("testObjectE1: string"));
         Assertions.assertTrue(output.contains("testObjectE2: TestObjectE | string"));
         Assertions.assertTrue(output.contains("testObjectE3: TestObjectE"));
-        Assertions.assertTrue(!output.contains("interface TestObjectA"));
+        Assertions.assertTrue(output.contains("interface TestObjectA"));
         Assertions.assertTrue(output.contains("interface TestObjectB"));
         Assertions.assertTrue(output.contains("interface TestObjectC<T>"));
         Assertions.assertTrue(!output.contains("interface TestObjectD"));
@@ -195,6 +199,10 @@ public class ObjectAsIdTest {
         public String myIdentification = "id1";
 
         public String myProperty = "valueA";
+    }
+
+    private static class TestObjectSubA extends TestObjectA {
+        public String subProperty = "valueSubA";
     }
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
@@ -277,6 +285,7 @@ public class ObjectAsIdTest {
     private static class Wrapper {
         public TestObjectA testObjectA1;
         public TestObjectA testObjectA2;
+        public TestObjectSubA testObjectSubA;
         public TestObjectB testObjectB1;
         public TestObjectB testObjectB2;
         public TestObjectC<String> testObjectC1;
