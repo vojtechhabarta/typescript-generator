@@ -124,14 +124,15 @@ public class ObjectAsIdTest {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Wrapper.class));
         Assertions.assertTrue(output.contains("testObjectA1: string"));
-        Assertions.assertTrue(output.contains("testObjectSubA: TestObjectSubA"));
+        Assertions.assertTrue(output.contains("testObjectSubA: string"));
         Assertions.assertTrue(output.contains("testObjectB1: TestObjectB | string"));
         Assertions.assertTrue(output.contains("testObjectC1: TestObjectC<string> | string"));
         Assertions.assertTrue(output.contains("testObjectD1: string"));
         Assertions.assertTrue(output.contains("testObjectE1: string"));
         Assertions.assertTrue(output.contains("testObjectE2: TestObjectE | string"));
         Assertions.assertTrue(output.contains("testObjectE3: TestObjectE"));
-        Assertions.assertTrue(output.contains("interface TestObjectA"));
+        Assertions.assertTrue(!output.contains("interface TestObjectA"));
+        Assertions.assertTrue(!output.contains("interface TestObjectSubA"));
         Assertions.assertTrue(output.contains("interface TestObjectB"));
         Assertions.assertTrue(output.contains("interface TestObjectC<T>"));
         Assertions.assertTrue(!output.contains("interface TestObjectD"));
