@@ -300,7 +300,8 @@ public class Jackson2Parser extends ModelParser {
 
         final Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo = Pair.of(sourceClass.type, sourceClass.type.getAnnotation(JsonTypeInfo.class));
         final Pair<Class<?>, JsonTypeInfo> parentClassWithJsonTypeInfo;
-        if (isTaggedUnion(classWithJsonTypeInfo)) {
+        final boolean isTaggedUnionParent = isTaggedUnion(classWithJsonTypeInfo);
+        if (isTaggedUnionParent) {
             // this is parent
             final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
@@ -336,16 +337,11 @@ public class Jackson2Parser extends ModelParser {
             }
         }
 
-        final List<Class<?>> taggedUnionClasses;
-        final JsonSubTypes jsonSubTypes = sourceClass.type.getAnnotation(JsonSubTypes.class);
-        if (jsonSubTypes != null) {
-            taggedUnionClasses = new ArrayList<>();
-            for (JsonSubTypes.Type type : jsonSubTypes.value()) {
-                addBeanToQueue(new SourceType<>(type.value(), sourceClass.type, "<subClass>"));
-                taggedUnionClasses.add(type.value());
-            }
-        } else {
-            taggedUnionClasses = null;
+        final List<Class<?>> taggedUnionClasses = getSubClassesFromAnnotation(sourceClass.type)
+                .or(() -> isTaggedUnionParent ? getSubClassesFromResolver(sourceClass.type) : Optional.empty())
+                .orElse(null);
+        if (taggedUnionClasses != null) {
+            taggedUnionClasses.forEach(subClass -> addBeanToQueue(new SourceType<>(subClass, sourceClass.type, "<subClass>")));
         }
         final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
@@ -444,46 +440,63 @@ public class Jackson2Parser extends ModelParser {
     }
 
     private String getTypeName(Class<?> cls) {
-        final List<String> typeNames = getTypeNamesOrEmptyOrNull(cls);
-        return typeNames != null && !typeNames.isEmpty() ? typeNames.get(0) : null;
-    }
-
-    private List<String> getTypeNamesOrEmptyOrNull(Class<?> cls) {
         try {
             final SerializationConfig config = objectMapper.getSerializationConfig();
             final JavaType javaType = config.constructType(cls);
             final TypeSerializer typeSerializer = objectMapper.getSerializerProviderInstance().findTypeSerializer(javaType);
             final TypeIdResolver typeIdResolver = typeSerializer.getTypeIdResolver();
             if (typeIdResolver.getMechanism() == JsonTypeInfo.Id.NAME) {
-                final SubtypeResolver subtypeResolver = config.getSubtypeResolver();
-                final BeanDescription beanDescription = config.introspectClassAnnotations(cls);
-                final AnnotatedClass annotatedClass = beanDescription.getClassInfo();
-                final Collection<NamedType> serializationSubtypes = subtypeResolver.collectAndResolveSubtypesByClass(config, annotatedClass);
-                final Collection<NamedType> deserializationSubtypes = subtypeResolver.collectAndResolveSubtypesByTypeId(config, annotatedClass);
-                final List<String> serializationTypeNames = getTypeNamesFromSubtypes(serializationSubtypes, cls);  // 0 or 1
-                final List<String> deserializationTypeNames = getTypeNamesFromSubtypes(deserializationSubtypes, cls);  // 0 or n
-                final LinkedHashSet<String> typeNames = Stream
-                        .concat(serializationTypeNames.stream(), deserializationTypeNames.stream())
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
-                if (typeNames.isEmpty()) {
-                    return isInterfaceOrAbstract(cls) ? null : Utils.listFromNullable(typeIdResolver.idFromBaseType());
+                final List<NamedType> subtypes = getSubtypesFromResolver(cls);
+                final String typeName = subtypes.stream()
+                        .filter(subtype -> Objects.equals(subtype.getType(), cls))
+                        .filter(NamedType::hasName)
+                        .map(NamedType::getName)
+                        .findFirst()
+                        .orElse(null);
+                if (typeName == null) {
+                    return isInterfaceOrAbstract(cls) ? null : typeIdResolver.idFromBaseType();
                 } else {
-                    return new ArrayList<>(typeNames);
+                    return typeName;
                 }
             } else {
-                return Utils.listFromNullable(typeIdResolver.idFromBaseType());
+                return typeIdResolver.idFromBaseType();
             }
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static List<String> getTypeNamesFromSubtypes(Collection<NamedType> subtypes, Class<?> cls) {
-        return subtypes.stream()
-                .filter(subtype -> Objects.equals(subtype.getType(), cls))
-                .filter(NamedType::hasName)
-                .map(NamedType::getName)
-                .collect(Collectors.toList());
+    private Optional<List<Class<?>>> getSubClassesFromAnnotation(Class<?> cls) {
+        return Optional.ofNullable(cls.getAnnotation(JsonSubTypes.class))
+                .map(jsonSubTypes -> Arrays.stream(jsonSubTypes.value())
+                        .map(jsonSubType -> jsonSubType.value())
+                        .collect(Collectors.toList()));
+    }
+
+    private Optional<List<Class<?>>> getSubClassesFromResolver(Class<?> cls) {
+        final List<NamedType> subtypes = getSubtypesFromResolver(cls);
+        final List<Class<?>> subClasses = subtypes.stream()
+            .map(subtype -> subtype.getType())
+            .filter(subClass -> !Objects.equals(subClass, cls))
+            .collect(Collectors.toList());
+        return subClasses.isEmpty() ? Optional.empty() : Optional.of(subClasses);
+    }
+
+    /**
+     * @return subtypes of specified class including the class itself
+     */
+    private List<NamedType> getSubtypesFromResolver(Class<?> cls) {
+        final SerializationConfig config = objectMapper.getSerializationConfig();
+        final SubtypeResolver subtypeResolver = config.getSubtypeResolver();
+        final BeanDescription beanDescription = config.introspectClassAnnotations(cls);
+        final AnnotatedClass annotatedClass = beanDescription.getClassInfo();
+        final Collection<NamedType> deserializationSubtypes = subtypeResolver.collectAndResolveSubtypesByTypeId(config, annotatedClass);
+        final Collection<NamedType> serializationSubtypes = subtypeResolver.collectAndResolveSubtypesByClass(config, annotatedClass);
+        final LinkedHashSet<NamedType> subtypes = Stream
+                .concat(deserializationSubtypes.stream(), serializationSubtypes.stream())
+                .filter(namedType -> cls.isAssignableFrom(namedType.getType()))  // `SubtypeResolver` returns all types from `JsonSubTypes` annotations, not only subtypes
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return new ArrayList<>(subtypes);
     }
 
     private boolean isInterfaceOrAbstract(Class<?> cls) {
