@@ -275,9 +275,10 @@ public class Jackson2Parser extends ModelParser {
                         beanProperty,
                         settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
 
-                if( settings.includePropertyFunctionImpl != null && !settings.includePropertyFunctionImpl.apply( member ) )
-                	continue;
-                		
+                if( settings.includePropertyFunctionImpl != null && !settings.includePropertyFunctionImpl.apply( member ) ) {
+                    continue;
+                }
+                
                 if (!isAnnotatedPropertyIncluded(beanProperty::getAnnotation, sourceClass.type.getName() + "." + beanProperty.getName())) {
                     continue;
                 }
