@@ -365,20 +365,6 @@ public class Jackson2Parser extends ModelParser {
         }
     }
 
-    private <T extends Annotation> T findClassAnnotation(Class<?> cls, Class<T> annotation) {
-        T identityInfo = cls.getAnnotation(annotation);
-
-        if (identityInfo == null) {
-            Class<?> parent = cls.getSuperclass();
-
-            if (parent != null) {
-                return findClassAnnotation(parent, annotation);
-            }
-        }
-
-        return identityInfo;
-    }
-
     // @JsonIdentityInfo and @JsonIdentityReference
     private Type processIdentity(Type propertyType, BeanProperty beanProperty) {
 
@@ -387,13 +373,13 @@ public class Jackson2Parser extends ModelParser {
         final Class<?> cls = clsT != null ? clsT : clsW;
 
         if (cls != null) {
-            final JsonIdentityInfo identityInfoC = this.findClassAnnotation(cls, JsonIdentityInfo.class);
+            final JsonIdentityInfo identityInfoC = getAnnotationRecursive(cls, JsonIdentityInfo.class).getValue2();
             final JsonIdentityInfo identityInfoP = beanProperty.getAnnotation(JsonIdentityInfo.class);
             final JsonIdentityInfo identityInfo = identityInfoP != null ? identityInfoP : identityInfoC;
             if (identityInfo == null) {
                 return null;
             }
-            final JsonIdentityReference identityReferenceC = this.findClassAnnotation(cls, JsonIdentityReference.class);
+            final JsonIdentityReference identityReferenceC = getAnnotationRecursive(cls, JsonIdentityReference.class).getValue2();
             final JsonIdentityReference identityReferenceP = beanProperty.getAnnotation(JsonIdentityReference.class);
             final JsonIdentityReference identityReference = identityReferenceP != null ? identityReferenceP : identityReferenceC;
             final boolean alwaysAsId = identityReference != null && identityReference.alwaysAsId();
