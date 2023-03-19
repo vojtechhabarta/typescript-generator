@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.UUID;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +36,14 @@ public class JsonbParserTest {
         settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.jsonb;
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
+    }
+
+    private static class JsonTypes {
+        public JsonValue jsonValue;
+        public JsonObject jsonObject;
+        public JsonArray jsonArray;
+        public JsonString jsonString;
+        public JsonNumber jsonNumber;
     }
 
     private static class OverridenPropertyName {
@@ -163,6 +176,19 @@ public class JsonbParserTest {
         public ListOfNullableElementsConstructor(List<@Nullable String> foos) {
             this.foos = foos;
         }
+    }
+
+    @Test
+    public void testJsonTypes() {
+        Assertions.assertEquals(
+                "interface JsonTypes {\n" +
+                "    jsonArray?: any[];\n" +
+                "    jsonNumber?: number;\n" +
+                "    jsonObject?: { [index: string]: any };\n" +
+                "    jsonString?: string;\n" +
+                "    jsonValue?: any;\n" +
+                "}",
+                generate(settings, JsonTypes.class).trim());
     }
 
     @Test
