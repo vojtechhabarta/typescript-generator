@@ -15,25 +15,27 @@ public class ModuleDependency {
     public File infoJson;
     public String npmPackageName;
     public String npmVersionRange;
+    public boolean usePeerDeps;
 
     public ModuleDependency() {
     }
 
-    private ModuleDependency(boolean global, String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange) {
+    private ModuleDependency(boolean global, String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange, boolean usePeerDeps) {
         this.global = global;
         this.importFrom = importFrom;
         this.importAs = importAs;
         this.infoJson = infoJson;
         this.npmPackageName = npmPackageName;
         this.npmVersionRange = npmVersionRange;
+        this.usePeerDeps = usePeerDeps;
     }
 
     public static ModuleDependency module(String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange) {
-        return new ModuleDependency(false, importFrom, importAs, infoJson, npmPackageName, npmVersionRange);
+        return new ModuleDependency(false, importFrom, importAs, infoJson, npmPackageName, npmVersionRange, false);
     }
 
     public static ModuleDependency global(File infoJson) {
-        return new ModuleDependency(true, null, null, infoJson, null, null);
+        return new ModuleDependency(true, null, null, infoJson, null, null, false);
     }
 
     @Override
