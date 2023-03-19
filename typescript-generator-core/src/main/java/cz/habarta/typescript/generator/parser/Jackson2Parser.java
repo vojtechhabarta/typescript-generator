@@ -134,9 +134,11 @@ public class Jackson2Parser extends ModelParser {
             }
         }
         if (useJaxbAnnotations) {
+            final AnnotationIntrospector original = objectMapper.getSerializationConfig().getAnnotationIntrospector();
             final AnnotationIntrospector jakartaIntrospector = new JakartaXmlBindAnnotationIntrospector(objectMapper.getTypeFactory());
             final AnnotationIntrospector javaxIntrospector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
-            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jakartaIntrospector, javaxIntrospector);
+            final AnnotationIntrospectorPair jaxbPair = new AnnotationIntrospectorPair(jakartaIntrospector, javaxIntrospector);
+            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jaxbPair, original);
             objectMapper.setAnnotationIntrospector(pair);
         }
         final Jackson2ConfigurationResolved config = settings.jackson2Configuration;

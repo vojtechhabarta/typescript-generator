@@ -43,7 +43,6 @@ public class RecordTest {
         settings.generateConstructors = true;
         settings.setExcludeFilter(List.of(Base.class.getName()), null);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Derived.class));
-        System.out.println(output);
         Assertions.assertTrue(!output.contains("interface Record"));
     }
 

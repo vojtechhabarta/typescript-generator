@@ -191,8 +191,8 @@ public class Jackson2ParserTest {
         Assertions.assertTrue(output.contains("oname2?: string"));
         Assertions.assertTrue(output.contains("jname1?: string"));
         Assertions.assertTrue(output.contains("jname2?: string"));
-        Assertions.assertTrue(output.contains("jname3?: string"));
-        Assertions.assertTrue(output.contains("jname4?: string"));
+        Assertions.assertTrue(output.contains("jname3: string"));
+        Assertions.assertTrue(output.contains("jname4: string"));
         Assertions.assertTrue(output.contains("xname1?: string"));
         Assertions.assertTrue(output.contains("xname2?: string"));
         Assertions.assertTrue(output.contains("xname3: string"));

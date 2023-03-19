@@ -689,4 +689,27 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @Test
+    public void testJaxb() {
+        final Settings settings = TestUtils.settings();
+        settings.jsonLibrary = JsonLibrary.jaxb;
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Parent.class));
+        Assertions.assertTrue(output.contains("'one' | 'two'"));
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Child1.class, name = "one"),
+        @JsonSubTypes.Type(value = Child2.class, name = "two"),
+    })
+    private static class Parent {
+    }
+
+    private static class Child1 extends Parent {
+    }
+
+    private static class Child2 extends Parent {
+    }
+
 }
