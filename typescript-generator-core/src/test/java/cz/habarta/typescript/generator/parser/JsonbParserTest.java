@@ -6,22 +6,24 @@ import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonNumber;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.UUID;
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -318,4 +320,29 @@ public class JsonbParserTest {
     private String generate(final Settings settings, Class<?> cls) {
         return new TypeScriptGenerator(settings).generateTypeScript(Input.from(cls));
     }
+
+    @javax.json.bind.annotation.JsonbVisibility(HideAllVisibilityStrategy.class)
+    public class SecretDataJavax {
+        public String password;
+    }
+
+    public static class HideAllVisibilityStrategy implements javax.json.bind.config.PropertyVisibilityStrategy {
+
+        @Override
+        public boolean isVisible(Field field) {
+            return false;
+        }
+    
+        @Override
+        public boolean isVisible(Method method) {
+            return false;
+        }
+    }
+
+    @Test
+    public void testJavaxVisibilityStrategy() {
+        final String output = generate(settings, SecretDataJavax.class);
+        Assertions.assertFalse(output.contains("password"), output);
+    }
+
 }
