@@ -14,7 +14,7 @@ Quick links:
 typescript-generator
 ====================
 typescript-generator is a tool for generating TypeScript definition files (.d.ts) from Java JSON classes.
-If you have REST service written in Java using object to JSON mapping you can use typescript-generator to generate TypeScript interfaces from Java classes.
+If you have REST service written in Java (or another JVM language) using object to JSON mapping you can use typescript-generator to generate TypeScript interfaces from Java classes.
 
 For example for this Java class:
 
@@ -90,23 +90,16 @@ Gradle
 
 In Gradle build you can use `cz.habarta.typescript-generator` plugin like this:
 ```groovy
-apply plugin: 'cz.habarta.typescript-generator'
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: 'x.y.z'
-    }
+plugins {
+    id 'cz.habarta.typescript-generator' version 'x.y.z'
 }
+
 generateTypeScript {
     jsonLibrary = 'jackson2'
     classes = [
         'cz.habarta.typescript.generator.sample.Person'
     ]
-    outputFile = 'build/sample.d.ts'
-    outputKind = 'global'
-    namespace = 'Rest';
+    outputKind = 'module'
 }
 ```
 
@@ -116,6 +109,7 @@ For the Kotlin Gradle DSL you can alternatively use the `cz.habarta.typescript-g
 ```kotlin
 import cz.habarta.typescript.generator.JsonLibrary
 import cz.habarta.typescript.generator.TypeScriptFileType
+import cz.habarta.typescript.generator.TypeScriptOutputKind
 
 plugins {
     id("cz.habarta.typescript-generator") version "x.y.z"
@@ -124,26 +118,9 @@ plugins {
 tasks {
     generateTypeScript {
         jsonLibrary = JsonLibrary.jackson2
+        outputKind = TypeScriptOutputKind.module
         outputFileType = TypeScriptFileType.implementationFile
         ...
-    }
-}
-```
-
-#### settings.gradle.kts
-We use this to resolve the plugin, as the plugin is not yet in the [Gradle Plugin Repository](https://plugins.gradle.org/)
-```kotlin
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "cz.habarta.typescript-generator") {
-                useModule("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:${requested.version ?: "+"}")
-            }
-        }
     }
 }
 ```
@@ -188,7 +165,7 @@ For more details see [Modules and Namespaces](http://vojtechhabarta.github.io/ty
 
 REST frameworks
 ---------------
-Typescript-generator can generate not only TypeScript declarations for JSON Java classes but it can also generate client classes for REST services. Supported REST frameworks are JAXR-RS and Spring. Client for JAX-RS service can be generated using `generateJaxrsApplicationClient` parameter, client for Spring service can be generated using `generateSpringApplicationClient`. Since Spring support is in separate module it is needed to add this module to typescript-generator dependencies. Here is example for Maven:
+Typescript-generator can generate not only TypeScript declarations for JSON Java classes but it can also generate client classes for REST services. Supported REST frameworks are JAX-RS and Spring. Client for JAX-RS service can be generated using `generateJaxrsApplicationClient` parameter, client for Spring service can be generated using `generateSpringApplicationClient`. Since Spring support is in separate module it is needed to add this module to typescript-generator dependencies. Here is example for Maven:
 ``` xml
 <plugin>
     <groupId>cz.habarta.typescript-generator</groupId>
