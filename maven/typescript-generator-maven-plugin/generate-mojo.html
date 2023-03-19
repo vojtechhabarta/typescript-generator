@@ -34,7 +34,7 @@
         <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2023-03-19<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 3.1.1247</li>
+          <li id="projectVersion">Version: 3.1.1249</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -67,12 +67,11 @@
       
 <p><b>Full name</b>:</p>
       
-<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:3.1.1247:generate</p>
+<p>cz.habarta.typescript-generator:typescript-generator-maven-plugin:3.1.1249:generate</p>
       
 <p><b>Description</b>:</p>
       
-<div>Generates TypeScript declaration file from specified java classes.
-For more information see README and Wiki on GitHub.</div>
+<div>Generates TypeScript declaration file from specified java classes. For more information see README and Wiki on GitHub.</div>
       
 <p><b>Attributes</b>:</p>
       
@@ -113,20 +112,21 @@ For more information see README and Wiki on GitHub.</div>
 <td>Library used in JSON classes. Supported values are: 
 
 <ul>
-
-<li><code>jackson2</code> - annotations from
-`com.fasterxml.jackson.annotation` package</li>
-
-<li><code>jaxb</code> - annotations from
-`javax.xml.bind.annotation` package</li>
-
-<li><code>gson</code> - annotations from
-`com.google.gson.annotations` package</li>
-
-<li><code>jsonb</code> - annotations from
-`javax.json.bind.annotation` package</li>
-</ul>
-Required parameter, recommended value is <code>jackson2</code>.<br /></td>
+ 
+<li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
+ 
+<li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package</li>
+ 
+<li></li>
+ 
+<li><code>gson</code> - annotations from `com.google.gson.annotations` package</li>
+ 
+<li></li>
+ 
+<li><code>jsonb</code> - annotations from `javax.json.bind.annotation` package</li>
+ 
+<li></li>
+</ul> Required parameter, recommended value is <code>jackson2</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -140,19 +140,13 @@ Required parameter, recommended value is <code>jackson2</code>.<br /></td>
 <td>Kind of generated TypeScript output. Allowed values are: 
 
 <ul>
-
-<li><code>global</code> - means that declarations will be in global
-scope or namespace (no module)</li>
-
-<li><code>module</code> - means that generated file will contain
-top-level <code>export</code> declarations</li>
-
-<li><code>ambientModule</code> - means that generated declarations
-will be wrapped in <code>declare module &quot;mod&quot; { }</code>
-declaration</li>
-</ul>
-Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules
-and Namespaces</a> Wiki page.<br /></td>
+ 
+<li><code>global</code> - means that declarations will be in global scope or namespace (no module)</li>
+ 
+<li><code>module</code> - means that generated file will contain top-level <code>export</code> declarations</li>
+ 
+<li><code>ambientModule</code> - means that generated declarations will be wrapped in <code>declare module &quot;mod&quot; { }</code> declaration</li>
+</ul> Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules and Namespaces</a> Wiki page.<br /></td>
           </tr>
         </table>
       </section>
@@ -174,18 +168,36 @@ and Namespaces</a> Wiki page.<br /></td>
           
 <tr class="b">
             
+<td align="left"><code><a href="#additionalDataLibraries">&lt;additionalDataLibraries&gt;</a></code></td>
+            
+<td><code>List&lt;String&gt;</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Allows to add support for specified libraries. Some libraries have special Jackson serializers and deserializers for their data types so this parameter allows to reflect actual JSON format of those data types. Note: specified library must be present in project dependencies (typescript-generator itself doesn't depend on those libraries). Supported libraries are: 
+
+<ul>
+ 
+<li><code>guava</code> (<a class="externalLink" href="https://github.com/google/guava">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
+ 
+<li><code>joda</code> (<a class="externalLink" href="https://github.com/JodaOrg/joda-time">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
+ 
+<li><code>vavr</code> (<a class="externalLink" href="https://github.com/vavr-io/vavr">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
+</ul><br /></td>
+          </tr>
+          
+<tr class="a">
+            
 <td align="left"><code><a href="#addTypeNamePrefix">&lt;addTypeNamePrefix&gt;</a></code></td>
             
 <td><code>String</code></td>
             
 <td><code>-</code></td>
             
-<td>Prefix which will be added to names of classes, interfaces, enums.
-For example if set to <code>I</code> then mapping for
-<code>Data</code> will be <code>IData</code>.<br /></td>
+<td>Prefix which will be added to names of classes, interfaces, enums. For example if set to <code>I</code> then mapping for <code>Data</code> will be <code>IData</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#addTypeNameSuffix">&lt;addTypeNameSuffix&gt;</a></code></td>
             
@@ -193,82 +205,32 @@ For example if set to <code>I</code> then mapping for
             
 <td><code>-</code></td>
             
-<td>Suffix which will be added to names of classes, interfaces, enums.
-For example if set to <code>Data</code> then mapping for
-<code>Person</code> will be <code>PersonData</code>.<br /></td>
-          </tr>
-          
-<tr class="b">
-            
-<td align="left"><code><a href="#additionalDataLibraries">&lt;additionalDataLibraries&gt;</a></code></td>
-            
-<td><code>List</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Allows to add support for specified libraries. Some libraries have
-special Jackson serializers and deserializers for their data types
-so this parameter allows to reflect actual JSON format of those
-data types. Note: specified library must be present in project
-dependencies (typescript-generator itself doesn't depend on those
-libraries). Supported libraries are: 
-
-<ul>
-
-<li><code>guava</code> (<a class="externalLink" href="https://github.com/google/guava">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
-
-<li><code>joda</code> (<a class="externalLink" href="https://github.com/JodaOrg/joda-time">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
-
-<li><code>vavr</code> (<a class="externalLink" href="https://github.com/vavr-io/vavr">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
-</ul><br /></td>
+<td>Suffix which will be added to names of classes, interfaces, enums. For example if set to <code>Data</code> then mapping for <code>Person</code> will be <code>PersonData</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
-<td align="left"><code><a href="#classPatterns">&lt;classPatterns&gt;</a></code></td>
-            
-<td><code>List</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Classes to process specified using glob patterns so it is possible
-to specify package or class name suffix. Glob patterns support two
-wildcards: 
-
-<ul>
-
-<li>Single <code>*</code> wildcard matches any character except for
-<code>.</code> and <code>$</code>.</li>
-
-<li>Double <code>**</code> wildcard matches any character.</li>
-</ul>
-For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
-Names Glob Patterns</a> Wiki page.<br /></td>
-          </tr>
-          
-<tr class="b">
-            
 <td align="left"><code><a href="#classes">&lt;classes&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
 <td>Classes to process.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#classesExtendingClasses">&lt;classesExtendingClasses&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
 <td>Classes to process specified by extended superclasses.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#classesFromAutomaticJaxrsApplication">&lt;classesFromAutomaticJaxrsApplication&gt;</a></code></td>
             
@@ -276,12 +238,10 @@ Names Glob Patterns</a> Wiki page.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Scans JAX-RS resources for JSON classes to process. It is possible
-to exclude particular REST resource classes using
-<code>excludeClasses</code> parameter.<br /></td>
+<td>Scans JAX-RS resources for JSON classes to process. It is possible to exclude particular REST resource classes using <code>excludeClasses</code> parameter.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#classesFromJaxrsApplication">&lt;classesFromJaxrsApplication&gt;</a></code></td>
             
@@ -289,83 +249,80 @@ to exclude particular REST resource classes using
             
 <td><code>-</code></td>
             
-<td>Scans specified JAX-RS <code>Application</code> for classes to
-process. Parameter contains fully-qualified class name. It is
-possible to exclude particular REST resource classes using
-<code>excludeClasses</code> parameter.<br /></td>
+<td>Scans specified JAX-RS <code>javax.ws.rs.core.Application</code> for classes to process. Parameter contains fully-qualified class name. It is possible to exclude particular REST resource classes using <code>excludeClasses</code> parameter.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#classesImplementingInterfaces">&lt;classesImplementingInterfaces&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
 <td>Classes to process specified by implemented interface.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#classesWithAnnotations">&lt;classesWithAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
 <td>Classes to process specified by annotations.<br /></td>
           </tr>
           
+<tr class="a">
+            
+<td align="left"><code><a href="#classPatterns">&lt;classPatterns&gt;</a></code></td>
+            
+<td><code>List&lt;String&gt;</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Classes to process specified using glob patterns so it is possible to specify package or class name suffix. Glob patterns support two wildcards: 
+
+<ul>
+ 
+<li>Single <code>*</code> wildcard matches any character except for <code>.</code> and <code>$</code>.</li>
+ 
+<li>Double <code>**</code> wildcard matches any character.</li>
+</ul> For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.<br /></td>
+          </tr>
+          
 <tr class="b">
             
 <td align="left"><code><a href="#customTypeAliases">&lt;customTypeAliases&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of custom type aliases. Each item it this list specifies type
-alias name (possibly with generic parameters) and its definition.
-Item format is: <code>name:definition</code>. For example for
-<code>Unwrap&lt;T&gt;:T</code> following type alias will be
-generated <code>type Unwrap&lt;T&gt; = T</code>. Other examples:
-<code>SimpleName:VeryLongGeneratedName</code>,
-<code>StringID&lt;T&gt;:string</code>.<br /></td>
+<td>List of custom type aliases. Each item it this list specifies type alias name (possibly with generic parameters) and its definition. Item format is: <code>name:definition</code>. For example for <code>Unwrap&lt;T&gt;:T</code> following type alias will be generated <code>type Unwrap&lt;T&gt; = T</code>. Other examples: <code>SimpleName:VeryLongGeneratedName</code>, <code>StringID&lt;T&gt;:string</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#customTypeMappings">&lt;customTypeMappings&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of custom mappings. Each item specifies TypeScript type which
-will be used for particular Java class. Item format is:
-<code>javaClassName:typescriptType</code>. For example mapping
-Joda-Time <code>LocalDateTime</code> to <code>string</code> would
-be added as <code>org.joda.time.LocalDateTime:string</code>.
-Mappings of generic classes must use syntax
-<code>com.package.MyGenericClass&lt;T1,T2&gt;:TsGenericType2&lt;T1,T2&gt;</code>.
-Instead of <code>&lt;T1,T2&gt;</code> it is also possible to use
-<code>[T1,T2]</code>.<br /></td>
+<td>List of custom mappings. Each item specifies TypeScript type which will be used for particular Java class. Item format is: <code>javaClassName:typescriptType</code>. For example mapping Joda-Time <code>org.joda.time.LocalDateTime</code> to <code>string</code> would be added as <code>org.joda.time.LocalDateTime:string</code>. Mappings of generic classes must use syntax <code>com.package.MyGenericClass&lt;T1,T2&gt;:TsGenericType2&lt;T1,T2&gt;</code>. Instead of <code>&lt;T1,T2&gt;</code> it is also possible to use <code>[T1,T2]</code>.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#customTypeNaming">&lt;customTypeNaming&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>Specifies custom TypeScript names for Java classes. Multiple
-mappings can be specified, each using this format:
-<code>javaClassName:typescriptName</code>. This takes precedence
-over other naming settings. For more information and example see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Type-Mapping">Type
-Mapping</a> Wiki page.<br /></td>
+<td>Specifies custom TypeScript names for Java classes. Multiple mappings can be specified, each using this format: <code>javaClassName:typescriptName</code>. This takes precedence over other naming settings. For more information and example see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Type-Mapping">Type Mapping</a> Wiki page.<br /></td>
           </tr>
           
 <tr class="a">
@@ -376,13 +333,7 @@ Mapping</a> Wiki page.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies JavaScript function for getting custom TypeScript names
-for Java classes. Function can return undefined if default name
-should be used.<br />
-Function signature: <code>function getName(className: string,
-classSimpleName: string): string | null | undefined;</code><br />
-Example function: <code>function(name, simpleName) { if
-(name.startsWith('cz.')) return 'Test' + simpleName; }</code><br /></td>
+<td>Specifies JavaScript function for getting custom TypeScript names for Java classes. Function can return undefined if default name should be used.<br /> Function signature: <code>function getName(className: string, classSimpleName: string): string | null | undefined;</code><br /> Example function: <code>function(name, simpleName) { if (name.startsWith('cz.')) return 'Test' + simpleName; }</code><br /></td>
           </tr>
           
 <tr class="b">
@@ -393,10 +344,7 @@ Example function: <code>function(name, simpleName) { if
             
 <td><code>-</code></td>
             
-<td>Specifies custom class implementing <code>TypeProcessor</code>.
-This allows to customize how Java types are mapped to TypeScript.
-For example it is possible to implement TypeProcessor for
-<code>Optional</code> from guava.<br /></td>
+<td>Specifies custom class implementing <code>cz.habarta.typescript.generator.TypeProcessor</code>. This allows to customize how Java types are mapped to TypeScript. For example it is possible to implement TypeProcessor for <code>com.google.common.base.Optional</code> from guava.<br /></td>
           </tr>
           
 <tr class="a">
@@ -407,25 +355,18 @@ For example it is possible to implement TypeProcessor for
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> declared properties will be
-<code>readonly</code>.<br /></td>
+<td>If <code>true</code> declared properties will be <code>readonly</code>.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#disableTaggedUnionAnnotations">&lt;disableTaggedUnionAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>Specifies annotations used for disabling tagged union created from
-classes. In case of Jackson2 library this means class hierarchy
-formed using <code>@JsonTypeInfo</code> and
-<code>@JsonSubTypes</code> annotations. While
-<code>disableTaggedUnions</code> parameter only disables creation
-of TypeScript discriminated union types this parameter allows to
-disable also processing of discriminant property.<br /></td>
+<td>Specifies annotations used for disabling tagged union created from classes. In case of Jackson2 library this means class hierarchy formed using <code>@JsonTypeInfo</code> and <code>@JsonSubTypes</code> annotations. While <code>disableTaggedUnions</code> parameter only disables creation of TypeScript discriminated union types this parameter allows to disable also processing of discriminant property.<br /></td>
           </tr>
           
 <tr class="a">
@@ -436,10 +377,7 @@ disable also processing of discriminant property.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> tagged unions will not be generated for
-Jackson 2 polymorphic types. This parameter does not disable
-processing of discriminant property. See also
-<code>disableTaggedUnionAnnotations</code> parameter.<br /></td>
+<td>If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types. This parameter does not disable processing of discriminant property. See also <code>disableTaggedUnionAnnotations</code> parameter.<br /></td>
           </tr>
           
 <tr class="b">
@@ -453,47 +391,42 @@ processing of discriminant property. See also
 <td>Specifies how enum members will be named. Supported values are: 
 
 <ul>
-
+ 
 <li><code>keepOriginal</code> - keeps member name as is</li>
-
-<li><code>PascalCase</code> - converts name to Pascal case (upper
-camel case) convention</li>
-
-<li><code>camelCase</code> - converts name to lower camel case
-convention</li>
-</ul>
-Default value is <code>keepOriginal</code>.<br /></td>
+ 
+<li><code>PascalCase</code> - converts name to Pascal case (upper camel case) convention</li>
+ 
+<li><code>camelCase</code> - converts name to lower camel case convention</li>
+</ul> Default value is <code>keepOriginal</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
-<td align="left"><code><a href="#excludeClassPatterns">&lt;excludeClassPatterns&gt;</a></code></td>
-            
-<td><code>List</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Excluded classes specified using glob patterns. For more
-information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
-Names Glob Patterns</a> Wiki page.<br /></td>
-          </tr>
-          
-<tr class="b">
-            
 <td align="left"><code><a href="#excludeClasses">&lt;excludeClasses&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
 <td>List of classes excluded from processing.<br /></td>
           </tr>
           
+<tr class="b">
+            
+<td align="left"><code><a href="#excludeClassPatterns">&lt;excludeClassPatterns&gt;</a></code></td>
+            
+<td><code>List&lt;String&gt;</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Excluded classes specified using glob patterns. For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.<br /></td>
+          </tr>
+          
 <tr class="a">
             
 <td align="left"><code><a href="#excludePropertyAnnotations">&lt;excludePropertyAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
@@ -504,50 +437,37 @@ Names Glob Patterns</a> Wiki page.<br /></td>
             
 <td align="left"><code><a href="#extensions">&lt;extensions&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of extensions specified as fully qualified class name. Known
-extensions: 
+<td>List of extensions specified as fully qualified class name. Known extensions: 
 
 <ul>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.AxiosClientExtension}</code>
-- generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX
-RS Application</a>Wiki page</li>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</code>
-- generates type-safe property path getters</li>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
-</ul>
-Parameter <code>extensionsWithConfiguration</code> can be used in
-case extension needs some configuration.<br /></td>
+ 
+<li><code>cz.habarta.typescript.generator.ext.AxiosClientExtension}</code> - generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX RS Application</a>Wiki page</li>
+ 
+<li><code>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</code> - generates type-safe property path getters</li>
+ 
+<li><code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
+</ul> Parameter <code>extensionsWithConfiguration</code> can be used in case extension needs some configuration.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#extensionsWithConfiguration">&lt;extensionsWithConfiguration&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;Settings$ConfiguredExtension&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of extensions with their configurations. This parameter has
-the same purpose as <code>extensions</code> parameter. Each item of
-this list has 
+<td>List of extensions with their configurations. This parameter has the same purpose as <code>extensions</code> parameter. Each item of this list has 
 
 <ul>
-
-<li><code>className</code> - required fully-qualified class name of
-the extension</li>
-
-<li><code>configuration</code> - optional <code>Map</code> with
-<code>String</code> keys and <code>String</code> values</li>
+ 
+<li><code>className</code> - required fully-qualified class name of the extension</li>
+ 
+<li><code>configuration</code> - optional <code>Map</code> with <code>String</code> keys and <code>String</code> values</li>
 </ul><br /></td>
           </tr>
           
@@ -559,12 +479,7 @@ the extension</li>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> generated classes will also have constructors.
-Generated constructors use &quot;named parameters&quot; pattern so when
-calling such constructor parameters need to be wrapped in &quot;options&quot;
-object. This parameter can only be used when
-<code>mapClasses</code> parameter is set to <code>asClasses</code>
-value.<br /></td>
+<td>If <code>true</code> generated classes will also have constructors. Generated constructors use &quot;named parameters&quot; pattern so when calling such constructor parameters need to be wrapped in &quot;options&quot; object. This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.<br /></td>
           </tr>
           
 <tr class="a">
@@ -575,14 +490,7 @@ value.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> JSON file describing generated module will be
-generated. In following typescript-generator run this allows to
-generate another module which could depend on currently generated
-module. Generated JSON file contains mapping from Java classes to
-TypeScript types which typescript-generator needs when the module
-is referenced from another module using
-<code>moduleDependencies</code> parameter. Only applicable when
-<code>outputKind</code> is set to <code>module</code>.<br /></td>
+<td>If <code>true</code> JSON file describing generated module will be generated. In following typescript-generator run this allows to generate another module which could depend on currently generated module. Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs when the module is referenced from another module using <code>moduleDependencies</code> parameter. Only applicable when <code>outputKind</code> is set to <code>module</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -593,8 +501,7 @@ is referenced from another module using
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> client for JAX-RS REST application will be
-generated.<br /></td>
+<td>If <code>true</code> client for JAX-RS REST application will be generated.<br /></td>
           </tr>
           
 <tr class="a">
@@ -605,8 +512,7 @@ generated.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> interface for JAX-RS REST application will be
-generated.<br /></td>
+<td>If <code>true</code> interface for JAX-RS REST application will be generated.<br /></td>
           </tr>
           
 <tr class="b">
@@ -617,10 +523,7 @@ generated.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> NPM <code>package.json</code> will be
-generated. Only applicable when <code>outputKind</code> is set to
-<code>module</code>. NPM package name and version can be specified
-using <code>npmName</code> and <code>npmVersion</code> parameters.<br /></td>
+<td>If <code>true</code> NPM <code>package.json</code> will be generated. Only applicable when <code>outputKind</code> is set to <code>module</code>. NPM package name and version can be specified using <code>npmName</code> and <code>npmVersion</code> parameters.<br /></td>
           </tr>
           
 <tr class="a">
@@ -631,9 +534,7 @@ using <code>npmName</code> and <code>npmVersion</code> parameters.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> JSDoc tags <code>@readonly</code> and
-<code>@writeonly</code> will be generated on properties with
-read-only or write-only access.<br /></td>
+<td>If <code>true</code> JSDoc tags <code>@readonly</code> and <code>@writeonly</code> will be generated on properties with read-only or write-only access.<br /></td>
           </tr>
           
 <tr class="b">
@@ -644,8 +545,7 @@ read-only or write-only access.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> client for Spring REST application will be
-generated.<br /></td>
+<td>If <code>true</code> client for Spring REST application will be generated.<br /></td>
           </tr>
           
 <tr class="a">
@@ -656,8 +556,7 @@ generated.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> interface for Spring REST application will be
-generated.<br /></td>
+<td>If <code>true</code> interface for Spring REST application will be generated.<br /></td>
           </tr>
           
 <tr class="b">
@@ -668,9 +567,7 @@ generated.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies Gson global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a>
-class on GitHub (latest version).<br /></td>
+<td>Specifies Gson global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a> class on GitHub (latest version).<br /></td>
           </tr>
           
 <tr class="a">
@@ -688,25 +585,22 @@ class on GitHub (latest version).<br /></td>
             
 <td align="left"><code><a href="#importDeclarations">&lt;importDeclarations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of import declarations which will be added to generated
-output. This can be used with <code>customTypeMappings</code> to
-provide needed TypeScript types.<br /></td>
+<td>List of import declarations which will be added to generated output. This can be used with <code>customTypeMappings</code> to provide needed TypeScript types.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#includePropertyAnnotations">&lt;includePropertyAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>If this list is not empty then only properties with any of these
-annotations will be included.<br /></td>
+<td>If this list is not empty then only properties with any of these annotations will be included.<br /></td>
           </tr>
           
 <tr class="b">
@@ -717,11 +611,7 @@ annotations will be included.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies indentation string. In Maven pom.xml file it is needed to
-set <code>xml:space</code> attribute to
-<code>preserve</code>.<br />
-Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt; 
-&lt;/indentString&gt;</code>.<br /></td>
+<td>Specifies indentation string. In Maven pom.xml file it is needed to set <code>xml:space</code> attribute to <code>preserve</code>.<br /> Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt;  &lt;/indentString&gt;</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -732,9 +622,7 @@ Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt;
             
 <td><code>-</code></td>
             
-<td>Specifies Jackson 2 global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a>
-class on GitHub (latest version).<br /></td>
+<td>Specifies Jackson 2 global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a> class on GitHub (latest version).<br /></td>
           </tr>
           
 <tr class="b">
@@ -752,7 +640,7 @@ class on GitHub (latest version).<br /></td>
             
 <td align="left"><code><a href="#jackson2Modules">&lt;jackson2Modules&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
@@ -763,17 +651,11 @@ class on GitHub (latest version).<br /></td>
             
 <td align="left"><code><a href="#javadocXmlFiles">&lt;javadocXmlFiles&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;File&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of Javadoc XML files to search for documentation comments.
-These files should be created using
-<code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from
-<code>com.github.markusbernhardt:xml-doclet</code> artifact.
-Javadoc comments are added to output declarations as JSDoc
-comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a>
-Wiki page.<br /></td>
+<td>List of Javadoc XML files to search for documentation comments. These files should be created using <code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from <code>com.github.markusbernhardt:xml-doclet</code> artifact. Javadoc comments are added to output declarations as JSDoc comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a> Wiki page.<br /></td>
           </tr>
           
 <tr class="a">
@@ -784,9 +666,7 @@ Wiki page.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies JSON-B global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a>
-class on GitHub (latest version).<br /></td>
+<td>Specifies JSON-B global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a> class on GitHub (latest version).<br /></td>
           </tr>
           
 <tr class="b">
@@ -800,18 +680,17 @@ class on GitHub (latest version).<br /></td>
 <td>Specifies level of logging output. Supported values are: 
 
 <ul>
-
+ 
 <li><code>Debug</code></li>
-
+ 
 <li><code>Verbose</code></li>
-
+ 
 <li><code>Info</code></li>
-
+ 
 <li><code>Warning</code></li>
-
+ 
 <li><code>Error</code></li>
-</ul>
-Default value is <code>Verbose</code>.<br /></td>
+</ul> Default value is <code>Verbose</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -822,40 +701,25 @@ Default value is <code>Verbose</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies whether Java classes will be mapped to TypeScript classes
-or interfaces. Java interfaces are always mapped as TypeScript
-interfaces. Supported values are: 
+<td>Specifies whether Java classes will be mapped to TypeScript classes or interfaces. Java interfaces are always mapped as TypeScript interfaces. Supported values are: 
 
 <ul>
-
+ 
 <li><code>asInterfaces</code></li>
-
+ 
 <li><code>asClasses</code></li>
-</ul>
-Default value is <code>asInterfaces</code>.<br />
-Value <code>asClasses</code> can only be used in implementation
-files (.ts). In this case it is also possible to generate
-constructors by setting <code>generateConstructors</code> parameter
-to <code>true</code>. It is also possible to generate mix of
-classes and interfaces by setting <code>mapClasses</code> parameter
-to <code>asClasses</code> value and specifying which classes should
-be mapped as classes using <code>mapClassesAsClassesPatterns</code>
-parameter.<br /></td>
+</ul> Default value is <code>asInterfaces</code>.<br /> Value <code>asClasses</code> can only be used in implementation files (.ts). In this case it is also possible to generate constructors by setting <code>generateConstructors</code> parameter to <code>true</code>. It is also possible to generate mix of classes and interfaces by setting <code>mapClasses</code> parameter to <code>asClasses</code> value and specifying which classes should be mapped as classes using <code>mapClassesAsClassesPatterns</code> parameter.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#mapClassesAsClassesPatterns">&lt;mapClassesAsClassesPatterns&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>Specifies which Java classes should be mapped as TypeScript
-classes. Classes which are matched by any of these patters are
-mapped as classes otherwise they are mapped as interfaces. This
-parameter can only be used when <code>mapClasses</code> parameter
-is set to <code>asClasses</code> value.<br /></td>
+<td>Specifies which Java classes should be mapped as TypeScript classes. Classes which are matched by any of these patters are mapped as classes otherwise they are mapped as interfaces. This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.<br /></td>
           </tr>
           
 <tr class="a">
@@ -866,18 +730,16 @@ is set to <code>asClasses</code> value.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies how <code>Date</code> will be mapped. Supported values
-are: 
+<td>Specifies how <code>java.util.Date</code> will be mapped. Supported values are: 
 
 <ul>
-
+ 
 <li><code>asDate</code> - type <code>Date</code></li>
-
+ 
 <li><code>asNumber</code> - type <code>number</code></li>
-
+ 
 <li><code>asString</code> - type <code>string</code></li>
-</ul>
-Default value is <code>asDate</code>.<br /></td>
+</ul> Default value is <code>asDate</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -891,21 +753,15 @@ Default value is <code>asDate</code>.<br /></td>
 <td>Specifies how enums will be mapped. Supported values are: 
 
 <ul>
-
-<li><code>asUnion</code> - creates type alias to union of string
-enum values</li>
-
-<li><code>asInlineUnion</code> - creates union of enum values on
-places where the enum is used</li>
-
-<li><code>asEnum</code> - creates string enum. Requires TypeScript
-2.4</li>
-
-<li><code>asNumberBasedEnum</code> - creates enum of named number
-values</li>
-</ul>
-Default value is <code>asUnion</code>.<br />
-See also <code>nonConstEnums</code> parameter.<br /></td>
+ 
+<li><code>asUnion</code> - creates type alias to union of string enum values</li>
+ 
+<li><code>asInlineUnion</code> - creates union of enum values on places where the enum is used</li>
+ 
+<li><code>asEnum</code> - creates string enum. Requires TypeScript 2.4</li>
+ 
+<li><code>asNumberBasedEnum</code> - creates enum of named number values</li>
+</ul> Default value is <code>asUnion</code>.<br /> See also <code>nonConstEnums</code> parameter.<br /></td>
           </tr>
           
 <tr class="a">
@@ -916,20 +772,14 @@ See also <code>nonConstEnums</code> parameter.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies how <code>Map</code> and similar types will be mapped.
-Supported values are: 
+<td>Specifies how <code>java.util.Map</code> and similar types will be mapped. Supported values are: 
 
 <ul>
-
-<li><code>asIndexedArray</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures">indexed
-array type</a>, example: <code>{ [index: string]: Person }</code>
-(original way)</li>
-
-<li><code>asRecord</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type">Record
-type</a>, example: <code>Record&lt;string, Person&gt;</code> (from
-TypeScript 2.1)</li>
-</ul>
-Default value is <code>asIndexedArray</code>.<br /><br /></td>
+ 
+<li><code>asIndexedArray</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures">indexed array type</a>, example: <code>{ [index: string]: Person }</code> (original way)</li>
+ 
+<li><code>asRecord</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type">Record type</a>, example: <code>Record&lt;string, Person&gt;</code> (from TypeScript 2.1)</li>
+</ul> Default value is <code>asIndexedArray</code>.<br /><br /></td>
           </tr>
           
 <tr class="b">
@@ -940,8 +790,7 @@ Default value is <code>asIndexedArray</code>.<br /><br /></td>
             
 <td><code>-</code></td>
             
-<td>Generates TypeScript namespaces from Java packages. Default is
-<code>false</code>.<br /></td>
+<td>Generates TypeScript namespaces from Java packages. Default is <code>false</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -952,42 +801,31 @@ Default value is <code>asIndexedArray</code>.<br /><br /></td>
             
 <td><code>-</code></td>
             
-<td>Name of generated ambient module.<br />
-Used when <code>outputKind</code> is set to
-<code>ambientModule</code>.<br /></td>
+<td>Name of generated ambient module.<br /> Used when <code>outputKind</code> is set to <code>ambientModule</code>.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#moduleDependencies">&lt;moduleDependencies&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;ModuleDependency&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of modules (generated by typescript-generator!) on which
-currently generated module depends on. Each item of this list has 
+<td>List of modules (generated by typescript-generator!) on which currently generated module depends on. Each item of this list has 
 
 <ul>
-
-<li><code>importFrom</code> - (required) module name in generated
-<code>import</code> statement, can be relative path</li>
-
-<li><code>importAs</code> - (required) name that will be used when
-referring to the imports</li>
-
-<li><code>infoJson</code> - (required) file path to the module info
-JSON generated by preceding typescript-generator run, see
-<code>generateInfoJson</code> parameter</li>
-
-<li><code>npmPackageName</code> - (required when generating
-package.json) NPM dependency package name</li>
-
-<li><code>npmVersionRange</code> - (required when generating
-package.json) NPM dependency version (or other identification)</li>
-</ul>
-Only applicable when <code>outputKind</code> is set to
-<code>module</code>.<br /></td>
+ 
+<li><code>importFrom</code> - (required) module name in generated <code>import</code> statement, can be relative path</li>
+ 
+<li><code>importAs</code> - (required) name that will be used when referring to the imports</li>
+ 
+<li><code>infoJson</code> - (required) file path to the module info JSON generated by preceding typescript-generator run, see <code>generateInfoJson</code> parameter</li>
+ 
+<li><code>npmPackageName</code> - (required when generating package.json) NPM dependency package name</li>
+ 
+<li><code>npmVersionRange</code> - (required when generating package.json) NPM dependency version (or other identification)</li>
+</ul> Only applicable when <code>outputKind</code> is set to <code>module</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -998,9 +836,7 @@ Only applicable when <code>outputKind</code> is set to
             
 <td><code>-</code></td>
             
-<td>Generates specified namespace.<br />
-Not recommended to combine with modules.<br />
-Default is no namespace.<br /></td>
+<td>Generates specified namespace.<br /> Not recommended to combine with modules.<br /> Default is no namespace.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1011,11 +847,7 @@ Default is no namespace.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> generated file will not be prevented from
-linting by ESLint. By default there is a
-<code>eslint-disable</code> comment that will force ESLint to
-ignore the generated file. This can be enabled to suppress this
-comment so that the file can be linted by ESLint.<br /></td>
+<td>If <code>true</code> generated file will not be prevented from linting by ESLint. By default there is a <code>eslint-disable</code> comment that will force ESLint to ignore the generated file. This can be enabled to suppress this comment so that the file can be linted by ESLint.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1026,11 +858,29 @@ comment so that the file can be linted by ESLint.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> generated file will not contain comment at the
-top. By default there is a comment with timestamp and
-typescript-generator version. So it might be useful to suppress
-this comment if the file is in source control and is regenerated in
-build.<br /></td>
+<td>If <code>true</code> generated file will not contain comment at the top. By default there is a comment with timestamp and typescript-generator version. So it might be useful to suppress this comment if the file is in source control and is regenerated in build.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td align="left"><code><a href="#nonConstEnumAnnotations">&lt;nonConstEnumAnnotations&gt;</a></code></td>
+            
+<td><code>List&lt;String&gt;</code></td>
+            
+<td><code>-</code></td>
+            
+<td>If this list is not empty, then generated enums will not have <code>const</code> keyword, if the enum contains one of the annotations defined in this list. See <code>nonConstEnums</code><br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td align="left"><code><a href="#nonConstEnums">&lt;nonConstEnums&gt;</a></code></td>
+            
+<td><code>boolean</code></td>
+            
+<td><code>-</code></td>
+            
+<td>If <code>true</code> generated enums will not have <code>const</code> keyword.<br /> This can be used only in implementation files.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1041,37 +891,7 @@ build.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> generated file will not be prevented from
-linting by TSLint. By default there is a
-<code>tslint:disable</code> comment that will force TSLint to
-ignore the generated file. This can be enabled to suppress this
-comment so that the file can be linted by TSLint.<br /></td>
-          </tr>
-          
-<tr class="a">
-            
-<td align="left"><code><a href="#nonConstEnumAnnotations">&lt;nonConstEnumAnnotations&gt;</a></code></td>
-            
-<td><code>List</code></td>
-            
-<td><code>-</code></td>
-            
-<td>If this list is not empty, then generated enums will not have
-<code>const</code> keyword, if the enum contains one of the
-annotations defined in this list. See <code>nonConstEnums</code><br /></td>
-          </tr>
-          
-<tr class="b">
-            
-<td align="left"><code><a href="#nonConstEnums">&lt;nonConstEnums&gt;</a></code></td>
-            
-<td><code>boolean</code></td>
-            
-<td><code>-</code></td>
-            
-<td>If <code>true</code> generated enums will not have
-<code>const</code> keyword.<br />
-This can be used only in implementation files.<br /></td>
+<td>If <code>true</code> generated file will not be prevented from linting by TSLint. By default there is a <code>tslint:disable</code> comment that will force TSLint to ignore the generated file. This can be enabled to suppress this comment so that the file can be linted by TSLint.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1082,45 +902,29 @@ This can be used only in implementation files.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies NPM &quot;build&quot; script.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Default value is <code>tsc --module umd --moduleResolution node
---typeRoots --target es5 --lib es6 --declaration --sourceMap
-$outputFile</code>.<br /></td>
+<td>Specifies NPM &quot;build&quot; script.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Default value is <code>tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#npmDependencies">&lt;npmDependencies&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of additional NPM <code>dependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.<br /></td>
+<td>List of additional NPM <code>dependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#npmDevDependencies">&lt;npmDevDependencies&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of additional NPM <code>devDependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.<br /></td>
+<td>List of additional NPM <code>devDependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1131,26 +935,18 @@ Item format is: <code>name:version</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies NPM package name.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code>.<br />
-Default value is <code>${project.artifactId}</code>.<br /></td>
+<td>Specifies NPM package name.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code>.<br /> Default value is <code>${project.artifactId}</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#npmPeerDependencies">&lt;npmPeerDependencies&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of additional NPM <code>peerDependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.<br /></td>
+<td>List of additional NPM <code>peerDependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1161,9 +957,7 @@ Item format is: <code>name:version</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies TypeScript version declared in NPM
-<code>package.json</code>.<br />
-Default value is <code>^2.4</code>.<br /></td>
+<td>Specifies TypeScript version declared in NPM <code>package.json</code>.<br /> Default value is <code>^2.4</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1174,10 +968,7 @@ Default value is <code>^2.4</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies NPM package version.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code>.<br />
-Default value is <code>1.0.0</code>.<br /></td>
+<td>Specifies NPM package version.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code>.<br /> Default value is <code>1.0.0</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1188,75 +979,44 @@ Default value is <code>1.0.0</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies how nullable types will be created in generated file.
-Nullable types are marked in Java by annotations specified using
-<code>nullableAnnotations</code> parameter like
-<code>List&lt;@Nullable String&gt;</code>. In Kotlin nullable types
-are marked using <code>?</code> character like
-<code>List&lt;String?&gt;</code>. Value of this parameter specifies
-how nullable type is created from regular type <code>T</code>: 
+<td>Specifies how nullable types will be created in generated file. Nullable types are marked in Java by annotations specified using <code>nullableAnnotations</code> parameter like <code>List&lt;@Nullable String&gt;</code>. In Kotlin nullable types are marked using <code>?</code> character like <code>List&lt;String?&gt;</code>. Value of this parameter specifies how nullable type is created from regular type <code>T</code>: 
 
 <ul>
-
-<li><code>nullAndUndefinedUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| null | undefined</code></li>
-
-<li><code>nullUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| null</code></li>
-
-<li><code>undefinedUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| undefined</code></li>
-
-<li><code>nullAndUndefinedInlineUnion</code> - union of <code>T |
-null | undefined</code> without type alias</li>
-
-<li><code>nullInlineUnion</code> - union of <code>T | null</code>
-without type alias</li>
-
-<li><code>undefinedInlineUnion</code> - union of <code>T |
-undefined</code> without type alias</li>
-</ul>
-Default value is <code>nullInlineUnion</code>.<br /></td>
+ 
+<li><code>nullAndUndefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null | undefined</code></li>
+ 
+<li><code>nullUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null</code></li>
+ 
+<li><code>undefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | undefined</code></li>
+ 
+<li><code>nullAndUndefinedInlineUnion</code> - union of <code>T | null | undefined</code> without type alias</li>
+ 
+<li><code>nullInlineUnion</code> - union of <code>T | null</code> without type alias</li>
+ 
+<li><code>undefinedInlineUnion</code> - union of <code>T | undefined</code> without type alias</li>
+</ul> Default value is <code>nullInlineUnion</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#nullableAnnotations">&lt;nullableAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>When any of specified annotations is used on a Java type
-typescript-generator treats this type as nullable. For example Java
-type <code>List&lt;@Nullable String&gt;</code> can be transformed
-to TypeScript as <code>(string | null)[]</code> (instead of just
-<code>string[]</code>). Exact nullability form depends on
-<code>nullabilityDefinition</code> parameter. Unlike optional
-properties nullable types can also be used &quot;inside&quot; other types
-like in previous example. Specified annotations must have target
-set to <code>TYPE_PARAMETER</code> or <code>TYPE_USE</code>.
-Example optional annotation:
-<code>org.checkerframework.checker.nullness.qual.Nullable</code><br /></td>
+<td>When any of specified annotations is used on a Java type typescript-generator treats this type as nullable. For example Java type <code>List&lt;@Nullable String&gt;</code> can be transformed to TypeScript as <code>(string | null)[]</code> (instead of just <code>string[]</code>). Exact nullability form depends on <code>nullabilityDefinition</code> parameter. Unlike optional properties nullable types can also be used &quot;inside&quot; other types like in previous example. Specified annotations must have target set to <code>TYPE_PARAMETER</code> or <code>TYPE_USE</code>. Example optional annotation: <code>org.checkerframework.checker.nullness.qual.Nullable</code><br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#optionalAnnotations">&lt;optionalAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>The presence of any annotation in this list on a JSON property will
-cause the typescript-generator to treat that property as optional
-when generating the corresponding TypeScript interface. Example
-optional annotation: <code>javax.annotation.Nullable</code>. This
-parameter is &quot;opposite&quot; of <code>requiredAnnotations</code>, only
-one of them could be used.<br /></td>
+<td>The presence of any annotation in this list on a JSON property will cause the typescript-generator to treat that property as optional when generating the corresponding TypeScript interface. Example optional annotation: <code>javax.annotation.Nullable</code>. This parameter is &quot;opposite&quot; of <code>requiredAnnotations</code>, only one of them could be used.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1267,23 +1027,16 @@ one of them could be used.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies how properties are defined to be optional. Supported
-values are: 
+<td>Specifies how properties are defined to be optional. Supported values are: 
 
 <ul>
-
-<li><code>useSpecifiedAnnotations</code> - annotations specified
-using <code>optionalAnnotations</code> or
-<code>requiredAnnotations</code> parameter</li>
-
-<li><code>useLibraryDefinition</code> - examples:
-<code>@JsonProperty(required = false)</code> when using
-<code>jackson2</code> library or <code>@XmlElement(required =
-false)</code> when using <code>jaxb</code> library</li>
-
+ 
+<li><code>useSpecifiedAnnotations</code> - annotations specified using <code>optionalAnnotations</code> or <code>requiredAnnotations</code> parameter</li>
+ 
+<li><code>useLibraryDefinition</code> - examples: <code>@JsonProperty(required = false)</code> when using <code>jackson2</code> library or <code>@XmlElement(required = false)</code> when using <code>jaxb</code> library</li>
+ 
 <li><code>all</code> - all properties are optional</li>
-</ul>
-Default value is <code>useSpecifiedAnnotations</code>.<br /></td>
+</ul> Default value is <code>useSpecifiedAnnotations</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1294,31 +1047,20 @@ Default value is <code>useSpecifiedAnnotations</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies how optional properties will be declared in generated
-file. This parameter applies to properties detected as optional.
-The detection can be specified using
-<code>optionalProperties</code> parameter. Supported values are: 
+<td>Specifies how optional properties will be declared in generated file. This parameter applies to properties detected as optional. The detection can be specified using <code>optionalProperties</code> parameter. Supported values are: 
 
 <ul>
-
-<li><code>questionMark</code> - property will be marked using
-<code>?</code> character as optional</li>
-
-<li><code>questionMarkAndNullableType</code> - property will be
-optional and it will also have union with <code>null</code>
-value</li>
-
-<li><code>nullableType</code> - property will not be optional but
-its type will be union with <code>null</code> value</li>
-
-<li><code>nullableAndUndefinableType</code> - property will not be
-optional but its type will be union with <code>null</code> and
-<code>undefined</code> values</li>
-
-<li><code>undefinableType</code> - property will not be optional
-but its type will be union with <code>undefined</code> value</li>
-</ul>
-Default value is <code>questionMark</code>.<br /></td>
+ 
+<li><code>questionMark</code> - property will be marked using <code>?</code> character as optional</li>
+ 
+<li><code>questionMarkAndNullableType</code> - property will be optional and it will also have union with <code>null</code> value</li>
+ 
+<li><code>nullableType</code> - property will not be optional but its type will be union with <code>null</code> value</li>
+ 
+<li><code>nullableAndUndefinableType</code> - property will not be optional but its type will be union with <code>null</code> and <code>undefined</code> values</li>
+ 
+<li><code>undefinableType</code> - property will not be optional but its type will be union with <code>undefined</code> value</li>
+</ul> Default value is <code>questionMark</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1343,14 +1085,11 @@ Default value is <code>questionMark</code>.<br /></td>
 <td>Output file format, can be: 
 
 <ul>
-
+ 
 <li><code>declarationFile</code> (.d.ts)</li>
-
+ 
 <li><code>implementationFile</code> (.ts)</li>
-</ul>
-Setting this parameter to <code>implementationFile</code> allows to
-generate runnable TypeScript code.<br />
-Default value is <code>declarationFile</code>.<br /></td>
+</ul> Setting this parameter to <code>implementationFile</code> allows to generate runnable TypeScript code.<br /> Default value is <code>declarationFile</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1361,23 +1100,18 @@ Default value is <code>declarationFile</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>When using <code>requiredAnnotations</code> to mark properties as
-not optional then setting this parameter to <code>true</code> marks
-also all properties of primitive type without explicit annotation.<br /></td>
+<td>When using <code>requiredAnnotations</code> to mark properties as not optional then setting this parameter to <code>true</code> marks also all properties of primitive type without explicit annotation.<br /></td>
           </tr>
           
 <tr class="b">
             
 <td align="left"><code><a href="#referencedFiles">&lt;referencedFiles&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>List of files which will be referenced using triple-slash
-directive: <code>/// &lt;reference path=&quot;file&quot; /&gt;</code>. This
-can be used with <code>customTypeMappings</code> to provide needed
-TypeScript types.<br /></td>
+<td>List of files which will be referenced using triple-slash directive: <code>/// &lt;reference path=&quot;file&quot; /&gt;</code>. This can be used with <code>customTypeMappings</code> to provide needed TypeScript types.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1388,9 +1122,7 @@ TypeScript types.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Prefix which will be removed from names of classes, interfaces,
-enums. For example if set to <code>Json</code> then mapping for
-<code>JsonData</code> will be <code>Data</code>.<br /></td>
+<td>Prefix which will be removed from names of classes, interfaces, enums. For example if set to <code>Json</code> then mapping for <code>JsonData</code> will be <code>Data</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1401,22 +1133,18 @@ enums. For example if set to <code>Json</code> then mapping for
             
 <td><code>-</code></td>
             
-<td>Suffix which will be removed from names of classes, interfaces,
-enums. For example if set to <code>JSON</code> then mapping for
-<code>DataJSON</code> will be <code>Data</code>.<br /></td>
+<td>Suffix which will be removed from names of classes, interfaces, enums. For example if set to <code>JSON</code> then mapping for <code>DataJSON</code> will be <code>Data</code>.<br /></td>
           </tr>
           
 <tr class="a">
             
 <td align="left"><code><a href="#requiredAnnotations">&lt;requiredAnnotations&gt;</a></code></td>
             
-<td><code>List</code></td>
+<td><code>List&lt;String&gt;</code></td>
             
 <td><code>-</code></td>
             
-<td>Properties will be treated as optional except those annotated with
-any of specified annotations. This parameter is &quot;opposite&quot; of
-<code>optionalAnnotations</code>, only one of them could be used.<br /></td>
+<td>Properties will be treated as optional except those annotated with any of specified annotations. This parameter is &quot;opposite&quot; of <code>optionalAnnotations</code>, only one of them could be used.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1427,22 +1155,16 @@ any of specified annotations. This parameter is &quot;opposite&quot; of
             
 <td><code>-</code></td>
             
-<td>Specifies how JAX-RS REST operations will be grouped into objects.
-Supported values are: 
+<td>Specifies how JAX-RS REST operations will be grouped into objects. Supported values are: 
 
 <ul>
-
-<li><code>singleObject</code> - means that one object with all
-operations will be generated</li>
-
-<li><code>perResource</code> - means that for each root resource
-one object will be generated</li>
-
-<li><code>byAnnotation</code> - means that operations will be
-grouped by annotation specified using
-<code>jaxrsNamespacingAnnotation</code></li>
-</ul>
-Default value is <code>singleObject</code>.<br /></td>
+ 
+<li><code>singleObject</code> - means that one object with all operations will be generated</li>
+ 
+<li><code>perResource</code> - means that for each root resource one object will be generated</li>
+ 
+<li><code>byAnnotation</code> - means that operations will be grouped by annotation specified using <code>#jaxrsNamespacingAnnotation</code></li>
+</ul> Default value is <code>singleObject</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1453,16 +1175,12 @@ Default value is <code>singleObject</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Specifies annotation used for grouping JAX-RS REST operations.
-Format is <code>annotationClass#annotationElement</code> where
-<code>annotationClass</code> is fully-qualified class name and
-<code>annotationElement</code> is element name and defaults to
-<code>value</code>. Examples: 
+<td>Specifies annotation used for grouping JAX-RS REST operations. Format is <code>annotationClass#annotationElement</code> where <code>annotationClass</code> is fully-qualified class name and <code>annotationElement</code> is element name and defaults to <code>value</code>. Examples: 
 
 <ul>
-
+ 
 <li><code>io.swagger.annotations.Api</code></li>
-
+ 
 <li><code>io.swagger.annotations.Api#value</code></li>
 </ul><br /></td>
           </tr>
@@ -1475,12 +1193,7 @@ Format is <code>annotationClass#annotationElement</code> where
             
 <td><code>-</code></td>
             
-<td>Specifies HTTP request options type in REST application. By default
-no <code>options</code> parameter is generated. Useful when passing
-additional parameters to underlying HTTP request method (like
-jQuery ajax settings or <code>AxiosRequestConfig</code>). Can be
-specific (for example <code>AxiosRequestConfig</code>) or generic
-(for example <code>&lt;O&gt;</code>).<br /></td>
+<td>Specifies HTTP request options type in REST application. By default no <code>options</code> parameter is generated. Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>). Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&lt;O&gt;</code>).<br /></td>
           </tr>
           
 <tr class="a">
@@ -1491,15 +1204,34 @@ specific (for example <code>AxiosRequestConfig</code>) or generic
             
 <td><code>-</code></td>
             
-<td>Specifies HTTP response type in REST application. Default value is
-<code>Promise&lt;R&gt;</code> which means data object returned
-asynchronously. This parameter is useful for example when
-underlying HTTP response object (like <code>XMLHttpRequest</code>
-or <code>AxiosPromise</code>) is returned instead of actual
-response data.<br /></td>
+<td>Specifies HTTP response type in REST application. Default value is <code>Promise&lt;R&gt;</code> which means data object returned asynchronously. This parameter is useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>) is returned instead of actual response data.<br /></td>
           </tr>
           
 <tr class="b">
+            
+<td align="left"><code><a href="#scanningAcceptedPackages">&lt;scanningAcceptedPackages&gt;</a></code></td>
+            
+<td><code>List&lt;String&gt;</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Allows to speed up classpath scanning by limiting scanning to specified packages. This optimization applies to following parameters: 
+
+<ul>
+ 
+<li><code>classPatterns</code></li>
+ 
+<li><code>classesImplementingInterfaces</code></li>
+ 
+<li><code>classesExtendingClasses</code></li>
+ 
+<li><code>classesWithAnnotations</code></li>
+ 
+<li><code>classesFromAutomaticJaxrsApplication</code></li>
+</ul> This parameter is passed directly to underlying classpath scanning library (ClassGraph) without any validation or interpretation.<br /></td>
+          </tr>
+          
+<tr class="a">
             
 <td align="left"><code><a href="#scanSpringApplication">&lt;scanSpringApplication&gt;</a></code></td>
             
@@ -1507,37 +1239,7 @@ response data.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> Spring REST application will be loaded and
-scanned for classes to process. It is needed to specify application
-class using another parameter (for example <code>classes</code>).<br /></td>
-          </tr>
-          
-<tr class="a">
-            
-<td align="left"><code><a href="#scanningAcceptedPackages">&lt;scanningAcceptedPackages&gt;</a></code></td>
-            
-<td><code>List</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Allows to speed up classpath scanning by limiting scanning to
-specified packages. This optimization applies to following
-parameters: 
-
-<ul>
-
-<li><code>classPatterns</code></li>
-
-<li><code>classesImplementingInterfaces</code></li>
-
-<li><code>classesExtendingClasses</code></li>
-
-<li><code>classesWithAnnotations</code></li>
-
-<li><code>classesFromAutomaticJaxrsApplication</code></li>
-</ul>
-This parameter is passed directly to underlying classpath scanning
-library (ClassGraph) without any validation or interpretation.<br /></td>
+<td>If <code>true</code> Spring REST application will be loaded and scanned for classes to process. It is needed to specify application class using another parameter (for example <code>classes</code>).<br /></td>
           </tr>
           
 <tr class="b">
@@ -1559,8 +1261,7 @@ library (ClassGraph) without any validation or interpretation.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> TypeScript declarations (interfaces,
-properties) will be sorted alphabetically.<br /></td>
+<td>If <code>true</code> TypeScript declarations (interfaces, properties) will be sorted alphabetically.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1571,8 +1272,7 @@ properties) will be sorted alphabetically.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> TypeScript type declarations (interfaces) will
-be sorted alphabetically.<br /></td>
+<td>If <code>true</code> TypeScript type declarations (interfaces) will be sorted alphabetically.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1586,12 +1286,11 @@ be sorted alphabetically.<br /></td>
 <td>Specifies how strings will be quoted. Supported values are: 
 
 <ul>
-
+ 
 <li><code>doubleQuotes</code></li>
-
+ 
 <li><code>singleQuotes</code></li>
-</ul>
-Default value is <code>doubleQuotes</code>.<br /></td>
+</ul> Default value is <code>doubleQuotes</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -1602,8 +1301,7 @@ Default value is <code>doubleQuotes</code>.<br /></td>
             
 <td><code>-</code></td>
             
-<td>If <code>true</code> generated file will have disabled TypeScript
-semantic checks using <code>@ts-nocheck</code> comment.<br /></td>
+<td>If <code>true</code> generated file will have disabled TypeScript semantic checks using <code>@ts-nocheck</code> comment.<br /></td>
           </tr>
           
 <tr class="a">
@@ -1614,19 +1312,35 @@ semantic checks using <code>@ts-nocheck</code> comment.<br /></td>
             
 <td><code>-</code></td>
             
-<td>Turns proper module into UMD (Universal Module Definition) with
-specified namespace. Only applicable to declaration files.<br /></td>
+<td>Turns proper module into UMD (Universal Module Definition) with specified namespace. Only applicable to declaration files.<br /></td>
           </tr>
         </table>
       </section>
       <section>
 <h3><a name="Parameter_Details"></a>Parameter Details</h3>
         <section>
+<h4><a name="a.3CadditionalDataLibraries.3E"></a><b><a name="additionalDataLibraries">&lt;additionalDataLibraries&gt;</a></b></h4>
+        
+<div>Allows to add support for specified libraries. Some libraries have special Jackson serializers and deserializers for their data types so this parameter allows to reflect actual JSON format of those data types. Note: specified library must be present in project dependencies (typescript-generator itself doesn't depend on those libraries). Supported libraries are: 
+
+<ul>
+ 
+<li><code>guava</code> (<a class="externalLink" href="https://github.com/google/guava">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
+ 
+<li><code>joda</code> (<a class="externalLink" href="https://github.com/JodaOrg/joda-time">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
+ 
+<li><code>vavr</code> (<a class="externalLink" href="https://github.com/vavr-io/vavr">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
+</ul></div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
 <h4><a name="a.3CaddTypeNamePrefix.3E"></a><b><a name="addTypeNamePrefix">&lt;addTypeNamePrefix&gt;</a></b></h4>
         
-<div>Prefix which will be added to names of classes, interfaces, enums.
-For example if set to <code>I</code> then mapping for
-<code>Data</code> will be <code>IData</code>.</div>
+<div>Prefix which will be added to names of classes, interfaces, enums. For example if set to <code>I</code> then mapping for <code>Data</code> will be <code>IData</code>.</div>
         
 <ul>
           
@@ -1636,59 +1350,11 @@ For example if set to <code>I</code> then mapping for
         </ul><hr /></section><section>
 <h4><a name="a.3CaddTypeNameSuffix.3E"></a><b><a name="addTypeNameSuffix">&lt;addTypeNameSuffix&gt;</a></b></h4>
         
-<div>Suffix which will be added to names of classes, interfaces, enums.
-For example if set to <code>Data</code> then mapping for
-<code>Person</code> will be <code>PersonData</code>.</div>
+<div>Suffix which will be added to names of classes, interfaces, enums. For example if set to <code>Data</code> then mapping for <code>Person</code> will be <code>PersonData</code>.</div>
         
 <ul>
           
 <li><b>Type</b>: <code>java.lang.String</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CadditionalDataLibraries.3E"></a><b><a name="additionalDataLibraries">&lt;additionalDataLibraries&gt;</a></b></h4>
-        
-<div>Allows to add support for specified libraries. Some libraries have
-special Jackson serializers and deserializers for their data types
-so this parameter allows to reflect actual JSON format of those
-data types. Note: specified library must be present in project
-dependencies (typescript-generator itself doesn't depend on those
-libraries). Supported libraries are: 
-
-<ul>
-
-<li><code>guava</code> (<a class="externalLink" href="https://github.com/google/guava">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/guava.json">definition</a>)</li>
-
-<li><code>joda</code> (<a class="externalLink" href="https://github.com/JodaOrg/joda-time">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/joda.json">definition</a>)</li>
-
-<li><code>vavr</code> (<a class="externalLink" href="https://github.com/vavr-io/vavr">source</a>) (<a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/resources/datalibrary/vavr.json">definition</a>)</li>
-</ul></div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>java.util.List</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CclassPatterns.3E"></a><b><a name="classPatterns">&lt;classPatterns&gt;</a></b></h4>
-        
-<div>Classes to process specified using glob patterns so it is possible
-to specify package or class name suffix. Glob patterns support two
-wildcards: 
-
-<ul>
-
-<li>Single <code>*</code> wildcard matches any character except for
-<code>.</code> and <code>$</code>.</li>
-
-<li>Double <code>**</code> wildcard matches any character.</li>
-</ul>
-For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
-Names Glob Patterns</a> Wiki page.</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>java.util.List</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1698,7 +1364,7 @@ Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1708,15 +1374,13 @@ Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CclassesFromAutomaticJaxrsApplication.3E"></a><b><a name="classesFromAutomaticJaxrsApplication">&lt;classesFromAutomaticJaxrsApplication&gt;</a></b></h4>
         
-<div>Scans JAX-RS resources for JSON classes to process. It is possible
-to exclude particular REST resource classes using
-<code>excludeClasses</code> parameter.</div>
+<div>Scans JAX-RS resources for JSON classes to process. It is possible to exclude particular REST resource classes using <code>excludeClasses</code> parameter.</div>
         
 <ul>
           
@@ -1726,10 +1390,7 @@ to exclude particular REST resource classes using
         </ul><hr /></section><section>
 <h4><a name="a.3CclassesFromJaxrsApplication.3E"></a><b><a name="classesFromJaxrsApplication">&lt;classesFromJaxrsApplication&gt;</a></b></h4>
         
-<div>Scans specified JAX-RS <code>Application</code> for classes to
-process. Parameter contains fully-qualified class name. It is
-possible to exclude particular REST resource classes using
-<code>excludeClasses</code> parameter.</div>
+<div>Scans specified JAX-RS <code>javax.ws.rs.core.Application</code> for classes to process. Parameter contains fully-qualified class name. It is possible to exclude particular REST resource classes using <code>excludeClasses</code> parameter.</div>
         
 <ul>
           
@@ -1743,7 +1404,7 @@ possible to exclude particular REST resource classes using
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1753,67 +1414,60 @@ possible to exclude particular REST resource classes using
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3CclassPatterns.3E"></a><b><a name="classPatterns">&lt;classPatterns&gt;</a></b></h4>
+        
+<div>Classes to process specified using glob patterns so it is possible to specify package or class name suffix. Glob patterns support two wildcards: 
+
+<ul>
+ 
+<li>Single <code>*</code> wildcard matches any character except for <code>.</code> and <code>$</code>.</li>
+ 
+<li>Double <code>**</code> wildcard matches any character.</li>
+</ul> For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CcustomTypeAliases.3E"></a><b><a name="customTypeAliases">&lt;customTypeAliases&gt;</a></b></h4>
         
-<div>List of custom type aliases. Each item it this list specifies type
-alias name (possibly with generic parameters) and its definition.
-Item format is: <code>name:definition</code>. For example for
-<code>Unwrap&lt;T&gt;:T</code> following type alias will be
-generated <code>type Unwrap&lt;T&gt; = T</code>. Other examples:
-<code>SimpleName:VeryLongGeneratedName</code>,
-<code>StringID&lt;T&gt;:string</code>.</div>
+<div>List of custom type aliases. Each item it this list specifies type alias name (possibly with generic parameters) and its definition. Item format is: <code>name:definition</code>. For example for <code>Unwrap&lt;T&gt;:T</code> following type alias will be generated <code>type Unwrap&lt;T&gt; = T</code>. Other examples: <code>SimpleName:VeryLongGeneratedName</code>, <code>StringID&lt;T&gt;:string</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CcustomTypeMappings.3E"></a><b><a name="customTypeMappings">&lt;customTypeMappings&gt;</a></b></h4>
         
-<div>List of custom mappings. Each item specifies TypeScript type which
-will be used for particular Java class. Item format is:
-<code>javaClassName:typescriptType</code>. For example mapping
-Joda-Time <code>LocalDateTime</code> to <code>string</code> would
-be added as <code>org.joda.time.LocalDateTime:string</code>.
-Mappings of generic classes must use syntax
-<code>com.package.MyGenericClass&lt;T1,T2&gt;:TsGenericType2&lt;T1,T2&gt;</code>.
-Instead of <code>&lt;T1,T2&gt;</code> it is also possible to use
-<code>[T1,T2]</code>.</div>
+<div>List of custom mappings. Each item specifies TypeScript type which will be used for particular Java class. Item format is: <code>javaClassName:typescriptType</code>. For example mapping Joda-Time <code>org.joda.time.LocalDateTime</code> to <code>string</code> would be added as <code>org.joda.time.LocalDateTime:string</code>. Mappings of generic classes must use syntax <code>com.package.MyGenericClass&lt;T1,T2&gt;:TsGenericType2&lt;T1,T2&gt;</code>. Instead of <code>&lt;T1,T2&gt;</code> it is also possible to use <code>[T1,T2]</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CcustomTypeNaming.3E"></a><b><a name="customTypeNaming">&lt;customTypeNaming&gt;</a></b></h4>
         
-<div>Specifies custom TypeScript names for Java classes. Multiple
-mappings can be specified, each using this format:
-<code>javaClassName:typescriptName</code>. This takes precedence
-over other naming settings. For more information and example see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Type-Mapping">Type
-Mapping</a> Wiki page.</div>
+<div>Specifies custom TypeScript names for Java classes. Multiple mappings can be specified, each using this format: <code>javaClassName:typescriptName</code>. This takes precedence over other naming settings. For more information and example see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Type-Mapping">Type Mapping</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CcustomTypeNamingFunction.3E"></a><b><a name="customTypeNamingFunction">&lt;customTypeNamingFunction&gt;</a></b></h4>
         
-<div>Specifies JavaScript function for getting custom TypeScript names
-for Java classes. Function can return undefined if default name
-should be used.<br />
-Function signature: <code>function getName(className: string,
-classSimpleName: string): string | null | undefined;</code><br />
-Example function: <code>function(name, simpleName) { if
-(name.startsWith('cz.')) return 'Test' + simpleName; }</code></div>
+<div>Specifies JavaScript function for getting custom TypeScript names for Java classes. Function can return undefined if default name should be used.<br /> Function signature: <code>function getName(className: string, classSimpleName: string): string | null | undefined;</code><br /> Example function: <code>function(name, simpleName) { if (name.startsWith('cz.')) return 'Test' + simpleName; }</code></div>
         
 <ul>
           
@@ -1823,10 +1477,7 @@ Example function: <code>function(name, simpleName) { if
         </ul><hr /></section><section>
 <h4><a name="a.3CcustomTypeProcessor.3E"></a><b><a name="customTypeProcessor">&lt;customTypeProcessor&gt;</a></b></h4>
         
-<div>Specifies custom class implementing <code>TypeProcessor</code>.
-This allows to customize how Java types are mapped to TypeScript.
-For example it is possible to implement TypeProcessor for
-<code>Optional</code> from guava.</div>
+<div>Specifies custom class implementing <code>cz.habarta.typescript.generator.TypeProcessor</code>. This allows to customize how Java types are mapped to TypeScript. For example it is possible to implement TypeProcessor for <code>com.google.common.base.Optional</code> from guava.</div>
         
 <ul>
           
@@ -1836,8 +1487,7 @@ For example it is possible to implement TypeProcessor for
         </ul><hr /></section><section>
 <h4><a name="a.3CdeclarePropertiesAsReadOnly.3E"></a><b><a name="declarePropertiesAsReadOnly">&lt;declarePropertiesAsReadOnly&gt;</a></b></h4>
         
-<div>If <code>true</code> declared properties will be
-<code>readonly</code>.</div>
+<div>If <code>true</code> declared properties will be <code>readonly</code>.</div>
         
 <ul>
           
@@ -1847,26 +1497,17 @@ For example it is possible to implement TypeProcessor for
         </ul><hr /></section><section>
 <h4><a name="a.3CdisableTaggedUnionAnnotations.3E"></a><b><a name="disableTaggedUnionAnnotations">&lt;disableTaggedUnionAnnotations&gt;</a></b></h4>
         
-<div>Specifies annotations used for disabling tagged union created from
-classes. In case of Jackson2 library this means class hierarchy
-formed using <code>@JsonTypeInfo</code> and
-<code>@JsonSubTypes</code> annotations. While
-<code>disableTaggedUnions</code> parameter only disables creation
-of TypeScript discriminated union types this parameter allows to
-disable also processing of discriminant property.</div>
+<div>Specifies annotations used for disabling tagged union created from classes. In case of Jackson2 library this means class hierarchy formed using <code>@JsonTypeInfo</code> and <code>@JsonSubTypes</code> annotations. While <code>disableTaggedUnions</code> parameter only disables creation of TypeScript discriminated union types this parameter allows to disable also processing of discriminant property.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CdisableTaggedUnions.3E"></a><b><a name="disableTaggedUnions">&lt;disableTaggedUnions&gt;</a></b></h4>
         
-<div>If <code>true</code> tagged unions will not be generated for
-Jackson 2 polymorphic types. This parameter does not disable
-processing of discriminant property. See also
-<code>disableTaggedUnionAnnotations</code> parameter.</div>
+<div>If <code>true</code> tagged unions will not be generated for Jackson 2 polymorphic types. This parameter does not disable processing of discriminant property. See also <code>disableTaggedUnionAnnotations</code> parameter.</div>
         
 <ul>
           
@@ -1879,32 +1520,17 @@ processing of discriminant property. See also
 <div>Specifies how enum members will be named. Supported values are: 
 
 <ul>
-
+ 
 <li><code>keepOriginal</code> - keeps member name as is</li>
-
-<li><code>PascalCase</code> - converts name to Pascal case (upper
-camel case) convention</li>
-
-<li><code>camelCase</code> - converts name to lower camel case
-convention</li>
-</ul>
-Default value is <code>keepOriginal</code>.</div>
+ 
+<li><code>PascalCase</code> - converts name to Pascal case (upper camel case) convention</li>
+ 
+<li><code>camelCase</code> - converts name to lower camel case convention</li>
+</ul> Default value is <code>keepOriginal</code>.</div>
         
 <ul>
           
 <li><b>Type</b>: <code>cz.habarta.typescript.generator.IdentifierCasing</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CexcludeClassPatterns.3E"></a><b><a name="excludeClassPatterns">&lt;excludeClassPatterns&gt;</a></b></h4>
-        
-<div>Excluded classes specified using glob patterns. For more
-information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class
-Names Glob Patterns</a> Wiki page.</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>java.util.List</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1914,7 +1540,17 @@ Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3CexcludeClassPatterns.3E"></a><b><a name="excludeClassPatterns">&lt;excludeClassPatterns&gt;</a></b></h4>
+        
+<div>Excluded classes specified using glob patterns. For more information and examples see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Class-Names-Glob-Patterns">Class Names Glob Patterns</a> Wiki page.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1924,67 +1560,49 @@ Names Glob Patterns</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3Cextensions.3E"></a><b><a name="extensions">&lt;extensions&gt;</a></b></h4>
         
-<div>List of extensions specified as fully qualified class name. Known
-extensions: 
+<div>List of extensions specified as fully qualified class name. Known extensions: 
 
 <ul>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.AxiosClientExtension}</code>
-- generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX
-RS Application</a>Wiki page</li>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</code>
-- generates type-safe property path getters</li>
-
-<li>
-<code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
-</ul>
-Parameter <code>extensionsWithConfiguration</code> can be used in
-case extension needs some configuration.</div>
+ 
+<li><code>cz.habarta.typescript.generator.ext.AxiosClientExtension}</code> - generates client for JAX-RS service using Axios library, see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/JAX-RS-Application">JAX RS Application</a>Wiki page</li>
+ 
+<li><code>cz.habarta.typescript.generator.ext.BeanPropertyPathExtension}</code> - generates type-safe property path getters</li>
+ 
+<li><code>cz.habarta.typescript.generator.ext.TypeGuardsForJackson2PolymorphismExtension}</code></li>
+</ul> Parameter <code>extensionsWithConfiguration</code> can be used in case extension needs some configuration.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CextensionsWithConfiguration.3E"></a><b><a name="extensionsWithConfiguration">&lt;extensionsWithConfiguration&gt;</a></b></h4>
         
-<div>List of extensions with their configurations. This parameter has
-the same purpose as <code>extensions</code> parameter. Each item of
-this list has 
+<div>List of extensions with their configurations. This parameter has the same purpose as <code>extensions</code> parameter. Each item of this list has 
 
 <ul>
-
-<li><code>className</code> - required fully-qualified class name of
-the extension</li>
-
-<li><code>configuration</code> - optional <code>Map</code> with
-<code>String</code> keys and <code>String</code> values</li>
+ 
+<li><code>className</code> - required fully-qualified class name of the extension</li>
+ 
+<li><code>configuration</code> - optional <code>Map</code> with <code>String</code> keys and <code>String</code> values</li>
 </ul></div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;cz.habarta.typescript.generator.Settings$ConfiguredExtension&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateConstructors.3E"></a><b><a name="generateConstructors">&lt;generateConstructors&gt;</a></b></h4>
         
-<div>If <code>true</code> generated classes will also have constructors.
-Generated constructors use &quot;named parameters&quot; pattern so when
-calling such constructor parameters need to be wrapped in &quot;options&quot;
-object. This parameter can only be used when
-<code>mapClasses</code> parameter is set to <code>asClasses</code>
-value.</div>
+<div>If <code>true</code> generated classes will also have constructors. Generated constructors use &quot;named parameters&quot; pattern so when calling such constructor parameters need to be wrapped in &quot;options&quot; object. This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.</div>
         
 <ul>
           
@@ -1994,14 +1612,7 @@ value.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateInfoJson.3E"></a><b><a name="generateInfoJson">&lt;generateInfoJson&gt;</a></b></h4>
         
-<div>If <code>true</code> JSON file describing generated module will be
-generated. In following typescript-generator run this allows to
-generate another module which could depend on currently generated
-module. Generated JSON file contains mapping from Java classes to
-TypeScript types which typescript-generator needs when the module
-is referenced from another module using
-<code>moduleDependencies</code> parameter. Only applicable when
-<code>outputKind</code> is set to <code>module</code>.</div>
+<div>If <code>true</code> JSON file describing generated module will be generated. In following typescript-generator run this allows to generate another module which could depend on currently generated module. Generated JSON file contains mapping from Java classes to TypeScript types which typescript-generator needs when the module is referenced from another module using <code>moduleDependencies</code> parameter. Only applicable when <code>outputKind</code> is set to <code>module</code>.</div>
         
 <ul>
           
@@ -2011,8 +1622,7 @@ is referenced from another module using
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateJaxrsApplicationClient.3E"></a><b><a name="generateJaxrsApplicationClient">&lt;generateJaxrsApplicationClient&gt;</a></b></h4>
         
-<div>If <code>true</code> client for JAX-RS REST application will be
-generated.</div>
+<div>If <code>true</code> client for JAX-RS REST application will be generated.</div>
         
 <ul>
           
@@ -2022,8 +1632,7 @@ generated.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateJaxrsApplicationInterface.3E"></a><b><a name="generateJaxrsApplicationInterface">&lt;generateJaxrsApplicationInterface&gt;</a></b></h4>
         
-<div>If <code>true</code> interface for JAX-RS REST application will be
-generated.</div>
+<div>If <code>true</code> interface for JAX-RS REST application will be generated.</div>
         
 <ul>
           
@@ -2033,10 +1642,7 @@ generated.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateNpmPackageJson.3E"></a><b><a name="generateNpmPackageJson">&lt;generateNpmPackageJson&gt;</a></b></h4>
         
-<div>If <code>true</code> NPM <code>package.json</code> will be
-generated. Only applicable when <code>outputKind</code> is set to
-<code>module</code>. NPM package name and version can be specified
-using <code>npmName</code> and <code>npmVersion</code> parameters.</div>
+<div>If <code>true</code> NPM <code>package.json</code> will be generated. Only applicable when <code>outputKind</code> is set to <code>module</code>. NPM package name and version can be specified using <code>npmName</code> and <code>npmVersion</code> parameters.</div>
         
 <ul>
           
@@ -2046,9 +1652,7 @@ using <code>npmName</code> and <code>npmVersion</code> parameters.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateReadonlyAndWriteonlyJSDocTags.3E"></a><b><a name="generateReadonlyAndWriteonlyJSDocTags">&lt;generateReadonlyAndWriteonlyJSDocTags&gt;</a></b></h4>
         
-<div>If <code>true</code> JSDoc tags <code>@readonly</code> and
-<code>@writeonly</code> will be generated on properties with
-read-only or write-only access.</div>
+<div>If <code>true</code> JSDoc tags <code>@readonly</code> and <code>@writeonly</code> will be generated on properties with read-only or write-only access.</div>
         
 <ul>
           
@@ -2058,8 +1662,7 @@ read-only or write-only access.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateSpringApplicationClient.3E"></a><b><a name="generateSpringApplicationClient">&lt;generateSpringApplicationClient&gt;</a></b></h4>
         
-<div>If <code>true</code> client for Spring REST application will be
-generated.</div>
+<div>If <code>true</code> client for Spring REST application will be generated.</div>
         
 <ul>
           
@@ -2069,8 +1672,7 @@ generated.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgenerateSpringApplicationInterface.3E"></a><b><a name="generateSpringApplicationInterface">&lt;generateSpringApplicationInterface&gt;</a></b></h4>
         
-<div>If <code>true</code> interface for Spring REST application will be
-generated.</div>
+<div>If <code>true</code> interface for Spring REST application will be generated.</div>
         
 <ul>
           
@@ -2080,9 +1682,7 @@ generated.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CgsonConfiguration.3E"></a><b><a name="gsonConfiguration">&lt;gsonConfiguration&gt;</a></b></h4>
         
-<div>Specifies Gson global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a>
-class on GitHub (latest version).</div>
+<div>Specifies Gson global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/GsonConfiguration.java">GsonConfiguration</a> class on GitHub (latest version).</div>
         
 <ul>
           
@@ -2102,34 +1702,27 @@ class on GitHub (latest version).</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CimportDeclarations.3E"></a><b><a name="importDeclarations">&lt;importDeclarations&gt;</a></b></h4>
         
-<div>List of import declarations which will be added to generated
-output. This can be used with <code>customTypeMappings</code> to
-provide needed TypeScript types.</div>
+<div>List of import declarations which will be added to generated output. This can be used with <code>customTypeMappings</code> to provide needed TypeScript types.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CincludePropertyAnnotations.3E"></a><b><a name="includePropertyAnnotations">&lt;includePropertyAnnotations&gt;</a></b></h4>
         
-<div>If this list is not empty then only properties with any of these
-annotations will be included.</div>
+<div>If this list is not empty then only properties with any of these annotations will be included.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CindentString.3E"></a><b><a name="indentString">&lt;indentString&gt;</a></b></h4>
         
-<div>Specifies indentation string. In Maven pom.xml file it is needed to
-set <code>xml:space</code> attribute to
-<code>preserve</code>.<br />
-Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt; 
-&lt;/indentString&gt;</code>.</div>
+<div>Specifies indentation string. In Maven pom.xml file it is needed to set <code>xml:space</code> attribute to <code>preserve</code>.<br /> Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt;  &lt;/indentString&gt;</code>.</div>
         
 <ul>
           
@@ -2139,9 +1732,7 @@ Example: <code>&lt;indentString xml:space=&quot;preserve&quot;&gt;
         </ul><hr /></section><section>
 <h4><a name="a.3Cjackson2Configuration.3E"></a><b><a name="jackson2Configuration">&lt;jackson2Configuration&gt;</a></b></h4>
         
-<div>Specifies Jackson 2 global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a>
-class on GitHub (latest version).</div>
+<div>Specifies Jackson 2 global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/Jackson2Configuration.java">Jackson2Configuration</a> class on GitHub (latest version).</div>
         
 <ul>
           
@@ -2165,23 +1756,27 @@ class on GitHub (latest version).</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CjavadocXmlFiles.3E"></a><b><a name="javadocXmlFiles">&lt;javadocXmlFiles&gt;</a></b></h4>
         
-<div>List of Javadoc XML files to search for documentation comments.
-These files should be created using
-<code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from
-<code>com.github.markusbernhardt:xml-doclet</code> artifact.
-Javadoc comments are added to output declarations as JSDoc
-comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a>
-Wiki page.</div>
+<div>List of Javadoc XML files to search for documentation comments. These files should be created using <code>com.github.markusbernhardt.xmldoclet.XmlDoclet</code> from <code>com.github.markusbernhardt:xml-doclet</code> artifact. Javadoc comments are added to output declarations as JSDoc comments. For more information see <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/wiki/Javadoc">Javadoc</a> Wiki page.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.io.File&gt;</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3CjsonbConfiguration.3E"></a><b><a name="jsonbConfiguration">&lt;jsonbConfiguration&gt;</a></b></h4>
+        
+<div>Specifies JSON-B global configuration. Description of individual parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a> class on GitHub (latest version).</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>cz.habarta.typescript.generator.JsonbConfiguration</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -2190,20 +1785,21 @@ Wiki page.</div>
 <div>Library used in JSON classes. Supported values are: 
 
 <ul>
-
-<li><code>jackson2</code> - annotations from
-`com.fasterxml.jackson.annotation` package</li>
-
-<li><code>jaxb</code> - annotations from
-`javax.xml.bind.annotation` package</li>
-
-<li><code>gson</code> - annotations from
-`com.google.gson.annotations` package</li>
-
-<li><code>jsonb</code> - annotations from
-`javax.json.bind.annotation` package</li>
-</ul>
-Required parameter, recommended value is <code>jackson2</code>.</div>
+ 
+<li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
+ 
+<li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package</li>
+ 
+<li></li>
+ 
+<li><code>gson</code> - annotations from `com.google.gson.annotations` package</li>
+ 
+<li></li>
+ 
+<li><code>jsonb</code> - annotations from `javax.json.bind.annotation` package</li>
+ 
+<li></li>
+</ul> Required parameter, recommended value is <code>jackson2</code>.</div>
         
 <ul>
           
@@ -2211,35 +1807,22 @@ Required parameter, recommended value is <code>jackson2</code>.</div>
           
 <li><b>Required</b>: <code>Yes</code></li>
         </ul><hr /></section><section>
-<h4><a name="a.3CjsonbConfiguration.3E"></a><b><a name="jsonbConfiguration">&lt;jsonbConfiguration&gt;</a></b></h4>
-        
-<div>Specifies JSON-B global configuration. Description of individual
-parameters is in <a class="externalLink" href="https://github.com/vojtechhabarta/typescript-generator/blob/main/typescript-generator-core/src/main/java/cz/habarta/typescript/generator/JsonbConfiguration.java">Jackson2Configuration</a>
-class on GitHub (latest version).</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>cz.habarta.typescript.generator.JsonbConfiguration</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
 <h4><a name="a.3CloggingLevel.3E"></a><b><a name="loggingLevel">&lt;loggingLevel&gt;</a></b></h4>
         
 <div>Specifies level of logging output. Supported values are: 
 
 <ul>
-
+ 
 <li><code>Debug</code></li>
-
+ 
 <li><code>Verbose</code></li>
-
+ 
 <li><code>Info</code></li>
-
+ 
 <li><code>Warning</code></li>
-
+ 
 <li><code>Error</code></li>
-</ul>
-Default value is <code>Verbose</code>.</div>
+</ul> Default value is <code>Verbose</code>.</div>
         
 <ul>
           
@@ -2249,25 +1832,14 @@ Default value is <code>Verbose</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CmapClasses.3E"></a><b><a name="mapClasses">&lt;mapClasses&gt;</a></b></h4>
         
-<div>Specifies whether Java classes will be mapped to TypeScript classes
-or interfaces. Java interfaces are always mapped as TypeScript
-interfaces. Supported values are: 
+<div>Specifies whether Java classes will be mapped to TypeScript classes or interfaces. Java interfaces are always mapped as TypeScript interfaces. Supported values are: 
 
 <ul>
-
+ 
 <li><code>asInterfaces</code></li>
-
+ 
 <li><code>asClasses</code></li>
-</ul>
-Default value is <code>asInterfaces</code>.<br />
-Value <code>asClasses</code> can only be used in implementation
-files (.ts). In this case it is also possible to generate
-constructors by setting <code>generateConstructors</code> parameter
-to <code>true</code>. It is also possible to generate mix of
-classes and interfaces by setting <code>mapClasses</code> parameter
-to <code>asClasses</code> value and specifying which classes should
-be mapped as classes using <code>mapClassesAsClassesPatterns</code>
-parameter.</div>
+</ul> Default value is <code>asInterfaces</code>.<br /> Value <code>asClasses</code> can only be used in implementation files (.ts). In this case it is also possible to generate constructors by setting <code>generateConstructors</code> parameter to <code>true</code>. It is also possible to generate mix of classes and interfaces by setting <code>mapClasses</code> parameter to <code>asClasses</code> value and specifying which classes should be mapped as classes using <code>mapClassesAsClassesPatterns</code> parameter.</div>
         
 <ul>
           
@@ -2277,32 +1849,26 @@ parameter.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CmapClassesAsClassesPatterns.3E"></a><b><a name="mapClassesAsClassesPatterns">&lt;mapClassesAsClassesPatterns&gt;</a></b></h4>
         
-<div>Specifies which Java classes should be mapped as TypeScript
-classes. Classes which are matched by any of these patters are
-mapped as classes otherwise they are mapped as interfaces. This
-parameter can only be used when <code>mapClasses</code> parameter
-is set to <code>asClasses</code> value.</div>
+<div>Specifies which Java classes should be mapped as TypeScript classes. Classes which are matched by any of these patters are mapped as classes otherwise they are mapped as interfaces. This parameter can only be used when <code>mapClasses</code> parameter is set to <code>asClasses</code> value.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CmapDate.3E"></a><b><a name="mapDate">&lt;mapDate&gt;</a></b></h4>
         
-<div>Specifies how <code>Date</code> will be mapped. Supported values
-are: 
+<div>Specifies how <code>java.util.Date</code> will be mapped. Supported values are: 
 
 <ul>
-
+ 
 <li><code>asDate</code> - type <code>Date</code></li>
-
+ 
 <li><code>asNumber</code> - type <code>number</code></li>
-
+ 
 <li><code>asString</code> - type <code>string</code></li>
-</ul>
-Default value is <code>asDate</code>.</div>
+</ul> Default value is <code>asDate</code>.</div>
         
 <ul>
           
@@ -2315,21 +1881,15 @@ Default value is <code>asDate</code>.</div>
 <div>Specifies how enums will be mapped. Supported values are: 
 
 <ul>
-
-<li><code>asUnion</code> - creates type alias to union of string
-enum values</li>
-
-<li><code>asInlineUnion</code> - creates union of enum values on
-places where the enum is used</li>
-
-<li><code>asEnum</code> - creates string enum. Requires TypeScript
-2.4</li>
-
-<li><code>asNumberBasedEnum</code> - creates enum of named number
-values</li>
-</ul>
-Default value is <code>asUnion</code>.<br />
-See also <code>nonConstEnums</code> parameter.</div>
+ 
+<li><code>asUnion</code> - creates type alias to union of string enum values</li>
+ 
+<li><code>asInlineUnion</code> - creates union of enum values on places where the enum is used</li>
+ 
+<li><code>asEnum</code> - creates string enum. Requires TypeScript 2.4</li>
+ 
+<li><code>asNumberBasedEnum</code> - creates enum of named number values</li>
+</ul> Default value is <code>asUnion</code>.<br /> See also <code>nonConstEnums</code> parameter.</div>
         
 <ul>
           
@@ -2339,20 +1899,14 @@ See also <code>nonConstEnums</code> parameter.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CmapMap.3E"></a><b><a name="mapMap">&lt;mapMap&gt;</a></b></h4>
         
-<div>Specifies how <code>Map</code> and similar types will be mapped.
-Supported values are: 
+<div>Specifies how <code>java.util.Map</code> and similar types will be mapped. Supported values are: 
 
 <ul>
-
-<li><code>asIndexedArray</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures">indexed
-array type</a>, example: <code>{ [index: string]: Person }</code>
-(original way)</li>
-
-<li><code>asRecord</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type">Record
-type</a>, example: <code>Record&lt;string, Person&gt;</code> (from
-TypeScript 2.1)</li>
-</ul>
-Default value is <code>asIndexedArray</code>.<br /></div>
+ 
+<li><code>asIndexedArray</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures">indexed array type</a>, example: <code>{ [index: string]: Person }</code> (original way)</li>
+ 
+<li><code>asRecord</code> - creates <a class="externalLink" href="https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type">Record type</a>, example: <code>Record&lt;string, Person&gt;</code> (from TypeScript 2.1)</li>
+</ul> Default value is <code>asIndexedArray</code>.<br /></div>
         
 <ul>
           
@@ -2362,8 +1916,7 @@ Default value is <code>asIndexedArray</code>.<br /></div>
         </ul><hr /></section><section>
 <h4><a name="a.3CmapPackagesToNamespaces.3E"></a><b><a name="mapPackagesToNamespaces">&lt;mapPackagesToNamespaces&gt;</a></b></h4>
         
-<div>Generates TypeScript namespaces from Java packages. Default is
-<code>false</code>.</div>
+<div>Generates TypeScript namespaces from Java packages. Default is <code>false</code>.</div>
         
 <ul>
           
@@ -2373,9 +1926,7 @@ Default value is <code>asIndexedArray</code>.<br /></div>
         </ul><hr /></section><section>
 <h4><a name="a.3Cmodule.3E"></a><b><a name="module">&lt;module&gt;</a></b></h4>
         
-<div>Name of generated ambient module.<br />
-Used when <code>outputKind</code> is set to
-<code>ambientModule</code>.</div>
+<div>Name of generated ambient module.<br /> Used when <code>outputKind</code> is set to <code>ambientModule</code>.</div>
         
 <ul>
           
@@ -2385,41 +1936,30 @@ Used when <code>outputKind</code> is set to
         </ul><hr /></section><section>
 <h4><a name="a.3CmoduleDependencies.3E"></a><b><a name="moduleDependencies">&lt;moduleDependencies&gt;</a></b></h4>
         
-<div>List of modules (generated by typescript-generator!) on which
-currently generated module depends on. Each item of this list has 
+<div>List of modules (generated by typescript-generator!) on which currently generated module depends on. Each item of this list has 
 
 <ul>
-
-<li><code>importFrom</code> - (required) module name in generated
-<code>import</code> statement, can be relative path</li>
-
-<li><code>importAs</code> - (required) name that will be used when
-referring to the imports</li>
-
-<li><code>infoJson</code> - (required) file path to the module info
-JSON generated by preceding typescript-generator run, see
-<code>generateInfoJson</code> parameter</li>
-
-<li><code>npmPackageName</code> - (required when generating
-package.json) NPM dependency package name</li>
-
-<li><code>npmVersionRange</code> - (required when generating
-package.json) NPM dependency version (or other identification)</li>
-</ul>
-Only applicable when <code>outputKind</code> is set to
-<code>module</code>.</div>
+ 
+<li><code>importFrom</code> - (required) module name in generated <code>import</code> statement, can be relative path</li>
+ 
+<li><code>importAs</code> - (required) name that will be used when referring to the imports</li>
+ 
+<li><code>infoJson</code> - (required) file path to the module info JSON generated by preceding typescript-generator run, see <code>generateInfoJson</code> parameter</li>
+ 
+<li><code>npmPackageName</code> - (required when generating package.json) NPM dependency package name</li>
+ 
+<li><code>npmVersionRange</code> - (required when generating package.json) NPM dependency version (or other identification)</li>
+</ul> Only applicable when <code>outputKind</code> is set to <code>module</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;cz.habarta.typescript.generator.ModuleDependency&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3Cnamespace.3E"></a><b><a name="namespace">&lt;namespace&gt;</a></b></h4>
         
-<div>Generates specified namespace.<br />
-Not recommended to combine with modules.<br />
-Default is no namespace.</div>
+<div>Generates specified namespace.<br /> Not recommended to combine with modules.<br /> Default is no namespace.</div>
         
 <ul>
           
@@ -2429,11 +1969,7 @@ Default is no namespace.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnoEslintDisable.3E"></a><b><a name="noEslintDisable">&lt;noEslintDisable&gt;</a></b></h4>
         
-<div>If <code>true</code> generated file will not be prevented from
-linting by ESLint. By default there is a
-<code>eslint-disable</code> comment that will force ESLint to
-ignore the generated file. This can be enabled to suppress this
-comment so that the file can be linted by ESLint.</div>
+<div>If <code>true</code> generated file will not be prevented from linting by ESLint. By default there is a <code>eslint-disable</code> comment that will force ESLint to ignore the generated file. This can be enabled to suppress this comment so that the file can be linted by ESLint.</div>
         
 <ul>
           
@@ -2443,25 +1979,7 @@ comment so that the file can be linted by ESLint.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnoFileComment.3E"></a><b><a name="noFileComment">&lt;noFileComment&gt;</a></b></h4>
         
-<div>If <code>true</code> generated file will not contain comment at the
-top. By default there is a comment with timestamp and
-typescript-generator version. So it might be useful to suppress
-this comment if the file is in source control and is regenerated in
-build.</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>boolean</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CnoTslintDisable.3E"></a><b><a name="noTslintDisable">&lt;noTslintDisable&gt;</a></b></h4>
-        
-<div>If <code>true</code> generated file will not be prevented from
-linting by TSLint. By default there is a
-<code>tslint:disable</code> comment that will force TSLint to
-ignore the generated file. This can be enabled to suppress this
-comment so that the file can be linted by TSLint.</div>
+<div>If <code>true</code> generated file will not contain comment at the top. By default there is a comment with timestamp and typescript-generator version. So it might be useful to suppress this comment if the file is in source control and is regenerated in build.</div>
         
 <ul>
           
@@ -2471,21 +1989,27 @@ comment so that the file can be linted by TSLint.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnonConstEnumAnnotations.3E"></a><b><a name="nonConstEnumAnnotations">&lt;nonConstEnumAnnotations&gt;</a></b></h4>
         
-<div>If this list is not empty, then generated enums will not have
-<code>const</code> keyword, if the enum contains one of the
-annotations defined in this list. See <code>nonConstEnums</code></div>
+<div>If this list is not empty, then generated enums will not have <code>const</code> keyword, if the enum contains one of the annotations defined in this list. See <code>nonConstEnums</code></div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CnonConstEnums.3E"></a><b><a name="nonConstEnums">&lt;nonConstEnums&gt;</a></b></h4>
         
-<div>If <code>true</code> generated enums will not have
-<code>const</code> keyword.<br />
-This can be used only in implementation files.</div>
+<div>If <code>true</code> generated enums will not have <code>const</code> keyword.<br /> This can be used only in implementation files.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>boolean</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3CnoTslintDisable.3E"></a><b><a name="noTslintDisable">&lt;noTslintDisable&gt;</a></b></h4>
+        
+<div>If <code>true</code> generated file will not be prevented from linting by TSLint. By default there is a <code>tslint:disable</code> comment that will force TSLint to ignore the generated file. This can be enabled to suppress this comment so that the file can be linted by TSLint.</div>
         
 <ul>
           
@@ -2495,13 +2019,7 @@ This can be used only in implementation files.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmBuildScript.3E"></a><b><a name="npmBuildScript">&lt;npmBuildScript&gt;</a></b></h4>
         
-<div>Specifies NPM &quot;build&quot; script.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Default value is <code>tsc --module umd --moduleResolution node
---typeRoots --target es5 --lib es6 --declaration --sourceMap
-$outputFile</code>.</div>
+<div>Specifies NPM &quot;build&quot; script.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Default value is <code>tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile</code>.</div>
         
 <ul>
           
@@ -2511,40 +2029,27 @@ $outputFile</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmDependencies.3E"></a><b><a name="npmDependencies">&lt;npmDependencies&gt;</a></b></h4>
         
-<div>List of additional NPM <code>dependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.</div>
+<div>List of additional NPM <code>dependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmDevDependencies.3E"></a><b><a name="npmDevDependencies">&lt;npmDevDependencies&gt;</a></b></h4>
         
-<div>List of additional NPM <code>devDependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.</div>
+<div>List of additional NPM <code>devDependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmName.3E"></a><b><a name="npmName">&lt;npmName&gt;</a></b></h4>
         
-<div>Specifies NPM package name.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code>.<br />
-Default value is <code>${project.artifactId}</code>.</div>
+<div>Specifies NPM package name.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code>.<br /> Default value is <code>${project.artifactId}</code>.</div>
         
 <ul>
           
@@ -2554,24 +2059,17 @@ Default value is <code>${project.artifactId}</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmPeerDependencies.3E"></a><b><a name="npmPeerDependencies">&lt;npmPeerDependencies&gt;</a></b></h4>
         
-<div>List of additional NPM <code>peerDependencies</code>.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code> and generating implementation file
-(.ts).<br />
-Each item it this list specifies dependency with its version.<br />
-Item format is: <code>name:version</code>.</div>
+<div>List of additional NPM <code>peerDependencies</code>.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code> and generating implementation file (.ts).<br /> Each item it this list specifies dependency with its version.<br /> Item format is: <code>name:version</code>.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmTypescriptVersion.3E"></a><b><a name="npmTypescriptVersion">&lt;npmTypescriptVersion&gt;</a></b></h4>
         
-<div>Specifies TypeScript version declared in NPM
-<code>package.json</code>.<br />
-Default value is <code>^2.4</code>.</div>
+<div>Specifies TypeScript version declared in NPM <code>package.json</code>.<br /> Default value is <code>^2.4</code>.</div>
         
 <ul>
           
@@ -2581,10 +2079,7 @@ Default value is <code>^2.4</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnpmVersion.3E"></a><b><a name="npmVersion">&lt;npmVersion&gt;</a></b></h4>
         
-<div>Specifies NPM package version.<br />
-Only applicable when <code>generateNpmPackageJson</code> parameter
-is <code>true</code>.<br />
-Default value is <code>1.0.0</code>.</div>
+<div>Specifies NPM package version.<br /> Only applicable when <code>generateNpmPackageJson</code> parameter is <code>true</code>.<br /> Default value is <code>1.0.0</code>.</div>
         
 <ul>
           
@@ -2594,38 +2089,22 @@ Default value is <code>1.0.0</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnullabilityDefinition.3E"></a><b><a name="nullabilityDefinition">&lt;nullabilityDefinition&gt;</a></b></h4>
         
-<div>Specifies how nullable types will be created in generated file.
-Nullable types are marked in Java by annotations specified using
-<code>nullableAnnotations</code> parameter like
-<code>List&lt;@Nullable String&gt;</code>. In Kotlin nullable types
-are marked using <code>?</code> character like
-<code>List&lt;String?&gt;</code>. Value of this parameter specifies
-how nullable type is created from regular type <code>T</code>: 
+<div>Specifies how nullable types will be created in generated file. Nullable types are marked in Java by annotations specified using <code>nullableAnnotations</code> parameter like <code>List&lt;@Nullable String&gt;</code>. In Kotlin nullable types are marked using <code>?</code> character like <code>List&lt;String?&gt;</code>. Value of this parameter specifies how nullable type is created from regular type <code>T</code>: 
 
 <ul>
-
-<li><code>nullAndUndefinedUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| null | undefined</code></li>
-
-<li><code>nullUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| null</code></li>
-
-<li><code>undefinedUnion</code> - type alias
-<code>Nullable&lt;T&gt;</code> which is defined as union of <code>T
-| undefined</code></li>
-
-<li><code>nullAndUndefinedInlineUnion</code> - union of <code>T |
-null | undefined</code> without type alias</li>
-
-<li><code>nullInlineUnion</code> - union of <code>T | null</code>
-without type alias</li>
-
-<li><code>undefinedInlineUnion</code> - union of <code>T |
-undefined</code> without type alias</li>
-</ul>
-Default value is <code>nullInlineUnion</code>.</div>
+ 
+<li><code>nullAndUndefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null | undefined</code></li>
+ 
+<li><code>nullUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | null</code></li>
+ 
+<li><code>undefinedUnion</code> - type alias <code>Nullable&lt;T&gt;</code> which is defined as union of <code>T | undefined</code></li>
+ 
+<li><code>nullAndUndefinedInlineUnion</code> - union of <code>T | null | undefined</code> without type alias</li>
+ 
+<li><code>nullInlineUnion</code> - union of <code>T | null</code> without type alias</li>
+ 
+<li><code>undefinedInlineUnion</code> - union of <code>T | undefined</code> without type alias</li>
+</ul> Default value is <code>nullInlineUnion</code>.</div>
         
 <ul>
           
@@ -2635,58 +2114,36 @@ Default value is <code>nullInlineUnion</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CnullableAnnotations.3E"></a><b><a name="nullableAnnotations">&lt;nullableAnnotations&gt;</a></b></h4>
         
-<div>When any of specified annotations is used on a Java type
-typescript-generator treats this type as nullable. For example Java
-type <code>List&lt;@Nullable String&gt;</code> can be transformed
-to TypeScript as <code>(string | null)[]</code> (instead of just
-<code>string[]</code>). Exact nullability form depends on
-<code>nullabilityDefinition</code> parameter. Unlike optional
-properties nullable types can also be used &quot;inside&quot; other types
-like in previous example. Specified annotations must have target
-set to <code>TYPE_PARAMETER</code> or <code>TYPE_USE</code>.
-Example optional annotation:
-<code>org.checkerframework.checker.nullness.qual.Nullable</code></div>
+<div>When any of specified annotations is used on a Java type typescript-generator treats this type as nullable. For example Java type <code>List&lt;@Nullable String&gt;</code> can be transformed to TypeScript as <code>(string | null)[]</code> (instead of just <code>string[]</code>). Exact nullability form depends on <code>nullabilityDefinition</code> parameter. Unlike optional properties nullable types can also be used &quot;inside&quot; other types like in previous example. Specified annotations must have target set to <code>TYPE_PARAMETER</code> or <code>TYPE_USE</code>. Example optional annotation: <code>org.checkerframework.checker.nullness.qual.Nullable</code></div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CoptionalAnnotations.3E"></a><b><a name="optionalAnnotations">&lt;optionalAnnotations&gt;</a></b></h4>
         
-<div>The presence of any annotation in this list on a JSON property will
-cause the typescript-generator to treat that property as optional
-when generating the corresponding TypeScript interface. Example
-optional annotation: <code>javax.annotation.Nullable</code>. This
-parameter is &quot;opposite&quot; of <code>requiredAnnotations</code>, only
-one of them could be used.</div>
+<div>The presence of any annotation in this list on a JSON property will cause the typescript-generator to treat that property as optional when generating the corresponding TypeScript interface. Example optional annotation: <code>javax.annotation.Nullable</code>. This parameter is &quot;opposite&quot; of <code>requiredAnnotations</code>, only one of them could be used.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CoptionalProperties.3E"></a><b><a name="optionalProperties">&lt;optionalProperties&gt;</a></b></h4>
         
-<div>Specifies how properties are defined to be optional. Supported
-values are: 
+<div>Specifies how properties are defined to be optional. Supported values are: 
 
 <ul>
-
-<li><code>useSpecifiedAnnotations</code> - annotations specified
-using <code>optionalAnnotations</code> or
-<code>requiredAnnotations</code> parameter</li>
-
-<li><code>useLibraryDefinition</code> - examples:
-<code>@JsonProperty(required = false)</code> when using
-<code>jackson2</code> library or <code>@XmlElement(required =
-false)</code> when using <code>jaxb</code> library</li>
-
+ 
+<li><code>useSpecifiedAnnotations</code> - annotations specified using <code>optionalAnnotations</code> or <code>requiredAnnotations</code> parameter</li>
+ 
+<li><code>useLibraryDefinition</code> - examples: <code>@JsonProperty(required = false)</code> when using <code>jackson2</code> library or <code>@XmlElement(required = false)</code> when using <code>jaxb</code> library</li>
+ 
 <li><code>all</code> - all properties are optional</li>
-</ul>
-Default value is <code>useSpecifiedAnnotations</code>.</div>
+</ul> Default value is <code>useSpecifiedAnnotations</code>.</div>
         
 <ul>
           
@@ -2696,31 +2153,20 @@ Default value is <code>useSpecifiedAnnotations</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CoptionalPropertiesDeclaration.3E"></a><b><a name="optionalPropertiesDeclaration">&lt;optionalPropertiesDeclaration&gt;</a></b></h4>
         
-<div>Specifies how optional properties will be declared in generated
-file. This parameter applies to properties detected as optional.
-The detection can be specified using
-<code>optionalProperties</code> parameter. Supported values are: 
+<div>Specifies how optional properties will be declared in generated file. This parameter applies to properties detected as optional. The detection can be specified using <code>optionalProperties</code> parameter. Supported values are: 
 
 <ul>
-
-<li><code>questionMark</code> - property will be marked using
-<code>?</code> character as optional</li>
-
-<li><code>questionMarkAndNullableType</code> - property will be
-optional and it will also have union with <code>null</code>
-value</li>
-
-<li><code>nullableType</code> - property will not be optional but
-its type will be union with <code>null</code> value</li>
-
-<li><code>nullableAndUndefinableType</code> - property will not be
-optional but its type will be union with <code>null</code> and
-<code>undefined</code> values</li>
-
-<li><code>undefinableType</code> - property will not be optional
-but its type will be union with <code>undefined</code> value</li>
-</ul>
-Default value is <code>questionMark</code>.</div>
+ 
+<li><code>questionMark</code> - property will be marked using <code>?</code> character as optional</li>
+ 
+<li><code>questionMarkAndNullableType</code> - property will be optional and it will also have union with <code>null</code> value</li>
+ 
+<li><code>nullableType</code> - property will not be optional but its type will be union with <code>null</code> value</li>
+ 
+<li><code>nullableAndUndefinableType</code> - property will not be optional but its type will be union with <code>null</code> and <code>undefined</code> values</li>
+ 
+<li><code>undefinableType</code> - property will not be optional but its type will be union with <code>undefined</code> value</li>
+</ul> Default value is <code>questionMark</code>.</div>
         
 <ul>
           
@@ -2743,14 +2189,11 @@ Default value is <code>questionMark</code>.</div>
 <div>Output file format, can be: 
 
 <ul>
-
+ 
 <li><code>declarationFile</code> (.d.ts)</li>
-
+ 
 <li><code>implementationFile</code> (.ts)</li>
-</ul>
-Setting this parameter to <code>implementationFile</code> allows to
-generate runnable TypeScript code.<br />
-Default value is <code>declarationFile</code>.</div>
+</ul> Setting this parameter to <code>implementationFile</code> allows to generate runnable TypeScript code.<br /> Default value is <code>declarationFile</code>.</div>
         
 <ul>
           
@@ -2763,19 +2206,13 @@ Default value is <code>declarationFile</code>.</div>
 <div>Kind of generated TypeScript output. Allowed values are: 
 
 <ul>
-
-<li><code>global</code> - means that declarations will be in global
-scope or namespace (no module)</li>
-
-<li><code>module</code> - means that generated file will contain
-top-level <code>export</code> declarations</li>
-
-<li><code>ambientModule</code> - means that generated declarations
-will be wrapped in <code>declare module &quot;mod&quot; { }</code>
-declaration</li>
-</ul>
-Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules
-and Namespaces</a> Wiki page.</div>
+ 
+<li><code>global</code> - means that declarations will be in global scope or namespace (no module)</li>
+ 
+<li><code>module</code> - means that generated file will contain top-level <code>export</code> declarations</li>
+ 
+<li><code>ambientModule</code> - means that generated declarations will be wrapped in <code>declare module &quot;mod&quot; { }</code> declaration</li>
+</ul> Required parameter. For more information see <a class="externalLink" href="http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html">Modules and Namespaces</a> Wiki page.</div>
         
 <ul>
           
@@ -2785,9 +2222,7 @@ and Namespaces</a> Wiki page.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CprimitivePropertiesRequired.3E"></a><b><a name="primitivePropertiesRequired">&lt;primitivePropertiesRequired&gt;</a></b></h4>
         
-<div>When using <code>requiredAnnotations</code> to mark properties as
-not optional then setting this parameter to <code>true</code> marks
-also all properties of primitive type without explicit annotation.</div>
+<div>When using <code>requiredAnnotations</code> to mark properties as not optional then setting this parameter to <code>true</code> marks also all properties of primitive type without explicit annotation.</div>
         
 <ul>
           
@@ -2797,22 +2232,17 @@ also all properties of primitive type without explicit annotation.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CreferencedFiles.3E"></a><b><a name="referencedFiles">&lt;referencedFiles&gt;</a></b></h4>
         
-<div>List of files which will be referenced using triple-slash
-directive: <code>/// &lt;reference path=&quot;file&quot; /&gt;</code>. This
-can be used with <code>customTypeMappings</code> to provide needed
-TypeScript types.</div>
+<div>List of files which will be referenced using triple-slash directive: <code>/// &lt;reference path=&quot;file&quot; /&gt;</code>. This can be used with <code>customTypeMappings</code> to provide needed TypeScript types.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CremoveTypeNamePrefix.3E"></a><b><a name="removeTypeNamePrefix">&lt;removeTypeNamePrefix&gt;</a></b></h4>
         
-<div>Prefix which will be removed from names of classes, interfaces,
-enums. For example if set to <code>Json</code> then mapping for
-<code>JsonData</code> will be <code>Data</code>.</div>
+<div>Prefix which will be removed from names of classes, interfaces, enums. For example if set to <code>Json</code> then mapping for <code>JsonData</code> will be <code>Data</code>.</div>
         
 <ul>
           
@@ -2822,9 +2252,7 @@ enums. For example if set to <code>Json</code> then mapping for
         </ul><hr /></section><section>
 <h4><a name="a.3CremoveTypeNameSuffix.3E"></a><b><a name="removeTypeNameSuffix">&lt;removeTypeNameSuffix&gt;</a></b></h4>
         
-<div>Suffix which will be removed from names of classes, interfaces,
-enums. For example if set to <code>JSON</code> then mapping for
-<code>DataJSON</code> will be <code>Data</code>.</div>
+<div>Suffix which will be removed from names of classes, interfaces, enums. For example if set to <code>JSON</code> then mapping for <code>DataJSON</code> will be <code>Data</code>.</div>
         
 <ul>
           
@@ -2834,34 +2262,26 @@ enums. For example if set to <code>JSON</code> then mapping for
         </ul><hr /></section><section>
 <h4><a name="a.3CrequiredAnnotations.3E"></a><b><a name="requiredAnnotations">&lt;requiredAnnotations&gt;</a></b></h4>
         
-<div>Properties will be treated as optional except those annotated with
-any of specified annotations. This parameter is &quot;opposite&quot; of
-<code>optionalAnnotations</code>, only one of them could be used.</div>
+<div>Properties will be treated as optional except those annotated with any of specified annotations. This parameter is &quot;opposite&quot; of <code>optionalAnnotations</code>, only one of them could be used.</div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.util.List</code></li>
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CrestNamespacing.3E"></a><b><a name="restNamespacing">&lt;restNamespacing&gt;</a></b></h4>
         
-<div>Specifies how JAX-RS REST operations will be grouped into objects.
-Supported values are: 
+<div>Specifies how JAX-RS REST operations will be grouped into objects. Supported values are: 
 
 <ul>
-
-<li><code>singleObject</code> - means that one object with all
-operations will be generated</li>
-
-<li><code>perResource</code> - means that for each root resource
-one object will be generated</li>
-
-<li><code>byAnnotation</code> - means that operations will be
-grouped by annotation specified using
-<code>jaxrsNamespacingAnnotation</code></li>
-</ul>
-Default value is <code>singleObject</code>.</div>
+ 
+<li><code>singleObject</code> - means that one object with all operations will be generated</li>
+ 
+<li><code>perResource</code> - means that for each root resource one object will be generated</li>
+ 
+<li><code>byAnnotation</code> - means that operations will be grouped by annotation specified using <code>#jaxrsNamespacingAnnotation</code></li>
+</ul> Default value is <code>singleObject</code>.</div>
         
 <ul>
           
@@ -2871,16 +2291,12 @@ Default value is <code>singleObject</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CrestNamespacingAnnotation.3E"></a><b><a name="restNamespacingAnnotation">&lt;restNamespacingAnnotation&gt;</a></b></h4>
         
-<div>Specifies annotation used for grouping JAX-RS REST operations.
-Format is <code>annotationClass#annotationElement</code> where
-<code>annotationClass</code> is fully-qualified class name and
-<code>annotationElement</code> is element name and defaults to
-<code>value</code>. Examples: 
+<div>Specifies annotation used for grouping JAX-RS REST operations. Format is <code>annotationClass#annotationElement</code> where <code>annotationClass</code> is fully-qualified class name and <code>annotationElement</code> is element name and defaults to <code>value</code>. Examples: 
 
 <ul>
-
+ 
 <li><code>io.swagger.annotations.Api</code></li>
-
+ 
 <li><code>io.swagger.annotations.Api#value</code></li>
 </ul></div>
         
@@ -2892,12 +2308,7 @@ Format is <code>annotationClass#annotationElement</code> where
         </ul><hr /></section><section>
 <h4><a name="a.3CrestOptionsType.3E"></a><b><a name="restOptionsType">&lt;restOptionsType&gt;</a></b></h4>
         
-<div>Specifies HTTP request options type in REST application. By default
-no <code>options</code> parameter is generated. Useful when passing
-additional parameters to underlying HTTP request method (like
-jQuery ajax settings or <code>AxiosRequestConfig</code>). Can be
-specific (for example <code>AxiosRequestConfig</code>) or generic
-(for example <code>&lt;O&gt;</code>).</div>
+<div>Specifies HTTP request options type in REST application. By default no <code>options</code> parameter is generated. Useful when passing additional parameters to underlying HTTP request method (like jQuery ajax settings or <code>AxiosRequestConfig</code>). Can be specific (for example <code>AxiosRequestConfig</code>) or generic (for example <code>&lt;O&gt;</code>).</div>
         
 <ul>
           
@@ -2907,12 +2318,7 @@ specific (for example <code>AxiosRequestConfig</code>) or generic
         </ul><hr /></section><section>
 <h4><a name="a.3CrestResponseType.3E"></a><b><a name="restResponseType">&lt;restResponseType&gt;</a></b></h4>
         
-<div>Specifies HTTP response type in REST application. Default value is
-<code>Promise&lt;R&gt;</code> which means data object returned
-asynchronously. This parameter is useful for example when
-underlying HTTP response object (like <code>XMLHttpRequest</code>
-or <code>AxiosPromise</code>) is returned instead of actual
-response data.</div>
+<div>Specifies HTTP response type in REST application. Default value is <code>Promise&lt;R&gt;</code> which means data object returned asynchronously. This parameter is useful for example when underlying HTTP response object (like <code>XMLHttpRequest</code> or <code>AxiosPromise</code>) is returned instead of actual response data.</div>
         
 <ul>
           
@@ -2920,42 +2326,36 @@ response data.</div>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
+<h4><a name="a.3CscanningAcceptedPackages.3E"></a><b><a name="scanningAcceptedPackages">&lt;scanningAcceptedPackages&gt;</a></b></h4>
+        
+<div>Allows to speed up classpath scanning by limiting scanning to specified packages. This optimization applies to following parameters: 
+
+<ul>
+ 
+<li><code>classPatterns</code></li>
+ 
+<li><code>classesImplementingInterfaces</code></li>
+ 
+<li><code>classesExtendingClasses</code></li>
+ 
+<li><code>classesWithAnnotations</code></li>
+ 
+<li><code>classesFromAutomaticJaxrsApplication</code></li>
+</ul> This parameter is passed directly to underlying classpath scanning library (ClassGraph) without any validation or interpretation.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.util.List&lt;java.lang.String&gt;</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
 <h4><a name="a.3CscanSpringApplication.3E"></a><b><a name="scanSpringApplication">&lt;scanSpringApplication&gt;</a></b></h4>
         
-<div>If <code>true</code> Spring REST application will be loaded and
-scanned for classes to process. It is needed to specify application
-class using another parameter (for example <code>classes</code>).</div>
+<div>If <code>true</code> Spring REST application will be loaded and scanned for classes to process. It is needed to specify application class using another parameter (for example <code>classes</code>).</div>
         
 <ul>
           
 <li><b>Type</b>: <code>boolean</code></li>
-          
-<li><b>Required</b>: <code>No</code></li>
-        </ul><hr /></section><section>
-<h4><a name="a.3CscanningAcceptedPackages.3E"></a><b><a name="scanningAcceptedPackages">&lt;scanningAcceptedPackages&gt;</a></b></h4>
-        
-<div>Allows to speed up classpath scanning by limiting scanning to
-specified packages. This optimization applies to following
-parameters: 
-
-<ul>
-
-<li><code>classPatterns</code></li>
-
-<li><code>classesImplementingInterfaces</code></li>
-
-<li><code>classesExtendingClasses</code></li>
-
-<li><code>classesWithAnnotations</code></li>
-
-<li><code>classesFromAutomaticJaxrsApplication</code></li>
-</ul>
-This parameter is passed directly to underlying classpath scanning
-library (ClassGraph) without any validation or interpretation.</div>
-        
-<ul>
-          
-<li><b>Type</b>: <code>java.util.List</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -2973,8 +2373,7 @@ library (ClassGraph) without any validation or interpretation.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CsortDeclarations.3E"></a><b><a name="sortDeclarations">&lt;sortDeclarations&gt;</a></b></h4>
         
-<div>If <code>true</code> TypeScript declarations (interfaces,
-properties) will be sorted alphabetically.</div>
+<div>If <code>true</code> TypeScript declarations (interfaces, properties) will be sorted alphabetically.</div>
         
 <ul>
           
@@ -2984,8 +2383,7 @@ properties) will be sorted alphabetically.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CsortTypeDeclarations.3E"></a><b><a name="sortTypeDeclarations">&lt;sortTypeDeclarations&gt;</a></b></h4>
         
-<div>If <code>true</code> TypeScript type declarations (interfaces) will
-be sorted alphabetically.</div>
+<div>If <code>true</code> TypeScript type declarations (interfaces) will be sorted alphabetically.</div>
         
 <ul>
           
@@ -2998,12 +2396,11 @@ be sorted alphabetically.</div>
 <div>Specifies how strings will be quoted. Supported values are: 
 
 <ul>
-
+ 
 <li><code>doubleQuotes</code></li>
-
+ 
 <li><code>singleQuotes</code></li>
-</ul>
-Default value is <code>doubleQuotes</code>.</div>
+</ul> Default value is <code>doubleQuotes</code>.</div>
         
 <ul>
           
@@ -3013,8 +2410,7 @@ Default value is <code>doubleQuotes</code>.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CtsNoCheck.3E"></a><b><a name="tsNoCheck">&lt;tsNoCheck&gt;</a></b></h4>
         
-<div>If <code>true</code> generated file will have disabled TypeScript
-semantic checks using <code>@ts-nocheck</code> comment.</div>
+<div>If <code>true</code> generated file will have disabled TypeScript semantic checks using <code>@ts-nocheck</code> comment.</div>
         
 <ul>
           
@@ -3024,8 +2420,7 @@ semantic checks using <code>@ts-nocheck</code> comment.</div>
         </ul><hr /></section><section>
 <h4><a name="a.3CumdNamespace.3E"></a><b><a name="umdNamespace">&lt;umdNamespace&gt;</a></b></h4>
         
-<div>Turns proper module into UMD (Universal Module Definition) with
-specified namespace. Only applicable to declaration files.</div>
+<div>Turns proper module into UMD (Universal Module Definition) with specified namespace. Only applicable to declaration files.</div>
         
 <ul>
           
