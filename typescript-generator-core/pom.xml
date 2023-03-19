@@ -325,9 +325,6 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
-                        <configuration>
-                            <excludes>cz/habarta/typescript/generator/xmldoclet/*.java</excludes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -224,7 +224,10 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <directory>${project.build.sourceDirectory}</directory>
+                        <directory>${project.build.testSourceDirectory}</directory>
+                    </sourceDirectories>
                     <configLocation>../checkstyle.xml</configLocation>
                 </configuration>
             </plugin>

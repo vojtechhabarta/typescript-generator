@@ -67,9 +67,6 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
-                        <configuration>
-                            <excludes>cz/habarta/typescript/generator/maven/HelpMojo.java</excludes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
