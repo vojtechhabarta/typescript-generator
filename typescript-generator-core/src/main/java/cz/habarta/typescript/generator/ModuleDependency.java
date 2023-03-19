@@ -15,19 +15,19 @@ public class ModuleDependency {
     public File infoJson;
     public String npmPackageName;
     public String npmVersionRange;
-    public boolean usePeerDeps;
+    public boolean peerDependency;
 
     public ModuleDependency() {
     }
 
-    private ModuleDependency(boolean global, String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange, boolean usePeerDeps) {
+    private ModuleDependency(boolean global, String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange, boolean peerDependency) {
         this.global = global;
         this.importFrom = importFrom;
         this.importAs = importAs;
         this.infoJson = infoJson;
         this.npmPackageName = npmPackageName;
         this.npmVersionRange = npmVersionRange;
-        this.usePeerDeps = usePeerDeps;
+        this.peerDependency = peerDependency;
     }
 
     public static ModuleDependency module(String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange) {
