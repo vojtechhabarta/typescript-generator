@@ -154,4 +154,27 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(output.contains("specialData: SpecialString"), output);
     }
 
+    @Test
+    public void testGenericSuperType() {
+        final Settings settings = TestUtils.settings();
+        settings.mapDate = DateMapping.asString;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Class3.class));
+        Assertions.assertTrue(output.contains("Interface<DateAsString>"));
+        Assertions.assertTrue(output.contains("interfaceValue: DateAsString;"));
+        Assertions.assertTrue(output.contains("AbstractClass<DateAsString>"));
+        Assertions.assertTrue(output.contains("abstractValue: DateAsString;"));
+    }
+
+    private interface Interface<T> {
+        T getInterfaceValue();
+    }
+
+    private static abstract class AbstractClass<T> {
+        public abstract T getAbstractValue();
+    }
+
+    private static abstract class Class3 extends AbstractClass<Date> implements Interface<Date>{
+    }
+
+
 }
