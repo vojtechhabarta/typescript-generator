@@ -11,3 +11,5 @@
 - wait for the release to appear in Maven Central - https://repo1.maven.org/maven2/cz/habarta/typescript-generator/
 - write release notes
 - run "Release to Gradle plugin portal" GitHub Action
+- close/update relevant issues and PRs
+- remove unused tags
