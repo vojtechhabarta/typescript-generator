@@ -166,8 +166,6 @@
                 <configuration>
                     <source>11.0.18</source>
                     <target>11.0.18</target>
-                    <fork>true</fork>
-		            <executable>C:\Program Files\Java\jdk-11\bin\javac</executable>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
