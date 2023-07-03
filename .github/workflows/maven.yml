@@ -17,3 +17,4 @@ jobs:
     #  run: mvn -B package --file pom.xml
     - name: Run test
       run: mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.TaggedUnionsTest#testTaggedUnionsWithInterfaces
+      shell: bash
