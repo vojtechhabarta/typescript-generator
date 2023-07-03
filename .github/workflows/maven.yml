@@ -16,5 +16,7 @@ jobs:
     # - name: Build with Maven
     #  run: mvn -B package --file pom.xml
     - name: Run test
-      run: mvn test -Dtest=ReadOnlyWriteOnlyTest
-    #  shell: bash
+      run: |
+        mvn clean install -DskipTests -pl typescript-generator-core -am
+        mvn -pl typescript-generator-core test -Dtest=cz.habarta.typescript.generator.ReadOnlyWriteOnlyTest#test
+      shell: bash
