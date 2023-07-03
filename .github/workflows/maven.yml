@@ -16,4 +16,4 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Run test
-      run: mvn -B test --file pom.xml
+      run: mvn test -Dtest=ReadOnlyWriteOnlyTest
