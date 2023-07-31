@@ -78,7 +78,15 @@ public class ReadOnlyWriteOnlyTest {
         String expected3 = "    /**\n" + "     * @writeonly\n" + "     */\n" + "    password1: string;\n";
         String expected4 = "    /**\n" + "     * @readonly\n" + "     */\n" + "    id2: string;\n";
         String expected5 = "    /**\n" + "     * @writeonly\n" + "     */\n" + "    password2: string;\n";
-        Assertions.assertTrue(output.length() == 269 && output.substring(0,35).equals("\n" + "interface ReadOnlyWriteOnlyUser {\n") && output.substring(267,269).equals("}\n") && output.contains(expected1) && output.contains(expected2) && output.contains(expected3) && output.contains(expected4) && output.contains(expected5));
+        Assertions.assertTrue(
+            output.length() == 269 && 
+            output.substring(0,35).equals("\n" + "interface ReadOnlyWriteOnlyUser {\n") && 
+            output.substring(267,269).equals("}\n") && 
+            output.contains(expected1) && 
+            output.contains(expected2) && 
+            output.contains(expected3) && 
+            output.contains(expected4) && 
+            output.contains(expected5));
     }
 
 }
