@@ -5,7 +5,7 @@ buildscript {
     // /*dev*/ }
     dependencies {
         classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.14.2'
-        // /*dev*/ classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION-SNAPSHOT'
+        classpath files('/Users/igor/typescript-generator/typescript-generator-gradle-plugin/target/typescript-generator-gradle-plugin-3.2-SNAPSHOT.jar')
     }
 }
 
@@ -14,10 +14,10 @@ plugins {
     id 'groovy'
     id "org.jetbrains.kotlin.jvm" version "1.8.10"
     id 'scala'
-    /*prod*/ id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
+
 }
 
-// /*dev*/ apply plugin: 'cz.habarta.typescript-generator'
+apply plugin: cz.habarta.typescript.generator.gradle.TypeScriptGeneratorPlugin
 
 version = '3.0'
 sourceCompatibility = 11
@@ -43,24 +43,24 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 
 generateTypeScript {
     classes = [
-        'cz.habarta.typescript.generator.sample.Person',
-        'cz.habarta.typescript.generator.sample.PersonGroovy',
-        'cz.habarta.typescript.generator.sample.PersonKt',
-        'cz.habarta.typescript.generator.sample.PersonScala',
+            'cz.habarta.typescript.generator.sample.Person',
+            'cz.habarta.typescript.generator.sample.PersonGroovy',
+            'cz.habarta.typescript.generator.sample.PersonKt',
+            'cz.habarta.typescript.generator.sample.PersonScala',
     ]
     jsonLibrary = 'jackson2'
     outputKind = 'module'
     excludeClasses = [
-        'groovy.lang.GroovyObject',
-        'groovy.lang.MetaClass',
-        'java.io.Serializable',
-        'scala.Equals',
-        'scala.Product',
-        'scala.Serializable',
+            'groovy.lang.GroovyObject',
+            'groovy.lang.MetaClass',
+            'java.io.Serializable',
+            'scala.Equals',
+            'scala.Product',
+            'scala.Serializable',
     ]
     jackson2Modules = [
-        'com.fasterxml.jackson.module.scala.DefaultScalaModule',
-        'com.fasterxml.jackson.module.kotlin.KotlinModule',
+            'com.fasterxml.jackson.module.scala.DefaultScalaModule',
+            'com.fasterxml.jackson.module.kotlin.KotlinModule',
     ]
 }
 

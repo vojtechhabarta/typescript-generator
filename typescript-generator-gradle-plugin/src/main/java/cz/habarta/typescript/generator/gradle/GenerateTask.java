@@ -34,10 +34,13 @@ import java.util.List;
 import java.util.Set;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Task;
+import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.TaskAction;
 
 
-public class GenerateTask extends DefaultTask {
+public abstract class GenerateTask extends DefaultTask {
 
     public String outputFile;
     public TypeScriptFileType outputFileType;
@@ -129,6 +132,9 @@ public class GenerateTask extends DefaultTask {
     public boolean jackson2ModuleDiscovery;
     public List<String> jackson2Modules;
     public Logger.Level loggingLevel;
+
+    @Classpath
+    abstract ConfigurableFileCollection getClasspath();
 
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
@@ -229,14 +235,9 @@ public class GenerateTask extends DefaultTask {
 
         // class loader
         final Set<URL> urls = new LinkedHashSet<>();
-        for (Task task : getProject().getTasks()) {
-            if (task.getName().startsWith("compile") && !task.getName().startsWith("compileTest")) {
-                for (File file : task.getOutputs().getFiles()) {
-                    urls.add(file.toURI().toURL());
-                }
-            }
+        for (File file : getClasspath()) {
+            urls.add(file.toURI().toURL());
         }
-        urls.addAll(getFilesFromConfiguration("compileClasspath"));
 
         try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
 
@@ -276,5 +277,5 @@ public class GenerateTask extends DefaultTask {
             return Collections.emptyList();
         }
     }
-
 }
+
