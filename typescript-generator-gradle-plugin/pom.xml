@@ -13,51 +13,10 @@
     <name>typescript-generator-gradle-plugin</name>
 
     <properties>
-        <gradle.version>5.6</gradle.version>
+        <gradle.version>7.3</gradle.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-core</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-core-api</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-model-core</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-base-services</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-base-services-groovy</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-logging</artifactId>
-            <version>${gradle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.21</version>
-        </dependency>
         <dependency>
             <groupId>cz.habarta.typescript-generator</groupId>
             <artifactId>typescript-generator-core</artifactId>
@@ -74,17 +33,28 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>dev.gradleplugins</groupId>
+            <artifactId>gradle-test-kit</artifactId>
+            <version>8.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_2.13</artifactId>
+            <version>2.14.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <version>2.14.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.gradle/gradle-test-kit -->
-        <dependency>
-            <groupId>org.gradle</groupId>
-            <artifactId>gradle-test-kit</artifactId>
-            <version>6.1.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

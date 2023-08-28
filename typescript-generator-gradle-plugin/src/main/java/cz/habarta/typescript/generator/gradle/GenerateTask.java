@@ -1,48 +1,27 @@
 
 package cz.habarta.typescript.generator.gradle;
 
-import cz.habarta.typescript.generator.ClassMapping;
-import cz.habarta.typescript.generator.DateMapping;
-import cz.habarta.typescript.generator.EnumMapping;
-import cz.habarta.typescript.generator.GsonConfiguration;
-import cz.habarta.typescript.generator.IdentifierCasing;
-import cz.habarta.typescript.generator.Input;
-import cz.habarta.typescript.generator.Jackson2Configuration;
-import cz.habarta.typescript.generator.JsonLibrary;
-import cz.habarta.typescript.generator.JsonbConfiguration;
-import cz.habarta.typescript.generator.Logger;
-import cz.habarta.typescript.generator.MapMapping;
-import cz.habarta.typescript.generator.ModuleDependency;
-import cz.habarta.typescript.generator.NullabilityDefinition;
-import cz.habarta.typescript.generator.OptionalProperties;
-import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
-import cz.habarta.typescript.generator.Output;
-import cz.habarta.typescript.generator.RestNamespacing;
-import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.StringQuotes;
-import cz.habarta.typescript.generator.TypeScriptFileType;
-import cz.habarta.typescript.generator.TypeScriptGenerator;
-import cz.habarta.typescript.generator.TypeScriptOutputKind;
+import cz.habarta.typescript.generator.*;
 import cz.habarta.typescript.generator.util.Utils;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.TaskAction;
+import org.jetbrains.annotations.NotNull;
+
+import javax.inject.Inject;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.Task;
-import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.TaskAction;
 
 
 public abstract class GenerateTask extends DefaultTask {
 
-    public String outputFile;
     public TypeScriptFileType outputFileType;
     public TypeScriptOutputKind outputKind;
     public String module;
@@ -133,8 +112,19 @@ public abstract class GenerateTask extends DefaultTask {
     public List<String> jackson2Modules;
     public Logger.Level loggingLevel;
 
+    public String projectName;
+
+    private final ProjectLayout projectLayout;
+
     @Classpath
     abstract ConfigurableFileCollection getClasspath();
+
+    public String outputFile;
+
+    @Inject
+    public GenerateTask(ProjectLayout projectLayout) {
+        this.projectLayout = projectLayout;
+    }
 
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
@@ -206,7 +196,7 @@ public abstract class GenerateTask extends DefaultTask {
         settings.primitivePropertiesRequired = primitivePropertiesRequired;
         settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
-        settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
+        settings.npmName = npmName == null && generateNpmPackageJson ? projectName : npmName;
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
         settings.npmTypescriptVersion = npmTypescriptVersion;
         settings.npmBuildScript = npmBuildScript;
@@ -221,6 +211,7 @@ public abstract class GenerateTask extends DefaultTask {
         return settings;
     }
 
+
     @TaskAction
     public void generate() throws Exception {
         if (outputKind == null) {
@@ -232,50 +223,54 @@ public abstract class GenerateTask extends DefaultTask {
 
         TypeScriptGenerator.setLogger(new Logger(loggingLevel));
         TypeScriptGenerator.printVersion();
+        try (URLClassLoader classLoader = createClassloader()) {
+            final Settings settings = createSettings(classLoader);
+            final Input.Parameters parameters = parameters(classLoader, settings);
+            File finalOutputFile = calculateOutputFile(settings);
+            settings.validateFileName(finalOutputFile);
+            new TypeScriptGenerator(settings).generateTypeScript(Input.from(parameters), Output.to(finalOutputFile));
+        }
+    }
 
+    @NotNull
+    private URLClassLoader createClassloader() throws MalformedURLException {
         // class loader
         final Set<URL> urls = new LinkedHashSet<>();
         for (File file : getClasspath()) {
             urls.add(file.toURI().toURL());
         }
-
-        try (URLClassLoader classLoader = Settings.createClassLoader(getProject().getName(), urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader())) {
-
-            final Settings settings = createSettings(classLoader);
-
-            final Input.Parameters parameters = new Input.Parameters();
-            parameters.classNames = classes;
-            parameters.classNamePatterns = classPatterns;
-            parameters.classesWithAnnotations = classesWithAnnotations;
-            parameters.classesImplementingInterfaces = classesImplementingInterfaces;
-            parameters.classesExtendingClasses = classesExtendingClasses;
-            parameters.jaxrsApplicationClassName = classesFromJaxrsApplication;
-            parameters.automaticJaxrsApplication = classesFromAutomaticJaxrsApplication;
-            parameters.isClassNameExcluded = settings.getExcludeFilter();
-            parameters.classLoader = classLoader;
-            parameters.scanningAcceptedPackages = scanningAcceptedPackages;
-            parameters.debug = loggingLevel == Logger.Level.Debug;
-
-            final File output = outputFile != null
-                    ? getProject().file(outputFile)
-                    : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
-            settings.validateFileName(output);
-
-            new TypeScriptGenerator(settings).generateTypeScript(Input.from(parameters), Output.to(output));
-        }
+        return Settings.createClassLoader(projectName, urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
     }
 
-    private List<URL> getFilesFromConfiguration(String configuration) {
-        try {
-            final List<URL> urls = new ArrayList<>();
-            for (File file : getProject().getConfigurations().getAt(configuration).getFiles()) {
-                urls.add(file.toURI().toURL());
-            }
-            return urls;
-        } catch (Exception e) {
-            TypeScriptGenerator.getLogger().warning(String.format("Cannot get file names from configuration '%s': %s", configuration, e.getMessage()));
-            return Collections.emptyList();
-        }
+    @NotNull
+    private File calculateOutputFile(Settings settings) {
+        return new File(outputFile != null ? outputFile : defaultOutputFile(settings));
+    }
+
+    @NotNull
+    private String defaultOutputFile(Settings settings) {
+        return projectLayout.getBuildDirectory().dir("typescript-generator").get().file(projectName + ext(settings.outputFileType)).getAsFile().getAbsolutePath();
+    }
+
+    @NotNull
+    private Input.Parameters parameters(URLClassLoader classLoader, Settings settings) {
+        final Input.Parameters parameters = new Input.Parameters();
+        parameters.classNames = classes;
+        parameters.classNamePatterns = classPatterns;
+        parameters.classesWithAnnotations = classesWithAnnotations;
+        parameters.classesImplementingInterfaces = classesImplementingInterfaces;
+        parameters.classesExtendingClasses = classesExtendingClasses;
+        parameters.jaxrsApplicationClassName = classesFromJaxrsApplication;
+        parameters.automaticJaxrsApplication = classesFromAutomaticJaxrsApplication;
+        parameters.isClassNameExcluded = settings.getExcludeFilter();
+        parameters.classLoader = classLoader;
+        parameters.scanningAcceptedPackages = scanningAcceptedPackages;
+        parameters.debug = loggingLevel == Logger.Level.Debug;
+        return parameters;
+    }
+
+    private String ext(TypeScriptFileType outputFileType) {
+        return outputFileType.equals(TypeScriptFileType.implementationFile) ? ".ts" : ".d.ts";
     }
 }
 

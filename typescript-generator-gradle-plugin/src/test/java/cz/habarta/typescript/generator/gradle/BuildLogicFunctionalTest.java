@@ -1,100 +1,86 @@
 package cz.habarta.typescript.generator.gradle;
 
-import static org.gradle.testkit.runner.GradleRunner.create;
-import static org.junit.jupiter.api.Assertions.*;
-
+import org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import sun.misc.Unsafe;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class BuildLogicFunctionalTest {
 
-    @TempDir File testProjectDir;
-    private File settingsFile;
+
+    String sampleGradle = "/Users/igor/typescript-generator/sample-gradle";
+    File sourceDir = new File(sampleGradle + "/src");
+    @TempDir
+    File testProjectDir;
     private File buildFile;
+    private File classpathFile;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         // settingsFile = new File(testProjectDir, "settings.gradle");
-        buildFile = new File(testProjectDir, "build.gradle");
-    }
 
+        buildFile = new File(testProjectDir, "build.gradle");
+        classpathFile = new File(new File(BuildLogicFunctionalTest.class.getResource("/build.gradle.template").getPath()).getParent(), "plugin-under-test-metadata.properties");
+    }
 
 
     @Test
     public void testConfigurationCache() throws IOException {
+        writeFile(classpathFile, "implementation-classpath=" + getClasspath(testProjectDir).stream().collect(Collectors.joining(File.pathSeparator)));
+        FileUtils.copyToFile(getClass().getResourceAsStream("/build.gradle.template"), buildFile);
+        FileUtils.copyDirectory(sourceDir, new File(testProjectDir, "src"));
+        assertTrue(runGradle("assemble").getOutput().contains("BUILD SUCCESSFUL"));
+        BuildResult generateTypeScript = runGradle("generateTypeScript");
+        assertTrue(generateTypeScript.getOutput().contains("BUILD SUCCESSFUL"));
+    }
 
-        String buildFileContent = "'prepareBuildGradleFile(\n" +
-                "                plugins {\n" +
-                "        id 'java'\n" +
-                "                id 'groovy'\n" +
-                "                id \"org.jetbrains.kotlin.jvm\" version \"1.8.10\"\n" +
-                "                id 'scala'}\n" +
-                "\n" +
-                "\n" +
-                "    apply plugin: cz.habarta.typescript.generator.gradle.TypeScriptGeneratorPlugin\n" +
-                "\n" +
-                "        version = '3.0'\n" +
-                "        sourceCompatibility = 11\n" +
-                "        targetCompatibility = 11\n" +
-                "\n" +
-                "        repositories {\n" +
-                "        mavenCentral()\n" +
-                "        }\n" +
-                "\n" +
-                "    generateTypeScript {\n" +
-                "        classes = [\n" +
-                "            'cz.habarta.typescript.generator.sample.Person',\n" +
-                "            'cz.habarta.typescript.generator.sample.PersonGroovy',\n" +
-                "            'cz.habarta.typescript.generator.sample.PersonKt',\n" +
-                "            'cz.habarta.typescript.generator.sample.PersonScala',\n" +
-                "        ]\n" +
-                "        jsonLibrary = 'jackson2'\n" +
-                "        outputKind = 'module'\n" +
-                "        excludeClasses = [\n" +
-                "            'groovy.lang.GroovyObject',\n" +
-                "            'groovy.lang.MetaClass',\n" +
-                "            'java.io.Serializable',\n" +
-                "            'scala.Equals',\n" +
-                "            'scala.Product',\n" +
-                "            'scala.Serializable',\n" +
-                "        ]\n" +
-                "        jackson2Modules = [\n" +
-                "            'com.fasterxml.jackson.module.scala.DefaultScalaModule',\n" +
-                "            'com.fasterxml.jackson.module.kotlin.KotlinModule',\n" +
-                "        ]\n" +
-                "    }\n" +
-                "\n" +
-                "    build.dependsOn generateTypeScript";
-        writeFile(buildFile, buildFileContent);
-
-        BuildResult result = create()
+    private BuildResult runGradle(String task) {
+        return GradleRunner.create()
                 .withProjectDir(testProjectDir)
-                .withGradleVersion("8.1")
+                .withGradleVersion("8.2.1")
                 .withPluginClasspath()
-                .withDebug(true)
                 .withArguments(
-                        "--stacktrace",
-                        "--info",
+                            "--stacktrace",
+                            "--info",
                         "--configuration-cache",
-                        "generateJava",
-                        "build"
+                        task
                 )
                 .build();
+    }
 
-        assertTrue(result.getOutput().contains("BUILD SUCCESSFUL"));
+    private static List<String> getClasspath(File projectDir) {
+        List<String> list = new ArrayList<>(Arrays.asList(getUrls(ClassLoader.getSystemClassLoader())).stream().map(URL::getFile).collect(Collectors.toList()));
+        list.addAll(buildDirs(projectDir.toString()));
+        return list;
+    }
+
+    @NotNull
+    private static List<String> buildDirs(String sampleGradle) {
+        List<String> projectBuildDirs = new ArrayList<>();
+        projectBuildDirs.add(sampleGradle + "/build/classes/java/main/");
+        projectBuildDirs.add(sampleGradle + "/build/classes/groovy/main/");
+        projectBuildDirs.add(sampleGradle + "/build/classes/scala/main/");
+        projectBuildDirs.add(sampleGradle + "/build/classes/kotlin/main/");
+        return projectBuildDirs;
     }
 
     private void writeFile(File destination, String content) throws IOException {
@@ -107,6 +93,37 @@ public class BuildLogicFunctionalTest {
                 output.close();
             }
         }
+    }
+
+    public static URL[] getUrls(ClassLoader classLoader) {
+        if (classLoader instanceof URLClassLoader) {
+            return ((URLClassLoader) classLoader).getURLs();
+        }
+
+        // jdk9
+        if (classLoader.getClass().getName().startsWith("jdk.internal.loader.ClassLoaders$")) {
+            try {
+                Field field = Unsafe.class.getDeclaredField("theUnsafe");
+                field.setAccessible(true);
+                Unsafe unsafe = (Unsafe) field.get(null);
+
+                // jdk.internal.loader.ClassLoaders.AppClassLoader.ucp
+                Field ucpField = classLoader.getClass().getSuperclass().getDeclaredField("ucp");
+                long ucpFieldOffset = unsafe.objectFieldOffset(ucpField);
+                Object ucpObject = unsafe.getObject(classLoader, ucpFieldOffset);
+
+                // jdk.internal.loader.URLClassPath.path
+                Field pathField = ucpField.getType().getDeclaredField("path");
+                long pathFieldOffset = unsafe.objectFieldOffset(pathField);
+                ArrayList<URL> path = (ArrayList<URL>) unsafe.getObject(ucpObject, pathFieldOffset);
+
+                return path.toArray(new URL[path.size()]);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
     }
 }
 
