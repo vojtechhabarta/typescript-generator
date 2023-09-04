@@ -60,10 +60,10 @@ public class GradlePluginClasspathProvider {
     @NotNull
     private static List<String> buildDirs(String sampleGradleDir) {
         List<String> buildDirs = new ArrayList<>();
-        buildDirs.add(sampleGradleDir + "/build/classes/java/main/");
-        buildDirs.add(sampleGradleDir + "/build/classes/groovy/main/");
-        buildDirs.add(sampleGradleDir + "/build/classes/scala/main/");
-        buildDirs.add(sampleGradleDir + "/build/classes/kotlin/main/");
+        buildDirs.add(sampleGradleDir + File.separator +"build" + File.separator + "classes" + File.separator + "java" + File.separator + "main" + File.separator);
+        buildDirs.add(sampleGradleDir + File.separator +"build"+ File.separator +"classes"+ File.separator +"groovy"+ File.separator +"main"+ File.separator);
+        buildDirs.add(sampleGradleDir + File.separator +"build"+ File.separator +"classes"+ File.separator +"scala"+ File.separator +"main"+ File.separator);
+        buildDirs.add(sampleGradleDir + File.separator +"build"+ File.separator +"classes"+ File.separator +"kotlin"+ File.separator +"main"+ File.separator);;
         return buildDirs;
     }
 
