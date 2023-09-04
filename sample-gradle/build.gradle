@@ -14,7 +14,7 @@ plugins {
     id 'groovy'
     id "org.jetbrains.kotlin.jvm" version "1.8.10"
     id 'scala'
-    /*prod*/ id 'cz.habarta.typescript-generator' version '3.2.1263'
+    /*prod*/ id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
 }
 
 // /*dev*/ apply plugin: 'cz.habarta.typescript-generator'
