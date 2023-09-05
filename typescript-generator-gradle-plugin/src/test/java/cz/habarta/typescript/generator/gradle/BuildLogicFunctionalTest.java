@@ -39,7 +39,7 @@ public class BuildLogicFunctionalTest {
 
     @Test
     public void shouldWorkWithConfigurationCache() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String classpath = "implementation-classpath=" + String.join(File.pathSeparator, getClasspath(testProjectDir));
+        String classpath = "implementation-classpath=" + String.join(":", getClasspath(testProjectDir));
         System.out.println("Classpath: " + classpath);
         writeFile(classpathFile, classpath);
         FileUtils.copyToFile(buildGradleTemplateUrl().openStream(), buildFile);
