@@ -1,26 +1,32 @@
 package cz.habarta.typescript.generator.gradle;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.io.FileUtils.readFileToString;
+
 public class GradlePluginClasspathProvider {
 
     public static List<String> getClasspath(File projectDir) throws NoSuchFieldException, IllegalAccessException {
-        List<String> list = GradlePluginClasspathProvider.getUrls(ClassLoader.getSystemClassLoader()).stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
-        list.addAll(buildDirs(projectDir.toString()));
-        return list;
+        List<File> list = GradlePluginClasspathProvider.getUrls(ClassLoader.getSystemClassLoader());
+        list.addAll(buildDirs(projectDir));
+        return list.stream().map(file -> path(file)).collect(Collectors.toList());
+    }
+
+    @NotNull
+    private static String path(File file) {
+        String path = file.getAbsolutePath();
+        return path.replace("\\", "\\\\");
     }
 
     public static List<File> getUrls(ClassLoader classLoader) throws NoSuchFieldException, IllegalAccessException {
@@ -77,12 +83,12 @@ public class GradlePluginClasspathProvider {
 
 
     @NotNull
-    private static List<String> buildDirs(String sampleGradleDir) {
-        List<String> buildDirs = new ArrayList<>();
-        buildDirs.add(String.join(File.separator, sampleGradleDir, "build", "classes", "java", "main"));
-        buildDirs.add(String.join(File.separator, sampleGradleDir, "build", "classes", "groovy", "main"));
-        buildDirs.add(String.join(File.separator, sampleGradleDir, "build", "classes", "scala", "main"));
-        buildDirs.add(String.join(File.separator, sampleGradleDir, "build", "classes", "kotlin", "main"));
+    private static List<File> buildDirs(File sampleGradleDir) {
+        List<File> buildDirs = new ArrayList<>();
+        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "java", "main"));
+        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "groovy", "main"));
+        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "scala", "main"));
+        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "kotlin", "main"));
 
         return buildDirs;
     }

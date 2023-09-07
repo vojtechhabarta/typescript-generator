@@ -39,7 +39,7 @@ public class BuildLogicFunctionalTest {
 
     @Test
     public void shouldWorkWithConfigurationCache() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String classpath = "implementation-classpath=" + String.join(":", getClasspath(testProjectDir));
+        String classpath = "implementation-classpath=" + String.join(";", getClasspath(testProjectDir));
         System.out.println("Classpath: " + classpath);
         writeFile(classpathFile, classpath);
         FileUtils.copyToFile(buildGradleTemplateUrl().openStream(), buildFile);
@@ -50,12 +50,12 @@ public class BuildLogicFunctionalTest {
         assertTrue(generateTypeScript.getOutput().contains("BUILD SUCCESSFUL"));
 
         String testFileName = testProjectDir.getName() + ".d.ts";
-        String testFilePath = testProjectDir.toString() + "/build/typescript-generator/" + testFileName;
+        String testFilePath = testProjectDir + File.separator + "build" + File.separator + "typescript-generator" + File.separator + testFileName;
         String schema = FileUtils.readFileToString(new File(testFilePath) , StandardCharsets.UTF_8);
-        assertThat(schema, containsString("export interface Person {\n"));
-        assertThat(schema, containsString("export interface PersonGroovy {\n"));
-        assertThat(schema, containsString("export interface PersonKt {\n"));
-        assertThat(schema, containsString("export interface PersonScala {\n"));
+        assertThat(schema, containsString("export interface Person {"));
+        assertThat(schema, containsString("export interface PersonGroovy {"));
+        assertThat(schema, containsString("export interface PersonKt {"));
+        assertThat(schema, containsString("export interface PersonScala {"));
 
     }
 
@@ -65,6 +65,7 @@ public class BuildLogicFunctionalTest {
                 .withGradleVersion("8.2.1")
                 .withPluginClasspath()
                 .withArguments(
+                       // "-Dorg.gradle.jvmargs='-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005'",
                         "--stacktrace",
                         "--info",
                         "--configuration-cache",
