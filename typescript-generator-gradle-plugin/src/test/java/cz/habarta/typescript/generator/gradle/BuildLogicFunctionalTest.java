@@ -17,6 +17,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import static cz.habarta.typescript.generator.gradle.GradlePluginClasspathProvider.getClasspath;
+import static java.io.File.pathSeparator;
+import static java.io.File.separator;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -39,7 +41,7 @@ public class BuildLogicFunctionalTest {
 
     @Test
     public void shouldWorkWithConfigurationCache() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String classpath = "implementation-classpath=" + String.join(";", getClasspath(testProjectDir));
+        String classpath = "implementation-classpath=" + String.join(pathSeparator, getClasspath(testProjectDir));
         System.out.println("Classpath: " + classpath);
         writeFile(classpathFile, classpath);
         FileUtils.copyToFile(buildGradleTemplateUrl().openStream(), buildFile);
@@ -50,7 +52,7 @@ public class BuildLogicFunctionalTest {
         assertTrue(generateTypeScript.getOutput().contains("BUILD SUCCESSFUL"));
 
         String testFileName = testProjectDir.getName() + ".d.ts";
-        String testFilePath = testProjectDir + File.separator + "build" + File.separator + "typescript-generator" + File.separator + testFileName;
+        String testFilePath = testProjectDir + separator + "build" + separator + "typescript-generator" + separator + testFileName;
         String schema = FileUtils.readFileToString(new File(testFilePath) , StandardCharsets.UTF_8);
         assertThat(schema, containsString("export interface Person {"));
         assertThat(schema, containsString("export interface PersonGroovy {"));
