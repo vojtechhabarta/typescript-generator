@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
 import com.fasterxml.jackson.databind.deser.CreatorProperty;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
+import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -45,6 +46,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
@@ -277,6 +279,10 @@ public class Jackson2Parser extends ModelParser {
                         beanProperty,
                         settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
 
+                if( settings.includePropertyFunctionImpl != null && !settings.includePropertyFunctionImpl.apply( member ) ) {
+                    continue;
+                }
+                
                 if (!isAnnotatedPropertyIncluded(beanProperty::getAnnotation, sourceClass.type.getName() + "." + beanProperty.getName())) {
                     continue;
                 }
@@ -550,7 +556,10 @@ public class Jackson2Parser extends ModelParser {
         try {
             final DefaultSerializerProvider.Impl serializerProvider = new DefaultSerializerProvider.Impl()
                     .createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
-            final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider, javaType);
+            JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider, javaType);
+            if (jsonSerializer != null && jsonSerializer instanceof StdDelegatingSerializer) {
+                jsonSerializer = ((StdDelegatingSerializer ) jsonSerializer).getDelegatee();
+            }
             if (jsonSerializer != null && jsonSerializer instanceof BeanSerializer) {
                 return new BeanSerializerHelper((BeanSerializer) jsonSerializer);
             } else {
@@ -566,7 +575,10 @@ public class Jackson2Parser extends ModelParser {
             final DeserializationContext deserializationContext = new DefaultDeserializationContext.Impl(objectMapper.getDeserializationContext().getFactory())
                     .createInstance(objectMapper.getDeserializationConfig(), null, null);
             final BeanDescription beanDescription = deserializationContext.getConfig().introspect(javaType);
-            final JsonDeserializer<?> jsonDeserializer = BeanDeserializerFactory.instance.createBeanDeserializer(deserializationContext, javaType, beanDescription);
+            JsonDeserializer<?> jsonDeserializer = BeanDeserializerFactory.instance.createBeanDeserializer(deserializationContext, javaType, beanDescription);
+            if (jsonDeserializer != null && jsonDeserializer instanceof StdDelegatingDeserializer) {
+                jsonDeserializer = ((StdDelegatingDeserializer<?> ) jsonDeserializer).getDelegatee();
+            }
             if (jsonDeserializer != null && jsonDeserializer instanceof BeanDeserializer) {
                 return new BeanDeserializerHelper((BeanDeserializer) jsonDeserializer);
             } else {
