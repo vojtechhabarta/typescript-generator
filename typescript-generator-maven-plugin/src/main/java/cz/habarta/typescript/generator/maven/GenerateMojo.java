@@ -608,6 +608,12 @@ public class GenerateMojo extends AbstractMojo {
     private String restOptionsType;
 
     /**
+     * If <code>true</code> REST method parameters marked as headers will be parsed. Otherwise, they will be ignored.
+     */
+    @Parameter
+    private boolean restHeaderArgumentsParsed;
+
+    /**
      * Specifies custom class implementing {@link cz.habarta.typescript.generator.TypeProcessor}.
      * This allows to customize how Java types are mapped to TypeScript.
      * For example it is possible to implement TypeProcessor
@@ -915,6 +921,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.setRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
         settings.restResponseType = restResponseType;
         settings.setRestOptionsType(restOptionsType);
+        settings.setRestHeaderArgumentsParsed(restHeaderArgumentsParsed);
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;

@@ -53,7 +53,7 @@ import cz.habarta.typescript.generator.parser.PropertyAccess;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
-import cz.habarta.typescript.generator.parser.RestQueryParam;
+import cz.habarta.typescript.generator.parser.RestParam;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
@@ -629,6 +629,7 @@ public class ModelCompiler {
                                 new TsProperty("queryParams", new TsType.OptionalType(TsType.Any)),
                                 new TsProperty("data", new TsType.OptionalType(TsType.Any)),
                                 new TsProperty("copyFn", new TsType.OptionalType(new TsType.FunctionType(Arrays.asList(new TsParameter("data", returnGenericVariable)), returnGenericVariable))),
+                                new TsProperty("headers", new TsType.OptionalType(TsType.Any)),
                                 optionsType != null ? new TsProperty("options", new TsType.OptionalType(optionsType)) : null
                         ))
                 ), new TsType.GenericReferenceType(responseSymbol, returnGenericVariable), null, null)
@@ -735,57 +736,14 @@ public class ModelCompiler {
             parameters.add(processParameter(symbolTable, method, method.getEntityParam()));
         }
         // query params
-        final List<RestQueryParam> queryParams = method.getQueryParams();
-        final TsParameterModel queryParameter;
-        if (queryParams != null && !queryParams.isEmpty()) {
-            final List<TsType> types = new ArrayList<>();
-            if (queryParams.stream().anyMatch(param -> param instanceof RestQueryParam.Map)) {
-                types.add(new TsType.IndexedArrayType(TsType.String, TsType.Any));
-            } else {
-                final List<TsProperty> currentSingles = new ArrayList<>();
-                final Runnable flushSingles = () -> {
-                    if (!currentSingles.isEmpty()) {
-                        types.add(new TsType.ObjectType(currentSingles));
-                        currentSingles.clear();
-                    }
-                };
-                for (RestQueryParam restQueryParam : queryParams) {
-                    if (restQueryParam instanceof RestQueryParam.Single) {
-                        final MethodParameterModel queryParam = ((RestQueryParam.Single) restQueryParam).getQueryParam();
-                        final TsType type = typeFromJava(symbolTable, queryParam.getType(), method.getName(), method.getOriginClass());
-                        currentSingles.add(new TsProperty(queryParam.getName(), restQueryParam.required ? type : new TsType.OptionalType(type)));
-                    }
-                    if (restQueryParam instanceof RestQueryParam.Bean) {
-                        final BeanModel queryBean = ((RestQueryParam.Bean) restQueryParam).getBean();
-                        flushSingles.run();
-                        final Symbol queryParamsSymbol = symbolTable.getSymbol(queryBean.getOrigin(), "QueryParams");
-                        if (tsModel.getBean(queryParamsSymbol) == null) {
-                            tsModel.getBeans().add(new TsBeanModel(
-                                    queryBean.getOrigin(),
-                                    TsBeanCategory.Data,
-                                    /*isClass*/false,
-                                    queryParamsSymbol,
-                                    /*typeParameters*/null,
-                                    /*parent*/null,
-                                    /*extendsList*/null,
-                                    /*implementsList*/null,
-                                    processProperties(symbolTable, null, queryBean),
-                                    /*constructor*/null,
-                                    /*methods*/null,
-                                    /*comments*/null
-                            ));
-                        }
-                        types.add(new TsType.ReferenceType(queryParamsSymbol));
-                    }
-                }
-                flushSingles.run();
-            }
-            boolean allQueryParamsOptional = queryParams.stream().noneMatch(queryParam -> queryParam.required);
-            TsType.IntersectionType queryParamType = new TsType.IntersectionType(types);
-            queryParameter = new TsParameterModel("queryParams", allQueryParamsOptional ? new TsType.OptionalType(queryParamType) : queryParamType);
+        final TsParameterModel queryParameter = convertRestParams(method.getQueryParams(), symbolTable, method, tsModel, "queryParams", "QueryParams");
+        if(queryParameter != null){
             parameters.add(queryParameter);
-        } else {
-            queryParameter = null;
+        }
+        // body params
+        final TsParameterModel headersParameter = convertRestParams(method.getHeaders(), symbolTable, method, tsModel, "headers", "Headers");
+        if(headersParameter != null){
+            parameters.add(headersParameter);
         }
         if (optionsType != null) {
             final TsParameterModel optionsParameter = new TsParameterModel("options", new TsType.OptionalType(optionsType));
@@ -815,6 +773,7 @@ public class ModelCompiler {
                                     new TsPropertyDefinition("url", processPathTemplate(pathTemplate)),
                                     queryParameter != null ? new TsPropertyDefinition("queryParams", new TsIdentifierReference("queryParams")) : null,
                                     method.getEntityParam() != null ? new TsPropertyDefinition("data", new TsIdentifierReference(method.getEntityParam().getName())) : null,
+                                    headersParameter != null ? new TsPropertyDefinition("headers", new TsIdentifierReference("headers")) : null,
                                     optionsType != null ? new TsPropertyDefinition("options", new TsIdentifierReference("options")) : null
                             )
                     )
@@ -825,6 +784,57 @@ public class ModelCompiler {
         // method
         final TsMethodModel tsMethodModel = new TsMethodModel(method.getName() + nameSuffix, TsModifierFlags.None, null, parameters, wrappedReturnType, body, comments);
         return tsMethodModel;
+    }
+
+    private TsParameterModel convertRestParams(List<RestParam> restParams, SymbolTable symbolTable, RestMethodModel method, TsModel tsModel, String parameterName, String beanSuffix){
+        if (restParams == null || restParams.isEmpty()){
+            return null;
+        }
+        final List<TsType> types = new ArrayList<>();
+        if (restParams.stream().anyMatch(param -> param instanceof RestParam.Map)) {
+            types.add(new TsType.IndexedArrayType(TsType.String, TsType.Any));
+        } else {
+            final List<TsProperty> currentSingles = new ArrayList<>();
+            final Runnable flushSingles = () -> {
+                if (!currentSingles.isEmpty()) {
+                    types.add(new TsType.ObjectType(currentSingles));
+                    currentSingles.clear();
+                }
+            };
+            for (RestParam restParam : restParams) {
+                if (restParam instanceof RestParam.Single) {
+                    final MethodParameterModel restParamMethodParameterModel = ((RestParam.Single) restParam).getRestParam();
+                    final TsType type = typeFromJava(symbolTable, restParamMethodParameterModel.getType(), method.getName(), method.getOriginClass());
+                    currentSingles.add(new TsProperty(restParamMethodParameterModel.getName(), restParam.required ? type : new TsType.OptionalType(type)));
+                }
+                if (restParam instanceof RestParam.Bean) {
+                    final BeanModel paramBean = ((RestParam.Bean) restParam).getBean();
+                    flushSingles.run();
+                    final Symbol paramsSymbol = symbolTable.getSymbol(paramBean.getOrigin(), beanSuffix);
+                    if (tsModel.getBean(paramsSymbol) == null) {
+                        tsModel.getBeans().add(new TsBeanModel(
+                                paramBean.getOrigin(),
+                                TsBeanCategory.Data,
+                                /*isClass*/false,
+                                paramsSymbol,
+                                /*typeParameters*/null,
+                                /*parent*/null,
+                                /*extendsList*/null,
+                                /*implementsList*/null,
+                                processProperties(symbolTable, null, paramBean),
+                                /*constructor*/null,
+                                /*methods*/null,
+                                /*comments*/null
+                        ));
+                    }
+                    types.add(new TsType.ReferenceType(paramsSymbol));
+                }
+            }
+            flushSingles.run();
+        }
+        boolean allParamsOptional = restParams.stream().noneMatch(param -> param.required);
+        TsType.IntersectionType paramType = new TsType.IntersectionType(types);
+        return new TsParameterModel(parameterName, allParamsOptional ? new TsType.OptionalType(paramType) : paramType);
     }
 
     private TsParameterModel processParameter(SymbolTable symbolTable, MethodModel method, MethodParameterModel parameter) {

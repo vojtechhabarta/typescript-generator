@@ -2,28 +2,28 @@
 package cz.habarta.typescript.generator.parser;
 
 
-public abstract class RestQueryParam {
+public abstract class RestParam {
 
     public boolean required;
 
-    RestQueryParam(boolean required) {
+    RestParam(boolean required) {
         this.required = required;
     }
 
-    public static class Single extends RestQueryParam {
-        private final MethodParameterModel queryParam;
+    public static class Single extends RestParam {
+        private final MethodParameterModel restParam;
 
-        public Single(MethodParameterModel queryParam, boolean required) {
+        public Single(MethodParameterModel restParam, boolean required) {
             super(required);
-            this.queryParam = queryParam;
+            this.restParam = restParam;
         }
 
-        public MethodParameterModel getQueryParam() {
-            return queryParam;
+        public MethodParameterModel getRestParam() {
+            return restParam;
         }
     }
 
-    public static class Bean extends RestQueryParam {
+    public static class Bean extends RestParam {
         private final BeanModel bean;
 
         // Only used in JAX-Rs, so optional
@@ -37,7 +37,7 @@ public abstract class RestQueryParam {
         }
     }
 
-    public static class Map extends RestQueryParam {
+    public static class Map extends RestParam {
         public Map(boolean required) {
             super(required);
         }

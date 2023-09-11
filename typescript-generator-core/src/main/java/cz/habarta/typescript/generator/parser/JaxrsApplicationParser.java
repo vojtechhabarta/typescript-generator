@@ -174,11 +174,11 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 }
             }
             // query parameters
-            final List<RestQueryParam> queryParams = new ArrayList<>();
+            final List<RestParam> queryParams = new ArrayList<>();
             for (Parameter param : method.getParameters()) {
                 final QueryParam queryParamAnnotation = getRsAnnotation(param, QueryParam.class);
                 if (queryParamAnnotation != null) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()), false));
+                    queryParams.add(new RestParam.Single(new MethodParameterModel(queryParamAnnotation.value(), param.getParameterizedType()), false));
                     foundType(result, param.getParameterizedType(), resourceClass, method.getName());
                 }
                 final BeanParam beanParamAnnotation = getRsAnnotation(param, BeanParam.class);
@@ -186,9 +186,31 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                     final Class<?> beanParamClass = param.getType();
                     final BeanModel paramBean = getQueryParameters(beanParamClass);
                     if (paramBean != null) {
-                        queryParams.add(new RestQueryParam.Bean(paramBean));
+                        queryParams.add(new RestParam.Bean(paramBean));
                         for (PropertyModel property : paramBean.getProperties()) {
                             foundType(result, property.getType(), beanParamClass, property.getName());
+                        }
+                    }
+                }
+            }
+            // header parameters
+            final List<RestParam> headers = new ArrayList<>();
+            if(settings.restHeaderArgumentsParsed){
+                for (Parameter param : method.getParameters()) {
+                    final HeaderParam headerParamAnnotation = getRsAnnotation(param, HeaderParam.class);
+                    if (headerParamAnnotation != null) {
+                        headers.add(new RestParam.Single(new MethodParameterModel(headerParamAnnotation.value(), param.getParameterizedType()), false));
+                        foundType(result, param.getParameterizedType(), resourceClass, method.getName());
+                    }
+                    final BeanParam beanParamAnnotation = getRsAnnotation(param, BeanParam.class);
+                    if (beanParamAnnotation != null) {
+                        final Class<?> beanParamClass = param.getType();
+                        final BeanModel paramBean = getHeaderParameters(beanParamClass);
+                        if (paramBean != null) {
+                            headers.add(new RestParam.Bean(paramBean));
+                            for (PropertyModel property : paramBean.getProperties()) {
+                                foundType(result, property.getType(), beanParamClass, property.getName());
+                            }
                         }
                     }
                 }
@@ -234,7 +256,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
             model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType, method,
-                    context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
+                    context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments, headers));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
         if (pathAnnotation != null && httpMethod == null) {
@@ -267,6 +289,36 @@ public class JaxrsApplicationParser extends RestApplicationParser {
                 final Method writeMethod = propertyDescriptor.getWriteMethod();
                 if (writeMethod != null) {
                     final QueryParam annotation = getRsAnnotation(writeMethod, QueryParam.class);
+                    if (annotation != null) {
+                        properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, null, writeMethod, null, null, null));
+                    }
+                }
+            }
+        } catch (IntrospectionException e) {
+            TypeScriptGenerator.getLogger().warning(String.format("Cannot introspect '%s' class: " + e.getMessage(), paramBean));
+        }
+        if (properties.isEmpty()) {
+            return null;
+        } else {
+            return new BeanModel(paramBean, null, null, null, null, null, properties, null);
+        }
+    }
+
+    private static BeanModel getHeaderParameters(Class<?> paramBean) {
+        final List<PropertyModel> properties = new ArrayList<>();
+        final List<Field> fields = Utils.getAllFields(paramBean);
+        for (Field field : fields) {
+            final HeaderParam annotation = getRsAnnotation(field, HeaderParam.class);
+            if (annotation != null) {
+                properties.add(new PropertyModel(annotation.value(), field.getGenericType(), /*optional*/true, null, field, null, null, null));
+            }
+        }
+        try {
+            final BeanInfo beanInfo = Introspector.getBeanInfo(paramBean);
+            for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+                final Method writeMethod = propertyDescriptor.getWriteMethod();
+                if (writeMethod != null) {
+                    final HeaderParam annotation = getRsAnnotation(writeMethod, HeaderParam.class);
                     if (annotation != null) {
                         properties.add(new PropertyModel(annotation.value(), propertyDescriptor.getPropertyType(), /*optional*/true, null, writeMethod, null, null, null));
                     }
