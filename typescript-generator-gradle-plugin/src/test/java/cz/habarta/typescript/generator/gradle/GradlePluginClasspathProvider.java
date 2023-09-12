@@ -18,9 +18,15 @@ import sun.misc.Unsafe;
 public class GradlePluginClasspathProvider {
 
     public static List<String> getClasspath(File projectDir) throws NoSuchFieldException, IllegalAccessException {
-        List<File> list = GradlePluginClasspathProvider.getUrls(ClassLoader.getSystemClassLoader());
+        List<File> list = GradlePluginClasspathProvider.getUrls(ClassLoader.getSystemClassLoader())
+                .stream().filter(file -> !gradleDependency(file))
+                .collect(Collectors.toList());
         list.addAll(buildDirs(projectDir));
         return list.stream().map(file -> path(file)).collect(Collectors.toList());
+    }
+
+    private static boolean gradleDependency(File file) {
+        return file.getAbsolutePath().contains(String.format("%sorg%sgradle%s", File.separator, File.separator, File.separator));
     }
 
     @NotNull
@@ -85,10 +91,10 @@ public class GradlePluginClasspathProvider {
     @NotNull
     private static List<File> buildDirs(File sampleGradleDir) {
         List<File> buildDirs = new ArrayList<>();
-        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "java", "main"));
-        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "groovy", "main"));
-        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "scala", "main"));
-        buildDirs.add(FileUtils.getFile( sampleGradleDir, "build", "classes", "kotlin", "main"));
+        buildDirs.add(FileUtils.getFile(sampleGradleDir, "build", "classes", "java", "main"));
+        buildDirs.add(FileUtils.getFile(sampleGradleDir, "build", "classes", "groovy", "main"));
+        buildDirs.add(FileUtils.getFile(sampleGradleDir, "build", "classes", "scala", "main"));
+        buildDirs.add(FileUtils.getFile(sampleGradleDir, "build", "classes", "kotlin", "main"));
 
         return buildDirs;
     }

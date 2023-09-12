@@ -25,6 +25,9 @@ public class BuildLogicFunctionalTest {
 
     String sampleGradle = "../../typescript-generator/sample-gradle";
     File sourceDir = new File(sampleGradle + "/src");
+
+    @TempDir
+    File testKitDir;
     @TempDir
     File testProjectDir;
     private File buildFile;
@@ -50,7 +53,7 @@ public class BuildLogicFunctionalTest {
 
         String testFileName = testProjectDir.getName() + ".d.ts";
         String testFilePath = testProjectDir + separator + "build" + separator + "typescript-generator" + separator + testFileName;
-        String schema = FileUtils.readFileToString(new File(testFilePath) , StandardCharsets.UTF_8);
+        String schema = FileUtils.readFileToString(new File(testFilePath), StandardCharsets.UTF_8);
         assertThat(schema, containsString("export interface Person {"));
         assertThat(schema, containsString("export interface PersonGroovy {"));
         assertThat(schema, containsString("export interface PersonKt {"));
@@ -59,12 +62,12 @@ public class BuildLogicFunctionalTest {
     }
 
     private BuildResult runGradle(String task) {
+        System.setProperty("org.gradle.testkit.dir", testKitDir.getAbsolutePath());
         return GradleRunner.create()
                 .withProjectDir(testProjectDir)
                 .withGradleVersion("8.2.1")
                 .withPluginClasspath()
                 .withArguments(
-                       // "-Dorg.gradle.jvmargs='-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005'",
                         "--stacktrace",
                         "--info",
                         "--configuration-cache",

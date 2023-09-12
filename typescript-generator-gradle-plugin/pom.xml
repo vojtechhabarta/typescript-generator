@@ -18,6 +18,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>dev.gradleplugins</groupId>
+            <artifactId>gradle-test-kit</artifactId>
+            <version>8.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-core</artifactId>
             <version>${gradle.version}</version>
@@ -63,12 +69,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>dev.gradleplugins</groupId>
-            <artifactId>gradle-test-kit</artifactId>
-            <version>8.2.1</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_2.13</artifactId>
