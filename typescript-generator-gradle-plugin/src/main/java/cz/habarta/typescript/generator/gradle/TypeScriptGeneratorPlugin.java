@@ -11,7 +11,6 @@ public class TypeScriptGeneratorPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         GenerateTask generateTsTask = project.getTasks().create("generateTypeScript", GenerateTask.class);
-        project.getLogger().warn("Output type: " + generateTsTask.outputFileType);
         generateTsTask.projectName = project.getName();
         for (Task task : project.getTasks()) {
             if (task.getName().startsWith("compile") && !task.getName().startsWith("compileTest")) {
