@@ -1,28 +1,25 @@
 package cz.habarta.typescript.generator.gradle;
 
-import org.apache.commons.io.FileUtils;
-import org.gradle.testkit.runner.BuildResult;
-import org.gradle.testkit.runner.GradleRunner;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import static cz.habarta.typescript.generator.gradle.GradlePluginClasspathProvider.getClasspath;
 import java.io.BufferedWriter;
 import java.io.File;
+import static java.io.File.pathSeparator;
+import static java.io.File.separator;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
-import static cz.habarta.typescript.generator.gradle.GradlePluginClasspathProvider.getClasspath;
-import static java.io.File.pathSeparator;
-import static java.io.File.separator;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.apache.commons.io.FileUtils;
+import org.gradle.testkit.runner.BuildResult;
+import org.gradle.testkit.runner.GradleRunner;
 import static org.hamcrest.CoreMatchers.containsString;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class BuildLogicFunctionalTest {
 

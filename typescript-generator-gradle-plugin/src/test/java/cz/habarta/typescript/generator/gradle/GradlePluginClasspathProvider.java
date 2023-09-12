@@ -1,19 +1,19 @@
 package cz.habarta.typescript.generator.gradle;
 
-import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
-import sun.misc.Unsafe;
-
 import java.io.File;
 import java.lang.reflect.Field;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.io.FileUtils.readFileToString;
+import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
+import sun.misc.Unsafe;
 
 public class GradlePluginClasspathProvider {
 
