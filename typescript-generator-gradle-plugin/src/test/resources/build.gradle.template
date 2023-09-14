@@ -1,0 +1,62 @@
+
+buildscript {
+    dependencies {
+        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.14.2'
+    }
+}
+
+plugins {
+    id 'java'
+    id "org.jetbrains.kotlin.jvm" version "1.9.0"
+    id 'scala'
+    id 'groovy'
+    id 'cz.habarta.typescript-generator'
+
+}
+
+version = '3.0'
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.14.2'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.16'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
+    implementation 'org.scala-lang:scala-library:2.13.10'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2'
+}
+
+generateTypeScript {
+    classes = [
+            'cz.habarta.typescript.generator.sample.Person',
+            'cz.habarta.typescript.generator.sample.PersonGroovy',
+            'cz.habarta.typescript.generator.sample.PersonKt',
+            'cz.habarta.typescript.generator.sample.PersonScala',
+    ]
+    jsonLibrary = 'jackson2'
+    outputKind = 'module'
+    excludeClasses = [
+            'groovy.lang.GroovyObject',
+            'groovy.lang.MetaClass',
+            'java.io.Serializable',
+            'scala.Equals',
+            'scala.Product',
+            'scala.Serializable',
+    ]
+    jackson2Modules = [
+            'com.fasterxml.jackson.module.scala.DefaultScalaModule',
+            'com.fasterxml.jackson.module.kotlin.KotlinModule',
+    ]
+}
+
+build.dependsOn generateTypeScript
