@@ -1,5 +1,6 @@
 package cz.habarta.typescript.generator.gradle;
 
+import com.google.common.io.Files;
 import static cz.habarta.typescript.generator.gradle.GradlePluginClasspathProvider.getClasspath;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,9 +26,8 @@ public class BuildLogicFunctionalTest {
 
     String sampleGradle = "../../typescript-generator/sample-gradle";
     File sourceDir = new File(sampleGradle + "/src");
+    private File testKitDir = Files.createTempDir();
 
-    @TempDir
-    File testKitDir;
     @TempDir
     File testProjectDir;
     private File buildFile;
@@ -41,24 +41,36 @@ public class BuildLogicFunctionalTest {
 
     @Test
     public void shouldWorkWithConfigurationCache() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String classpath = "implementation-classpath=" + String.join(pathSeparator, getClasspath(testProjectDir));
-        System.out.println("Classpath: " + classpath);
-        writeFile(classpathFile, classpath);
-        FileUtils.copyToFile(buildGradleTemplateUrl().openStream(), buildFile);
-        FileUtils.copyDirectory(sourceDir, new File(testProjectDir, "src"));
+        try {
+            String classpath = "implementation-classpath=" + String.join(pathSeparator, getClasspath(testProjectDir));
+            System.out.println("Classpath: " + classpath);
+            writeFile(classpathFile, classpath);
+            FileUtils.copyToFile(buildGradleTemplateUrl().openStream(), buildFile);
+            FileUtils.copyDirectory(sourceDir, new File(testProjectDir, "src"));
 
-        assertTrue(runGradle("assemble").getOutput().contains("BUILD SUCCESSFUL"));
-        BuildResult generateTypeScript = runGradle("generateTypeScript");
-        assertTrue(generateTypeScript.getOutput().contains("BUILD SUCCESSFUL"));
+            assertTrue(runGradle("assemble").getOutput().contains("BUILD SUCCESSFUL"));
+            BuildResult generateTypeScript = runGradle("generateTypeScript");
+            assertTrue(generateTypeScript.getOutput().contains("BUILD SUCCESSFUL"));
 
-        String testFileName = testProjectDir.getName() + ".d.ts";
-        String testFilePath = testProjectDir + separator + "build" + separator + "typescript-generator" + separator + testFileName;
-        String schema = FileUtils.readFileToString(new File(testFilePath), StandardCharsets.UTF_8);
-        assertThat(schema, containsString("export interface Person {"));
-        assertThat(schema, containsString("export interface PersonGroovy {"));
-        assertThat(schema, containsString("export interface PersonKt {"));
-        assertThat(schema, containsString("export interface PersonScala {"));
+            String testFileName = testProjectDir.getName() + ".d.ts";
+            String testFilePath = testProjectDir + separator + "build" + separator + "typescript-generator" + separator + testFileName;
+            String schema = FileUtils.readFileToString(new File(testFilePath), StandardCharsets.UTF_8);
+            assertThat(schema, containsString("export interface Person {"));
+            assertThat(schema, containsString("export interface PersonGroovy {"));
+            assertThat(schema, containsString("export interface PersonKt {"));
+            assertThat(schema, containsString("export interface PersonScala {"));
+        } finally {
+            deleteGradleDir(testKitDir);
+        }
+    }
 
+    private static void deleteGradleDir(File testKitDir) {
+        try {
+            FileUtils.deleteDirectory(testKitDir);
+        }catch (IOException e)
+        {
+            //might happen on Windows but should be ignored
+        }
     }
 
     private BuildResult runGradle(String task) {
