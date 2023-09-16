@@ -17,6 +17,7 @@ import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
 import cz.habarta.typescript.generator.Output;
+import cz.habarta.typescript.generator.RestMethodBuilder;
 import cz.habarta.typescript.generator.RestNamespacing;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.StringQuotes;
@@ -617,6 +618,15 @@ public class GenerateMojo extends AbstractMojo {
     private String customTypeProcessor;
 
     /**
+     * Specifies custom class implementing {@link RestMethodBuilder}.
+     * This allows to customize how Rest methods are mapped to TypeScript.
+     * For example, it is possible to implement RestMethodBuilder to filter or add some query parameters or
+     * change the returned type, etc.
+     */
+    @Parameter
+    private String customRestMethodBuilder;
+
+    /**
      * If <code>true</code> TypeScript declarations (interfaces, properties) will be sorted alphabetically.
      */
     @Parameter
@@ -916,6 +926,7 @@ public class GenerateMojo extends AbstractMojo {
         settings.restResponseType = restResponseType;
         settings.setRestOptionsType(restOptionsType);
         settings.loadCustomTypeProcessor(classLoader, customTypeProcessor);
+        settings.loadCustomRestMethodBuilder(classLoader, customRestMethodBuilder);
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
