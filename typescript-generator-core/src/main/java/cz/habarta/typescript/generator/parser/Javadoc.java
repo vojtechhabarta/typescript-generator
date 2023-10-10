@@ -256,11 +256,11 @@ public class Javadoc {
                     .replaceAll("\\s*<br />\\s*", nn)
                     .replaceAll("\\s*<p>\\s*", nn)
                     .replaceAll("\\s*</p>\\s*", nn);
-            result.addAll(Utils.splitMultiline(replacedHtmlLines, true));
+            result.addAll(Utils.splitMultiline(convertAnchorToLink(replacedHtmlLines), true));
         }
         if (tags != null) {
             for (TagInfo tag : tags) {
-                result.addAll(Utils.splitMultiline(tag.getName() + " " + tag.getText(), true));
+                result.addAll(Utils.splitMultiline(tag.getName() + " " + convertAnchorToLink(tag.getText()), true));
             }
         }
         return result;
@@ -269,6 +269,16 @@ public class Javadoc {
     private static List<String> combineComments(List<String> firstComments, List<String> secondComments) {
         // consider putting tags (from both comments) after regular comments
         return Utils.concat(firstComments, secondComments);
+    }
+
+    /**
+     * Replaces all anchor tags in the given string with TSdoc-style links.
+     *
+     * @param comment comment to convert
+     * @return comment with Javadoc anchor tags converted to TSdoc links
+     */
+    private static String convertAnchorToLink(String comment) {
+        return comment.replaceAll("<a.*?href=(?:\\s+)?\"(.*)\">(?:\\s+)?(.*)</a>", "{@link $1 $2}");
     }
 
 }

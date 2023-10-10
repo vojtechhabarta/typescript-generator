@@ -2547,6 +2547,14 @@
             <class qualified="java.lang.Object"/>
             <constructor name="ClassWithPElements" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithPElements" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
         </class>
+        <class name="JavadocTest.ClassWithExternalLinks" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
+            <comment>Documentation for ClassWithExternalLinks
+
+ This sentence has a &lt;a href="https://github.com/vojtechhabarta/typescript-generator"&gt;link&lt;/a&gt;!</comment>
+            <tag name="@see" text="&lt;a href=&#10;      &quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;&#10;      the wiki&lt;/a&gt;"/>
+            <class qualified="java.lang.Object"/>
+            <constructor name="ClassWithExternalLinks" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
+        </class>
         <class name="JaxbTest" qualified="cz.habarta.typescript.generator.JaxbTest" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
             <class qualified="java.lang.Object"/>
             <constructor name="JaxbTest" signature="()" qualified="cz.habarta.typescript.generator.JaxbTest" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
@@ -8212,6 +8220,14 @@
  paragraph&lt;/p&gt;</comment>
             <class qualified="java.lang.Object"/>
             <constructor name="ClassWithPElements" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithPElements" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
+        </class>
+        <class name="JavadocTest.ClassWithExternalLinks" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
+            <comment>Documentation for ClassWithExternalLinks
+
+ This sentence has a &lt;a href="https://github.com/vojtechhabarta/typescript-generator"&gt;link&lt;/a&gt;!</comment>
+            <tag name="@see" text="&lt;a href=&#10;      &quot;https://github.com/vojtechhabarta/typescript-generator/wiki&quot;&gt;&#10;      the wiki&lt;/a&gt;"/>
+            <class qualified="java.lang.Object"/>
+            <constructor name="ClassWithExternalLinks" signature="()" qualified="cz.habarta.typescript.generator.JavadocTest.ClassWithExternalLinks" scope="public" final="false" included="true" native="false" synchronized="false" static="false" varArgs="false"/>
         </class>
         <class name="Jackson2PolymorphismTest" qualified="cz.habarta.typescript.generator.Jackson2PolymorphismTest" scope="public" abstract="false" error="false" exception="false" externalizable="false" included="true" serializable="false">
             <class qualified="java.lang.Object"/>
