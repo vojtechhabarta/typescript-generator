@@ -8,18 +8,23 @@ import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
 public class JavadocTest {
+    final Settings settings = TestUtils.settings();
+    final TypeProcessor typeProcessor = new DefaultTypeProcessor();
+
+    @BeforeEach
+    void initSettings() {
+        settings.javadocXmlFiles = Collections.singletonList(new File("src/test/javadoc/test-javadoc.xml"));
+    }
 
     @Test
-    public void testJavadoc() {
-        final Settings settings = TestUtils.settings();
-        settings.javadocXmlFiles = Arrays.asList(new File("src/test/javadoc/test-javadoc.xml"));
-        final TypeProcessor typeProcessor = new DefaultTypeProcessor();
+    void javadocXml() {
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithJavadoc.class);
             final BeanModel bean = model.getBeans().get(0);
@@ -32,6 +37,10 @@ public class JavadocTest {
             final EnumModel enumModel = model.getEnums().get(0);
             Assertions.assertEquals("Documentation for DummyEnum.", enumModel.getComments().get(0));
         }
+    }
+
+    @Test
+    void classWithoutJavadoc() {
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithoutJavadoc.class);
             final BeanModel bean = model.getBeans().get(0);
@@ -39,6 +48,10 @@ public class JavadocTest {
             final PropertyModel property = bean.getProperties().get(0);
             Assertions.assertNull(property.getComments());
         }
+    }
+
+    @Test
+    void classWithEmbeddedExample() {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(
                     Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
@@ -61,6 +74,10 @@ public class JavadocTest {
             Assertions.assertTrue(generated.contains("00ff00"));
             Assertions.assertTrue(generated.contains("0000ff"));
         }
+    }
+
+    @Test
+    void deprecatedClassWithoutJavadoc() {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedClassWithoutJavadoc.class));
             final String expected = ""
@@ -75,6 +92,10 @@ public class JavadocTest {
                     + "}";
             Assertions.assertEquals(expected.trim(), generated.trim());
         }
+    }
+
+    @Test
+    void deprecatedEnumWithoutJavadoc() {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumWithoutJavadoc.class));
             final String expected = ""
@@ -83,7 +104,7 @@ public class JavadocTest {
                     + " * \n"
                     + " * Values:\n"
                     + " * - `North`\n"
-                    + " * - `East` - @deprecated\n"
+                    + " * - `East` - deprecated\n"
                     + " * - `South`\n"
                     + " * - `West`\n"
                     + " */\n"
@@ -91,6 +112,25 @@ public class JavadocTest {
                     + "";
             Assertions.assertEquals(expected.trim(), generated.trim());
         }
+    }
+
+    @Test
+    void deprecatedEnumWItem() {
+        final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumItem.class));
+        final String expected = ""
+                + "/**\n"
+                + " * Values:\n"
+                + " * - `First`\n"
+                + " * - `Second` - deprecated\n"
+                + " * - `Third`\n"
+                + " */\n"
+                + "type DeprecatedEnumItem = \"First\" | \"Second\" | \"Third\";\n"
+                + "";
+        Assertions.assertEquals(expected.trim(), generated.trim());
+    }
+
+    @Test
+    void classWithBrInJavadoc() {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithBrElements.class));
             Assertions.assertTrue(!generated.contains("<br>"));
@@ -99,6 +139,10 @@ public class JavadocTest {
             Assertions.assertTrue(generated.contains("Class documentation\n * \n"));
             Assertions.assertTrue(generated.contains("Some documentation\n * \n * for this class."));
         }
+    }
+
+    @Test
+    void classWithPInJavadoc() {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithPElements.class));
             Assertions.assertTrue(!generated.contains("<p>"));
@@ -175,6 +219,12 @@ public class JavadocTest {
         South,
         West;
 
+    }
+
+    public enum DeprecatedEnumItem {
+        First,
+        @Deprecated Second,
+        Third;
     }
 
     /**

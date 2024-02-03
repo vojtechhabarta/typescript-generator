@@ -59,8 +59,14 @@ public class DeprecationEnricher {
     }
 
     private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember) {
+        List<String> updatedComment = addDeprecation(enumMember.getComments(), enumMember.getOriginalField());
+        if (updatedComment == null || updatedComment.equals(enumMember.getComments())) {
+            return enumMember;
+        }
         return enumMember
-                .withComments(addDeprecation(enumMember.getComments(), enumMember.getOriginalField()));
+                .withComments(updatedComment.stream()
+                        .map(s -> s.startsWith(DeprecationUtils.DEPRECATED) ? s.substring(1) : s)
+                        .collect(Collectors.toList()));
     }
 
     private RestApplicationModel enrichRestApplication(RestApplicationModel restApplicationModel) {
