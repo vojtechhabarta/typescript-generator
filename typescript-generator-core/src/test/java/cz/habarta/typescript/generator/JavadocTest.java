@@ -116,6 +116,7 @@ public class JavadocTest {
 
     @Test
     void deprecatedEnumWItem() {
+        settings.mapEnum = EnumMapping.asEnum;
         final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumItem.class));
         final String expected = ""
                 + "/**\n"
@@ -124,7 +125,14 @@ public class JavadocTest {
                 + " * - `Second` - deprecated\n"
                 + " * - `Third`\n"
                 + " */\n"
-                + "type DeprecatedEnumItem = \"First\" | \"Second\" | \"Third\";\n"
+                + "declare const enum DeprecatedEnumItem {\n" +
+                "    First = \"First\",\n" +
+                "    /**\n" +
+                "     * @deprecated\n" +
+                "     */\n" +
+                "    Second = \"Second\",\n" +
+                "    Third = \"Third\",\n" +
+                "}"
                 + "";
         Assertions.assertEquals(expected.trim(), generated.trim());
     }
