@@ -46,6 +46,19 @@ public class GenericsResolver {
         return result;
     }
 
+    /**
+     * Receives a given generic class/interface (that have generic type parameters) and returns a List with the type parameter names.
+     * For instance, if we have a generic type Map&lt;K,V&gt;, this method will return the string K, V;.
+     * @param genericClass a class/interface that have generic type parameters
+     * @return a List of the type parameter names
+     */
+    public static List<String> typeParameterNameList(final Class<?> genericClass){
+        return
+            Arrays.stream(genericClass.getTypeParameters())
+                  .map(TypeVariable::getName)
+                  .collect(Collectors.toList());
+    }
+
     public static List<Type> resolveBaseGenericVariables(Class<?> baseClass, Type contextType) {
         final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(contextType);
         if (rawClassAndTypeArguments != null) {

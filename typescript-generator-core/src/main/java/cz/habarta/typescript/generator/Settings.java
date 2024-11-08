@@ -11,26 +11,14 @@ import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.parser.TypeParser;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.io.File;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -179,15 +167,33 @@ public class Settings {
 
     public static class GenericName {
         public final String rawName;
-        public final @Nullable List<String> typeParameters;
+        public final List<String> typeParameters;
 
         public GenericName(String rawName, @Nullable List<String> typeParameters) {
             this.rawName = Objects.requireNonNull(rawName);
-            this.typeParameters = typeParameters;
+            this.typeParameters = typeParameters == null ? List.of() : typeParameters;
         }
 
         public int indexOfTypeParameter(String typeParameter) {
-            return typeParameters != null ? typeParameters.indexOf(typeParameter) : -1;
+            return typeParameters.indexOf(typeParameter);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("GenericName{rawName: '%s', typeParameters: %s}", rawName, typeParameters);
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            if (this == other) return true;
+            if (!(other instanceof GenericName)) return false;
+            final var that = (GenericName) other;
+            return Objects.equals(rawName, that.rawName) && Objects.equals(typeParameters, that.typeParameters);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rawName, typeParameters);
         }
     }
 
@@ -517,7 +523,7 @@ public class Settings {
                 validateTypeParameters(genericTsName.typeParameters);
                 final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, null);
                 final int required = cls.getTypeParameters().length;
-                final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
+                final int specified = genericJavaName.typeParameters.size();
                 if (specified != required) {
                     final String parameters = Stream.of(cls.getTypeParameters())
                         .map(TypeVariable::getName)
@@ -563,10 +569,14 @@ public class Settings {
         return aliases;
     }
 
-    private static GenericName parseGenericName(String name) {
-        // Class<T1, T2>
-        // Class[T1, T2]
-        final Matcher matcher = Pattern.compile("([^<\\[]+)(<|\\[)([^>\\]]+)(>|\\])").matcher(name);
+    /**
+     * Parses generic name in format Class&lt;T1, T2&gt;. Class[T1, T2], Class[T1[T2], T3], etc.,
+     * splitting the class name and type parameters.
+     * @param name string representation of a generic name
+     * @return a {@link GenericName} object containing the class name and type parameters
+     */
+    public static GenericName parseGenericName(final String name) {
+        final Matcher matcher = Pattern.compile("(.+?)([<\\[])([^]]{0,1}.*[^\\[])([>\\]])").matcher(name);
         final String rawName;
         final List<String> typeParameters;
         if (matcher.matches()) { // is generic?
@@ -578,13 +588,11 @@ public class Settings {
             rawName = name;
             typeParameters = null;
         }
+
         return new GenericName(rawName, typeParameters);
     }
 
-    private static void validateTypeParameters(@Nullable List<String> typeParameters) {
-        if (typeParameters == null) {
-            return;
-        }
+    private static void validateTypeParameters(List<String> typeParameters) {
         for (String typeParameter : typeParameters) {
             if (!ModelCompiler.isValidIdentifierName(typeParameter)) {
                 throw new RuntimeException(String.format("Invalid generic type parameter: '%s'", typeParameter));
@@ -857,11 +865,13 @@ public class Settings {
         return Pair.of(className, dimensions);
     }
 
-    private static Class<?> loadPrimitiveOrRegularClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
+    static Class<?> loadPrimitiveOrRegularClass(final ClassLoader classLoader, final String className) throws ClassNotFoundException {
+        // Stripe generic types: remove them from the class name, since the class can only be loaded using its raw name
+        final var rawClassName = className.replaceAll("<.*>", "");
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
         return primitiveType != null
             ? primitiveType
-            : classLoader.loadClass(className);
+            : classLoader.loadClass(rawClassName);
     }
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, @Nullable List<String> classNames, Class<T> requiredType) {

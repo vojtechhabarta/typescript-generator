@@ -1,3 +1,7 @@
+# Files generated during test execution
+JaxrsV2ApplicationTest.java
+JsonbV1ParserTest.java
+
 # Maven
 target/
 pom.xml.tag

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -33,6 +34,48 @@ public class CustomTypeMappingTest {
         assertTrue(output.contains("import * as myModule from '../src/test/ts/my-module.d.ts';"));
         assertTrue(output.contains("date1: MyDate;"));
         assertTrue(output.contains("calendar1: myModule.MyCalendar;"));
+    }
+
+    /**
+     * Checks that the custom type mapping works for non-nested generic parameters.
+     * That is, each type parameter is not generic by itself.
+     */
+    @Test
+    public void testSimpleGenericParameter() {
+        class ClassWithNonNestedGenericTypes {
+            public List<String> stringList;
+            public List<BigDecimal> bigDecimalList;
+        }
+
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        settings.customTypeMappings.put("java.util.List<BigDecimal>", "number[]");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithNonNestedGenericTypes.class));
+        System.out.println(output);
+
+        assertTrue(output.contains("stringList: string[];"));
+        assertTrue(output.contains("bigDecimalList: number[];"));
+    }
+
+    /**
+     * Checks that the custom type mapping works for nested generic parameters.
+     * That is, a type parameter is generic by itself.
+     */
+    @Test
+    public void testNestedGenericParameter() {
+        class ClassWithNestedGenericTypes {
+            public List<String> stringList;
+            public List<List<BigDecimal>> bigDecimalMatrix;
+        }
+
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        settings.customTypeMappings.put("java.util.List<java.util.List<BigDecimal>>", "number[][]");
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithNestedGenericTypes.class));
+        System.out.println(output);
+
+        assertTrue(output.contains("stringList: string[];"));
+        assertTrue(output.contains("bigDecimalMatrix: number[][];"));
     }
 
     @SuppressWarnings("NullAway.Init")
