@@ -185,6 +185,24 @@ public class Settings {
         public int indexOfTypeParameter(String typeParameter) {
             return typeParameters != null ? typeParameters.indexOf(typeParameter) : -1;
         }
+
+        @Override
+        public String toString() {
+            return String.format("GenericName{rawName: '%s', typeParameters: %s}", rawName, typeParameters);
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            if (this == other) return true;
+            if (!(other instanceof GenericName)) return false;
+            final var that = (GenericName) other;
+            return Objects.equals(rawName, that.rawName) && Objects.equals(typeParameters, that.typeParameters);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rawName, typeParameters);
+        }
     }
 
     private static class TypeScriptGeneratorURLClassLoader extends URLClassLoader {
