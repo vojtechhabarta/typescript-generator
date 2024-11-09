@@ -847,7 +847,7 @@ public class Settings {
     }
 
     static Class<?> loadPrimitiveOrRegularClass(final ClassLoader classLoader, final String className) throws ClassNotFoundException {
-        // Stripe generic types: remove the generic types from the class name, since the class can only be loaded using its raw name
+        // Stripe generic types: remove them from the class name, since the class can only be loaded using its raw name
         final var rawClassName = className.replaceAll("<.*>", "");
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
         return primitiveType != null
