@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
                         ? m.rawClass.isAssignableFrom(rawClass)
                         : m.rawClass.equals(rawClass)
                 )
+                .filter(m -> GenericsResolver.typeParameterNameList(m.rawClass).equals(m.javaType.typeParameters) )
                 .findFirst()
                 .orElse(null);
         if (mapping == null) {
