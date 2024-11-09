@@ -1,12 +1,14 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.type.JTypeVariable;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class GenericsResolverTest {
+    /**
+     * TODO: Not sure how to test this GenericsResolver.typeParameterNameList method. This test doesn't work.
+     */
+    @Test
+    void testTypeParameterNameList() {
+        // A type for a generic attribute that is List<BigDecimal>
+        final var javaType = new JParameterizedType(List.class, new Type[]{BigDecimal.class}, null);
+        final Class<?> attributeRawClass = Utils.getRawClassOrNull(javaType);
+        assertEquals(List.of("BigDecimal"), GenericsResolver.typeParameterNameList(attributeRawClass));
+        //assertEquals(List.of("List<BigDecimal>"), GenericsResolver.typeParameterNameList(classOfFieldWithNestedGeneric));
+    }
+
     @Test
     public void testStringField() throws Exception {
         final Class<?> cls = F1String.class;
