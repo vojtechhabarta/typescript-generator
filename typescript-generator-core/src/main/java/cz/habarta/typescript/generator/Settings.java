@@ -850,9 +850,7 @@ public class Settings {
         // Stripe generic types: remove them from the class name, since the class can only be loaded using its raw name
         final var rawClassName = className.replaceAll("<.*>", "");
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
-        return primitiveType != null
-                ? primitiveType
-                : classLoader.loadClass(rawClassName);
+        return primitiveType == null ? classLoader.loadClass(rawClassName) : primitiveType;
     }
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
