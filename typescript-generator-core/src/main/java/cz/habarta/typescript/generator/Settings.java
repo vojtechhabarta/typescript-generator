@@ -13,26 +13,14 @@ import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.parser.TypeParser;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.io.File;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -825,7 +813,7 @@ public class Settings {
             if (requiredClassType != null && !requiredClassType.isAssignableFrom(loadedClass)) {
                 throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
             }
-            @SuppressWarnings("unchecked") 
+            @SuppressWarnings("unchecked")
             final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
             return castedClass;
         } catch (ReflectiveOperationException e) {
@@ -859,10 +847,12 @@ public class Settings {
     }
 
     static Class<?> loadPrimitiveOrRegularClass(final ClassLoader classLoader, final String className) throws ClassNotFoundException {
+        // Stripe generic types: remove the generic types from the class name, since the class can only be loaded using its raw name
+        final var rawClassName = className.replaceAll("<.*>", "");
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
         return primitiveType != null
                 ? primitiveType
-                : classLoader.loadClass(className);
+                : classLoader.loadClass(rawClassName);
     }
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
