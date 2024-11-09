@@ -856,7 +856,7 @@ public class Settings {
         return Pair.of(className, dimensions);
     }
 
-    private static Class<?> loadPrimitiveOrRegularClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
+    static Class<?> loadPrimitiveOrRegularClass(final ClassLoader classLoader, final String className) throws ClassNotFoundException {
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
         return primitiveType != null
                 ? primitiveType

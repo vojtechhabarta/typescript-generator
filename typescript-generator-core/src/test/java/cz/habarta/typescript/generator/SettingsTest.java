@@ -3,13 +3,36 @@ package cz.habarta.typescript.generator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SettingsTest {
+    /**
+     * Checks if the method can load a class from a given class name,
+     * either it has a generic type argument or not.
+     * @param className the class name to be loaded
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "java.util.List",
+            "java.util.List<String>"
+    })
+    void testLoadPrimitiveOrRegularClass(final String className) {
+        try {
+            final var loadedClass = Settings.loadPrimitiveOrRegularClass(getClass().getClassLoader(), className);
+            Assertions.assertEquals(List.class, loadedClass);
+        } catch (ClassNotFoundException e) {
+            Assertions.fail(e);
+        }
+    }
+
+
     /**
      * Checks if generic type arguments are parsed correctly, even when there are nested generic types.
      */
