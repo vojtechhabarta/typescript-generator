@@ -561,10 +561,14 @@ public class Settings {
         return aliases;
     }
 
-    private static GenericName parseGenericName(String name) {
-        // Class<T1, T2>
-        // Class[T1, T2]
-        final Matcher matcher = Pattern.compile("([^<\\[]+)(<|\\[)([^>\\]]+)(>|\\])").matcher(name);
+    /**
+     * Parses generic name in format Class&lt;T1, T2&gt;. Class[T1, T2], Class[T1[T2], T3], etc.,
+     * splitting the class name and type parameters.
+     * @param name string representation of a generic name
+     * @return a {@link GenericName} object containing the class name and type parameters
+     */
+    public static GenericName parseGenericName(final String name) {
+        final Matcher matcher = Pattern.compile("(.+?)([<\\[])([^]]{0,1}.*[^\\[])([>\\]])").matcher(name);
         final String rawName;
         final List<String> typeParameters;
         if (matcher.matches()) {  // is generic?
@@ -576,6 +580,7 @@ public class Settings {
             rawName = name;
             typeParameters = null;
         }
+
         return new GenericName(rawName, typeParameters);
     }
 
