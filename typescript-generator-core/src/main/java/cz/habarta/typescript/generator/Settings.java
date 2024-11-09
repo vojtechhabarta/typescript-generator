@@ -179,11 +179,11 @@ public class Settings {
 
         public GenericName(String rawName, List<String> typeParameters) {
             this.rawName = Objects.requireNonNull(rawName);
-            this.typeParameters = typeParameters;
+            this.typeParameters = typeParameters == null ? List.of() : typeParameters;
         }
 
         public int indexOfTypeParameter(String typeParameter) {
-            return typeParameters != null ? typeParameters.indexOf(typeParameter) : -1;
+            return typeParameters.indexOf(typeParameter);
         }
 
         @Override
@@ -305,7 +305,7 @@ public class Settings {
         }
         return result;
     }
-    
+
     public void validate() {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
@@ -515,7 +515,7 @@ public class Settings {
                 validateTypeParameters(genericTsName.typeParameters);
                 final Class<?> cls = loadClass(classLoader, genericJavaName.rawName, null);
                 final int required = cls.getTypeParameters().length;
-                final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
+                final int specified = genericJavaName.typeParameters.size();
                 if (specified != required) {
                     final String parameters = Stream.of(cls.getTypeParameters())
                             .map(TypeVariable::getName)
@@ -580,9 +580,6 @@ public class Settings {
     }
 
     private static void validateTypeParameters(List<String> typeParameters) {
-        if (typeParameters == null) {
-            return;
-        }
         for (String typeParameter : typeParameters) {
             if (!ModelCompiler.isValidIdentifierName(typeParameter)) {
                 throw new RuntimeException(String.format("Invalid generic type parameter: '%s'", typeParameter));
