@@ -1,76 +1,18 @@
 
 package cz.habarta.typescript.generator.compiler;
 
-import cz.habarta.typescript.generator.DateMapping;
-import cz.habarta.typescript.generator.EnumMapping;
-import cz.habarta.typescript.generator.Extension;
-import cz.habarta.typescript.generator.IdentifierCasing;
-import cz.habarta.typescript.generator.MapMapping;
-import cz.habarta.typescript.generator.NullabilityDefinition;
-import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
-import cz.habarta.typescript.generator.RestNamespacing;
-import cz.habarta.typescript.generator.Settings;
-import cz.habarta.typescript.generator.TsParameter;
-import cz.habarta.typescript.generator.TsProperty;
-import cz.habarta.typescript.generator.TsType;
-import cz.habarta.typescript.generator.TypeProcessor;
-import cz.habarta.typescript.generator.TypeScriptGenerator;
-import cz.habarta.typescript.generator.emitter.EmitterExtension;
-import cz.habarta.typescript.generator.emitter.TsAccessibilityModifier;
-import cz.habarta.typescript.generator.emitter.TsAliasModel;
-import cz.habarta.typescript.generator.emitter.TsAssignmentExpression;
-import cz.habarta.typescript.generator.emitter.TsBeanCategory;
-import cz.habarta.typescript.generator.emitter.TsBeanModel;
-import cz.habarta.typescript.generator.emitter.TsCallExpression;
-import cz.habarta.typescript.generator.emitter.TsConstructorModel;
-import cz.habarta.typescript.generator.emitter.TsEnumModel;
-import cz.habarta.typescript.generator.emitter.TsExpression;
-import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
-import cz.habarta.typescript.generator.emitter.TsHelper;
-import cz.habarta.typescript.generator.emitter.TsIdentifierReference;
-import cz.habarta.typescript.generator.emitter.TsMemberExpression;
-import cz.habarta.typescript.generator.emitter.TsMethodModel;
-import cz.habarta.typescript.generator.emitter.TsModel;
-import cz.habarta.typescript.generator.emitter.TsModifierFlags;
-import cz.habarta.typescript.generator.emitter.TsObjectLiteral;
-import cz.habarta.typescript.generator.emitter.TsParameterModel;
-import cz.habarta.typescript.generator.emitter.TsPropertyDefinition;
-import cz.habarta.typescript.generator.emitter.TsPropertyModel;
-import cz.habarta.typescript.generator.emitter.TsReturnStatement;
-import cz.habarta.typescript.generator.emitter.TsStatement;
-import cz.habarta.typescript.generator.emitter.TsStringLiteral;
-import cz.habarta.typescript.generator.emitter.TsSuperExpression;
-import cz.habarta.typescript.generator.emitter.TsTaggedTemplateLiteral;
-import cz.habarta.typescript.generator.emitter.TsTemplateLiteral;
-import cz.habarta.typescript.generator.emitter.TsThisExpression;
-import cz.habarta.typescript.generator.parser.BeanModel;
-import cz.habarta.typescript.generator.parser.EnumModel;
-import cz.habarta.typescript.generator.parser.MethodModel;
-import cz.habarta.typescript.generator.parser.MethodParameterModel;
-import cz.habarta.typescript.generator.parser.Model;
-import cz.habarta.typescript.generator.parser.PathTemplate;
-import cz.habarta.typescript.generator.parser.PropertyAccess;
-import cz.habarta.typescript.generator.parser.PropertyModel;
-import cz.habarta.typescript.generator.parser.RestApplicationModel;
-import cz.habarta.typescript.generator.parser.RestMethodModel;
-import cz.habarta.typescript.generator.parser.RestQueryParam;
+import cz.habarta.typescript.generator.*;
+import cz.habarta.typescript.generator.emitter.*;
+import cz.habarta.typescript.generator.parser.*;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -467,11 +409,9 @@ public class ModelCompiler {
         final List<TsAliasModel> aliases = new ArrayList<>(tsModel.getTypeAliases());
         for (Settings.CustomTypeAlias customTypeAlias : settings.getValidatedCustomTypeAliases()) {
             final Symbol name = symbolTable.getSyntheticSymbol(customTypeAlias.tsType.rawName);
-            final List<TsType.GenericVariableType> typeParameters = customTypeAlias.tsType.typeParameters != null
-                    ? customTypeAlias.tsType.typeParameters.stream()
+            final List<TsType.GenericVariableType> typeParameters = customTypeAlias.tsType.typeParameters.stream()
                             .map(TsType.GenericVariableType::new)
-                            .collect(Collectors.toList())
-                    : null;
+                            .collect(Collectors.toList());
             final TsType definition = new TsType.VerbatimType(customTypeAlias.tsDefinition);
             aliases.add(new TsAliasModel(null, name, typeParameters, definition, null));
         }
@@ -1356,7 +1296,7 @@ public class ModelCompiler {
     }
 
     private static boolean isValidIdentifierPart(char c) {
-        return Character.isUnicodeIdentifierPart(c) || c == '$' || c == '_' || c == '\u200C' || c == '\u200D';
+        return Character.isUnicodeIdentifierPart(c) ||  c == '.' ||  c == '<' ||  c == '>' || c == '$' || c == '_' || c == '\u200C' || c == '\u200D';
     }
 
 }

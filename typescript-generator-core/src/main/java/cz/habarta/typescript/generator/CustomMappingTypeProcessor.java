@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
                         ? m.rawClass.isAssignableFrom(rawClass)
                         : m.rawClass.equals(rawClass)
                 )
+                .filter(m -> GenericsResolver.typeParameterNameList(m.rawClass).equals(m.javaType.typeParameters) )
                 .findFirst()
                 .orElse(null);
         if (mapping == null) {
@@ -42,20 +44,8 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
             discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
             return typeArgumentResult.getTsType();
         };
-        if (mapping.tsType.typeParameters != null) {
-            final List<TsType> tsTypeArguments = new ArrayList<>();
-            for (String typeParameter : mapping.tsType.typeParameters) {
-                final TsType tsType;
-                final int index = mapping.javaType.indexOfTypeParameter(typeParameter);
-                if (index != -1) {
-                    tsType = processGenericParameter.apply(index);
-                } else {
-                    tsType = new TsType.VerbatimType(typeParameter);
-                }
-                tsTypeArguments.add(tsType);
-            }
-            return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), discoveredClasses);
-        } else {
+
+        if (mapping.tsType.typeParameters.isEmpty()) {
             final int index = mapping.javaType.indexOfTypeParameter(mapping.tsType.rawName);
             if (index != -1) {
                 final TsType tsType = processGenericParameter.apply(index);
@@ -64,6 +54,20 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
                 return new Result(new TsType.VerbatimType(mapping.tsType.rawName), discoveredClasses);
             }
         }
+
+        final List<TsType> tsTypeArguments = new ArrayList<>();
+        for (String typeParameter : mapping.tsType.typeParameters) {
+            final TsType tsType;
+            final int index = mapping.javaType.indexOfTypeParameter(typeParameter);
+            if (index != -1) {
+                tsType = processGenericParameter.apply(index);
+            } else {
+                tsType = new TsType.VerbatimType(typeParameter);
+            }
+            tsTypeArguments.add(tsType);
+        }
+
+        return new Result(new TsType.GenericBasicType(mapping.tsType.rawName, tsTypeArguments), discoveredClasses);
     }
 
 }

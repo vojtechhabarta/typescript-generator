@@ -4,14 +4,7 @@ package cz.habarta.typescript.generator.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -43,6 +36,19 @@ public class GenericsResolver {
                     .collect(Collectors.toList());
         }
         return result;
+    }
+
+    /**
+     * Receives a given generic class/interface (that have generic type parameters) and returns a List with the type parameter names.
+     * For instance, if we have a generic type Map&lt;K,V&gt;, this method will return the string K, V;.
+     * @param genericClass a class/interface that have generic type parameters
+     * @return a List of the type parameter names
+     */
+    public static List<String> typeParameterNameList(final Class<?> genericClass){
+        return
+            Arrays.stream(genericClass.getTypeParameters())
+                  .map(TypeVariable::getName)
+                  .collect(Collectors.toList());
     }
 
     public static List<Type> resolveBaseGenericVariables(Class<?> baseClass, Type contextType) {
