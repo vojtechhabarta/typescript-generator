@@ -3,12 +3,11 @@ package cz.habarta.typescript.generator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,17 +15,29 @@ public class SettingsTest {
     /**
      * Checks if the method can load a class from a given class name,
      * either it has a generic type argument or not.
-     * @param className the class name to be loaded
      */
-    @ParameterizedTest
-    @CsvSource({
-            "java.util.List",
-            "java.util.List<String>"
-    })
-    void testLoadPrimitiveOrRegularClass(final String className) {
+    @Test
+    void testLoadPrimitiveOrRegularClass() {
+        // A map where each key is a type reference (class/interface) and each value is a list of class names representing that type
+        final var typeToClassName = Map.of(
+            List.class, List.of("java.util.List", "java.util.List<String>", "java.util.List<java.util.List<String>>"),
+            Map.class, List.of("java.util.Map", "java.util.Map<Integer, String>", "java.util.Map<Integer, java.util.List<String>>")
+        );
+
+        typeToClassName.forEach((type, classNameList) -> {
+            classNameList.forEach(className -> assertTypeLoadedFromClassName(className, type));
+        });
+    }
+
+    /**
+     * Asserts that a class is loaded from a given class name.
+     * @param className name of the class to load (that may contain generic arguments, even nested ones)
+     * @param expectedClass the class that sould be loaded from the given class name
+     */
+    private void assertTypeLoadedFromClassName(final String className, final Class<?> expectedClass) {
         try {
             final var loadedClass = Settings.loadPrimitiveOrRegularClass(getClass().getClassLoader(), className);
-            assertEquals(List.class, loadedClass);
+            assertEquals(expectedClass, loadedClass);
         } catch (ClassNotFoundException e) {
             Assertions.fail(e);
         }
