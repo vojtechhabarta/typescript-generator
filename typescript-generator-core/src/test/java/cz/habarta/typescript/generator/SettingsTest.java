@@ -26,12 +26,11 @@ public class SettingsTest {
     void testLoadPrimitiveOrRegularClass(final String className) {
         try {
             final var loadedClass = Settings.loadPrimitiveOrRegularClass(getClass().getClassLoader(), className);
-            Assertions.assertEquals(List.class, loadedClass);
+            assertEquals(List.class, loadedClass);
         } catch (ClassNotFoundException e) {
             Assertions.fail(e);
         }
     }
-
 
     /**
      * Checks if generic type arguments are parsed correctly, even when there are nested generic types.
