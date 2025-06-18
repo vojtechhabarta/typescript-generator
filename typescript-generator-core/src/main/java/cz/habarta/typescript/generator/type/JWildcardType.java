@@ -55,10 +55,10 @@ public class JWildcardType implements WildcardType {
     @Override
     public String toString() {
         final String upper = upperBounds.length > 0 && !Objects.equals(upperBounds[0], Object.class)
-                ? " extends " + Stream.of(upperBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
+                ? " extends " + Stream.of(upperBounds).map(Type::getTypeName).sorted().collect(Collectors.joining(" & "))
                 : "";
         final String lower = lowerBounds.length > 0
-                ? " extends " + Stream.of(lowerBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
+                ? " extends " + Stream.of(lowerBounds).map(Type::getTypeName).sorted().collect(Collectors.joining(" & "))
                 : "";
         return "?" + upper + lower;
     }

@@ -67,6 +67,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import java.util.Comparator;
+
+
 
 public class Jackson2Parser extends ModelParser {
 
@@ -318,6 +321,12 @@ public class Jackson2Parser extends ModelParser {
         for (Type aInterface : interfaces) {
             addBeanToQueue(new SourceType<>(aInterface, sourceClass.type, "<interface>"));
         }
+        
+        if (taggedUnionClasses != null) {
+    		taggedUnionClasses.sort(Comparator.comparing(Class::getTypeName));
+	}
+	interfaces.sort(Comparator.comparing(Type::getTypeName));
+        
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, classComments);
     }
 

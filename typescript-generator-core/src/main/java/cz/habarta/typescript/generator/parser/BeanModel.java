@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import java.util.Comparator; 
+
 
 public class BeanModel extends DeclarationModel {
 
@@ -53,6 +55,11 @@ public class BeanModel extends DeclarationModel {
             ancestors.add(parent);
         }
         ancestors.addAll(interfaces);
+        ancestors.sort(Comparator.comparing(Type::getTypeName));
+        System.out.println("Ancestors:");
+	for (Type t : ancestors) {
+    		System.out.println("  " + t.getTypeName());
+	}	
         return ancestors;
     }
 
