@@ -1,0 +1,11 @@
+nondexFilter=.*
+nondexMode=FULL
+nondexSeed=974622
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=H4R6EOha9EQCVR+hF4FKNirZQuNhUiMp1Zs5zHuwq60=
+nondexLogging=CONFIG
+test=

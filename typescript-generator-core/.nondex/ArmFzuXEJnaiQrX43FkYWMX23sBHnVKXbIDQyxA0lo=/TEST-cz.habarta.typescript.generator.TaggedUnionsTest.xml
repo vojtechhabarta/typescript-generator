@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.35" tests="10" errors="0" skipped="0" failures="5">
+  <properties>
+    <property name="sun.desktop" value="gnome"/>
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="nondexStart" value="0"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/test-classes:/home/codebind/typescript-generator/typescript-generator-core/target/classes:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.10.3/jackson-jaxrs-json-provider-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.10.3/jackson-jaxrs-base-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.10.3/jackson-module-jaxb-annotations-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.10.3/jackson-annotations-2.10.3.jar:/home/codebind/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar:/home/codebind/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.1/jakarta.activation-api-1.2.1.jar:/home/codebind/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar:/home/codebind/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/txw2/2.3.1/txw2-2.3.1.jar:/home/codebind/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.7/istack-commons-runtime-3.0.7.jar:/home/codebind/.m2/repository/org/jvnet/staxex/stax-ex/1.8/stax-ex-1.8.jar:/home/codebind/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.15/FastInfoset-1.2.15.jar:/home/codebind/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar:/home/codebind/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar:/home/codebind/.m2/repository/io/github/classgraph/classgraph/4.8.24/classgraph-4.8.24.jar:/home/codebind/.m2/repository/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.3.61/kotlin-stdlib-1.3.61.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.3.61/kotlin-stdlib-common-1.3.61.jar:/home/codebind/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-reflect/1.3.61/kotlin-reflect-1.3.61.jar:/home/codebind/.m2/repository/jakarta/json/bind/jakarta.json.bind-api/1.0.2/jakarta.json.bind-api-1.0.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js/20.0.0/js-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/regex/regex/20.0.0/regex-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/truffle/truffle-api/20.0.0/truffle-api-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/sdk/graal-sdk/20.0.0/graal-sdk-20.0.0.jar:/home/codebind/.m2/repository/org/ow2/asm/asm/7.1/asm-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar:/home/codebind/.m2/repository/com/ibm/icu/icu4j/64.2/icu4j-64.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js-scriptengine/20.0.0/js-scriptengine-20.0.0.jar:/home/codebind/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/codebind/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/codebind/.m2/repository/org/immutables/value/2.7.3/value-2.7.3.jar:/home/codebind/.m2/repository/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar:/home/codebind/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar:/home/codebind/.m2/repository/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.10.3/jackson-datatype-jdk8-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.10.3/jackson-core-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.10.3/jackson-databind-2.10.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/containers/jersey-container-jdk-http/2.31/jersey-container-jdk-http-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-common/2.31/jersey-common-2.31.jar:/home/codebind/.m2/repository/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/jakarta.inject/2.6.1/jakarta.inject-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.3/osgi-resource-locator-1.0.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-server/2.31/jersey-server-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-client/2.31/jersey-client-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-jaxb/2.31/jersey-media-jaxb-2.31.jar:/home/codebind/.m2/repository/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar:/home/codebind/.m2/repository/jakarta/ws/rs/jakarta.ws.rs-api/2.1.6/jakarta.ws.rs-api-2.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-binding/2.31/jersey-media-json-binding-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:/home/codebind/.m2/repository/org/eclipse/yasson/1.0.6/yasson-1.0.6.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6-module.jar:/home/codebind/.m2/repository/jakarta/json/jakarta.json-api/1.1.6/jakarta.json-api-1.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/inject/jersey-hk2/2.31/jersey-hk2-2.31.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-locator/2.6.1/hk2-locator-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/aopalliance-repackaged/2.6.1/aopalliance-repackaged-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-api/2.6.1/hk2-api-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-utils/2.6.1/hk2-utils-2.6.1.jar:/home/codebind/.m2/repository/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar:/home/codebind/.m2/repository/io/swagger/swagger-annotations/1.5.21/swagger-annotations-1.5.21.jar:/home/codebind/.m2/repository/joda-time/joda-time/2.10.1/joda-time-2.10.1.jar:/home/codebind/.m2/repository/org/checkerframework/checker-qual/3.0.1/checker-qual-3.0.1.jar:"/>
+    <property name="java.vm.vendor" value="Private Build"/>
+    <property name="nondexPrintstack" value="false"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="user.timezone" value=""/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/aarch64"/>
+    <property name="nondexLogging" value="CONFIG"/>
+    <property name="sun.java.command" value="/home/codebind/typescript-generator/typescript-generator-core/target/surefire/surefirebooter7151317159738449725.jar /home/codebind/typescript-generator/typescript-generator-core/target/surefire 2025-06-09T21-09-22_608-jvmRun1 surefire5112421238034406127tmp surefire_31204150630171011883tmp"/>
+    <property name="surefire.test.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/test-classes:/home/codebind/typescript-generator/typescript-generator-core/target/classes:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.10.3/jackson-jaxrs-json-provider-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.10.3/jackson-jaxrs-base-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.10.3/jackson-module-jaxb-annotations-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.10.3/jackson-annotations-2.10.3.jar:/home/codebind/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar:/home/codebind/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.1/jakarta.activation-api-1.2.1.jar:/home/codebind/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar:/home/codebind/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/txw2/2.3.1/txw2-2.3.1.jar:/home/codebind/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.7/istack-commons-runtime-3.0.7.jar:/home/codebind/.m2/repository/org/jvnet/staxex/stax-ex/1.8/stax-ex-1.8.jar:/home/codebind/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.15/FastInfoset-1.2.15.jar:/home/codebind/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar:/home/codebind/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar:/home/codebind/.m2/repository/io/github/classgraph/classgraph/4.8.24/classgraph-4.8.24.jar:/home/codebind/.m2/repository/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.3.61/kotlin-stdlib-1.3.61.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.3.61/kotlin-stdlib-common-1.3.61.jar:/home/codebind/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-reflect/1.3.61/kotlin-reflect-1.3.61.jar:/home/codebind/.m2/repository/jakarta/json/bind/jakarta.json.bind-api/1.0.2/jakarta.json.bind-api-1.0.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js/20.0.0/js-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/regex/regex/20.0.0/regex-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/truffle/truffle-api/20.0.0/truffle-api-20.0.0.jar:/home/codebind/.m2/repository/org/graalvm/sdk/graal-sdk/20.0.0/graal-sdk-20.0.0.jar:/home/codebind/.m2/repository/org/ow2/asm/asm/7.1/asm-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar:/home/codebind/.m2/repository/com/ibm/icu/icu4j/64.2/icu4j-64.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js-scriptengine/20.0.0/js-scriptengine-20.0.0.jar:/home/codebind/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/codebind/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/codebind/.m2/repository/org/immutables/value/2.7.3/value-2.7.3.jar:/home/codebind/.m2/repository/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar:/home/codebind/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar:/home/codebind/.m2/repository/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.10.3/jackson-datatype-jdk8-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.10.3/jackson-core-2.10.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.10.3/jackson-databind-2.10.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/containers/jersey-container-jdk-http/2.31/jersey-container-jdk-http-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-common/2.31/jersey-common-2.31.jar:/home/codebind/.m2/repository/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/jakarta.inject/2.6.1/jakarta.inject-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.3/osgi-resource-locator-1.0.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-server/2.31/jersey-server-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-client/2.31/jersey-client-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-jaxb/2.31/jersey-media-jaxb-2.31.jar:/home/codebind/.m2/repository/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar:/home/codebind/.m2/repository/jakarta/ws/rs/jakarta.ws.rs-api/2.1.6/jakarta.ws.rs-api-2.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-binding/2.31/jersey-media-json-binding-2.31.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:/home/codebind/.m2/repository/org/eclipse/yasson/1.0.6/yasson-1.0.6.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6-module.jar:/home/codebind/.m2/repository/jakarta/json/jakarta.json-api/1.1.6/jakarta.json-api-1.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/inject/jersey-hk2/2.31/jersey-hk2-2.31.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-locator/2.6.1/hk2-locator-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/aopalliance-repackaged/2.6.1/aopalliance-repackaged-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-api/2.6.1/hk2-api-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-utils/2.6.1/hk2-utils-2.6.1.jar:/home/codebind/.m2/repository/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar:/home/codebind/.m2/repository/io/swagger/swagger-annotations/1.5.21/swagger-annotations-1.5.21.jar:/home/codebind/.m2/repository/joda-time/joda-time/2.10.1/joda-time-2.10.1.jar:/home/codebind/.m2/repository/org/checkerframework/checker-qual/3.0.1/checker-qual-3.0.1.jar:"/>
+    <property name="test" value="cz.habarta.typescript.generator.TaggedUnionsTest"/>
+    <property name="nondexExecid" value="ArmFzuXEJnaiQrX43FkYWMX23sBHnVKXbIDQyxA0lo="/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/codebind"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.home" value="/usr/lib/jvm/java-8-openjdk-arm64/jre"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/codebind/typescript-generator/typescript-generator-core"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="nondexEnd" value="9223372036854775807"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="nondexFilter" value=".*"/>
+    <property name="nondexSeed" value="1016066"/>
+    <property name="surefire.real.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/surefire/surefirebooter7151317159738449725.jar"/>
+    <property name="sun.boot.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/.nondex/nondex-instr.jar:/home/codebind/.m2/repository/edu/illinois/nondex-common/1.1.2/nondex-common-1.1.2.jar:/home/codebind/.m2/repository/edu/illinois/nondex-annotations/1.1.2/nondex-annotations-1.1.2.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/resources.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/jsse.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/jce.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/charsets.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/jfr.jar:/usr/lib/jvm/java-8-openjdk-arm64/jre/classes"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="1.8.0_452-8u452-ga~us1-0ubuntu1~24.04-b09"/>
+    <property name="user.name" value="codebind"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-60-generic"/>
+    <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/endorsed"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/codebind/.m2/repository"/>
+    <property name="nondexDir" value="/home/codebind/typescript-generator/typescript-generator-core/.nondex"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="nondexJarDir" value="/home/codebind/typescript-generator/typescript-generator-core/.nondex"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="1.8.0_452"/>
+    <property name="user.dir" value="/home/codebind/typescript-generator/typescript-generator-core"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="nondexMode" value="FULL"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.library.path" value="/usr/java/packages/lib/aarch64:/usr/lib/aarch64-linux-gnu/jni:/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Private Build"/>
+    <property name="java.vm.version" value="25.452-b09"/>
+    <property name="java.specification.maintenance.version" value="6"/>
+    <property name="java.ext.dirs" value="/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/ext:/usr/java/packages/lib/ext"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="52.0"/>
+  </properties>
+  <testcase name="testTaggedUnionsWithOverlappingInterfaces" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.205">
+    <failure message="expected:&lt;&#10;interface I[Shape3 {&#10;    kind: &quot;circle&quot; | &quot;rectangle&quot;;&#10;}&#10;&#10;interface IRectangle3 extends INamedQuadrilateral3 {&#10;    kind: &quot;rectangle&quot;;&#10;}&#10;&#10;interface ICircle3 extends INamedShape3 {&#10;    kind: &quot;circle&quot;;&#10;}&#10;&#10;interface INamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {&#10;    kind: &quot;rectangle&quot;;&#10;}&#10;&#10;interface INamedShape3 extends IShape3 {&#10;    kind: &quot;circle&quot; | &quot;rectangle&quot;;&#10;    name: string];&#10;}&#10;&#10;interface IQuad...&gt; but was:&lt;&#10;interface I[NamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {&#10;    kind: &quot;rectangle&quot;;&#10;}&#10;&#10;interface INamedShape3 extends IShape3 {&#10;    kind: &quot;circle&quot; | &quot;rectangle&quot;;&#10;    name: string;&#10;}&#10;&#10;interface IShape3 {&#10;    kind: &quot;circle&quot; | &quot;rectangle&quot;;&#10;}&#10;&#10;interface ICircle3 extends INamedShape3 {&#10;    kind: &quot;circle&quot;;&#10;}&#10;&#10;interface IRectangle3 extends INamedQuadrilateral3 {&#10;    kind: &quot;rectangle&quot;];&#10;}&#10;&#10;interface IQuad...&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<
+interface I[Shape3 {
+    kind: "circle" | "rectangle";
+}
+
+interface IRectangle3 extends INamedQuadrilateral3 {
+    kind: "rectangle";
+}
+
+interface ICircle3 extends INamedShape3 {
+    kind: "circle";
+}
+
+interface INamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {
+    kind: "rectangle";
+}
+
+interface INamedShape3 extends IShape3 {
+    kind: "circle" | "rectangle";
+    name: string];
+}
+
+interface IQuad...> but was:<
+interface I[NamedQuadrilateral3 extends INamedShape3, IQuadrilateral3 {
+    kind: "rectangle";
+}
+
+interface INamedShape3 extends IShape3 {
+    kind: "circle" | "rectangle";
+    name: string;
+}
+
+interface IShape3 {
+    kind: "circle" | "rectangle";
+}
+
+interface ICircle3 extends INamedShape3 {
+    kind: "circle";
+}
+
+interface IRectangle3 extends INamedQuadrilateral3 {
+    kind: "rectangle"];
+}
+
+interface IQuad...>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsWithOverlappingInterfaces(TaggedUnionsTest.java:289)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IShape3'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IRectangle3' used in 'IShape3.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$ICircle3' used in 'IShape3.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$INamedQuadrilateral3' used in 'IRectangle3.<interface>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$INamedShape3' used in 'ICircle3.<interface>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IQuadrilateral3' used in 'INamedQuadrilateral3.<interface>'
+]]></system-out>
+  </testcase>
+  <testcase name="testTaggedUnionsWithInterfaces" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.032">
+    <failure message="expected:&lt;...ngle&quot;;&#10;}&#10;&#10;interface [CSquare2 extends IQuadrilateral2 {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface CRectangle2 extends IQuadrilateral2 {&#10;    kind: &quot;rectangle&quot;;&#10;    width: number;&#10;    height: number;&#10;}&#10;&#10;interface CCircle2 extends IShape2 {&#10;    kind: &quot;circle&quot;;&#10;    radius: number;&#10;}&#10;&#10;interface IQuadrilateral2 extends IShape2 {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot;];&#10;}&#10;&#10;type IShape2Uni...&gt; but was:&lt;...ngle&quot;;&#10;}&#10;&#10;interface [IQuadrilateral2 extends IShape2 {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot;;&#10;}&#10;&#10;interface CSquare2 extends IQuadrilateral2 {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface CRectangle2 extends IQuadrilateral2 {&#10;    kind: &quot;rectangle&quot;;&#10;    height: number;&#10;    width: number;&#10;}&#10;&#10;interface CCircle2 extends IShape2 {&#10;    kind: &quot;circle&quot;;&#10;    radius: number];&#10;}&#10;&#10;type IShape2Uni...&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<...ngle";
+}
+
+interface [CSquare2 extends IQuadrilateral2 {
+    kind: "square";
+    size: number;
+}
+
+interface CRectangle2 extends IQuadrilateral2 {
+    kind: "rectangle";
+    width: number;
+    height: number;
+}
+
+interface CCircle2 extends IShape2 {
+    kind: "circle";
+    radius: number;
+}
+
+interface IQuadrilateral2 extends IShape2 {
+    kind: "square" | "rectangle"];
+}
+
+type IShape2Uni...> but was:<...ngle";
+}
+
+interface [IQuadrilateral2 extends IShape2 {
+    kind: "square" | "rectangle";
+}
+
+interface CSquare2 extends IQuadrilateral2 {
+    kind: "square";
+    size: number;
+}
+
+interface CRectangle2 extends IQuadrilateral2 {
+    kind: "rectangle";
+    height: number;
+    width: number;
+}
+
+interface CCircle2 extends IShape2 {
+    kind: "circle";
+    radius: number];
+}
+
+type IShape2Uni...>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsWithInterfaces(TaggedUnionsTest.java:253)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IShape2'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CSquare2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CRectangle2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CCircle2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IQuadrilateral2' used in 'CSquare2.<interface>'
+]]></system-out>
+  </testcase>
+  <testcase name="testGenericBaseWithNonGenericSubType" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.006"/>
+  <testcase name="testBaseWithGenerics" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.025"/>
+  <testcase name="testTaggedUnionsDisabled" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.007">
+    <failure message="expected:&lt;&#10;interface [Geometry {&#10;    shapes: Shape[];&#10;}&#10;&#10;interface Shape {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot; | &quot;circle&quot;;&#10;}&#10;&#10;interface Square extends Shape {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface Rectangle extends Shape {&#10;    kind: &quot;rectangle&quot;;&#10;    width: number;&#10;    height: number;&#10;}&#10;&#10;interface Circle extends Shape {&#10;    kind: &quot;circle&quot;;&#10;    radius]: number;&#10;}&#10;&gt; but was:&lt;&#10;interface [Circle extends Shape {&#10;    kind: &quot;circle&quot;;&#10;    radius: number;&#10;}&#10;&#10;interface Square extends Shape {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface Shape {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot; | &quot;circle&quot;;&#10;}&#10;&#10;interface Geometry {&#10;    shapes: Shape[];&#10;}&#10;&#10;interface Rectangle extends Shape {&#10;    kind: &quot;rectangle&quot;;&#10;    width: number;&#10;    height]: number;&#10;}&#10;&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<
+interface [Geometry {
+    shapes: Shape[];
+}
+
+interface Shape {
+    kind: "square" | "rectangle" | "circle";
+}
+
+interface Square extends Shape {
+    kind: "square";
+    size: number;
+}
+
+interface Rectangle extends Shape {
+    kind: "rectangle";
+    width: number;
+    height: number;
+}
+
+interface Circle extends Shape {
+    kind: "circle";
+    radius]: number;
+}
+> but was:<
+interface [Circle extends Shape {
+    kind: "circle";
+    radius: number;
+}
+
+interface Square extends Shape {
+    kind: "square";
+    size: number;
+}
+
+interface Shape {
+    kind: "square" | "rectangle" | "circle";
+}
+
+interface Geometry {
+    shapes: Shape[];
+}
+
+interface Rectangle extends Shape {
+    kind: "rectangle";
+    width: number;
+    height]: number;
+}
+>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsDisabled(TaggedUnionsTest.java:324)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Geometry'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Shape' used in 'Geometry.shapes'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Square' used in 'Shape.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Rectangle' used in 'Shape.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Circle' used in 'Shape.<subClass>'
+]]></system-out>
+  </testcase>
+  <testcase name="testAsyncResultWithGenerics" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.004"/>
+  <testcase name="testTaggedUnionsWithDiamond" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0">
+    <failure message="expected:&lt;&#10;interface Diamond[A {&#10;    kind: &quot;b1&quot; | &quot;c&quot; | &quot;b2&quot;;&#10;    a: string;&#10;}&#10;&#10;interface DiamondB1 extends DiamondA {&#10;    kind: &quot;b1&quot; | &quot;c&quot;;&#10;    b1: string;&#10;}&#10;&#10;interface DiamondB2 extends DiamondA {&#10;    kind: &quot;b2&quot; | &quot;c&quot;;&#10;    b2: string;&#10;}&#10;&#10;interface DiamondC extends DiamondB1, DiamondB2 {&#10;    kind: &quot;c&quot;;&#10;    c]: string;&#10;}&#10;&#10;type Di...&gt; but was:&lt;&#10;interface Diamond[B1 extends DiamondA {&#10;    kind: &quot;b1&quot; | &quot;c&quot;;&#10;    b1: string;&#10;}&#10;&#10;interface DiamondA {&#10;    kind: &quot;b1&quot; | &quot;c&quot; | &quot;b2&quot;;&#10;    a: string;&#10;}&#10;&#10;interface DiamondC extends DiamondB1, DiamondB2 {&#10;    kind: &quot;c&quot;;&#10;    c: string;&#10;}&#10;&#10;interface DiamondB2 extends DiamondA {&#10;    kind: &quot;b2&quot; | &quot;c&quot;;&#10;    b2]: string;&#10;}&#10;&#10;type Di...&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<
+interface Diamond[A {
+    kind: "b1" | "c" | "b2";
+    a: string;
+}
+
+interface DiamondB1 extends DiamondA {
+    kind: "b1" | "c";
+    b1: string;
+}
+
+interface DiamondB2 extends DiamondA {
+    kind: "b2" | "c";
+    b2: string;
+}
+
+interface DiamondC extends DiamondB1, DiamondB2 {
+    kind: "c";
+    c]: string;
+}
+
+type Di...> but was:<
+interface Diamond[B1 extends DiamondA {
+    kind: "b1" | "c";
+    b1: string;
+}
+
+interface DiamondA {
+    kind: "b1" | "c" | "b2";
+    a: string;
+}
+
+interface DiamondC extends DiamondB1, DiamondB2 {
+    kind: "c";
+    c: string;
+}
+
+interface DiamondB2 extends DiamondA {
+    kind: "b2" | "c";
+    b2]: string;
+}
+
+type Di...>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsWithDiamond(TaggedUnionsTest.java:356)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$DiamondA'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$DiamondB1' used in 'DiamondA.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$DiamondB2' used in 'DiamondA.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$DiamondC' used in 'DiamondA.<subClass>'
+]]></system-out>
+  </testcase>
+  <testcase name="testIdClass" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0"/>
+  <testcase name="testWithTypeParameter" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.025"/>
+  <testcase name="testTaggedUnions" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.008">
+    <failure message="expected:&lt;&#10;interface [Geometry {&#10;    shapes: ShapeUnion[];&#10;}&#10;&#10;interface Shape {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot; | &quot;circle&quot;;&#10;}&#10;&#10;interface Square extends Shape {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface Rectangle extends Shape {&#10;    kind: &quot;rectangle&quot;;&#10;    width: number;&#10;    height: number;&#10;}&#10;&#10;interface Circle extends Shape {&#10;    kind: &quot;circle&quot;;&#10;    radius]: number;&#10;}&#10;&#10;type Sh...&gt; but was:&lt;&#10;interface [Shape {&#10;    kind: &quot;square&quot; | &quot;rectangle&quot; | &quot;circle&quot;;&#10;}&#10;&#10;interface Circle extends Shape {&#10;    kind: &quot;circle&quot;;&#10;    radius: number;&#10;}&#10;&#10;interface Square extends Shape {&#10;    kind: &quot;square&quot;;&#10;    size: number;&#10;}&#10;&#10;interface Geometry {&#10;    shapes: ShapeUnion[];&#10;}&#10;&#10;interface Rectangle extends Shape {&#10;    kind: &quot;rectangle&quot;;&#10;    height: number;&#10;    width]: number;&#10;}&#10;&#10;type Sh...&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<
+interface [Geometry {
+    shapes: ShapeUnion[];
+}
+
+interface Shape {
+    kind: "square" | "rectangle" | "circle";
+}
+
+interface Square extends Shape {
+    kind: "square";
+    size: number;
+}
+
+interface Rectangle extends Shape {
+    kind: "rectangle";
+    width: number;
+    height: number;
+}
+
+interface Circle extends Shape {
+    kind: "circle";
+    radius]: number;
+}
+
+type Sh...> but was:<
+interface [Shape {
+    kind: "square" | "rectangle" | "circle";
+}
+
+interface Circle extends Shape {
+    kind: "circle";
+    radius: number;
+}
+
+interface Square extends Shape {
+    kind: "square";
+    size: number;
+}
+
+interface Geometry {
+    shapes: ShapeUnion[];
+}
+
+interface Rectangle extends Shape {
+    kind: "rectangle";
+    height: number;
+    width]: number;
+}
+
+type Sh...>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnions(TaggedUnionsTest.java:217)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Geometry'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Shape' used in 'Geometry.shapes'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Square' used in 'Shape.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Rectangle' used in 'Shape.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$Circle' used in 'Shape.<subClass>'
+]]></system-out>
+  </testcase>
+</testsuite>

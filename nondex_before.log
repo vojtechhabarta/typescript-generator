@@ -1,0 +1,376 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;33mWARNING[m] 
+[[1;33mWARNING[m] Some problems were encountered while building the effective model for cz.habarta.typescript-generator:typescript-generator-gradle-plugin:jar:1.12-SNAPSHOT
+[[1;33mWARNING[m] 'dependencies.dependency.systemPath' for org.gradle:gradle-core:jar should not point at files within the project directory, ${basedir}/gradle-lib/gradle-core-2.0.jar will be unresolvable by dependent projects @ line 21, column 25
+[[1;33mWARNING[m] 'dependencies.dependency.systemPath' for org.gradle:gradle-base-services:jar should not point at files within the project directory, ${basedir}/gradle-lib/gradle-base-services-2.0.jar will be unresolvable by dependent projects @ line 28, column 25
+[[1;33mWARNING[m] 'dependencies.dependency.systemPath' for org.gradle:gradle-base-services-groovy:jar should not point at files within the project directory, ${basedir}/gradle-lib/gradle-base-services-groovy-2.0.jar will be unresolvable by dependent projects @ line 35, column 25
+[[1;33mWARNING[m] 
+[[1;33mWARNING[m] It is highly recommended to fix these problems because they threaten the stability of your build.
+[[1;33mWARNING[m] 
+[[1;33mWARNING[m] For this reason, future Maven versions might no longer support building such malformed projects.
+[[1;33mWARNING[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----< [0;36mcz.habarta.typescript-generator:typescript-generator-core[0;1m >------[m
+[[1;34mINFO[m] [1mBuilding typescript-generator-core 1.12-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mnondex-maven-plugin:1.1.2:nondex[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mtypescript-generator-core[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-jaxb2-plugin:0.13.1:generate[m [1m(generate)[m @ [36mtypescript-generator-core[0;1m ---[m
+[[1;34mINFO[m] Up-to-date check for source resources [[file:/home/codebind/typescript-generator/typescript-generator-core/src/main/schema/javadoc.xsd, file:/home/codebind/typescript-generator/typescript-generator-core/pom.xml]] and target resources [[file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/META-INF/sun-jaxb.episode, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Annotation.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/TypeInfo.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Method.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/TagInfo.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Wildcard.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Constructor.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/ObjectFactory.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Interface.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Package.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/AnnotationElement.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Field.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Class.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/EnumConstant.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/TypeParameter.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/AnnotationInstance.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/MethodParameter.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/AnnotationArgument.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Root.java, file:/home/codebind/typescript-generator/typescript-generator-core/target/generated-sources/xjc/cz/habarta/typescript/generator/xmldoclet/Enum.java]].
+[[1;34mINFO[m] Latest timestamp of the source resources is [2025-06-09 22:52:29.575], earliest timestamp of the target resources is [2025-06-12 23:53:30.524].
+[[1;34mINFO[m] Sources are up-to-date, XJC will be skipped.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:resources[m [1m(default-resources)[m @ [36mtypescript-generator-core[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] skip non existing resourceDirectory /home/codebind/typescript-generator/typescript-generator-core/src/main/resources
+[[1;34mINFO[m] Copying 1 resource
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.2:compile[m [1m(default-compile)[m @ [36mtypescript-generator-core[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:testResources[m [1m(default-testResources)[m @ [36mtypescript-generator-core[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] skip non existing resourceDirectory /home/codebind/typescript-generator/typescript-generator-core/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.2:testCompile[m [1m(default-testCompile)[m @ [36mtypescript-generator-core[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mnondex-maven-plugin:1.1.2:nondex[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mtypescript-generator-core[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mnondex-maven-plugin:1.1.2:nondex[m [1m(default-cli)[m @ [36mtypescript-generator-core[0;1m ---[m
+INFO: The original argline is: 
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=933178
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=.nondex
+nondexExecid=clean_sMII3+z9v0locOvVEVRA+zsqEQnysqMLD2Ujy7Ycyg=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/clean_sMII3+z9v0locOvVEVRA+zsqEQnysqMLD2Ujy7Ycyg=
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running cz.habarta.typescript.generator.TaggedUnionsTest
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec - in cz.habarta.typescript.generator.TaggedUnionsTest
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for clean_sMII3+z9v0locOvVEVRA+zsqEQnysqMLD2Ujy7Ycyg=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=933178
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=974622
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=Ce6KMIBdhCnnbcheAL9ioq+8Djpt+NazeoXx0QZo6j0=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/Ce6KMIBdhCnnbcheAL9ioq+8Djpt+NazeoXx0QZo6j0=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for Ce6KMIBdhCnnbcheAL9ioq+8Djpt+NazeoXx0QZo6j0=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1016066
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=cw889t8uxHyzfx3ErPDU8f9uX7UlXwNCIBwTp0fsmYk=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/cw889t8uxHyzfx3ErPDU8f9uX7UlXwNCIBwTp0fsmYk=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for cw889t8uxHyzfx3ErPDU8f9uX7UlXwNCIBwTp0fsmYk=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1057510
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=A9owVc6ItAdDqyNI8JZCtM2++qDPiaOF9k6n+hXFco=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/A9owVc6ItAdDqyNI8JZCtM2++qDPiaOF9k6n+hXFco=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for A9owVc6ItAdDqyNI8JZCtM2++qDPiaOF9k6n+hXFco=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1098954
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=3qNsvNxLxWzI3GcVDi1w84ujLreDsMI1Xju+eJ+KyWE=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/3qNsvNxLxWzI3GcVDi1w84ujLreDsMI1Xju+eJ+KyWE=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for 3qNsvNxLxWzI3GcVDi1w84ujLreDsMI1Xju+eJ+KyWE=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1140398
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=WxdOaqt7qOjkk4yUdjosE2k3mXlSQ1KE7GKdxUpfYko=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/WxdOaqt7qOjkk4yUdjosE2k3mXlSQ1KE7GKdxUpfYko=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for WxdOaqt7qOjkk4yUdjosE2k3mXlSQ1KE7GKdxUpfYko=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1181842
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=2j5wep7zgh0nCftkXUPVwmMxPOvWAl6IMKu1Ti6O42k=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/2j5wep7zgh0nCftkXUPVwmMxPOvWAl6IMKu1Ti6O42k=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for 2j5wep7zgh0nCftkXUPVwmMxPOvWAl6IMKu1Ti6O42k=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1223286
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=dpjVkFMU32B7nkPxuJtWkJ2CrWG2adtBDFjIQEWnxIE=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/dpjVkFMU32B7nkPxuJtWkJ2CrWG2adtBDFjIQEWnxIE=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for dpjVkFMU32B7nkPxuJtWkJ2CrWG2adtBDFjIQEWnxIE=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1264730
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=Xk4ae3uEkyoFljW7NcXxqziIoNhop0dZTSiS76EhpY=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/Xk4ae3uEkyoFljW7NcXxqziIoNhop0dZTSiS76EhpY=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for Xk4ae3uEkyoFljW7NcXxqziIoNhop0dZTSiS76EhpY=
+INFO: Adding excluded groups to newly created one
+INFO: Adding NonDex argLine to existing argLine specified by the project
+CONFIG: nondexFilter=.*
+nondexMode=FULL
+nondexSeed=1306174
+nondexStart=0
+nondexEnd=9223372036854775807
+nondexPrintstack=false
+nondexDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexJarDir=/home/codebind/typescript-generator/typescript-generator-core/.nondex
+nondexExecid=2zFHusL3cgYqJzpFofxhe9VbXpymE+d0lWdGBD1fDKE=
+nondexLogging=CONFIG
+test=
+[[1;34mINFO[m] Surefire report directory: /home/codebind/typescript-generator/typescript-generator-core/.nondex/2zFHusL3cgYqJzpFofxhe9VbXpymE+d0lWdGBD1fDKE=
+[[1;34mINFO[m] parallel='none', perCoreThreadCount=true, threadCount=0, useUnlimitedThreads=false, threadCountSuites=0, threadCountClasses=0, threadCountMethods=0, parallelOptimized=true
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+INFO: Surefire failed when running tests for 2zFHusL3cgYqJzpFofxhe9VbXpymE+d0lWdGBD1fDKE=
+[[1;34mINFO[m] NonDex SUMMARY:
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=933178 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=974622 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=Ce6KMIBdhCnnbcheAL9ioq+8Djpt+NazeoXx0QZo6j0= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1016066 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=cw889t8uxHyzfx3ErPDU8f9uX7UlXwNCIBwTp0fsmYk= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1057510 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=A9owVc6ItAdDqyNI8JZCtM2++qDPiaOF9k6n+hXFco= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1098954 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=3qNsvNxLxWzI3GcVDi1w84ujLreDsMI1Xju+eJ+KyWE= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1140398 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=WxdOaqt7qOjkk4yUdjosE2k3mXlSQ1KE7GKdxUpfYko= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1181842 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=2j5wep7zgh0nCftkXUPVwmMxPOvWAl6IMKu1Ti6O42k= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1223286 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=dpjVkFMU32B7nkPxuJtWkJ2CrWG2adtBDFjIQEWnxIE= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1264730 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=Xk4ae3uEkyoFljW7NcXxqziIoNhop0dZTSiS76EhpY= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] mvn nondex:nondex  -DnondexFilter='.*' -DnondexMode=FULL -DnondexSeed=1306174 -DnondexStart=0 -DnondexEnd=9223372036854775807 -DnondexPrintstack=false -DnondexDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexJarDir="/home/codebind/typescript-generator/typescript-generator-core/.nondex" -DnondexExecid=2zFHusL3cgYqJzpFofxhe9VbXpymE+d0lWdGBD1fDKE= -DnondexLogging=CONFIG
+[[1;34mINFO[m] No Test Failed with this configuration.
+[[1;34mINFO[m] *********
+[[1;34mINFO[m] Across all seeds:
+[[1;34mINFO[m] Test results can be found at: 
+[[1;34mINFO[m] file:///home/codebind/typescript-generator/typescript-generator-core/.nondex/l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys=/test_results.html
+[[1;34mINFO[m] [NonDex] The id of this run is: l38BmQ7bLO89EuTwJ4jFGggaqCqsEpdhT2PfLK6CHys=
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  3.155 s
+[[1;34mINFO[m] Finished at: 2025-06-13T18:34:16Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32medu.illinois:nondex-maven-plugin:1.1.2:nondex[m [1m(default-cli)[m on project [36mtypescript-generator-core[m: [1;31mUnable to execute mojo[m: No tests were executed!  (Set -DfailIfNoTests=false to ignore this error.) -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

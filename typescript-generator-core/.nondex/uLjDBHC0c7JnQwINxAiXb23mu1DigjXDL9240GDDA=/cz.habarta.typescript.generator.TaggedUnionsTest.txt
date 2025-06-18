@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Test set: cz.habarta.typescript.generator.TaggedUnionsTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.155 sec <<< FAILURE! - in cz.habarta.typescript.generator.TaggedUnionsTest
+testTaggedUnionsWithInterfaces(cz.habarta.typescript.generator.TaggedUnionsTest)  Time elapsed: 0.152 sec  <<< FAILURE!
+org.junit.ComparisonFailure: expected:<...d: "rectangle";
+    [width: number;
+    height]: number;
+}
+
+interfa...> but was:<...d: "rectangle";
+    [height: number;
+    width]: number;
+}
+
+interfa...>
+	at org.junit.Assert.assertEquals(Assert.java:115)
+	at org.junit.Assert.assertEquals(Assert.java:144)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsWithInterfaces(TaggedUnionsTest.java:140)
+

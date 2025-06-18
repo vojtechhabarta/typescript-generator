@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.323" tests="1" errors="0" skipped="0" failures="1">
+  <properties>
+    <property name="sun.desktop" value="gnome"/>
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
+    <property name="java.specification.version" value="11"/>
+    <property name="nondexStart" value="0"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/test-classes:/home/codebind/typescript-generator/typescript-generator-core/target/classes:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.11.3/jackson-jaxrs-json-provider-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.11.3/jackson-jaxrs-base-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.11.3/jackson-module-jaxb-annotations-2.11.3.jar:/home/codebind/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar:/home/codebind/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.1/jakarta.activation-api-1.2.1.jar:/home/codebind/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar:/home/codebind/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/txw2/2.3.1/txw2-2.3.1.jar:/home/codebind/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.7/istack-commons-runtime-3.0.7.jar:/home/codebind/.m2/repository/org/jvnet/staxex/stax-ex/1.8/stax-ex-1.8.jar:/home/codebind/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.15/FastInfoset-1.2.15.jar:/home/codebind/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar:/home/codebind/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar:/home/codebind/.m2/repository/io/github/classgraph/classgraph/4.8.90/classgraph-4.8.90.jar:/home/codebind/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.3.72/kotlin-stdlib-1.3.72.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.3.72/kotlin-stdlib-common-1.3.72.jar:/home/codebind/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-reflect/1.3.72/kotlin-reflect-1.3.72.jar:/home/codebind/.m2/repository/jakarta/json/bind/jakarta.json.bind-api/1.0.2/jakarta.json.bind-api-1.0.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js/20.2.0/js-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/regex/regex/20.2.0/regex-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/truffle/truffle-api/20.2.0/truffle-api-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/sdk/graal-sdk/20.2.0/graal-sdk-20.2.0.jar:/home/codebind/.m2/repository/org/ow2/asm/asm/7.1/asm-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar:/home/codebind/.m2/repository/com/ibm/icu/icu4j/67.1/icu4j-67.1.jar:/home/codebind/.m2/repository/org/graalvm/js/js-scriptengine/20.2.0/js-scriptengine-20.2.0.jar:/home/codebind/.m2/repository/junit/junit/4.13.1/junit-4.13.1.jar:/home/codebind/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/codebind/.m2/repository/org/immutables/value/2.8.8/value-2.8.8.jar:/home/codebind/.m2/repository/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar:/home/codebind/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar:/home/codebind/.m2/repository/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.11.3/jackson-datatype-jdk8-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.11.3/jackson-datatype-jsr310-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/containers/jersey-container-jdk-http/2.32/jersey-container-jdk-http-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-common/2.32/jersey-common-2.32.jar:/home/codebind/.m2/repository/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/jakarta.inject/2.6.1/jakarta.inject-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.3/osgi-resource-locator-1.0.3.jar:/home/codebind/.m2/repository/com/sun/activation/jakarta.activation/1.2.2/jakarta.activation-1.2.2.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-server/2.32/jersey-server-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-client/2.32/jersey-client-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-jaxb/2.32/jersey-media-jaxb-2.32.jar:/home/codebind/.m2/repository/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar:/home/codebind/.m2/repository/jakarta/ws/rs/jakarta.ws.rs-api/2.1.6/jakarta.ws.rs-api-2.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-binding/2.32/jersey-media-json-binding-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:/home/codebind/.m2/repository/org/eclipse/yasson/1.0.6/yasson-1.0.6.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6-module.jar:/home/codebind/.m2/repository/jakarta/json/jakarta.json-api/1.1.6/jakarta.json-api-1.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-jackson/2.32/jersey-media-json-jackson-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/ext/jersey-entity-filtering/2.32/jersey-entity-filtering-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/inject/jersey-hk2/2.32/jersey-hk2-2.32.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-locator/2.6.1/hk2-locator-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/aopalliance-repackaged/2.6.1/aopalliance-repackaged-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-api/2.6.1/hk2-api-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-utils/2.6.1/hk2-utils-2.6.1.jar:/home/codebind/.m2/repository/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar:/home/codebind/.m2/repository/io/swagger/swagger-annotations/1.6.2/swagger-annotations-1.6.2.jar:/home/codebind/.m2/repository/org/checkerframework/checker-qual/3.7.1/checker-qual-3.7.1.jar:/home/codebind/.m2/repository/com/google/guava/guava/30.0-jre/guava-30.0-jre.jar:/home/codebind/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/codebind/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/codebind/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar:/home/codebind/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-guava/2.11.3/jackson-datatype-guava-2.11.3.jar:/home/codebind/.m2/repository/joda-time/joda-time/2.10.8/joda-time-2.10.8.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-joda/2.11.3/jackson-datatype-joda-2.11.3.jar:/home/codebind/.m2/repository/io/vavr/vavr/0.10.3/vavr-0.10.3.jar:/home/codebind/.m2/repository/io/vavr/vavr-match/0.10.3/vavr-match-0.10.3.jar:/home/codebind/.m2/repository/io/vavr/vavr-jackson/0.10.3/vavr-jackson-0.10.3.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="nondexPrintstack" value="false"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="nondexRuns" value="100"/>
+    <property name="user.timezone" value=""/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="11"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-11-openjdk-arm64/lib"/>
+    <property name="sun.java.command" value="/home/codebind/typescript-generator/typescript-generator-core/target/surefire/surefirebooter2722605977251799640.jar /home/codebind/typescript-generator/typescript-generator-core/target/surefire 2025-06-05T02-31-07_347-jvmRun1 surefire16369011225223793398tmp surefire_467053964305308151290tmp"/>
+    <property name="nondexLogging" value="CONFIG"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="test" value="cz.habarta.typescript.generator.TaggedUnionsTest#testTaggedUnionsWithInterfaces"/>
+    <property name="surefire.test.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/test-classes:/home/codebind/typescript-generator/typescript-generator-core/target/classes:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar:/home/codebind/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.11.3/jackson-jaxrs-json-provider-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.11.3/jackson-jaxrs-base-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.11.3/jackson-module-jaxb-annotations-2.11.3.jar:/home/codebind/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar:/home/codebind/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.1/jakarta.activation-api-1.2.1.jar:/home/codebind/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar:/home/codebind/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar:/home/codebind/.m2/repository/org/glassfish/jaxb/txw2/2.3.1/txw2-2.3.1.jar:/home/codebind/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.7/istack-commons-runtime-3.0.7.jar:/home/codebind/.m2/repository/org/jvnet/staxex/stax-ex/1.8/stax-ex-1.8.jar:/home/codebind/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.15/FastInfoset-1.2.15.jar:/home/codebind/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar:/home/codebind/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar:/home/codebind/.m2/repository/io/github/classgraph/classgraph/4.8.90/classgraph-4.8.90.jar:/home/codebind/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.3.72/kotlin-stdlib-1.3.72.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.3.72/kotlin-stdlib-common-1.3.72.jar:/home/codebind/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar:/home/codebind/.m2/repository/org/jetbrains/kotlin/kotlin-reflect/1.3.72/kotlin-reflect-1.3.72.jar:/home/codebind/.m2/repository/jakarta/json/bind/jakarta.json.bind-api/1.0.2/jakarta.json.bind-api-1.0.2.jar:/home/codebind/.m2/repository/org/graalvm/js/js/20.2.0/js-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/regex/regex/20.2.0/regex-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/truffle/truffle-api/20.2.0/truffle-api-20.2.0.jar:/home/codebind/.m2/repository/org/graalvm/sdk/graal-sdk/20.2.0/graal-sdk-20.2.0.jar:/home/codebind/.m2/repository/org/ow2/asm/asm/7.1/asm-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar:/home/codebind/.m2/repository/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar:/home/codebind/.m2/repository/com/ibm/icu/icu4j/67.1/icu4j-67.1.jar:/home/codebind/.m2/repository/org/graalvm/js/js-scriptengine/20.2.0/js-scriptengine-20.2.0.jar:/home/codebind/.m2/repository/junit/junit/4.13.1/junit-4.13.1.jar:/home/codebind/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/codebind/.m2/repository/org/immutables/value/2.8.8/value-2.8.8.jar:/home/codebind/.m2/repository/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar:/home/codebind/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar:/home/codebind/.m2/repository/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.11.3/jackson-datatype-jdk8-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.11.3/jackson-datatype-jsr310-2.11.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar:/home/codebind/.m2/repository/org/glassfish/jersey/containers/jersey-container-jdk-http/2.32/jersey-container-jdk-http-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-common/2.32/jersey-common-2.32.jar:/home/codebind/.m2/repository/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/jakarta.inject/2.6.1/jakarta.inject-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.3/osgi-resource-locator-1.0.3.jar:/home/codebind/.m2/repository/com/sun/activation/jakarta.activation/1.2.2/jakarta.activation-1.2.2.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-server/2.32/jersey-server-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/core/jersey-client/2.32/jersey-client-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-jaxb/2.32/jersey-media-jaxb-2.32.jar:/home/codebind/.m2/repository/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar:/home/codebind/.m2/repository/jakarta/ws/rs/jakarta.ws.rs-api/2.1.6/jakarta.ws.rs-api-2.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-binding/2.32/jersey-media-json-binding-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:/home/codebind/.m2/repository/org/eclipse/yasson/1.0.6/yasson-1.0.6.jar:/home/codebind/.m2/repository/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6-module.jar:/home/codebind/.m2/repository/jakarta/json/jakarta.json-api/1.1.6/jakarta.json-api-1.1.6.jar:/home/codebind/.m2/repository/org/glassfish/jersey/media/jersey-media-json-jackson/2.32/jersey-media-json-jackson-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/ext/jersey-entity-filtering/2.32/jersey-entity-filtering-2.32.jar:/home/codebind/.m2/repository/org/glassfish/jersey/inject/jersey-hk2/2.32/jersey-hk2-2.32.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-locator/2.6.1/hk2-locator-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/external/aopalliance-repackaged/2.6.1/aopalliance-repackaged-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-api/2.6.1/hk2-api-2.6.1.jar:/home/codebind/.m2/repository/org/glassfish/hk2/hk2-utils/2.6.1/hk2-utils-2.6.1.jar:/home/codebind/.m2/repository/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar:/home/codebind/.m2/repository/io/swagger/swagger-annotations/1.6.2/swagger-annotations-1.6.2.jar:/home/codebind/.m2/repository/org/checkerframework/checker-qual/3.7.1/checker-qual-3.7.1.jar:/home/codebind/.m2/repository/com/google/guava/guava/30.0-jre/guava-30.0-jre.jar:/home/codebind/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/codebind/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/codebind/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar:/home/codebind/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-guava/2.11.3/jackson-datatype-guava-2.11.3.jar:/home/codebind/.m2/repository/joda-time/joda-time/2.10.8/joda-time-2.10.8.jar:/home/codebind/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-joda/2.11.3/jackson-datatype-joda-2.11.3.jar:/home/codebind/.m2/repository/io/vavr/vavr/0.10.3/vavr-0.10.3.jar:/home/codebind/.m2/repository/io/vavr/vavr-match/0.10.3/vavr-match-0.10.3.jar:/home/codebind/.m2/repository/io/vavr/vavr-jackson/0.10.3/vavr-jackson-0.10.3.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="nondexExecid" value="NCe83z0b5x2rGbV3xGTLwLGl7D3FuHOIUOAVIw+Vdo="/>
+    <property name="user.home" value="/home/codebind"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-11-openjdk-arm64"/>
+    <property name="basedir" value="/home/codebind/typescript-generator/typescript-generator-core"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="nondexEnd" value="9223372036854775807"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="nondexFilter" value=".*"/>
+    <property name="nondexSeed" value="2798158"/>
+    <property name="surefire.real.class.path" value="/home/codebind/typescript-generator/typescript-generator-core/target/surefire/surefirebooter2722605977251799640.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="11.0.27+6-post-Ubuntu-0ubuntu124.04"/>
+    <property name="user.name" value="codebind"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-60-generic"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/codebind/.m2/repository"/>
+    <property name="nondexDir" value="/home/codebind/typescript-generator/typescript-generator-core/.nondex"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-lts"/>
+    <property name="nondexJarDir" value="/home/codebind/typescript-generator/typescript-generator-core/.nondex"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="11.0.27"/>
+    <property name="user.dir" value="/home/codebind/typescript-generator/typescript-generator-core"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="nondexMode" value="FULL"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/aarch64-linux-gnu/jni:/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vm.version" value="11.0.27+6-post-Ubuntu-0ubuntu124.04"/>
+    <property name="java.specification.maintenance.version" value="3"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="55.0"/>
+  </properties>
+  <testcase name="testTaggedUnionsWithInterfaces" classname="cz.habarta.typescript.generator.TaggedUnionsTest" time="0.322">
+    <failure message="expected:&lt;...d: &quot;rectangle&quot;;&#10;    [width: number;&#10;    height]: number;&#10;}&#10;&#10;interfa...&gt; but was:&lt;...d: &quot;rectangle&quot;;&#10;    [height: number;&#10;    width]: number;&#10;}&#10;&#10;interfa...&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+expected:<...d: "rectangle";
+    [width: number;
+    height]: number;
+}
+
+interfa...> but was:<...d: "rectangle";
+    [height: number;
+    width]: number;
+}
+
+interfa...>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at cz.habarta.typescript.generator.TaggedUnionsTest.testTaggedUnionsWithInterfaces(TaggedUnionsTest.java:254)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junitcore.JUnitCore.run(JUnitCore.java:55)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.createRequestAndRun(JUnitCoreWrapper.java:137)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.executeEager(JUnitCoreWrapper.java:107)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:83)
+	at org.apache.maven.surefire.junitcore.JUnitCoreWrapper.execute(JUnitCoreWrapper.java:75)
+	at org.apache.maven.surefire.junitcore.JUnitCoreProvider.invoke(JUnitCoreProvider.java:158)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+]]></failure>
+    <system-out><![CDATA[Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IShape2'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CSquare2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CRectangle2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$CCircle2' used in 'IShape2.<subClass>'
+Parsing 'cz.habarta.typescript.generator.TaggedUnionsTest$IQuadrilateral2' used in 'CSquare2.<interface>'
+]]></system-out>
+  </testcase>
+</testsuite>

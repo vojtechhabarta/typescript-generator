@@ -19,6 +19,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import cz.habarta.typescript.generator.emitter.TsAliasModel;
+import cz.habarta.typescript.generator.emitter.TsEnumModel;
+import cz.habarta.typescript.generator.emitter.TsDeclarationModel;
+import cz.habarta.typescript.generator.emitter.TsPropertyModel;
+import cz.habarta.typescript.generator.emitter.TsMethodModel;
+import cz.habarta.typescript.generator.emitter.TsParameterModel;
+import cz.habarta.typescript.generator.emitter.TsAccessibilityModifier;
+import cz.habarta.typescript.generator.emitter.TsDecorator;
+import cz.habarta.typescript.generator.emitter.TsReturnStatement;
+import cz.habarta.typescript.generator.emitter.TsIfStatement;
+import cz.habarta.typescript.generator.emitter.TsExpressionStatement;
+import cz.habarta.typescript.generator.emitter.TsStatement;
+
+
+import java.util.Comparator;
+import java.util.Collections;
+
+
+
 
 public class Emitter implements EmitterExtension.Writer {
 
@@ -67,7 +86,9 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitReferences() {
         if (settings.referencedFiles != null && !settings.referencedFiles.isEmpty()) {
             writeNewLine();
-            for (String reference : settings.referencedFiles) {
+            ArrayList<String> sortedFiles = new ArrayList<String>(settings.referencedFiles);
+            Collections.sort(sortedFiles);
+            for (String reference : sortedFiles) {//here maybe
                 writeIndentedLine("/// <reference path=" + quote(reference, settings) + " />");
             }
         }
@@ -76,13 +97,22 @@ public class Emitter implements EmitterExtension.Writer {
     private void emitImports() {
         if (settings.moduleDependencies != null && !settings.moduleDependencies.isEmpty()) {
             writeNewLine();
-            for (ModuleDependency dependency : settings.moduleDependencies) {
+            
+            ArrayList<ModuleDependency> sortedDependencies = new ArrayList<ModuleDependency>(settings.moduleDependencies);
+            sortedDependencies.sort(Comparator.comparing(x->x.importAs));
+            
+            for (ModuleDependency dependency : sortedDependencies) {//
                 writeIndentedLine("import * as " + dependency.importAs + " from " + quote(dependency.importFrom, settings) + ";");
             }
+           
         }
         if (settings.importDeclarations != null && !settings.importDeclarations.isEmpty()) {
             writeNewLine();
-            for (String importDeclaration : settings.importDeclarations) {
+            
+            ArrayList<String> sortedImports = new ArrayList<String>(settings.importDeclarations);
+            Collections.sort(sortedImports);
+            
+            for (String importDeclaration : sortedImports) {//
                 writeIndentedLine(importDeclaration + ";");
             }
         }
@@ -135,20 +165,34 @@ public class Emitter implements EmitterExtension.Writer {
         emitExtensions(model, exportKeyword);
     }
 
-    private void emitBeans(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        for (TsBeanModel bean : model.getBeans()) {
+    private void emitBeans(TsModel model, boolean exportKeyword, boolean declareKeyword) {//
+    
+    	ArrayList<TsBeanModel> sortedBeans = new ArrayList<TsBeanModel>(model.getBeans());
+        sortedBeans.sort(Comparator.comparing(bean->bean.getName().toString()));
+            
+        for (TsBeanModel bean : sortedBeans) {
             emitFullyQualifiedDeclaration(bean, exportKeyword, declareKeyword);
         }
     }
 
-    private void emitTypeAliases(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        for (TsAliasModel alias : model.getTypeAliases()) {
+    private void emitTypeAliases(TsModel model, boolean exportKeyword, boolean declareKeyword) {//
+    
+    	ArrayList<TsAliasModel> sortedAliases = new ArrayList<TsAliasModel>(model.getTypeAliases());
+	sortedAliases.sort(Comparator.comparing((TsAliasModel alias) -> alias.getName().toString()));
+
+    
+        for (TsAliasModel alias : sortedAliases) {
             emitFullyQualifiedDeclaration(alias, exportKeyword, declareKeyword);
         }
     }
 
-    private void emitLiteralEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {
-        for (TsEnumModel enumModel : model.getEnums()) {
+    private void emitLiteralEnums(TsModel model, boolean exportKeyword, boolean declareKeyword) {//
+    
+    	ArrayList<TsEnumModel> sortedEnums = new ArrayList<TsEnumModel>(model.getEnums());
+	sortedEnums.sort(Comparator.comparing((TsEnumModel enumModel) -> enumModel.getName().toString()));
+
+    	
+        for (TsEnumModel enumModel : sortedEnums) {
             emitFullyQualifiedDeclaration(enumModel, exportKeyword, declareKeyword);
         }
     }
@@ -378,15 +422,25 @@ public class Emitter implements EmitterExtension.Writer {
         writeIndentedLine("}");
     }
 
-    private void emitHelpers(TsModel model) {
-        for (TsHelper helper : model.getHelpers()) {
+    private void emitHelpers(TsModel model) {//
+    
+    	ArrayList<TsHelper> sortedHelpers = new ArrayList<TsHelper>(model.getHelpers());
+    	sortedHelpers.sort(Comparator.comparing(helper -> String.join("\n", helper.getLines())));
+
+    
+        for (TsHelper helper : sortedHelpers) {
             writeNewLine();
             writeTemplate(this, settings, helper.getLines(), null);
         }
     }
 
-    private void emitExtensions(TsModel model, boolean exportKeyword) {
-        for (EmitterExtension emitterExtension : settings.extensions) {
+    private void emitExtensions(TsModel model, boolean exportKeyword) {//
+
+    
+    	ArrayList<EmitterExtension> sortedExtensions = new ArrayList<EmitterExtension>(settings.extensions);
+        sortedExtensions.sort(Comparator.comparing(extension->extension.getClass().getName()));
+    	
+        for (EmitterExtension emitterExtension : sortedExtensions) {
             final List<String> extensionLines = new ArrayList<>();
             final EmitterExtension.Writer extensionWriter = new EmitterExtension.Writer() {
                 @Override
