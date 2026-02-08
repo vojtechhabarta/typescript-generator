@@ -108,11 +108,11 @@ public class Jackson2Parser extends ModelParser {
     }
 
     public static class JaxbParserFactory extends Jackson2ParserFactory {
-        
+
         public JaxbParserFactory() {
             super(true);
         }
-        
+
     }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -219,7 +219,7 @@ public class Jackson2Parser extends ModelParser {
                                 final BeanDescription beanDescription = serializationConfig
                                         .introspect(TypeFactory.defaultInstance().constructType(rawClass));
                                 final JsonFormat.Value formatOverride = serializationConfig.getDefaultPropertyFormat(Map.Entry.class);
-                                final JsonFormat.Value formatFromAnnotation = beanDescription.findExpectedFormat(null);
+                                final JsonFormat.Value formatFromAnnotation = beanDescription.findExpectedFormat();
                                 final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
                                 if (format.getShape() != JsonFormat.Shape.OBJECT) {
                                     final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
