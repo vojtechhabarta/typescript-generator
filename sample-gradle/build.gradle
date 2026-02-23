@@ -20,8 +20,8 @@ plugins {
 // /*dev*/ apply plugin: 'cz.habarta.typescript-generator'
 
 version = '3.0'
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 17
+targetCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ dependencies {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
 }
 
