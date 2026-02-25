@@ -32,6 +32,18 @@
             <artifactId>jackson-module-jaxb-annotations</artifactId>
         </dependency>
         <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.module</groupId>
+            <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
@@ -184,6 +196,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>tools.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.12.5</version>
@@ -191,6 +208,11 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
             <scope>test</scope>
         </dependency>

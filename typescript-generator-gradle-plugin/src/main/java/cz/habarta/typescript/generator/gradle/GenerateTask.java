@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.GsonConfiguration;
 import cz.habarta.typescript.generator.IdentifierCasing;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson2Configuration;
+import cz.habarta.typescript.generator.Jackson3Configuration;
 import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.JsonbConfiguration;
 import cz.habarta.typescript.generator.Logger;
@@ -61,6 +62,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludePropertyAnnotations;
     public JsonLibrary jsonLibrary;
     public Jackson2Configuration jackson2Configuration;
+    public Jackson3Configuration jackson3Configuration;
     public GsonConfiguration gsonConfiguration;
     public JsonbConfiguration jsonbConfiguration;
     public List<String> additionalDataLibraries;
@@ -127,7 +129,9 @@ public class GenerateTask extends DefaultTask {
     public StringQuotes stringQuotes;
     public String indentString;
     public boolean jackson2ModuleDiscovery;
+    public boolean jackson3ModuleDiscovery;
     public List<String> jackson2Modules;
+    public List<String> jackson3Modules;
     public Logger.Level loggingLevel;
 
     private Settings createSettings(URLClassLoader classLoader) {
@@ -144,6 +148,7 @@ public class GenerateTask extends DefaultTask {
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
+        settings.setJackson3Configuration(classLoader, jackson3Configuration);
         settings.gsonConfiguration = gsonConfiguration;
         settings.jsonbConfiguration = jsonbConfiguration;
         settings.additionalDataLibraries = additionalDataLibraries;
@@ -210,7 +215,9 @@ public class GenerateTask extends DefaultTask {
         settings.setStringQuotes(stringQuotes);
         settings.setIndentString(indentString);
         settings.jackson2ModuleDiscovery = jackson2ModuleDiscovery;
+        settings.jackson3ModuleDiscovery = jackson3ModuleDiscovery;
         settings.loadJackson2Modules(classLoader, jackson2Modules);
+        settings.loadJackson3Modules(classLoader, jackson3Modules);
         settings.classLoader = classLoader;
         return settings;
     }

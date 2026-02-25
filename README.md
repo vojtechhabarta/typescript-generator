@@ -72,7 +72,7 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
         </execution>
     </executions>
     <configuration>
-        <jsonLibrary>jackson2</jsonLibrary>
+        <jsonLibrary>jackson3</jsonLibrary>
         <classes>
             <class>cz.habarta.typescript.generator.Person</class>
         </classes>
@@ -95,7 +95,7 @@ plugins {
 }
 
 generateTypeScript {
-    jsonLibrary = 'jackson2'
+    jsonLibrary = 'jackson3'
     classes = [
         'cz.habarta.typescript.generator.sample.Person'
     ]
@@ -117,7 +117,7 @@ plugins {
 
 tasks {
     generateTypeScript {
-        jsonLibrary = JsonLibrary.jackson2
+        jsonLibrary = JsonLibrary.jackson3
         outputKind = TypeScriptOutputKind.module
         outputFileType = TypeScriptFileType.implementationFile
         ...
@@ -214,7 +214,7 @@ ModelParser  ==>  ModelCompiler  ==>  Emitter
 - `ModelParser` reads Java JSON classes and their properties using Java reflections and creates `Model`.
   It uses `TypeProcessor`s for finding used classes.
   For example if property type is `List<Person>` it discovers that `Person` class should be also parsed.
-  `ModelParser`s are specific for each JSON library (for example `Jackson2Parser`).
+  `ModelParser`s are specific for each JSON library (for example `Jackson3Parser`).
 - `ModelCompiler` transforms Java model to TypeScript model (`Model` class to `TsModel` class).
   It uses `TypeProcessor`s for mapping Java types to TypeScript types (for example for `int` returns `number`).
 - `Emitter` takes `TsModel` and produces TypeScript declaration file.

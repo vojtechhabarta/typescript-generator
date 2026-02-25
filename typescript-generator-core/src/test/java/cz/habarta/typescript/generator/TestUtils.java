@@ -14,9 +14,13 @@ public class TestUtils {
     }
 
     public static Settings settings() {
+        return settings(false);
+    }
+
+    public static Settings settings(boolean useJackson3) {
         final Settings settings = new Settings();
         settings.outputKind = TypeScriptOutputKind.global;
-        settings.jsonLibrary = JsonLibrary.jackson2;
+        settings.jsonLibrary = useJackson3 ? JsonLibrary.jackson3 : JsonLibrary.jackson2;
         settings.noFileComment = true;
         settings.noTslintDisable = true;
         settings.noEslintDisable = true;
