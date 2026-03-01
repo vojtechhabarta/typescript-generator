@@ -19,7 +19,7 @@ plugins {
 
 // /*dev*/ apply plugin: 'cz.habarta.typescript-generator'
 
-version = '3.0'
+version = '4.0'
 sourceCompatibility = 17
 targetCompatibility = 17
 
