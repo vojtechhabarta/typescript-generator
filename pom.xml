@@ -263,19 +263,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>site</id>
-                        <configuration>
-                            <path>maven</path>
-                        </configuration>
-                        <inherited>false</inherited>
-                    </execution>
-                </executions>
-            </plugin>
             <!--            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -291,25 +278,6 @@
 
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>com.github.github</groupId>
-                    <artifactId>site-maven-plugin</artifactId>
-                    <version>0.12</version>
-                    <executions>
-                        <execution>
-                            <id>site</id>
-                            <phase>site-deploy</phase>
-                            <goals>
-                                <goal>site</goal>
-                            </goals>
-                            <configuration>
-                                <message>Generated site for ${project.artifactId} ${project.version}</message>
-                                <merge>true</merge>
-                                <path>maven/${project.artifactId}</path>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
