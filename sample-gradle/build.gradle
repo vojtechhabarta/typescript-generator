@@ -12,7 +12,7 @@ buildscript {
 plugins {
     id 'java'
     id 'groovy'
-    id "org.jetbrains.kotlin.jvm" version "1.8.10"
+    id "org.jetbrains.kotlin.jvm" version "2.2.21"
     id 'scala'
     /*prod*/ id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
 }
@@ -30,7 +30,7 @@ repositories {
 dependencies {
     implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.14.2'
     implementation 'org.codehaus.groovy:groovy-all:3.0.16'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
     implementation 'org.scala-lang:scala-library:2.13.10'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2'
 }
