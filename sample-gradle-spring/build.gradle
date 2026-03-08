@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web:4.0.3'
 }
 
 generateTypeScript {

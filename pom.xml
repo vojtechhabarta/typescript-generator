@@ -55,7 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <kotlin.version>2.2.0</kotlin.version>
+        <kotlin.version>2.3.10</kotlin.version>
         <github.global.server>github</github.global.server>
     </properties>
 
@@ -64,14 +64,14 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-bom</artifactId>
-                <version>4.0.3</version>
+                <version>4.0.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.5</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>3.1.0</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -91,7 +91,7 @@
             <dependency>
                 <groupId>jakarta.json</groupId>
                 <artifactId>jakarta.json-api</artifactId>
-                <version>2.1.2</version>
+                <version>2.1.3</version>
             </dependency>
             <dependency>
                 <groupId>javax.json</groupId>
@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>jakarta.json.bind</groupId>
                 <artifactId>jakarta.json.bind-api</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.json.bind</groupId>
@@ -111,7 +111,7 @@
             <dependency>
                 <groupId>jakarta.activation</groupId>
                 <artifactId>jakarta.activation-api</artifactId>
-                <version>2.1.2</version>
+                <version>2.1.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
@@ -121,30 +121,40 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.0</version>
+                <version>6.0.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.20.1</version>
+                <version>2.21.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.0.3</version>
+                <version>3.1.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
-                <version>3.1.3</version>
+                <version>4.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>1.6.16</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>2.2.44</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -156,7 +166,14 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.7.3</version>
+                <version>4.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-bom</artifactId>
+                <version>3.0.25</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -171,8 +188,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.15.0</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
@@ -274,6 +290,30 @@
                     <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
                 </configuration>
             </plugin>-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <ruleSet>
+                        <ignoreVersions>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>.+-.+</version>
+                            </ignoreVersion>
+                        </ignoreVersions>
+                        <rules>
+                            <rule groupId="org.apache.maven">
+                                <ignoreVersions>
+                                    <ignoreVersion>
+                                        <type>range</type>
+                                        <version>[3.7,)</version>
+                                    </ignoreVersion>
+                                </ignoreVersions>
+                            </rule>
+                        </rules>
+                    </ruleSet>
+                </configuration>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -287,6 +327,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
                     <version>3.15.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.21.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
