@@ -4,15 +4,14 @@ buildscript {
     // /*dev*/     mavenLocal()
     // /*dev*/ }
     dependencies {
-        classpath 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.14.2'
-        // /*dev*/ classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:FILL_VERSION-SNAPSHOT'
+        // /*dev*/ classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:4.0-SNAPSHOT'
     }
 }
 
 plugins {
     id 'java'
     id 'groovy'
-    id "org.jetbrains.kotlin.jvm" version "2.2.21"
+    id "org.jetbrains.kotlin.jvm" version "2.3.10"
     id 'scala'
     /*prod*/ id 'cz.habarta.typescript-generator' version 'FILL_VERSION'
 }
@@ -20,19 +19,24 @@ plugins {
 // /*dev*/ apply plugin: 'cz.habarta.typescript-generator'
 
 version = '4.0'
-sourceCompatibility = 17
-targetCompatibility = 17
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.14.2'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.16'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
-    implementation 'org.scala-lang:scala-library:2.13.10'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2'
+    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.21.1'
+    implementation 'org.codehaus.groovy:groovy:3.0.25'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
+    implementation 'org.scala-lang:scala3-library_3:3.8.2'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1'
+    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.21.1'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+    options.release = 17
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
