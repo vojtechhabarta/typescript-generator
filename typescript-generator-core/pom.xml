@@ -13,8 +13,9 @@
     <name>typescript-generator-core</name>
 
     <properties>
-        <graalvm.version>22.3.1</graalvm.version>
+        <graalvm.version>25.0.1</graalvm.version>
         <vavr.version>0.10.3</vavr.version>
+        <org.immutables.version>2.12.1</org.immutables.version>
     </properties>
 
     <dependencies>
@@ -110,6 +111,7 @@
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
             <version>${graalvm.version}</version>
+            <type>pom</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -126,7 +128,7 @@
         <dependency>
             <groupId>org.immutables</groupId>
             <artifactId>value</artifactId>
-            <version>2.9.3</version>
+            <version>${org.immutables.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -250,6 +252,20 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.immutables</groupId>
+                            <artifactId>value</artifactId>
+                            <version>${org.immutables.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.evolvedbinary.maven.jvnet</groupId>
