@@ -306,7 +306,7 @@
                                 <ignoreVersions>
                                     <ignoreVersion>
                                         <type>range</type>
-                                        <version>[3.7,)</version>
+                                        <version>[4,)</version>
                                     </ignoreVersion>
                                 </ignoreVersions>
                             </rule>
