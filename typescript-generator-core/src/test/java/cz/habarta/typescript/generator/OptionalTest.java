@@ -30,7 +30,7 @@ public class OptionalTest {
     public void testJackson2OptionalSupport() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new Jdk8Module())
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 
         final Person personWithEmail = new Person("afh", Optional.of("af@h.cz"));
         final Person personWithEmptyEmail = new Person("afh", Optional.<String>empty());
