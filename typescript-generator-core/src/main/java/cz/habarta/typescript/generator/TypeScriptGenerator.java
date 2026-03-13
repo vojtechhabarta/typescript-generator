@@ -149,7 +149,7 @@ public class TypeScriptGenerator {
             final ModelParser.Factory modelParserFactory = getModelParserFactory();
             final List<TypeProcessor> specificTypeProcessors = Stream
                     .concat(
-                            restFactories.stream().map(factory -> factory.getSpecificTypeProcessor()),
+                            restFactories.stream().map(RestApplicationParser.Factory::getSpecificTypeProcessor),
                             Stream.of(modelParserFactory.getSpecificTypeProcessor())
                     )
                     .filter(Objects::nonNull)
@@ -168,8 +168,7 @@ public class TypeScriptGenerator {
         processors.add(new CustomMappingTypeProcessor(settings.getValidatedCustomTypeMappings()));
         processors.addAll(specificTypeProcessors);
         processors.add(new DefaultTypeProcessor(settings.getLoadedDataLibraries()));
-        final TypeProcessor typeProcessor = new TypeProcessor.Chain(processors);
-        return typeProcessor;
+        return new TypeProcessor.Chain(processors);
     }
 
     public ModelParser getModelParser() {

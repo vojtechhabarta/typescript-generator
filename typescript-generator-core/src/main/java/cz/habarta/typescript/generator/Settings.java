@@ -140,6 +140,8 @@ public class Settings {
     public boolean jackson3ModuleDiscovery = false;
     public List<Class<? extends JacksonModule>> jackson3Modules = new ArrayList<>();
     public ClassLoader classLoader = null;
+    public boolean disableTrailingSemiColon = false;
+    public Map<String, List<String>> injectCustomProperties = Map.of();
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
@@ -920,5 +922,4 @@ public class Settings {
             default: return 0;
         }
     }
-
 }

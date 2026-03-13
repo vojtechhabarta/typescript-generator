@@ -24,7 +24,8 @@ public class TsProperty {
 
     public String format(Settings settings) {
         final String questionMark = (tsType instanceof TsType.OptionalType) ? "?" : "";
-        return Emitter.quoteIfNeeded(name, settings) + questionMark + ": " + tsType.format(settings) + ";";
+        final String trailingChar = settings.disableTrailingSemiColon ? "" : ";";
+        return Emitter.quoteIfNeeded(name, settings) + questionMark + ": " + tsType.format(settings) + trailingChar;
     }
 
 }
