@@ -12,7 +12,7 @@ import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestApplicationParser;
 import cz.habarta.typescript.generator.parser.RestApplicationType;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
-import cz.habarta.typescript.generator.parser.RestQueryParam;
+import cz.habarta.typescript.generator.parser.RestParam;
 import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.parser.Swagger;
 import cz.habarta.typescript.generator.parser.SwaggerOperation;
@@ -51,6 +51,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -297,20 +298,20 @@ public class SpringApplicationParser extends RestApplicationParser {
                 .collect(Collectors.toList());
 
             // query parameters
-            final List<RestQueryParam> queryParams = new ArrayList<>();
+            final List<RestParam> queryParams = new ArrayList<>();
             for (Parameter parameter : method.getParameters()) {
                 if (parameter.getType() == Pageable.class) {
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("page", Long.class), false));
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("size", Long.class), false));
-                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel("sort", String.class), false));
+                    queryParams.add(new RestParam.Single(new MethodParameterModel("page", Long.class), false));
+                    queryParams.add(new RestParam.Single(new MethodParameterModel("size", Long.class), false));
+                    queryParams.add(new RestParam.Single(new MethodParameterModel("sort", String.class), false));
                 } else {
                     final RequestParam requestParamAnnotation = AnnotationUtils.findAnnotation(parameter, RequestParam.class);
                     if (requestParamAnnotation != null) {
                         if (parameter.getType() == MultiValueMap.class) {
-                            queryParams.add(new RestQueryParam.Map(false));
+                            queryParams.add(new RestParam.Map(false));
                         } else {
                             final boolean isRequired = requestParamAnnotation.required() && requestParamAnnotation.defaultValue().equals(ValueConstants.DEFAULT_NONE);
-                            queryParams.add(new RestQueryParam.Single(new MethodParameterModel(firstOf(
+                            queryParams.add(new RestParam.Single(new MethodParameterModel(firstOf(
                                 requestParamAnnotation.value(),
                                 parameter.getName()
                             ), parameter.getParameterizedType()), isRequired));
@@ -325,7 +326,7 @@ public class SpringApplicationParser extends RestApplicationParser {
                             for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
                                 final Method writeMethod = propertyDescriptor.getWriteMethod();
                                 if (writeMethod != null) {
-                                    queryParams.add(new RestQueryParam.Single(new MethodParameterModel(
+                                    queryParams.add(new RestParam.Single(new MethodParameterModel(
                                             propertyDescriptor.getName(),
                                             propertyDescriptor.getPropertyType()
                                     ), false));
@@ -345,11 +346,31 @@ public class SpringApplicationParser extends RestApplicationParser {
                 foundType(result, entityParameter.getType(), controllerClass, method.getName());
             }
 
+            // header parameters
+            final List<RestParam> headers = new ArrayList<>();
+            if(settings.restHeaderArgumentsParsed){
+                for (Parameter parameter : method.getParameters()) {
+                    final RequestHeader requestHeaderAnnotation = AnnotationUtils.findAnnotation(parameter, RequestHeader.class);
+                    if (requestHeaderAnnotation != null) {
+                        if (parameter.getType() == MultiValueMap.class) {
+                            headers.add(new RestParam.Map(false));
+                        } else {
+                            final boolean isRequired = requestHeaderAnnotation.required() && requestHeaderAnnotation.defaultValue().equals(ValueConstants.DEFAULT_NONE);
+                            headers.add(new RestParam.Single(new MethodParameterModel(firstOf(
+                                    requestHeaderAnnotation.value(),
+                                    parameter.getName()
+                            ), parameter.getParameterizedType()), isRequired));
+                            foundType(result, parameter.getParameterizedType(), controllerClass, method.getName());
+                        }
+                    }
+                }
+            }
+
             final Type modelReturnType = parseReturnType(controllerClass, method);
             foundType(result, modelReturnType, controllerClass, method.getName());
 
             model.getMethods().add(new RestMethodModel(controllerClass, method.getName(), modelReturnType, method,
-                controllerClass, httpMethod.name(), context.path, pathParams, queryParams, entityParameter, null));
+                controllerClass, httpMethod.name(), context.path, pathParams, queryParams, entityParameter, null, headers));
         }
     }
 

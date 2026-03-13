@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -169,6 +170,26 @@ public class SpringTest {
         Assertions.assertFalse(output.contains("uriEncoding`test/b`"));
     }
 
+    @Test
+    public void testHeadersParameter() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.restHeaderArgumentsParsed = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller8.class));
+        Assertions.assertTrue(output.contains("sendHeaders(headers: { ownerId: number; petId?: string; }): RestResponse<void>"));
+    }
+
+    @Test
+    public void testHeadersParameterWithQueryParameter() {
+        final Settings settings = TestUtils.settings();
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.generateSpringApplicationClient = true;
+        settings.restHeaderArgumentsParsed = true;
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Controller9.class));
+        Assertions.assertTrue(output.contains("sendHeadersAndQueryParams(queryParams: { petId: string; }, headers: { ownerId: number; }): RestResponse<void>"));
+    }
+
     @RestController
     @RequestMapping("/owners/{ownerId}")
     public static class Controller1 {
@@ -289,6 +310,24 @@ public class SpringTest {
         int doSomethingElseAgain() {
             return 1;
         }
+    }
+
+    @RestController
+    public static class Controller8 {
+        @GetMapping("/headers1")
+        public void sendHeaders(
+                @RequestHeader Long ownerId,
+                @RequestHeader(required = false) String petId
+        ) {}
+    }
+
+    @RestController
+    public static class Controller9 {
+        @GetMapping("/headersWithQueryParams1")
+        public void sendHeadersAndQueryParams(
+                @RequestHeader Long ownerId,
+                @RequestParam String petId
+        ) {}
     }
 
     public static class Pet {
