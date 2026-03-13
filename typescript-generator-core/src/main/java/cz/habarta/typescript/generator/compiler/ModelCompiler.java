@@ -55,6 +55,7 @@ import cz.habarta.typescript.generator.parser.RestApplicationModel;
 import cz.habarta.typescript.generator.parser.RestMethodModel;
 import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
+import cz.habarta.typescript.generator.util.DeprecationUtils;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
@@ -72,6 +73,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1019,16 +1021,23 @@ public class ModelCompiler {
                             Stream.of("Values:"),
                             enumModel.getMembers().stream()
                                     .map(enumMember -> "- `" + enumMember.getEnumValue() + "`"
-                                            + (enumMember.getComments() != null
-                                            ? " - " + String.join(" ", enumMember.getComments())
-                                            : ""))
+                                            + getEnumItemCommentAsString(enumMember))
                     )
-                    .flatMap(s -> s)
+                    .flatMap(Function.identity())
                     .collect(Collectors.toList())
             );
         } else {
             return enumModel;
         }
+    }
+
+    private static String getEnumItemCommentAsString(EnumMemberModel enumMember) {
+        if (enumMember.getComments() == null) {
+            return "";
+        }
+        return " - " + enumMember.getComments().stream()
+                .map(s -> s.startsWith(DeprecationUtils.DEPRECATED) ? s.substring(1) : s)
+                .collect(Collectors.joining(" "));
     }
 
     private TsModel createAndUseTaggedUnions(final SymbolTable symbolTable, TsModel tsModel) {
