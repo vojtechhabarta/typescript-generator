@@ -111,6 +111,7 @@ public class Settings {
     public boolean restOptionsTypeIsGeneric;
     private List<RestApplicationParser.Factory> restApplicationParserFactories;
     public TypeProcessor customTypeProcessor = null;
+    public RestMethodBuilder customRestMethodBuilder = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
     public boolean noFileComment = false;
@@ -234,6 +235,12 @@ public class Settings {
     public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
         if (customTypeProcessor != null) {
             this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);
+        }
+    }
+
+    public void loadCustomRestMethodBuilder(ClassLoader classLoader, String customRestMethodBuilder) {
+        if (customRestMethodBuilder != null) {
+            this.customRestMethodBuilder = loadInstance(classLoader, customRestMethodBuilder, RestMethodBuilder.class);
         }
     }
 

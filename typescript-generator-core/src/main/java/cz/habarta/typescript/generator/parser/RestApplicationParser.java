@@ -1,6 +1,8 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.DefaultRestMethodBuilder;
+import cz.habarta.typescript.generator.RestMethodBuilder;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeProcessor;
 import cz.habarta.typescript.generator.util.Utils;
@@ -17,6 +19,7 @@ public abstract class RestApplicationParser {
     protected final Predicate<String> isClassNameExcluded;
     protected final TypeProcessor commonTypeProcessor;
     protected final RestApplicationModel model;
+    protected final RestMethodBuilder restMethodBuilder;
 
     public static abstract class Factory {
 
@@ -33,6 +36,9 @@ public abstract class RestApplicationParser {
         this.isClassNameExcluded = settings.getExcludeFilter();
         this.commonTypeProcessor = commonTypeProcessor;
         this.model = model;
+        this.restMethodBuilder = settings.customRestMethodBuilder == null ?
+                new DefaultRestMethodBuilder() :
+                settings.customRestMethodBuilder;
     }
 
     public RestApplicationModel getModel() {

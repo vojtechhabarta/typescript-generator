@@ -5,7 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.JaxrsApplicationParser;
+import cz.habarta.typescript.generator.parser.MethodParameterModel;
 import cz.habarta.typescript.generator.parser.Model;
+import cz.habarta.typescript.generator.parser.RestMethodModel;
+import cz.habarta.typescript.generator.parser.RestQueryParam;
 import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.type.JGenericArrayType;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
@@ -40,6 +43,7 @@ import jakarta.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -704,6 +708,18 @@ public class JaxrsApplicationTest {
         Assertions.assertTrue(output.contains("interface AccountDto"));
     }
 
+    @Test
+    public void testCustomREstMethodBuilder() {
+        final Settings settings = TestUtils.settings();
+        settings.generateJaxrsApplicationClient = true;
+        settings.outputFileType = TypeScriptFileType.implementationFile;
+        settings.customRestMethodBuilder = new CustomRestMethodBuilder();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AccountResource.class));
+        Assertions.assertTrue(!output.contains("get(testParam: ID): RestResponse<ENTITY>"));
+        Assertions.assertTrue(output.contains("get(testParam: string): RestResponse<AccountDto>"));
+        Assertions.assertTrue(output.contains("interface AccountDto"));
+    }
+
     public static class AccountDto {
         public Integer id;
         public String name;
@@ -728,4 +744,16 @@ public class JaxrsApplicationTest {
         System.out.println("Jersey started.");
     }
 
+    public class CustomRestMethodBuilder implements RestMethodBuilder{
+
+        @Override
+        public RestMethodModel build(Class<?> originClass, String name, Type returnType,
+                                     Method originalMethod, Class<?> rootResource, String httpMethod,
+                                     String path, List<MethodParameterModel> pathParams, List<RestQueryParam> queryParams,
+                                     MethodParameterModel entityParam, List<String> comments) {
+
+            return new RestMethodModel(originClass, name, returnType, originalMethod, rootResource, httpMethod, path,
+                    Arrays.asList(new MethodParameterModel("testParam", String.class)), queryParams, entityParam, comments);
+        }
+    }
 }
