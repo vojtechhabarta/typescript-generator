@@ -133,6 +133,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> jackson2Modules;
     public List<String> jackson3Modules;
     public Logger.Level loggingLevel;
+    public boolean skip;
 
     private Settings createSettings(URLClassLoader classLoader) {
         final Settings settings = new Settings();
@@ -233,7 +234,11 @@ public class GenerateTask extends DefaultTask {
 
         TypeScriptGenerator.setLogger(new Logger(loggingLevel));
         TypeScriptGenerator.printVersion();
-
+        if (skip) {
+            TypeScriptGenerator.getLogger().info("Skipping plugin execution");
+            return;
+        }
+        
         // class loader
         final Set<URL> urls = new LinkedHashSet<>();
         for (Task task : getProject().getTasks()) {
