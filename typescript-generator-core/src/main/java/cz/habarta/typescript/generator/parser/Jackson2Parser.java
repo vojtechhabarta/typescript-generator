@@ -64,6 +64,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -291,6 +292,20 @@ public class Jackson2Parser extends ModelParser {
                 }
                 properties.add(processTypeAndCreateProperty(beanProperty.getName(), propertyType, jackson2TypeContext, optional, access, sourceClass.type, member, pullProperties, propertyComments));
             }
+        } else if (Records.isRecord(sourceClass.type)) {
+            for (final Records.RecordComponentInfo component : Records.getComponents(sourceClass.type)) {
+                final Method accessor = component.accessor;
+                final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), accessor, null, accessor::getAnnotation, component.name, sourceClass.type);
+                if (propertyMember == null) {
+                    continue;
+                }
+                if (!isAnnotatedPropertyIncluded(accessor::getAnnotation, sourceClass.type.getName() + "." + component.name)) {
+                    continue;
+                }
+                final boolean optional = isPropertyOptional(propertyMember);
+                final List<String> propertyComments = getComments(accessor.getAnnotation(JsonPropertyDescription.class));
+                properties.add(processTypeAndCreateProperty(component.name, propertyMember.getType(), null, optional, PropertyAccess.ReadOnly, sourceClass.type, accessor, null, propertyComments));
+            }
         }
         if (sourceClass.type.isEnum()) {
             return new BeanModel(sourceClass.type, null, null, null, null, null, properties, classComments);
@@ -345,7 +360,7 @@ public class Jackson2Parser extends ModelParser {
         if (taggedUnionClasses != null) {
             taggedUnionClasses.forEach(subClass -> addBeanToQueue(new SourceType<>(subClass, sourceClass.type, "<subClass>")));
         }
-        final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null : sourceClass.type.getGenericSuperclass();
+        final Type superclass = (sourceClass.type.getGenericSuperclass() == Object.class || Records.isRecord(sourceClass.type)) ? null : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }
@@ -783,6 +798,77 @@ public class Jackson2Parser extends ModelParser {
         final String propertyDescriptionValue = propertyDescriptionAnnotation != null ? propertyDescriptionAnnotation.value() : null;
         final List<String> propertyComments = Utils.splitMultiline(propertyDescriptionValue, false);
         return propertyComments;
+    }
+
+    private static class Records {
+
+        private static final Method IS_RECORD;
+        private static final Method GET_RECORD_COMPONENTS;
+        private static final Method GET_NAME;
+        private static final Method GET_GENERIC_TYPE;
+        private static final Method GET_ACCESSOR;
+
+        static {
+            Method isRecord = null;
+            Method getRecordComponents = null;
+            Method getName = null;
+            Method getGenericType = null;
+            Method getAccessor = null;
+            try {
+                isRecord = Class.class.getMethod("isRecord");
+                getRecordComponents = Class.class.getMethod("getRecordComponents");
+                final Class<?> recordComponentClass = Class.forName("java.lang.reflect.RecordComponent");
+                getName = recordComponentClass.getMethod("getName");
+                getGenericType = recordComponentClass.getMethod("getGenericType");
+                getAccessor = recordComponentClass.getMethod("getAccessor");
+            } catch (NoSuchMethodException | ClassNotFoundException e) {
+                // running on Java < 16, records not supported
+            }
+            IS_RECORD = isRecord;
+            GET_RECORD_COMPONENTS = getRecordComponents;
+            GET_NAME = getName;
+            GET_GENERIC_TYPE = getGenericType;
+            GET_ACCESSOR = getAccessor;
+        }
+
+        public static boolean isRecord(Class<?> clazz) {
+            try {
+                return IS_RECORD != null && Boolean.TRUE.equals(IS_RECORD.invoke(clazz));
+            } catch (ReflectiveOperationException e) {
+                return false;
+            }
+        }
+
+        public static List<RecordComponentInfo> getComponents(Class<?> clazz) {
+            try {
+                if (GET_RECORD_COMPONENTS == null) {
+                    return Collections.emptyList();
+                }
+                final Object[] components = (Object[]) GET_RECORD_COMPONENTS.invoke(clazz);
+                final List<RecordComponentInfo> result = new ArrayList<>();
+                for (final Object component : components) {
+                    final String name = (String) GET_NAME.invoke(component);
+                    final Type genericType = (Type) GET_GENERIC_TYPE.invoke(component);
+                    final Method accessor = (Method) GET_ACCESSOR.invoke(component);
+                    result.add(new RecordComponentInfo(name, genericType, accessor));
+                }
+                return result;
+            } catch (ReflectiveOperationException e) {
+                return Collections.emptyList();
+            }
+        }
+
+        public static class RecordComponentInfo {
+            public final String name;
+            public final Type genericType;
+            public final Method accessor;
+
+            public RecordComponentInfo(String name, Type genericType, Method accessor) {
+                this.name = name;
+                this.genericType = genericType;
+                this.accessor = accessor;
+            }
+        }
     }
 
 }

@@ -345,4 +345,14 @@ public class JsonbParserTest {
         Assertions.assertFalse(output.contains("password"), output);
     }
 
+    public record SimpleRecord(Long id, String name) {}
+
+    @Test
+    public void testRecordProperties() {
+        final String output = generate(settings, SimpleRecord.class);
+        Assertions.assertTrue(output.contains("interface SimpleRecord"), output);
+        Assertions.assertTrue(output.contains("id"), output);
+        Assertions.assertTrue(output.contains("name"), output);
+    }
+
 }
