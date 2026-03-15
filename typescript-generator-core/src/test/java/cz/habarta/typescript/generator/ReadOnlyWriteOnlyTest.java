@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 
 public class ReadOnlyWriteOnlyTest {
-    
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ReadOnlyWriteOnlyUser {
 
@@ -23,7 +23,7 @@ public class ReadOnlyWriteOnlyTest {
         @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
         public String password1;
 
-        private String _id2;  // Jackson would use `id2` field as writable property
+        private String _id2; // Jackson would use `id2` field as writable property
 
         public String getId2() {
             return _id2;
@@ -60,7 +60,7 @@ public class ReadOnlyWriteOnlyTest {
     @Test
     public void testJacksonDeserialization() throws JsonProcessingException {
         final String json = "{'name':'name','id1':'id1','id2':'id2','password1':'password1','password2':'password2'}"
-                .replace("'", "\"");
+            .replace("'", "\"");
         final ReadOnlyWriteOnlyUser user = new ObjectMapper().readValue(json, ReadOnlyWriteOnlyUser.class);
         Assertions.assertNull(user.id1);
         Assertions.assertNull(user._id2);
@@ -74,25 +74,25 @@ public class ReadOnlyWriteOnlyTest {
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ReadOnlyWriteOnlyUser.class));
         final String expected = "\n"
-                + "interface ReadOnlyWriteOnlyUser {\n"
-                + "    name: string;\n"
-                + "    /**\n"
-                + "     * @readonly\n"
-                + "     */\n"
-                + "    id1: string;\n"
-                + "    /**\n"
-                + "     * @writeonly\n"
-                + "     */\n"
-                + "    password1: string;\n"
-                + "    /**\n"
-                + "     * @readonly\n"
-                + "     */\n"
-                + "    id2: string;\n"
-                + "    /**\n"
-                + "     * @writeonly\n"
-                + "     */\n"
-                + "    password2: string;\n"
-                + "}\n";
+            + "interface ReadOnlyWriteOnlyUser {\n"
+            + "    name: string;\n"
+            + "    /**\n"
+            + "     * @readonly\n"
+            + "     */\n"
+            + "    id1: string;\n"
+            + "    /**\n"
+            + "     * @writeonly\n"
+            + "     */\n"
+            + "    password1: string;\n"
+            + "    /**\n"
+            + "     * @readonly\n"
+            + "     */\n"
+            + "    id2: string;\n"
+            + "    /**\n"
+            + "     * @writeonly\n"
+            + "     */\n"
+            + "    password2: string;\n"
+            + "}\n";
         Assertions.assertEquals(expected, output);
     }
 

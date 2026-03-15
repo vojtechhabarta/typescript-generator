@@ -1,7 +1,9 @@
+
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.util.List;
+
 
 /**
  * This class is used for configuration in Maven and Gradle plugins

@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Extension;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
 
 /**
  * Adds constructor with each required property to every generated class.
@@ -70,8 +72,10 @@ public class RequiredPropertyConstructorExtension extends Extension {
         }));
     }
 
-    private TsBeanModel transformBean(TsBeanModel bean, TsModel model,
-                                             Map<String, TsConstructorModel> generatedConstructors) {
+    private TsBeanModel transformBean(
+        TsBeanModel bean, TsModel model,
+        Map<String, TsConstructorModel> generatedConstructors
+    ) {
         if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
             return bean;
         }
@@ -87,8 +91,10 @@ public class RequiredPropertyConstructorExtension extends Extension {
         return bean.withConstructor(constructor);
     }
 
-    private static Optional<TsConstructorModel> createConstructor(TsBeanModel bean, TsModel model,
-                                                                  Map<String, TsConstructorModel> generatedConstructors) {
+    private static Optional<TsConstructorModel> createConstructor(
+        TsBeanModel bean, TsModel model,
+        Map<String, TsConstructorModel> generatedConstructors
+    ) {
         List<TsParameterModel> parameters = new ArrayList<>();
         List<TsParameterModel> optionalParameters = new ArrayList<>();
         List<TsStatement> body = new ArrayList<>();
@@ -106,8 +112,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
             TsIdentifierReference[] callParameters = new TsIdentifierReference[parentParameters.size()];
             int i = 0;
             for (TsParameterModel parentParameter : parentParameters) {
-                List<TsParameterModel> targetParameterList =
-                        parentParameter.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
+                List<TsParameterModel> targetParameterList = parentParameter.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
                 targetParameterList.add(parentParameter);
                 callParameters[i] = new TsIdentifierReference(parentParameter.name);
                 i++;
@@ -124,8 +129,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
                 assignmentExpression = predefinedValue.get();
             } else {
                 TsParameterModel parameter = new TsParameterModel(property.name, property.tsType);
-                List<TsParameterModel> targetParameterList =
-                        property.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
+                List<TsParameterModel> targetParameterList = property.tsType instanceof TsType.OptionalType ? optionalParameters : parameters;
                 targetParameterList.add(parameter);
                 assignmentExpression = new TsIdentifierReference(property.name);
             }
@@ -135,7 +139,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
             body.add(assignmentStatement);
         }
         parameters.addAll(optionalParameters);
-        if(parameters.isEmpty() && body.isEmpty()) {
+        if (parameters.isEmpty() && body.isEmpty()) {
             return Optional.empty();
         }
         TsConstructorModel constructor = new TsConstructorModel(TsModifierFlags.None, parameters, body, null);
@@ -159,13 +163,13 @@ public class RequiredPropertyConstructorExtension extends Extension {
         if (property.tsType instanceof TsType.EnumReferenceType) {
             Symbol symbol = ((TsType.EnumReferenceType) property.tsType).symbol;
             Optional<TsEnumModel> enumModelOption = model.getOriginalStringEnums().stream()
-                    .filter(candidate -> candidate.getName().getFullName().equals(symbol.getFullName()))
-                    .findAny();
+                .filter(candidate -> candidate.getName().getFullName().equals(symbol.getFullName()))
+                .findAny();
             if (!enumModelOption.isPresent()) {
                 return Optional.empty();
             }
             TsEnumModel enumModel = enumModelOption.get();
-            if(enumModel.getMembers().size() != 1) {
+            if (enumModel.getMembers().size() != 1) {
                 return Optional.empty();
             }
             EnumMemberModel singleElement = enumModel.getMembers().iterator().next();

@@ -70,8 +70,8 @@ public class JaxrsApplicationTest {
         final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class, null);
         List<Type> types = getTypes(sourceTypes);
         final List<Type> expectedTypes = Arrays.<Type>asList(
-                TestApplication.class,
-                TestResource1.class
+            TestApplication.class,
+            TestResource1.class
         );
         assertHasSameItems(expectedTypes, types);
     }
@@ -83,19 +83,19 @@ public class JaxrsApplicationTest {
         Assertions.assertNotNull(result);
         List<Type> types = getTypes(result.discoveredTypes);
         final List<Type> expectedTypes = Arrays.asList(
-                A.class,
-                new TypeReference<List<B>>(){}.getType(),
-                C.class,
-                new TypeReference<List<D>>(){}.getType(),
-                List.class,
-                E.class,
-                new TypeReference<List<F>>(){}.getType(),
-                G.class,
-                new TypeReference<Map<String, H>>(){}.getType(),
-                I.class,
-                JGenericArrayType.of(J[].class),
-                // types handled by DefaultTypeProcessor
-                String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class, void.class
+            A.class,
+            new TypeReference<List<B>>() {}.getType(),
+            C.class,
+            new TypeReference<List<D>>() {}.getType(),
+            List.class,
+            E.class,
+            new TypeReference<List<F>>() {}.getType(),
+            G.class,
+            new TypeReference<Map<String, H>>() {}.getType(),
+            I.class,
+            JGenericArrayType.of(J[].class),
+            // types handled by DefaultTypeProcessor
+            String.class, Boolean.class, Character.class, Number.class, Integer.class, int.class, void.class
         );
         assertHasSameItems(expectedTypes, types);
     }
@@ -119,16 +119,16 @@ public class JaxrsApplicationTest {
             classes.add(beanModel.getOrigin());
         }
         final List<Class<?>> expectedClasses = Arrays.asList(
-                A.class,
-                B.class,
-                C.class,
-                D.class,
-                E.class,
-                F.class,
-                G.class,
-                H.class,
-                I.class,
-                J.class
+            A.class,
+            B.class,
+            C.class,
+            D.class,
+            E.class,
+            F.class,
+            G.class,
+            H.class,
+            I.class,
+            J.class
         );
         if (exactMatch) {
             assertHasSameItems(expectedClasses, classes);
@@ -140,7 +140,7 @@ public class JaxrsApplicationTest {
     @Test
     public void testExcludedResource() {
         final Predicate<String> excludeFilter = Settings.createExcludeFilter(Arrays.asList(
-                TestResource1.class.getName()
+            TestResource1.class.getName()
         ), null);
         final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanJaxrsApplication(TestApplication.class, excludeFilter);
         final List<Type> types = getTypes(sourceTypes);
@@ -152,8 +152,8 @@ public class JaxrsApplicationTest {
     public void testExcludedType() {
         final Settings settings = TestUtils.settings();
         settings.setExcludeFilter(Arrays.asList(
-                A.class.getName(),
-                J.class.getName()
+            A.class.getName(),
+            J.class.getName()
         ), null);
         final JaxrsApplicationParser jaxrsApplicationParser = createJaxrsApplicationParser(settings);
         final JaxrsApplicationParser.Result result = jaxrsApplicationParser.tryParse(new SourceType<>(TestResource1.class));
@@ -189,7 +189,7 @@ public class JaxrsApplicationTest {
         @Override
         public Set<Class<?>> getClasses() {
             return new LinkedHashSet<>(Arrays.asList(
-                    TestResource1.class
+                TestResource1.class
             ));
         }
     }
@@ -199,100 +199,146 @@ public class JaxrsApplicationTest {
         @GET
         public void getVoid() {
         }
+
         @GET
         public Response getResponse() {
             return null;
         }
+
         @GET
         @Path("a")
         public GenericEntity<A> getA() {
             return null;
         }
+
         @GET
         public GenericEntity<List<B>> getB() {
             return null;
         }
+
         @GET
         public C getC() {
             return null;
         }
+
         @GET
         public List<D> getD() {
             return null;
         }
+
         @SuppressWarnings("rawtypes")
         @GET
         public List getRawList() {
             return null;
         }
+
         @GET
         @Path("e")
         public E getE() {
             return null;
         }
+
         @Path("f")
         public SubResource1 getSubResource1() {
             return null;
         }
+
         @POST
         public void setG(G g) {
         }
+
         @POST
         public void setHs(Map<String, H> hs) {
         }
+
         @POST
         public void setI(
-                @MatrixParam("") String matrixParam,
-                @QueryParam("") String queryParam,
-                @PathParam("") String pathParam,
-                @CookieParam("") String cookieParam,
-                @Suspended AsyncResponse suspendedParam,
-                @HeaderParam("") String headerParam,
-                @Context String context,
-                @FormParam("") String formParam,
-                I entityI) {
+            @MatrixParam("") String matrixParam,
+            @QueryParam("") String queryParam,
+            @PathParam("") String pathParam,
+            @CookieParam("") String cookieParam,
+            @Suspended AsyncResponse suspendedParam,
+            @HeaderParam("") String headerParam,
+            @Context String context,
+            @FormParam("") String formParam,
+            I entityI
+        ) {
         }
+
         @POST
         @ApiOperation(value = "async", response = String.class)
         public void setAsync(
-                @Suspended AsyncResponse suspendedParam
+            @Suspended AsyncResponse suspendedParam
         ) {
         }
+
         @POST
         public void setJs(J[] js) {
         }
+
         @POST
-        public void setStandardEntity(byte[] value) {}
+        public void setStandardEntity(byte[] value) {
+        }
+
         @POST
-        public void setStandardEntity(String value) {}
+        public void setStandardEntity(String value) {
+        }
+
         @POST
-        public void setStandardEntity(InputStream value) {}
+        public void setStandardEntity(InputStream value) {
+        }
+
         @POST
-        public void setStandardEntity(Reader value) {}
+        public void setStandardEntity(Reader value) {
+        }
+
         @POST
-        public void setStandardEntity(File value) {}
+        public void setStandardEntity(File value) {
+        }
+
         @POST
-        public void setStandardEntity(DataSource value) {}
+        public void setStandardEntity(DataSource value) {
+        }
+
         @POST
-        public void setStandardEntity(Source value) {}
+        public void setStandardEntity(Source value) {
+        }
+
         @POST
-        public void setStandardEntity(DOMSource value) {}
+        public void setStandardEntity(DOMSource value) {
+        }
+
         @POST
-        public void setStandardEntity(JAXBElement<?> value) {}
+        public void setStandardEntity(JAXBElement<?> value) {
+        }
+
         @POST
-        public void setStandardEntity(MultivaluedMap<String,String> value) {}
+        public void setStandardEntity(MultivaluedMap<String, String> value) {
+        }
+
         @POST
-        public void setStandardEntity(StreamingOutput value) {}
+        public void setStandardEntity(StreamingOutput value) {
+        }
+
         @POST
-        public void setStandardEntity(Boolean value) {}
+        public void setStandardEntity(Boolean value) {
+        }
+
         @POST
-        public void setStandardEntity(Character value) {}
+        public void setStandardEntity(Character value) {
+        }
+
         @POST
-        public void setStandardEntity(Number value) {}
+        public void setStandardEntity(Number value) {
+        }
+
         @POST
-        public void setStandardEntity(Integer value) {}
+        public void setStandardEntity(Integer value) {
+        }
+
         @POST
-        public void setStandardEntity(int value) {}
+        public void setStandardEntity(int value) {
+        }
     }
 
     private static class SubResource1 {
@@ -302,16 +348,35 @@ public class JaxrsApplicationTest {
         }
     }
 
-    private static class A {}
-    private static class B {}
-    private static class C {}
-    private static class D {}
-    private static class E {}
-    private static class F {}
-    private static class G {}
-    private static class H {}
-    private static class I {}
-    private static class J {}
+    private static class A {
+    }
+
+    private static class B {
+    }
+
+    private static class C {
+    }
+
+    private static class D {
+    }
+
+    private static class E {
+    }
+
+    private static class F {
+    }
+
+    private static class G {
+    }
+
+    private static class H {
+    }
+
+    private static class I {
+    }
+
+    private static class J {
+    }
 
     @Test
     public void basicInterfaceTest() {
@@ -476,8 +541,8 @@ public class JaxrsApplicationTest {
         @Override
         public Set<Class<?>> getClasses() {
             return new LinkedHashSet<>(Arrays.asList(
-                    OrganizationsResource.class,
-                    PersonResource.class
+                OrganizationsResource.class,
+                PersonResource.class
             ));
         }
     }
@@ -487,10 +552,12 @@ public class JaxrsApplicationTest {
     public static class OrganizationsResource {
         @PathParam("organizationId")
         protected long organizationId;
+
         @GET
         public List<Organization> searchOrganizations(@QueryParam("name") String oranizationName, @QueryParam("search-limit") int searchLimit) {
             return null;
         }
+
         @Path("{ organizationCode : [a-z]+ }/{organizationId}")
         public OrganizationResource getOrganizationResource() {
             return null;
@@ -502,6 +569,7 @@ public class JaxrsApplicationTest {
         public Organization getOrganization() {
             return null;
         }
+
         @PUT
         public void setOrganization(@PathParam("organizationCode") String organizationCode, Organization organization) {
         }
@@ -558,15 +626,18 @@ public class JaxrsApplicationTest {
         public Person person(Person person) {
             return new Person("POST");
         }
+
         @GET
         public Person person() {
             return new Person("A");
         }
+
         @GET
         @Path("search")
         public Person person(@QueryParam("search") String search) {
             return new Person("B");
         }
+
         @GET
         @Path("{person-id:.+}")
         public Person person(@PathParam("person-id") long personId) {
@@ -629,6 +700,7 @@ public class JaxrsApplicationTest {
 
     public static class SearchParams2 {
         private String description;
+
         @QueryParam("description")
         public void setDescription(String description) {
             this.description = description;
@@ -657,7 +729,7 @@ public class JaxrsApplicationTest {
         }
     }
 
-//    http://localhost:9998/bean-param?id=1&name=vh&description=desc&message=hello
+    // http://localhost:9998/bean-param?id=1&name=vh&description=desc&message=hello
 
     @Path("bean-param")
     @Produces(MediaType.APPLICATION_JSON)
@@ -665,9 +737,9 @@ public class JaxrsApplicationTest {
 
         @GET
         public List<String> getItems(
-                @BeanParam SearchParams1 params1,
-                @BeanParam SearchParams2 params2,
-                @QueryParam("message") String message
+            @BeanParam SearchParams1 params1,
+            @BeanParam SearchParams2 params2,
+            @QueryParam("message") String message
         ) {
             return Collections.emptyList();
         }
@@ -687,7 +759,7 @@ public class JaxrsApplicationTest {
     public static class RegExpResource {
         @GET
         @Path("{id: [0-9]{1,99}}")
-//        @Path("{id: [0-9]+}")
+        // @Path("{id: [0-9]+}")
         public String getWithId(@PathParam("id") long id) {
             return null;
         }

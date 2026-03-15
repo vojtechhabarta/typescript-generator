@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public class TsAliasModel extends TsDeclarationModel {
-    
+
     private final List<TsType.GenericVariableType> typeParameters;
     private final TsType definition;
 

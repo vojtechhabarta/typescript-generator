@@ -38,7 +38,7 @@ public abstract class ModelParser {
     private final Queue<SourceType<? extends Type>> typeQueue;
     private final TypeProcessor commonTypeProcessor;
     private final List<RestApplicationParser> restApplicationParsers;
-        
+
     public static abstract class Factory {
 
         public TypeProcessor getSpecificTypeProcessor() {
@@ -74,7 +74,7 @@ public abstract class ModelParser {
     }
 
     private Model parseQueue() {
-        final Collection<Type> parsedTypes = new ArrayList<>();  // do not use hashcodes, we can only count on `equals` since we use custom `ParameterizedType`s
+        final Collection<Type> parsedTypes = new ArrayList<>(); // do not use hashcodes, we can only count on `equals` since we use custom `ParameterizedType`s
         final List<BeanModel> beans = new ArrayList<>();
         final List<EnumModel> enums = new ArrayList<>();
         SourceType<? extends Type> sourceType;
@@ -104,7 +104,7 @@ public abstract class ModelParser {
                     final TsType.ReferenceType referenceType = (TsType.ReferenceType) result.getTsType();
                     if (!referenceType.symbol.isResolved()) {
                         TypeScriptGenerator.getLogger().verbose("Parsing '" + cls.getName() + "'" +
-                                (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
+                            (sourceType.usedInClass != null ? " used in '" + sourceType.usedInClass.getSimpleName() + "." + sourceType.usedInMember + "'" : ""));
                         final DeclarationModel model = parseClass(sourceType.asSourceClass());
                         if (model instanceof EnumModel) {
                             enums.add((EnumModel) model);
@@ -121,15 +121,17 @@ public abstract class ModelParser {
             }
         }
         final List<RestApplicationModel> restModels = restApplicationParsers.stream()
-                .map(RestApplicationParser::getModel)
-                .collect(Collectors.toList());
+            .map(RestApplicationParser::getModel)
+            .collect(Collectors.toList());
         return new Model(beans, enums, restModels);
     }
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(TypeParser typeParser, Member propertyMember, Integer creatorIndex, AnnotationGetter annotationGetter,
-            String propertyName, Class<?> sourceClass) {
+    protected static PropertyMember wrapMember(
+        TypeParser typeParser, Member propertyMember, Integer creatorIndex, AnnotationGetter annotationGetter,
+        String propertyName, Class<?> sourceClass
+    ) {
         if (propertyMember instanceof Field) {
             final Field field = (Field) propertyMember;
             return new PropertyMember(field, typeParser.getFieldType(field), field.getAnnotatedType(), annotationGetter);
@@ -154,16 +156,16 @@ public abstract class ModelParser {
             }
         }
         TypeScriptGenerator.getLogger().verbose(String.format(
-                "Unexpected member '%s' in property '%s' in class '%s'",
-                propertyMember != null ? propertyMember.getClass().getName() : null,
-                propertyName,
-                sourceClass.getName()));
+            "Unexpected member '%s' in property '%s' in class '%s'",
+            propertyMember != null ? propertyMember.getClass().getName() : null,
+            propertyName,
+            sourceClass.getName()));
         return null;
     }
 
     protected boolean isAnnotatedPropertyIncluded(Function<Class<? extends Annotation>, Annotation> getAnnotationFunction, String propertyDescription) {
         boolean isIncluded = settings.includePropertyAnnotations.isEmpty()
-                || Utils.hasAnyAnnotation(getAnnotationFunction, settings.includePropertyAnnotations);
+            || Utils.hasAnyAnnotation(getAnnotationFunction, settings.includePropertyAnnotations);
         if (!isIncluded) {
             TypeScriptGenerator.getLogger().verbose("Skipping '" + propertyDescription + "' because it doesn't have any annotation from 'includePropertyAnnotations'");
             return false;
@@ -211,7 +213,10 @@ public abstract class ModelParser {
         typeQueue.add(sourceType);
     }
 
-    protected PropertyModel processTypeAndCreateProperty(String name, Type type, Object typeContext, boolean optional, PropertyAccess access, Class<?> usedInClass, Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments) {
+    protected PropertyModel processTypeAndCreateProperty(
+        String name, Type type, Object typeContext, boolean optional, PropertyAccess access, Class<?> usedInClass,
+        Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments
+    ) {
         final Type resolvedType = GenericsResolver.resolveType(usedInClass, type, originalMember.getDeclaringClass());
         final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, typeContext, settings);
         for (Class<?> cls : classes) {

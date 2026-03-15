@@ -35,12 +35,12 @@ public class GenericsResolver {
         }
         Collections.reverse(path);
         List<String> result = Arrays.stream(derivedClass.getTypeParameters())
-                .map(TypeVariable::getName)
-                .collect(Collectors.toList());
+            .map(TypeVariable::getName)
+            .collect(Collectors.toList());
         for (ResolvedClass resolvedClass : path.subList(0, path.size())) {
             result = result.stream()
-                    .map(typeVariableName -> mapGenericVariableToParent(typeVariableName, resolvedClass))
-                    .collect(Collectors.toList());
+                .map(typeVariableName -> mapGenericVariableToParent(typeVariableName, resolvedClass))
+                .collect(Collectors.toList());
         }
         return result;
     }
@@ -112,9 +112,9 @@ public class GenericsResolver {
             }
             ancestors.addAll(Arrays.asList(cls.getGenericInterfaces()));
             return ancestors.stream()
-                    .map(this::resolveAncestor)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                .map(this::resolveAncestor)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         }
 
         public ResolvedClass resolveAncestor(Type ancestor) {
@@ -144,11 +144,11 @@ public class GenericsResolver {
         @Override
         public String toString() {
             return rawClass.getName()
-                    + "<"
-                    + resolvedTypeParameters.entrySet().stream()
-                            .map(entry -> entry.getKey() + "=" + entry.getValue().getTypeName())
-                            .collect(Collectors.joining(", "))
-                    + ">";
+                + "<"
+                + resolvedTypeParameters.entrySet().stream()
+                    .map(entry -> entry.getKey() + "=" + entry.getValue().getTypeName())
+                    .collect(Collectors.joining(", "))
+                + ">";
         }
     }
 

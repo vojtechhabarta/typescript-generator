@@ -37,7 +37,7 @@ public class VavrTest {
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.registerModule(new VavrModule());
         final String json = objectMapper.writeValueAsString(new VavrSerializedClasses());
-//        System.out.println(json);
+        // System.out.println(json);
     }
 
     @Test

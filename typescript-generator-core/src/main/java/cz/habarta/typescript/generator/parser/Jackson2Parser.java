@@ -150,7 +150,7 @@ public class Jackson2Parser extends ModelParser {
             setVisibility(PropertyAccessor.CREATOR, config.creatorVisibility);
             if (config.shapeConfigOverrides != null) {
                 config.shapeConfigOverrides.entrySet()
-                        .forEach(entry -> setShapeOverride(entry.getKey(), entry.getValue()));
+                    .forEach(entry -> setShapeOverride(entry.getKey(), entry.getValue()));
             }
             if (config.enumsUsingToString) {
                 objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
@@ -168,68 +168,66 @@ public class Jackson2Parser extends ModelParser {
     private void setShapeOverride(Class<?> cls, JsonFormat.Shape shape) {
         final MutableConfigOverride configOverride = objectMapper.configOverride(cls);
         configOverride.setFormat(
-                JsonFormat.Value.merge(
-                        configOverride.getFormat(),
-                        JsonFormat.Value.forShape(shape)));
+            JsonFormat.Value.merge(
+                configOverride.getFormat(),
+                JsonFormat.Value.forShape(shape)));
     }
 
     private static TypeProcessor createSpecificTypeProcessor() {
         return new TypeProcessor.Chain(
-                new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName())),
-                new TypeProcessor() {
-                    @Override
-                    public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
-                        if (context.getTypeContext() instanceof Jackson2TypeContext) {
-                            final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
-                            final Jackson2ConfigurationResolved config = jackson2TypeContext.parser.settings.jackson2Configuration;
-                            // JsonSerialize
-                            final JsonSerialize jsonSerialize = jackson2TypeContext.beanProperty.getAnnotation(JsonSerialize.class);
-                            if (jsonSerialize != null && config != null && config.serializerTypeMappings != null) {
-                                @SuppressWarnings("unchecked")
-                                final Class<? extends JsonSerializer<?>> using = (Class<? extends JsonSerializer<?>>)
-                                    (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
-                                final String mappedType = config.serializerTypeMappings.get(using);
-                                if (mappedType != null) {
-                                    return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
-                                }
-                            }
-                            // JsonDeserialize
-                            final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanProperty.getAnnotation(JsonDeserialize.class);
-                            if (jsonDeserialize != null && config != null && config.deserializerTypeMappings != null) {
-                                @SuppressWarnings("unchecked")
-                                final Class<? extends JsonDeserializer<?>> using = (Class<? extends JsonDeserializer<?>>)
-                                    (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
-                                final String mappedType = config.deserializerTypeMappings.get(using);
-                                if (mappedType != null) {
-                                    return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
-                                }
-                            }
-                            // disableObjectIdentityFeature
-                            if (!jackson2TypeContext.disableObjectIdentityFeature) {
-                                final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanProperty);
-                                if (resultType != null) {
-                                    return context.withTypeContext(null).processType(resultType);
-                                }
-                            }
-                            // Map.Entry
-                            final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
-                            if (rawClass != null && Map.Entry.class.isAssignableFrom(rawClass)) {
-                                final ObjectMapper objectMapper = jackson2TypeContext.parser.objectMapper;
-                                final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
-                                final BeanDescription beanDescription = serializationConfig
-                                        .introspect(TypeFactory.defaultInstance().constructType(rawClass));
-                                final JsonFormat.Value formatOverride = serializationConfig.getDefaultPropertyFormat(Map.Entry.class);
-                                final JsonFormat.Value formatFromAnnotation = beanDescription.findExpectedFormat();
-                                final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
-                                if (format.getShape() != JsonFormat.Shape.OBJECT) {
-                                    final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
-                                    return context.processType(mapType);
-                                }
+            new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName())),
+            new TypeProcessor() {
+                @Override
+                public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+                    if (context.getTypeContext() instanceof Jackson2TypeContext) {
+                        final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
+                        final Jackson2ConfigurationResolved config = jackson2TypeContext.parser.settings.jackson2Configuration;
+                        // JsonSerialize
+                        final JsonSerialize jsonSerialize = jackson2TypeContext.beanProperty.getAnnotation(JsonSerialize.class);
+                        if (jsonSerialize != null && config != null && config.serializerTypeMappings != null) {
+                            @SuppressWarnings("unchecked")
+                            final Class<? extends JsonSerializer<?>> using = (Class<? extends JsonSerializer<?>>) (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
+                            final String mappedType = config.serializerTypeMappings.get(using);
+                            if (mappedType != null) {
+                                return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
                             }
                         }
-                        return null;
+                        // JsonDeserialize
+                        final JsonDeserialize jsonDeserialize = jackson2TypeContext.beanProperty.getAnnotation(JsonDeserialize.class);
+                        if (jsonDeserialize != null && config != null && config.deserializerTypeMappings != null) {
+                            @SuppressWarnings("unchecked")
+                            final Class<? extends JsonDeserializer<?>> using = (Class<? extends JsonDeserializer<?>>) (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
+                            final String mappedType = config.deserializerTypeMappings.get(using);
+                            if (mappedType != null) {
+                                return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
+                            }
+                        }
+                        // disableObjectIdentityFeature
+                        if (!jackson2TypeContext.disableObjectIdentityFeature) {
+                            final Type resultType = jackson2TypeContext.parser.processIdentity(javaType, jackson2TypeContext.beanProperty);
+                            if (resultType != null) {
+                                return context.withTypeContext(null).processType(resultType);
+                            }
+                        }
+                        // Map.Entry
+                        final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
+                        if (rawClass != null && Map.Entry.class.isAssignableFrom(rawClass)) {
+                            final ObjectMapper objectMapper = jackson2TypeContext.parser.objectMapper;
+                            final SerializationConfig serializationConfig = objectMapper.getSerializationConfig();
+                            final BeanDescription beanDescription = serializationConfig
+                                .introspect(TypeFactory.defaultInstance().constructType(rawClass));
+                            final JsonFormat.Value formatOverride = serializationConfig.getDefaultPropertyFormat(Map.Entry.class);
+                            final JsonFormat.Value formatFromAnnotation = beanDescription.findExpectedFormat();
+                            final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
+                            if (format.getShape() != JsonFormat.Shape.OBJECT) {
+                                final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
+                                return context.processType(mapType);
+                            }
+                        }
                     }
+                    return null;
                 }
+            }
         );
     }
 
@@ -273,16 +271,16 @@ public class Jackson2Parser extends ModelParser {
                 final List<String> propertyComments = getComments(beanProperty.getAnnotation(JsonPropertyDescription.class));
 
                 final Jackson2TypeContext jackson2TypeContext = new Jackson2TypeContext(
-                        this,
-                        beanProperty,
-                        settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
+                    this,
+                    beanProperty,
+                    settings.jackson2Configuration != null && settings.jackson2Configuration.disableObjectIdentityFeature);
 
                 if (!isAnnotatedPropertyIncluded(beanProperty::getAnnotation, sourceClass.type.getName() + "." + beanProperty.getName())) {
                     continue;
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
-                        ? !beanProperty.isRequired()
-                        : isPropertyOptional(propertyMember);
+                    ? !beanProperty.isRequired()
+                    : isPropertyOptional(propertyMember);
                 // @JsonUnwrapped
                 PropertyModel.PullProperties pullProperties = null;
                 final JsonUnwrapped annotation = beanProperty.getAnnotation(JsonUnwrapped.class);
@@ -324,15 +322,15 @@ public class Jackson2Parser extends ModelParser {
 
         if (discriminantProperty != null) {
             final PropertyModel foundDiscriminantProperty = properties.stream()
-                    .filter(property -> Objects.equals(property.getName(), discriminantProperty))
-                    .findFirst()
-                    .orElse(null);
+                .filter(property -> Objects.equals(property.getName(), discriminantProperty))
+                .findFirst()
+                .orElse(null);
             if (foundDiscriminantProperty != null) {
                 if (syntheticDiscriminantProperty) {
                     TypeScriptGenerator.getLogger().warning(String.format(
-                            "Class '%s' has duplicate property '%s'. "
-                                    + "For more information see 'https://github.com/vojtechhabarta/typescript-generator/issues/392'.",
-                            sourceClass.type.getName(), discriminantProperty));
+                        "Class '%s' has duplicate property '%s'. "
+                            + "For more information see 'https://github.com/vojtechhabarta/typescript-generator/issues/392'.",
+                        sourceClass.type.getName(), discriminantProperty));
                 } else {
                     properties.remove(foundDiscriminantProperty);
                 }
@@ -340,8 +338,8 @@ public class Jackson2Parser extends ModelParser {
         }
 
         final List<Class<?>> taggedUnionClasses = getSubClassesFromAnnotation(sourceClass.type)
-                .or(() -> isTaggedUnionParent ? getSubClassesFromResolver(sourceClass.type) : Optional.empty())
-                .orElse(null);
+            .or(() -> isTaggedUnionParent ? getSubClassesFromResolver(sourceClass.type) : Optional.empty())
+            .orElse(null);
         if (taggedUnionClasses != null) {
             taggedUnionClasses.forEach(subClass -> addBeanToQueue(new SourceType<>(subClass, sourceClass.type, "<subClass>")));
         }
@@ -394,8 +392,8 @@ public class Jackson2Parser extends ModelParser {
                 }
                 final List<BeanProperty> properties = beanHelpers.getProperties();
                 final Optional<BeanProperty> idPropertyOptional = properties.stream()
-                        .filter(p -> p.getName().equals(identityInfo.property()))
-                        .findFirst();
+                    .filter(p -> p.getName().equals(identityInfo.property()))
+                    .findFirst();
                 if (idPropertyOptional.isPresent()) {
                     final BeanProperty idProperty = idPropertyOptional.get();
                     final Member idMember = idProperty.getMember().getMember();
@@ -414,8 +412,8 @@ public class Jackson2Parser extends ModelParser {
                 idType = Object.class;
             }
             return alwaysAsId
-                    ? idType
-                    : new JUnionType(propertyType, idType);
+                ? idType
+                : new JUnionType(propertyType, idType);
         }
         return null;
     }
@@ -427,8 +425,8 @@ public class Jackson2Parser extends ModelParser {
             return false;
         }
         return jsonTypeInfo != null &&
-                (jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY || jsonTypeInfo.include() == JsonTypeInfo.As.EXISTING_PROPERTY) &&
-                (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME || jsonTypeInfo.use() == JsonTypeInfo.Id.CLASS);
+            (jsonTypeInfo.include() == JsonTypeInfo.As.PROPERTY || jsonTypeInfo.include() == JsonTypeInfo.As.EXISTING_PROPERTY) &&
+            (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME || jsonTypeInfo.use() == JsonTypeInfo.Id.CLASS);
     }
 
     private boolean isDiscriminantPropertySynthetic(JsonTypeInfo jsonTypeInfo) {
@@ -437,8 +435,8 @@ public class Jackson2Parser extends ModelParser {
 
     private String getDiscriminantPropertyName(JsonTypeInfo jsonTypeInfo) {
         return jsonTypeInfo.property().isEmpty()
-                ? jsonTypeInfo.use().getDefaultPropertyName()
-                : jsonTypeInfo.property();
+            ? jsonTypeInfo.use().getDefaultPropertyName()
+            : jsonTypeInfo.property();
     }
 
     private String getTypeName(Class<?> cls) {
@@ -450,11 +448,11 @@ public class Jackson2Parser extends ModelParser {
             if (typeIdResolver.getMechanism() == JsonTypeInfo.Id.NAME) {
                 final List<NamedType> subtypes = getSubtypesFromResolver(cls);
                 final String typeName = subtypes.stream()
-                        .filter(subtype -> Objects.equals(subtype.getType(), cls))
-                        .filter(NamedType::hasName)
-                        .map(NamedType::getName)
-                        .findFirst()
-                        .orElse(null);
+                    .filter(subtype -> Objects.equals(subtype.getType(), cls))
+                    .filter(NamedType::hasName)
+                    .map(NamedType::getName)
+                    .findFirst()
+                    .orElse(null);
                 if (typeName == null) {
                     return isInterfaceOrAbstract(cls) ? null : typeIdResolver.idFromBaseType();
                 } else {
@@ -470,9 +468,9 @@ public class Jackson2Parser extends ModelParser {
 
     private Optional<List<Class<?>>> getSubClassesFromAnnotation(Class<?> cls) {
         return Optional.ofNullable(cls.getAnnotation(JsonSubTypes.class))
-                .map(jsonSubTypes -> Arrays.stream(jsonSubTypes.value())
-                        .map(jsonSubType -> jsonSubType.value())
-                        .collect(Collectors.toList()));
+            .map(jsonSubTypes -> Arrays.stream(jsonSubTypes.value())
+                .map(jsonSubType -> jsonSubType.value())
+                .collect(Collectors.toList()));
     }
 
     private Optional<List<Class<?>>> getSubClassesFromResolver(Class<?> cls) {
@@ -495,9 +493,9 @@ public class Jackson2Parser extends ModelParser {
         final Collection<NamedType> deserializationSubtypes = subtypeResolver.collectAndResolveSubtypesByTypeId(config, annotatedClass);
         final Collection<NamedType> serializationSubtypes = subtypeResolver.collectAndResolveSubtypesByClass(config, annotatedClass);
         final LinkedHashSet<NamedType> subtypes = Stream
-                .concat(deserializationSubtypes.stream(), serializationSubtypes.stream())
-                .filter(namedType -> cls.isAssignableFrom(namedType.getType()))  // `SubtypeResolver` returns all types from `JsonSubTypes` annotations, not only subtypes
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+            .concat(deserializationSubtypes.stream(), serializationSubtypes.stream())
+            .filter(namedType -> cls.isAssignableFrom(namedType.getType())) // `SubtypeResolver` returns all types from `JsonSubTypes` annotations, not only subtypes
+            .collect(Collectors.toCollection(LinkedHashSet::new));
         return new ArrayList<>(subtypes);
     }
 
@@ -549,7 +547,7 @@ public class Jackson2Parser extends ModelParser {
     private BeanSerializerHelper createBeanSerializerHelper(JavaType javaType) {
         try {
             final DefaultSerializerProvider.Impl serializerProvider = new DefaultSerializerProvider.Impl()
-                    .createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
+                .createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
             final JsonSerializer<?> jsonSerializer = BeanSerializerFactory.instance.createSerializer(serializerProvider, javaType);
             if (jsonSerializer != null && jsonSerializer instanceof BeanSerializer) {
                 return new BeanSerializerHelper((BeanSerializer) jsonSerializer);
@@ -564,7 +562,7 @@ public class Jackson2Parser extends ModelParser {
     private BeanDeserializerHelper createBeanDeserializerHelper(JavaType javaType) {
         try {
             final DeserializationContext deserializationContext = new DefaultDeserializationContext.Impl(objectMapper.getDeserializationContext().getFactory())
-                    .createInstance(objectMapper.getDeserializationConfig(), null, null);
+                .createInstance(objectMapper.getDeserializationConfig(), null, null);
             final BeanDescription beanDescription = deserializationContext.getConfig().introspect(javaType);
             final JsonDeserializer<?> jsonDeserializer = BeanDeserializerFactory.instance.createBeanDeserializer(deserializationContext, javaType, beanDescription);
             if (jsonDeserializer != null && jsonDeserializer instanceof BeanDeserializer) {
@@ -597,51 +595,50 @@ public class Jackson2Parser extends ModelParser {
 
         public List<BeanProperty> getProperties() {
             return getPropertiesAndAccess().stream()
-                    .map(Pair::getValue1)
-                    .collect(Collectors.toList());
+                .map(Pair::getValue1)
+                .collect(Collectors.toList());
         }
 
         public List<Pair<BeanProperty, PropertyAccess>> getPropertiesAndAccess() {
             return getPropertiesPairs().stream()
-                    .map(pair -> pair.getValue1() != null
-                            ? Pair.of(pair.getValue1(), pair.getValue2() != null ? PropertyAccess.ReadWrite : PropertyAccess.ReadOnly)
-                            : Pair.of(pair.getValue2(), PropertyAccess.WriteOnly)
-                    )
-                    .collect(Collectors.toList());
+                .map(pair -> pair.getValue1() != null
+                    ? Pair.of(pair.getValue1(), pair.getValue2() != null ? PropertyAccess.ReadWrite : PropertyAccess.ReadOnly)
+                    : Pair.of(pair.getValue2(), PropertyAccess.WriteOnly)
+                )
+                .collect(Collectors.toList());
         }
 
         private List<Pair<BeanProperty, BeanProperty>> getPropertiesPairs() {
             final List<BeanProperty> serializableProperties = getSerializableProperties();
             final List<BeanProperty> deserializableProperties = getDeserializableProperties();
             final List<Pair<BeanProperty, BeanProperty>> properties = Stream
-                    .concat(
-                            serializableProperties.stream()
-                                    .filter(this::inView)
-                                    .map(property -> Pair.of(property, getBeanProperty(deserializableProperties, property.getName()))),
-                            deserializableProperties.stream()
-                                    .filter(this::inView)
-                                    .filter(property -> getBeanProperty(serializableProperties, property.getName()) == null)
-                                    .map(property -> Pair.of((BeanProperty) null, property))
-                    )
-                    .collect(Collectors.toCollection(ArrayList::new));
+                .concat(
+                    serializableProperties.stream()
+                        .filter(this::inView)
+                        .map(property -> Pair.of(property, getBeanProperty(deserializableProperties, property.getName()))),
+                    deserializableProperties.stream()
+                        .filter(this::inView)
+                        .filter(property -> getBeanProperty(serializableProperties, property.getName()) == null)
+                        .map(property -> Pair.of((BeanProperty) null, property))
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
 
             // sort
-            final Comparator<Pair<BeanProperty, BeanProperty>> bySerializationOrder = (pair1, pair2) ->
-                    pair1.getValue1() != null && pair2.getValue1() != null
-                            ? Integer.compare(
-                                    serializableProperties.indexOf(pair1.getValue1()),
-                                    serializableProperties.indexOf(pair2.getValue1()))
-                            : 0;
+            final Comparator<Pair<BeanProperty, BeanProperty>> bySerializationOrder = (pair1, pair2) -> pair1.getValue1() != null && pair2.getValue1() != null
+                ? Integer.compare(
+                    serializableProperties.indexOf(pair1.getValue1()),
+                    serializableProperties.indexOf(pair2.getValue1()))
+                : 0;
             final Comparator<Pair<BeanProperty, BeanProperty>> byIndex = Comparator.comparing(
-                    pair -> getIndex(pair),
-                    Comparator.nullsLast(Comparator.naturalOrder()));
+                pair -> getIndex(pair),
+                Comparator.nullsLast(Comparator.naturalOrder()));
             final List<Field> fields = Utils.getAllFields(beanClass);
             final Comparator<Pair<BeanProperty, BeanProperty>> byFieldIndex = Comparator.comparing(
-                    pair -> getFieldIndex(fields, pair),
-                    Comparator.nullsLast(Comparator.naturalOrder()));
+                pair -> getFieldIndex(fields, pair),
+                Comparator.nullsLast(Comparator.naturalOrder()));
             properties.sort(bySerializationOrder
-                    .thenComparing(byIndex)
-                    .thenComparing(byFieldIndex));
+                .thenComparing(byIndex)
+                .thenComparing(byFieldIndex));
             return properties;
         }
 
@@ -654,14 +651,14 @@ public class Jackson2Parser extends ModelParser {
                 return true;
             }
             return Stream.of(annotation.value())
-                    .anyMatch(v -> v.isAssignableFrom(view));
+                .anyMatch(v -> v.isAssignableFrom(view));
         }
 
         private static BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
             return properties.stream()
-                    .filter(dp -> Objects.equals(dp.getName(), name))
-                    .findFirst()
-                    .orElse(null);
+                .filter(dp -> Objects.equals(dp.getName(), name))
+                .findFirst()
+                .orElse(null);
         }
 
         private static Integer getIndex(Pair<BeanProperty, BeanProperty> pair) {
@@ -691,14 +688,14 @@ public class Jackson2Parser extends ModelParser {
 
         private List<BeanProperty> getSerializableProperties() {
             return serializer != null
-                    ? Arrays.asList(serializer.getProps())
-                    : Collections.emptyList();
+                ? Arrays.asList(serializer.getProps())
+                : Collections.emptyList();
         }
 
         private List<BeanProperty> getDeserializableProperties() {
             return deserializer != null
-                    ? Arrays.asList(deserializer.getBeanProperties().getPropertiesInInsertionOrder())
-                    : Collections.emptyList();
+                ? Arrays.asList(deserializer.getBeanProperties().getPropertiesInInsertionOrder())
+                : Collections.emptyList();
         }
     }
 
@@ -731,8 +728,8 @@ public class Jackson2Parser extends ModelParser {
         if (jsonFormat != null && jsonFormat.shape() == JsonFormat.Shape.OBJECT) {
             return parseBean(sourceClass, classComments);
         }
-        final boolean isNumberBased = jsonFormat != null && (
-                jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
+        final boolean isNumberBased = jsonFormat != null
+            && (jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_FLOAT ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_INT);
 
@@ -752,7 +749,7 @@ public class Jackson2Parser extends ModelParser {
                 try {
                     constant.setAccessible(true);
                     final String enumJson = objectMapper.writeValueAsString(constant.get(null));
-                    value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
+                    value = objectMapper.readValue(enumJson, new TypeReference<Object>() {});
                 } catch (Throwable e) {
                     TypeScriptGenerator.getLogger().error(String.format("Cannot get enum value for constant '%s.%s'", enumClass.getName(), constant.getName()));
                     TypeScriptGenerator.getLogger().verbose(Utils.exceptionToString(e));

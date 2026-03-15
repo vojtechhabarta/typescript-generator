@@ -21,7 +21,6 @@ import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
-import static cz.habarta.typescript.generator.util.Utils.getInheritanceChain;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -55,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ValueConstants;
+
 
 public class SpringApplicationParser extends RestApplicationParser {
 
@@ -197,7 +197,7 @@ public class SpringApplicationParser extends RestApplicationParser {
 
         List<Method> currentlyResolvedMethods = new ArrayList<>();
 
-        getInheritanceChain(cls)
+        Utils.getInheritanceChain(cls)
             .forEach(clazz -> {
 
                 for (Method method : clazz.getDeclaredMethods()) {
@@ -251,8 +251,8 @@ public class SpringApplicationParser extends RestApplicationParser {
 
             // swagger
             final SwaggerOperation swaggerOperation = settings.ignoreSwaggerAnnotations
-                    ? new SwaggerOperation()
-                    : Swagger.parseSwaggerAnnotations(method);
+                ? new SwaggerOperation()
+                : Swagger.parseSwaggerAnnotations(method);
             if (swaggerOperation.possibleResponses != null) {
                 for (SwaggerResponse response : swaggerOperation.possibleResponses) {
                     if (response.responseType != null) {
@@ -326,8 +326,8 @@ public class SpringApplicationParser extends RestApplicationParser {
                                 final Method writeMethod = propertyDescriptor.getWriteMethod();
                                 if (writeMethod != null) {
                                     queryParams.add(new RestQueryParam.Single(new MethodParameterModel(
-                                            propertyDescriptor.getName(),
-                                            propertyDescriptor.getPropertyType()
+                                        propertyDescriptor.getName(),
+                                        propertyDescriptor.getPropertyType()
                                     ), false));
                                     foundType(result, propertyDescriptor.getPropertyType(), controllerClass, method.getName());
                                 }

@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class AxiosClientExtension extends Extension {
 
     public static final String CFG_AXIOS_VERSION = "axiosVersion";
@@ -45,7 +46,7 @@ public class AxiosClientExtension extends Extension {
         for (TsBeanModel bean : model.getBeans()) {
             if (bean.isJaxrsApplicationClientBean()) {
                 final String clientName = bean.getName().getSimpleName();
-                final String clientFullName = settings.mapPackagesToNamespaces ? bean.getName().getFullName(): bean.getName().getSimpleName();
+                final String clientFullName = settings.mapPackagesToNamespaces ? bean.getName().getFullName() : bean.getName().getSimpleName();
                 emitClient(writer, settings, exportKeyword, clientName, clientFullName);
             }
         }

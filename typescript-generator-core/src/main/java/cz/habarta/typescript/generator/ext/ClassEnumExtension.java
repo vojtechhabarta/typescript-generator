@@ -57,12 +57,12 @@ public class ClassEnumExtension extends Extension {
                         }
                     }
                     TsEnumModel temp = new TsEnumModel(
-                            tsBeanModel.getOrigin(),
-                            tsBeanModel.getName(),
-                            EnumKind.StringBased,
-                            members,
-                            null,
-                            false
+                        tsBeanModel.getOrigin(),
+                        tsBeanModel.getName(),
+                        EnumKind.StringBased,
+                        members,
+                        null,
+                        false
                     );
                     stringEnums.add(temp);
                 }

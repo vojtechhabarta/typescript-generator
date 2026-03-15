@@ -97,8 +97,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 return knownGenericTypeResult;
             }
             if (OptionalInt.class.isAssignableFrom(javaClass) ||
-                    OptionalLong.class.isAssignableFrom(javaClass) ||
-                    OptionalDouble.class.isAssignableFrom(javaClass)) {
+                OptionalLong.class.isAssignableFrom(javaClass) ||
+                OptionalDouble.class.isAssignableFrom(javaClass)
+            ) {
                 return new Result(TsType.Number.optional());
             }
             // generic structural type used without type arguments
@@ -150,29 +151,29 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final WildcardType wildcardType = (WildcardType) javaType;
             final Type[] upperBounds = wildcardType.getUpperBounds();
             return upperBounds.length > 0
-                    ? context.processType(upperBounds[0])
-                    : new Result(TsType.Any);
+                ? context.processType(upperBounds[0])
+                : new Result(TsType.Any);
         }
         if (javaType instanceof JUnionType) {
             final JUnionType unionType = (JUnionType) javaType;
             final List<Result> results = unionType.getTypes().stream()
-                    .map(type -> context.processType(type))
-                    .collect(Collectors.toList());
+                .map(type -> context.processType(type))
+                .collect(Collectors.toList());
             return new Result(
-                    new TsType.UnionType(results.stream()
-                            .map(result -> result.getTsType())
-                            .collect(Collectors.toList())),
-                    results.stream()
-                            .flatMap(result -> result.getDiscoveredClasses().stream())
-                            .collect(Collectors.toList())
+                new TsType.UnionType(results.stream()
+                    .map(result -> result.getTsType())
+                    .collect(Collectors.toList())),
+                results.stream()
+                    .flatMap(result -> result.getDiscoveredClasses().stream())
+                    .collect(Collectors.toList())
             );
         }
         if (javaType instanceof JTypeWithNullability) {
             final JTypeWithNullability typeWithNullability = (JTypeWithNullability) javaType;
             final Result result = context.processType(typeWithNullability.getType());
             return new Result(
-                    typeWithNullability.isNullable() ? new TsType.NullableType(result.getTsType()) : result.getTsType(),
-                    result.getDiscoveredClasses()
+                typeWithNullability.isNullable() ? new TsType.NullableType(result.getTsType()) : result.getTsType(),
+                result.getDiscoveredClasses()
             );
         }
         return null;
@@ -195,13 +196,13 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final TsType valueTsType = valueResult.getTsType();
             if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
                 return new Result(
-                        new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
-                        Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
+                    new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
+                    Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
                 );
             } else {
                 return new Result(
-                        new TsType.IndexedArrayType(TsType.String, valueTsType),
-                        valueResult.getDiscoveredClasses()
+                    new TsType.IndexedArrayType(TsType.String, valueTsType),
+                    valueResult.getDiscoveredClasses()
                 );
             }
         }

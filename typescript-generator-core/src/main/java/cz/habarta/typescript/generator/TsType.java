@@ -51,7 +51,7 @@ public abstract class TsType implements Emittable {
     public String toString() {
         return format(new Settings());
     }
-    
+
     public static class BasicType extends TsType {
 
         public final String name;
@@ -135,7 +135,7 @@ public abstract class TsType implements Emittable {
             return super.format(settings) + "<" + Emitter.formatList(settings, typeArguments) + ">";
         }
     }
-    
+
     public static class GenericVariableType extends TsType.BasicType {
 
         public GenericVariableType(String name) {
@@ -163,8 +163,8 @@ public abstract class TsType implements Emittable {
             // https://github.com/Microsoft/TypeScript/pull/914
             // TypeScript Specification A.1
             return elementType instanceof UnionType
-                    ? "(" + elementType.format(settings) + ")" + "[]"
-                    : elementType.format(settings) + "[]";
+                ? "(" + elementType.format(settings) + ")" + "[]"
+                : elementType.format(settings) + "[]";
         }
 
     }
@@ -201,11 +201,11 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return "{ " +
-                    "[P in " + parameterType.format(settings) + "]" +
-                    (questionToken != null ? questionToken : "") +
-                    ": " +
-                    type.format(settings) +
-                    " }";
+                "[P in " + parameterType.format(settings) + "]" +
+                (questionToken != null ? questionToken : "") +
+                ": " +
+                type.format(settings) +
+                " }";
         }
 
         public enum QuestionToken {
@@ -223,7 +223,7 @@ public abstract class TsType implements Emittable {
             public String toString() {
                 return token;
             }
-            
+
         }
 
     }
@@ -242,15 +242,15 @@ public abstract class TsType implements Emittable {
 
         public static UnionType combine(List<? extends TsType> types) {
             return new UnionType(types.stream()
-                    .flatMap(type -> {
-                        if (type instanceof UnionType) {
-                            final UnionType unionType = (UnionType) type;
-                            return unionType.types.stream();
-                        } else {
-                            return Stream.of(type);
-                        }
-                    })
-                    .collect(Collectors.toList())
+                .flatMap(type -> {
+                    if (type instanceof UnionType) {
+                        final UnionType unionType = (UnionType) type;
+                        return unionType.types.stream();
+                    } else {
+                        return Stream.of(type);
+                    }
+                })
+                .collect(Collectors.toList())
             );
         }
 
@@ -265,8 +265,8 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return types.isEmpty()
-                    ? Never.format(settings)
-                    : Emitter.formatList(settings, types, " | ");
+                ? Never.format(settings)
+                : Emitter.formatList(settings, types, " | ");
         }
 
     }
@@ -286,8 +286,8 @@ public abstract class TsType implements Emittable {
         @Override
         public String format(Settings settings) {
             return types.isEmpty()
-                    ? Unknown.format(settings)
-                    : Emitter.formatList(settings, types, " & ");
+                ? Unknown.format(settings)
+                : Emitter.formatList(settings, types, " & ");
         }
 
     }
@@ -432,15 +432,15 @@ public abstract class TsType implements Emittable {
         if (type instanceof TsType.IndexedArrayType) {
             final TsType.IndexedArrayType indexedArrayType = (TsType.IndexedArrayType) type;
             return new TsType.IndexedArrayType(
-                    transformTsType(context, indexedArrayType.indexType, transformer),
-                    transformTsType(context, indexedArrayType.elementType, transformer));
+                transformTsType(context, indexedArrayType.indexType, transformer),
+                transformTsType(context, indexedArrayType.elementType, transformer));
         }
         if (type instanceof TsType.MappedType) {
             final TsType.MappedType mappedType = (TsType.MappedType) type;
             return new TsType.MappedType(
-                    transformTsType(context, mappedType.parameterType, transformer),
-                    mappedType.questionToken,
-                    transformTsType(context, mappedType.type, transformer));
+                transformTsType(context, mappedType.parameterType, transformer),
+                mappedType.questionToken,
+                transformTsType(context, mappedType.type, transformer));
         }
         if (type instanceof TsType.UnionType) {
             final TsType.UnionType unionType = (TsType.UnionType) type;

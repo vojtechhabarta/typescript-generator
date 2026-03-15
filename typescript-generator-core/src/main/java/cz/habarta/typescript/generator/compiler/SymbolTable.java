@@ -112,7 +112,8 @@ public class SymbolTable {
             }
         }
         if (conflict) {
-            throw new NameConflictException("Multiple classes are mapped to the same name. You can use 'customTypeNaming' or 'customTypeNamingFunction' settings to resolve conflicts or exclude conflicting class if it was added accidentally.");
+            throw new NameConflictException(
+                "Multiple classes are mapped to the same name. You can use 'customTypeNaming' or 'customTypeNamingFunction' settings to resolve conflicts or exclude conflicting class if it was added accidentally.");
         }
     }
 
@@ -185,6 +186,7 @@ public class SymbolTable {
     }
 
     // https://github.com/Microsoft/TypeScript/blob/master/doc/spec-ARCHIVED.md#221-reserved-words
+    // spotless:off
     private static final Set<String> Keywords = new LinkedHashSet<>(Arrays.asList(
         "break",             "case",              "catch",             "class",
         "const",             "continue",          "debugger",          "default",
@@ -200,6 +202,7 @@ public class SymbolTable {
         "private",           "protected",         "public",            "static",
         "yield"
     ));
+    // spotless:on
 
     public static boolean isReservedWord(String word) {
         return Keywords.contains(word);
@@ -208,8 +211,8 @@ public class SymbolTable {
     private CustomTypeNamingFunction getCustomTypeNamingFunction() throws ScriptException {
         if (customTypeNamingFunction == null) {
             final ScriptEngine engine = GraalJSScriptEngine.create(
-                    Engine.newBuilder().option("engine.WarnInterpreterOnly", "false").build(),
-                    Context.newBuilder("js").allowHostAccess(HostAccess.ALL)
+                Engine.newBuilder().option("engine.WarnInterpreterOnly", "false").build(),
+                Context.newBuilder("js").allowHostAccess(HostAccess.ALL)
             );
             engine.eval("var getName = " + settings.customTypeNamingFunction);
             final Invocable invocable = (Invocable) engine;
@@ -239,7 +242,7 @@ public class SymbolTable {
     }
 
     public static class NameConflictException extends RuntimeException {
-        
+
         private static final long serialVersionUID = 1L;
 
         public NameConflictException() {

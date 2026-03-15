@@ -50,9 +50,9 @@ public class SpringTest {
 
     private static Method getMethod(Class<?> cls, String methodName) {
         final Method greetingMethod = Utils.getAllMethods(cls).stream()
-                .filter(method -> method.getName().equals(methodName))
-                .findFirst()
-                .get();
+            .filter(method -> method.getName().equals(methodName))
+            .findFirst()
+            .get();
         return greetingMethod;
     }
 
@@ -174,8 +174,8 @@ public class SpringTest {
     public static class Controller1 {
         @GetMapping("/pets/{petId}")
         public Pet findPet(
-                @PathVariable("ownerId") Long ownerId,
-                @PathVariable(name = "petId") Long petId
+            @PathVariable("ownerId") Long ownerId,
+            @PathVariable(name = "petId") Long petId
         ) {
             return null;
         }
@@ -185,9 +185,9 @@ public class SpringTest {
     public static class Controller2 {
         @RequestMapping("/echo")
         public String echo(
-                @RequestParam("message") String message,
-                @RequestParam(name = "count", defaultValue = "1") Integer count,
-                @RequestParam(required = false) Integer optionalRequestParam
+            @RequestParam("message") String message,
+            @RequestParam(name = "count", defaultValue = "1") Integer count,
+            @RequestParam(required = false) Integer optionalRequestParam
         ) {
             return message;
         }
@@ -197,7 +197,7 @@ public class SpringTest {
     public static class Controller7 {
         @RequestMapping("/echo2")
         public String echo(
-                @RequestParam(required = false) String message
+            @RequestParam(required = false) String message
         ) {
             return message;
         }
@@ -221,8 +221,14 @@ public class SpringTest {
 
         static class FilterParams {
             private String message;
-            public String getMessage() { return message; }
-            public void setMessage(String message) { this.message = message; }
+
+            public String getMessage() {
+                return message;
+            }
+
+            public void setMessage(String message) {
+                this.message = message;
+            }
         }
     }
 
@@ -246,8 +252,8 @@ public class SpringTest {
     public static class Controller5 {
         @GetMapping("/pets2/{petId}")
         public Pet findPet(
-                @PathVariable Long ownerId,
-                @PathVariable Long petId
+            @PathVariable Long ownerId,
+            @PathVariable Long petId
         ) {
             return null;
         }
@@ -385,10 +391,10 @@ public class SpringTest {
     }
 
     @RestController
-    public class DoubleGenericController  {
+    public class DoubleGenericController {
         @GetMapping("/generic2")
-        public ResponseEntity<List<String>> get () {
-            return ResponseEntity.ok(Arrays.asList( "a" , "b" , "c" ));
+        public ResponseEntity<List<String>> get() {
+            return ResponseEntity.ok(Arrays.asList("a", "b", "c"));
         }
     }
 
@@ -430,6 +436,7 @@ public class SpringTest {
         @GetMapping("/")
         public void response() {
         }
+
         @GetMapping("")
         public void response2() {
         }

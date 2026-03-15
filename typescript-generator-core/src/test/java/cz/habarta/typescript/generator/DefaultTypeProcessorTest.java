@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.SymbolTable;
@@ -8,8 +9,10 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @SuppressWarnings("unused")
 public class DefaultTypeProcessorTest {

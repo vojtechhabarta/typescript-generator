@@ -25,8 +25,8 @@ public class DeprecationEnricher {
     private BeanModel enrichBean(BeanModel bean) {
         final List<PropertyModel> properties = mapList(bean.getProperties(), property -> enrichProperty(property));
         return bean
-                .withProperties(properties)
-                .withComments(addDeprecation(bean.getComments(), bean.getOrigin()));
+            .withProperties(properties)
+            .withComments(addDeprecation(bean.getComments(), bean.getOrigin()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property) {
@@ -43,24 +43,24 @@ public class DeprecationEnricher {
 
     private PropertyModel enrichFieldProperty(PropertyModel property, Field field) {
         return property
-                .withComments(addDeprecation(property.getComments(), field));
+            .withComments(addDeprecation(property.getComments(), field));
     }
 
     private PropertyModel enrichMethodProperty(PropertyModel property, Method method) {
         return property
-                .withComments(addDeprecation(property.getComments(), method));
+            .withComments(addDeprecation(property.getComments(), method));
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
         final List<EnumMemberModel> members = mapList(enumModel.getMembers(), enumMember -> enrichEnumMember(enumMember));
         return enumModel
-                .withMembers(members)
-                .withComments(addDeprecation(enumModel.getComments(), enumModel.getOrigin()));
+            .withMembers(members)
+            .withComments(addDeprecation(enumModel.getComments(), enumModel.getOrigin()));
     }
 
     private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember) {
         return enumMember
-                .withComments(addDeprecation(enumMember.getComments(), enumMember.getOriginalField()));
+            .withComments(addDeprecation(enumMember.getComments(), enumMember.getOriginalField()));
     }
 
     private RestApplicationModel enrichRestApplication(RestApplicationModel restApplicationModel) {
@@ -70,7 +70,7 @@ public class DeprecationEnricher {
 
     private RestMethodModel enrichRestMethod(RestMethodModel method) {
         return method
-                .withComments(addDeprecation(method.getComments(), method.getOriginalMethod()));
+            .withComments(addDeprecation(method.getComments(), method.getOriginalMethod()));
     }
 
     private static <R, T> List<R> mapList(List<T> list, Function<T, R> mapper) {
@@ -88,8 +88,8 @@ public class DeprecationEnricher {
 
     private static boolean containsDeprecatedTag(List<String> comments) {
         return comments != null
-                ? comments.stream().anyMatch(comment -> comment.startsWith(DeprecationUtils.DEPRECATED))
-                : false;
+            ? comments.stream().anyMatch(comment -> comment.startsWith(DeprecationUtils.DEPRECATED))
+            : false;
     }
 
 }

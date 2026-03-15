@@ -39,10 +39,10 @@ public class TsNewExpression extends TsExpression {
     @Override
     public String format(Settings settings) {
         return "new "
-                + expression.format(settings)
-                + (typeArguments.isEmpty() ? "" : "<" + Emitter.formatList(settings, typeArguments) + ">")
-                + "(" + Emitter.formatList(settings, arguments)
-                + ")";
+            + expression.format(settings)
+            + (typeArguments.isEmpty() ? "" : "<" + Emitter.formatList(settings, typeArguments) + ">")
+            + "(" + Emitter.formatList(settings, arguments)
+            + ")";
     }
 
 }

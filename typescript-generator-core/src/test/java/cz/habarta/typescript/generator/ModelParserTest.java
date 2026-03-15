@@ -19,7 +19,7 @@ public class ModelParserTest {
     public void testClassDiscovery1() {
         final Model model = parseModel(RootClass1.class);
         Assertions.assertEquals(2, model.getBeans().size());
-        
+
     }
 
     @Test
@@ -68,8 +68,8 @@ public class ModelParserTest {
         final Settings settings = new Settings();
         settings.setExcludeFilter(Arrays.asList(excludedClassNames), null);
         final ModelParser parser = new Jackson2Parser(settings, new TypeProcessor.Chain(
-                new ExcludingTypeProcessor(settings.getExcludeFilter()),
-                new DefaultTypeProcessor()
+            new ExcludingTypeProcessor(settings.getExcludeFilter()),
+            new DefaultTypeProcessor()
         ));
         final Model model = parser.parseModel(type);
         return model;

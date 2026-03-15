@@ -31,8 +31,8 @@ public class ModuleDependenciesTest {
         settings.npmVersion = "1.0.0";
         settings.generateInfoJson = true;
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(A1.class, A2.class, Enum1.class, ABase.class),
-                Output.to(new File("target/test-module-dependencies/a/a.d.ts")));
+            Input.from(A1.class, A2.class, Enum1.class, ABase.class),
+            Output.to(new File("target/test-module-dependencies/a/a.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/a/a.d.ts");
         Assertions.assertTrue(output.contains("interface A1 {"));
         Assertions.assertTrue(output.contains("namespace NS {"));
@@ -47,11 +47,11 @@ public class ModuleDependenciesTest {
         settings.npmName = "b";
         settings.npmVersion = "1.0.0";
         settings.moduleDependencies = Arrays.asList(
-                ModuleDependency.module("../a", "a", new File("target/test-module-dependencies/a/typescript-generator-info.json"), "a", "1.0.0")
+            ModuleDependency.module("../a", "a", new File("target/test-module-dependencies/a/typescript-generator-info.json"), "a", "1.0.0")
         );
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
-                Output.to(new File("target/test-module-dependencies/b/b.d.ts")));
+            Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
+            Output.to(new File("target/test-module-dependencies/b/b.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/b/b.d.ts");
         Assertions.assertTrue(output.contains("import * as a from \"../a\""));
         Assertions.assertTrue(output.contains("interface B1 extends a.A1 {"));
@@ -90,8 +90,8 @@ public class ModuleDependenciesTest {
         settings.customTypeNaming = Collections.singletonMap("cz.habarta.typescript.generator.ModuleDependenciesTest$A2", "NS.A2");
         settings.generateInfoJson = true;
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(A1.class, A2.class, Enum1.class, ABase.class),
-                Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
+            Input.from(A1.class, A2.class, Enum1.class, ABase.class),
+            Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
         Assertions.assertTrue(output.contains("interface A1 {"));
         Assertions.assertTrue(output.contains("namespace NS {"));
@@ -103,14 +103,14 @@ public class ModuleDependenciesTest {
         final Settings settings = TestUtils.settings();
         settings.outputKind = TypeScriptOutputKind.global;
         settings.referencedFiles = Stream.of(dependencyDirectories)
-                .map(depDir -> "../" + depDir + "/global.d.ts")
-                .collect(Collectors.toList());
+            .map(depDir -> "../" + depDir + "/global.d.ts")
+            .collect(Collectors.toList());
         settings.moduleDependencies = Stream.of(dependencyDirectories)
-                .map(depDir -> ModuleDependency.global(new File("target/test-module-dependencies/" + depDir + "/typescript-generator-info.json")))
-                .collect(Collectors.toList());
+            .map(depDir -> ModuleDependency.global(new File("target/test-module-dependencies/" + depDir + "/typescript-generator-info.json")))
+            .collect(Collectors.toList());
         new TypeScriptGenerator(settings).generateTypeScript(
-                Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
-                Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
+            Input.from(B1.class, B2.class, C.class, D1.class, D2.class),
+            Output.to(new File("target/test-module-dependencies/" + directory + "/global.d.ts")));
         final String output = TestUtils.readFile("target/test-module-dependencies/" + directory + "/global.d.ts");
         Assertions.assertTrue(!output.contains("import"));
         Assertions.assertTrue(output.contains("interface B1 extends A1 {"));

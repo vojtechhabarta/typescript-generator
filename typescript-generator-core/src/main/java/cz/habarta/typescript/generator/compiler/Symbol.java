@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator.compiler;
 
-
 public class Symbol {
 
     private String module;

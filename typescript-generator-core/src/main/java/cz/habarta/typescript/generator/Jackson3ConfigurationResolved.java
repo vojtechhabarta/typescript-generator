@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.ValueSerializer;
+
 
 public class Jackson3ConfigurationResolved {
 
@@ -45,8 +47,10 @@ public class Jackson3ConfigurationResolved {
         return resolved;
     }
 
-    private static <C, V> Map<Class<? extends C>, V> resolveClassMappings(List<String> mappings, String mappingName, ClassLoader classLoader,
-            Class<? extends C> key, Function<String, V> valueConvertor) {
+    private static <C, V> Map<Class<? extends C>, V> resolveClassMappings(
+        List<String> mappings, String mappingName, ClassLoader classLoader,
+        Class<? extends C> key, Function<String, V> valueConvertor
+    ) {
         if (mappings == null) {
             return null;
         }
@@ -61,11 +65,12 @@ public class Jackson3ConfigurationResolved {
     }
 
     public void setVisibility(
-            JsonAutoDetect.Visibility fieldVisibility,
-            JsonAutoDetect.Visibility getterVisibility,
-            JsonAutoDetect.Visibility isGetterVisibility,
-            JsonAutoDetect.Visibility setterVisibility,
-            JsonAutoDetect.Visibility creatorVisibility) {
+        JsonAutoDetect.Visibility fieldVisibility,
+        JsonAutoDetect.Visibility getterVisibility,
+        JsonAutoDetect.Visibility isGetterVisibility,
+        JsonAutoDetect.Visibility setterVisibility,
+        JsonAutoDetect.Visibility creatorVisibility
+    ) {
         this.fieldVisibility = fieldVisibility;
         this.getterVisibility = getterVisibility;
         this.isGetterVisibility = isGetterVisibility;

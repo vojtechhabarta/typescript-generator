@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+
 @SuppressWarnings("unused")
 public class GenericCustomTypeMappingsTest {
 
@@ -109,11 +110,16 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(output.contains("nonGeneric: Map<string, string>"));
     }
 
-    private static class NonGeneric {}
+    private static class NonGeneric {
+    }
+
     private static class NonGenericUsage {
         public NonGeneric nonGeneric;
     }
-    private static class Generic2<T1, T2> {}
+
+    private static class Generic2<T1, T2> {
+    }
+
     private static class Usage {
         public Generic2<String, Integer> generic;
     }
@@ -173,8 +179,7 @@ public class GenericCustomTypeMappingsTest {
         public abstract T getAbstractValue();
     }
 
-    private static abstract class Class3 extends AbstractClass<Date> implements Interface<Date>{
+    private static abstract class Class3 extends AbstractClass<Date> implements Interface<Date> {
     }
-
 
 }

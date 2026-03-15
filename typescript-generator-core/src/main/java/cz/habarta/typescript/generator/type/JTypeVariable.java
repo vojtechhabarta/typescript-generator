@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable<D> {
 
-    private final D genericDeclaration;  // should not be null but for Kotlin KTypeParameter we don't have it
+    private final D genericDeclaration; // should not be null but for Kotlin KTypeParameter we don't have it
     private final String name;
     private Type[] bounds;
     private final AnnotatedType[] annotatedBounds;
@@ -89,7 +89,7 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
         if (obj instanceof TypeVariable) {
             final TypeVariable<?> that = (TypeVariable<?>) obj;
             return Objects.equals(genericDeclaration, that.getGenericDeclaration()) &&
-                    Objects.equals(name, that.getName());
+                Objects.equals(name, that.getName());
         } else {
             return false;
         }

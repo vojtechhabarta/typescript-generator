@@ -87,8 +87,8 @@ public class Javadoc {
             enrichedProperties.add(enrichedProperty);
         }
         return bean
-                .withProperties(enrichedProperties)
-                .withComments(combineComments(getComments(beanComment, tags), bean.getComments()));
+            .withProperties(enrichedProperties)
+            .withComments(combineComments(getComments(beanComment, tags), bean.getComments()));
     }
 
     private PropertyModel enrichProperty(PropertyModel property, List<Field> dFields, List<Method> dMethods) {
@@ -104,15 +104,15 @@ public class Javadoc {
             final Field dField = findJavadocField(field.getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
-        } 
-        if (propertyComment == null )  {
-            //give a chance for comments on fields but not on getter setters
+        }
+        if (propertyComment == null) {
+            // give a chance for comments on fields but not on getter setters
             final Field dField = findJavadocField(property.getName(), dFields);
             propertyComment = dField != null ? dField.getComment() : null;
             tags = dField != null ? dField.getTag() : null;
         }
         return property
-                .withComments(combineComments(getComments(propertyComment, tags), property.getComments()));
+            .withComments(combineComments(getComments(propertyComment, tags), property.getComments()));
     }
 
     private EnumModel enrichEnum(EnumModel enumModel) {
@@ -125,16 +125,16 @@ public class Javadoc {
         final String enumComment = dEnum != null ? dEnum.getComment() : null;
         final List<TagInfo> tags = dEnum != null ? dEnum.getTag() : null;
         return enumModel
-                .withMembers(enrichedMembers)
-                .withComments(combineComments(getComments(enumComment, tags), enumModel.getComments()));
+            .withMembers(enrichedMembers)
+            .withComments(combineComments(getComments(enumComment, tags), enumModel.getComments()));
     }
 
     private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember, Enum dEnum) {
         final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
-        final List<TagInfo> tags = dConstant != null ? dConstant.getTag(): null;
+        final List<TagInfo> tags = dConstant != null ? dConstant.getTag() : null;
         final String memberComment = dConstant != null ? dConstant.getComment() : null;
         return enumMember
-                .withComments(combineComments(getComments(memberComment, tags), enumMember.getComments()));
+            .withComments(combineComments(getComments(memberComment, tags), enumMember.getComments()));
     }
 
     private RestApplicationModel enrichRestApplication(RestApplicationModel restApplicationModel) {
@@ -151,7 +151,7 @@ public class Javadoc {
         final String comment = dMethod != null ? dMethod.getComment() : null;
         final List<TagInfo> tags = dMethod != null ? dMethod.getTag() : null;
         return method
-                .withComments(combineComments(getComments(comment, tags), method.getComments()));
+            .withComments(combineComments(getComments(comment, tags), method.getComments()));
     }
 
     // finders
@@ -251,11 +251,11 @@ public class Javadoc {
         if (dComments != null) {
             final String nn = newline + newline;
             final String replacedHtmlLines = dComments
-                    .replaceAll("\\s*<br>\\s*", nn)
-                    .replaceAll("\\s*<br/>\\s*", nn)
-                    .replaceAll("\\s*<br />\\s*", nn)
-                    .replaceAll("\\s*<p>\\s*", nn)
-                    .replaceAll("\\s*</p>\\s*", nn);
+                .replaceAll("\\s*<br>\\s*", nn)
+                .replaceAll("\\s*<br/>\\s*", nn)
+                .replaceAll("\\s*<br />\\s*", nn)
+                .replaceAll("\\s*<p>\\s*", nn)
+                .replaceAll("\\s*</p>\\s*", nn);
             result.addAll(Utils.splitMultiline(replacedHtmlLines, true));
         }
         if (tags != null) {

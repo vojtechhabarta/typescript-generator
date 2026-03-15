@@ -17,6 +17,7 @@ public class ExcludingTypeProcessor implements TypeProcessor {
     public ExcludingTypeProcessor(List<String> excludedTypes) {
         this(new Predicate<String>() {
             final Set<String> excludedTypesSet = excludedTypes != null ? new LinkedHashSet<>(excludedTypes) : Collections.emptySet();
+
             @Override
             public boolean test(String typeName) {
                 return excludedTypesSet.contains(typeName);

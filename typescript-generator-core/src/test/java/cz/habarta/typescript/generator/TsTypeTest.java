@@ -1,16 +1,19 @@
+
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.TsType.BasicArrayType;
 import cz.habarta.typescript.generator.TsType.IndexedArrayType;
-import static cz.habarta.typescript.generator.TsType.Number;
 import cz.habarta.typescript.generator.TsType.ObjectType;
-import static cz.habarta.typescript.generator.TsType.String;
 import cz.habarta.typescript.generator.TsType.UnionType;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.Arrays;
+import org.junit.jupiter.api.Test;
+
+import static cz.habarta.typescript.generator.TsType.Number;
+import static cz.habarta.typescript.generator.TsType.String;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import org.junit.jupiter.api.Test;
+
 
 public class TsTypeTest {
 
@@ -43,12 +46,12 @@ public class TsTypeTest {
     public void testObjectType() {
         final Settings settings = TestUtils.settings();
         assertEquals("{ a: string; b: string | number; c: {}; d: { x: string; }; }", new TsType.ObjectType(Arrays.asList(
-                new TsProperty("a", String),
-                new TsProperty("b", new UnionType(Arrays.asList(String, Number))),
-                new TsProperty("c", new ObjectType(Arrays.<TsProperty>asList())),
-                new TsProperty("d", new ObjectType(Arrays.asList(
-                        new TsProperty("x", String)
-                )))
+            new TsProperty("a", String),
+            new TsProperty("b", new UnionType(Arrays.asList(String, Number))),
+            new TsProperty("c", new ObjectType(Arrays.<TsProperty>asList())),
+            new TsProperty("d", new ObjectType(Arrays.asList(
+                new TsProperty("x", String)
+            )))
         )).format(settings));
     }
 

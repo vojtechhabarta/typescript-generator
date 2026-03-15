@@ -8,7 +8,6 @@ public class InfoJson {
 
     public List<ClassInfo> classes;
 
-
     public static class ClassInfo {
         public String javaClass;
         public String typeName;

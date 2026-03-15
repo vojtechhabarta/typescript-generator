@@ -72,10 +72,10 @@ public class JsonViewTest {
 
     public static class SomeClass {
 
-        @JsonView({Views.BaseConfig.class, Views.REST.class})
+        @JsonView({ Views.BaseConfig.class, Views.REST.class })
         public Integer id;
 
-        @JsonView({Views.BaseConfig.class, Views.REST.class})
+        @JsonView({ Views.BaseConfig.class, Views.REST.class })
         public Integer parentID;
 
         @JsonView(Views.Exclude.class)
@@ -97,12 +97,12 @@ public class JsonViewTest {
         private String someProperty;
         private Long anotherProperty;
 
-        @JsonView({Views.BaseConfig.class, Views.REST.class})
+        @JsonView({ Views.BaseConfig.class, Views.REST.class })
         public Integer getId() {
             return id;
         }
 
-        @JsonView({Views.BaseConfig.class, Views.REST.class})
+        @JsonView({ Views.BaseConfig.class, Views.REST.class })
         public Integer getParentID() {
             return parentID;
         }

@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.parser;
 
 import cz.habarta.typescript.generator.Input;
@@ -28,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 
 public class JsonbParserTest {
 
@@ -153,7 +155,8 @@ public class JsonbParserTest {
         public String bar;
 
         @JsonbCreator
-        public ObjectWithRequiredPropertyAndConstructor(@RequiredAnnotation final String foo, final String bar) {}
+        public ObjectWithRequiredPropertyAndConstructor(@RequiredAnnotation final String foo, final String bar) {
+        }
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -183,14 +186,14 @@ public class JsonbParserTest {
     @Test
     public void testJsonTypes() {
         Assertions.assertEquals(
-                "interface JsonTypes {\n" +
+            "interface JsonTypes {\n" +
                 "    jsonArray?: any[];\n" +
                 "    jsonNumber?: number;\n" +
                 "    jsonObject?: { [index: string]: any };\n" +
                 "    jsonString?: string;\n" +
                 "    jsonValue?: any;\n" +
                 "}",
-                generate(settings, JsonTypes.class).trim());
+            generate(settings, JsonTypes.class).trim());
     }
 
     @Test
@@ -273,11 +276,13 @@ public class JsonbParserTest {
         Assertions.assertTrue(output.contains(" $foo?:"), output);
         Assertions.assertFalse(output.contains(" foo?:"), output);
     }
+
     @Test
     public void tesImplicitName() {
         final String output = generate(settings, DirectName.class);
         Assertions.assertTrue(output.contains(" foo?:"), output);
     }
+
     @Test
     public void optionality() {
         {
@@ -332,7 +337,7 @@ public class JsonbParserTest {
         public boolean isVisible(Field field) {
             return false;
         }
-    
+
         @Override
         public boolean isVisible(Method method) {
             return false;

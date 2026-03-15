@@ -72,7 +72,8 @@ public class UtilsTest {
         Assertions.assertFalse(Utils.isPrimitiveType(Date.class));
         Assertions.assertFalse(Utils.isPrimitiveType(Collection.class));
         Assertions.assertFalse(Utils.isPrimitiveType(Map.class));
-        class NewClass{}
+        class NewClass {
+        }
         Assertions.assertFalse(Utils.isPrimitiveType(NewClass.class));
     }
 

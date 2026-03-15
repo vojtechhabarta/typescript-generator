@@ -24,12 +24,12 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
             return null;
         }
         final Settings.CustomTypeMapping mapping = customMappings.stream()
-                .filter(m -> m.matchSubclasses
-                        ? m.rawClass.isAssignableFrom(rawClass)
-                        : m.rawClass.equals(rawClass)
-                )
-                .findFirst()
-                .orElse(null);
+            .filter(m -> m.matchSubclasses
+                ? m.rawClass.isAssignableFrom(rawClass)
+                : m.rawClass.equals(rawClass)
+            )
+            .findFirst()
+            .orElse(null);
         if (mapping == null) {
             return null;
         }

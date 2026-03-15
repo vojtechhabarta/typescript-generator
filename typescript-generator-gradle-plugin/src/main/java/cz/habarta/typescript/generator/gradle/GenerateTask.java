@@ -263,8 +263,8 @@ public class GenerateTask extends DefaultTask {
             parameters.debug = loggingLevel == Logger.Level.Debug;
 
             final File output = outputFile != null
-                    ? getProject().file(outputFile)
-                    : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
+                ? getProject().file(outputFile)
+                : new File(new File(getProject().getBuildDir(), "typescript-generator"), getProject().getName() + settings.getExtension());
             settings.validateFileName(output);
 
             new TypeScriptGenerator(settings).generateTypeScript(Input.from(parameters), Output.to(output));

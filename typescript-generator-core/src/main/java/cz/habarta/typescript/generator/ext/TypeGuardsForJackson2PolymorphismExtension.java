@@ -64,10 +64,10 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
         return null;
     }
 
-// Example:
-//    function isCartesianPoint(point: Point): point is CartesianPoint {
-//        return point.type === "cartesian";
-//    }
+    // Example:
+    // function isCartesianPoint(point: Point): point is CartesianPoint {
+    // return point.type === "cartesian";
+    // }
     static void emitTypeGuard(Writer writer, Settings settings, boolean exportKeyword, String baseType, String subType, String propertyName, String propertyValue) {
         final String argument = Character.toLowerCase(baseType.charAt(0)) + baseType.substring(1);
         final String exportPrefix = exportKeyword ? "export " : "";

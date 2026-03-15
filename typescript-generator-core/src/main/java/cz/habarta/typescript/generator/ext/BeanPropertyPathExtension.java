@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Settings;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 /**
  * Emitter which generates type-safe property path getters.
@@ -76,7 +78,8 @@ public class BeanPropertyPathExtension extends EmitterExtension {
      * Returns the list of beans that were emitted.
      */
     private static Set<TsBeanModel> writeBeanAndParentsFieldSpecs(
-        Writer writer, Settings settings, TsModel model, Set<TsBeanModel> emittedSoFar, TsBeanModel bean) {
+        Writer writer, Settings settings, TsModel model, Set<TsBeanModel> emittedSoFar, TsBeanModel bean
+    ) {
         if (emittedSoFar.contains(bean)) {
             return new HashSet<>();
         }
@@ -108,7 +111,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
      */
     private static boolean isOriginalTsType(TsType type) {
         if (type instanceof TsType.BasicType) {
-            TsType.BasicType basicType = (TsType.BasicType)type;
+            TsType.BasicType basicType = (TsType.BasicType) type;
             return !(basicType.name.equals("null") || basicType.name.equals("undefined"));
         }
         return true;
@@ -123,10 +126,10 @@ public class BeanPropertyPathExtension extends EmitterExtension {
      */
     private static TsType extractOriginalTsType(TsType type) {
         if (type instanceof TsType.OptionalType) {
-            return extractOriginalTsType(((TsType.OptionalType)type).type);
+            return extractOriginalTsType(((TsType.OptionalType) type).type);
         }
         if (type instanceof TsType.UnionType) {
-            TsType.UnionType union = (TsType.UnionType)type;
+            TsType.UnionType union = (TsType.UnionType) type;
             List<TsType> originalTypes = new ArrayList<>();
             for (TsType curType : union.types) {
                 if (isOriginalTsType(curType)) {
@@ -138,7 +141,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
                 : type;
         }
         if (type instanceof TsType.BasicArrayType) {
-            return extractOriginalTsType(((TsType.BasicArrayType)type).elementType);
+            return extractOriginalTsType(((TsType.BasicArrayType) type).elementType);
         }
         return type;
     }
@@ -148,7 +151,7 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         if (!(originalType instanceof TsType.ReferenceType)) {
             return null;
         }
-        TsType.ReferenceType originalTypeBean = (TsType.ReferenceType)originalType;
+        TsType.ReferenceType originalTypeBean = (TsType.ReferenceType) originalType;
 
         for (TsBeanModel curBean : model.getBeans()) {
             if (curBean.getName().equals(originalTypeBean.symbol)) {
@@ -164,7 +167,8 @@ public class BeanPropertyPathExtension extends EmitterExtension {
 
     private static void writeBeanProperty(
         Writer writer, Settings settings, TsModel model, TsBeanModel bean,
-        TsPropertyModel property) {
+        TsPropertyModel property
+    ) {
         TsBeanModel fieldBeanModel = getBeanModelByType(model, property.getTsType());
         String fieldClassName = fieldBeanModel != null ? getBeanModelClassName(fieldBeanModel) : "";
         // if a class has a field of its own type, we get stackoverflow exception

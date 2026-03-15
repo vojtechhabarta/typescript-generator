@@ -26,8 +26,8 @@ public class JUnionType implements Type {
     @Override
     public String toString() {
         return "(" +
-                types.stream().map(Type::toString).collect(Collectors.joining(" | "))
-                + ")";
+            types.stream().map(Type::toString).collect(Collectors.joining(" | "))
+            + ")";
     }
 
 }

@@ -21,7 +21,7 @@ public class DuplicatePropertyTest {
         @JsonSubTypes.Type(value = DuplicateKind2.class, name = "kind_2"),
     })
     public static abstract class DuplicateKind {
-//        public String kind;
+        // public String kind;
     }
 
     public static class DuplicateKind1 extends DuplicateKind {

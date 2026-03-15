@@ -1,8 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -44,6 +42,9 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 
 
 @SuppressWarnings("unused")
@@ -143,11 +144,14 @@ public class Jackson2ParserTest {
     @JsonTypeName("explicit-name1")
     private static class SubTypeDiscriminatedByName1 implements ParentWithNameDiscriminant {
     }
+
     private static class SubTypeDiscriminatedByName2 implements ParentWithNameDiscriminant {
     }
+
     @JsonTypeName(/* Default should be the simplename of the class */)
     private static class SubTypeDiscriminatedByName3 implements ParentWithNameDiscriminant {
     }
+
     private static class SubTypeDiscriminatedByName4 implements ParentWithNameDiscriminant {
     }
 
@@ -210,6 +214,7 @@ public class Jackson2ParserTest {
         @JsonProperty(required = true)
         public String jname3;
         private String jname4;
+
         @JsonProperty(required = true)
         public String getJname4() {
             return jname4;
@@ -222,6 +227,7 @@ public class Jackson2ParserTest {
         @XmlElement(required = true)
         public String xname3;
         private String xname4;
+
         @XmlElement(required = true)
         public String getXname4() {
             return xname4;
@@ -293,13 +299,13 @@ public class Jackson2ParserTest {
         public String name2;
     }
 
-//    public static void main(String[] args) throws JsonProcessingException {
-//        final ObjectMapper objectMapper = new ObjectMapper();
-//        final ClassWithIgnoredProperty instance = new ClassWithIgnoredProperty();
-//        instance.name1 = "xxx";
-//        instance.name2 = "xxx";
-//        System.out.println(objectMapper.writeValueAsString(instance));
-//    }
+    // public static void main(String[] args) throws JsonProcessingException {
+    //     final ObjectMapper objectMapper = new ObjectMapper();
+    //     final ClassWithIgnoredProperty instance = new ClassWithIgnoredProperty();
+    //     instance.name1 = "xxx";
+    //     instance.name2 = "xxx";
+    //     System.out.println(objectMapper.writeValueAsString(instance));
+    // }
 
     @Test
     public void testVisibilityConfiguration() {
@@ -321,6 +327,7 @@ public class Jackson2ParserTest {
 
     private static class ClassWithDifferentMemberVisibilities {
         private String property1;
+
         public String getProperty2() {
             return null;
         }
@@ -382,6 +389,7 @@ public class Jackson2ParserTest {
         public String getId() {
             return UUID.randomUUID().toString();
         }
+
         public String getName() {
             return "myProject";
         }
@@ -421,11 +429,11 @@ public class Jackson2ParserTest {
 
         @Override
         public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
+            throws IOException, JsonProcessingException {
             final String text = p.getText();
             return Objects.equals("TODAY", text)
-                    ? LocalDateTime.of(LocalDate.parse("2020-07-17"), LocalTime.MIN)
-                    : LocalDateTime.parse(text);
+                ? LocalDateTime.of(LocalDate.parse("2020-07-17"), LocalTime.MIN)
+                : LocalDateTime.parse(text);
         }
     }
 
@@ -468,7 +476,7 @@ public class Jackson2ParserTest {
 
     @Test
     public void testConstructor() throws JsonProcessingException {
-//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
+        // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
 
         final Settings settings = TestUtils.settings();
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
@@ -492,11 +500,12 @@ public class Jackson2ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
+
     @Test
     public void testFactoryMethod() throws JsonProcessingException {
-//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
+        // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
 
         final Settings settings = TestUtils.settings();
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
@@ -526,7 +535,7 @@ public class Jackson2ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
 
     @Retention(RetentionPolicy.RUNTIME)

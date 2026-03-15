@@ -19,21 +19,21 @@ public class NullabilityTest {
         settings.sortDeclarations = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(A.class));
         final String expected = "" +
-                "interface A<T> {\n" +
-                "    data?: T;\n" +
-                "    isNonNullableFlag: boolean;\n" +
-                "    isNullableFlag?: boolean;\n" +
-                "    nonNullableBoolean: boolean;\n" +
-                "    nonNullableString: string;\n" +
-                "    nullableArray?: (string | undefined)[];\n" +
-                "    nullableBoolean?: boolean;\n" +
-                "    nullableGenericArray?: (T | undefined)[];\n" +
-                "    nullableGenericType?: T;\n" +
-                "    nullableList?: (string | undefined)[];\n" +
-                "    nullableString?: string;\n" +
-                "    test: string;\n" +
-                "    testNullable?: string;\n" +
-                "}";
+            "interface A<T> {\n" +
+            "    data?: T;\n" +
+            "    isNonNullableFlag: boolean;\n" +
+            "    isNullableFlag?: boolean;\n" +
+            "    nonNullableBoolean: boolean;\n" +
+            "    nonNullableString: string;\n" +
+            "    nullableArray?: (string | undefined)[];\n" +
+            "    nullableBoolean?: boolean;\n" +
+            "    nullableGenericArray?: (T | undefined)[];\n" +
+            "    nullableGenericType?: T;\n" +
+            "    nullableList?: (string | undefined)[];\n" +
+            "    nullableString?: string;\n" +
+            "    test: string;\n" +
+            "    testNullable?: string;\n" +
+            "}";
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
@@ -66,12 +66,14 @@ public class NullabilityTest {
 
     @Test
     public void testVariants() {
+        // spotless:off
         testVariant(NullabilityDefinition.nullAndUndefinedUnion,       "list?: Nullable<Nullable<string>[]>", "type Nullable<T> = T | null | undefined");
         testVariant(NullabilityDefinition.undefinedUnion,              "list?: Nullable<Nullable<string>[]>", "type Nullable<T> = T | undefined");
         testVariant(NullabilityDefinition.nullUnion,                   "list: Nullable<Nullable<string>[]>", "type Nullable<T> = T | null");
         testVariant(NullabilityDefinition.nullAndUndefinedInlineUnion, "list?: (string | null | undefined)[] | null");
         testVariant(NullabilityDefinition.undefinedInlineUnion,        "list?: (string | undefined)[]");
         testVariant(NullabilityDefinition.nullInlineUnion,             "list: (string | null)[] | null");
+        // spotless:on
     }
 
     private static void testVariant(NullabilityDefinition nullabilityDefinition, String... expected) {
@@ -91,27 +93,27 @@ public class NullabilityTest {
     @Test
     public void testCombinationsOfOptionalAndNullable() {
         testCombinationOfOptionalAndNullable(
-                OptionalPropertiesDeclaration.questionMark,
-                NullabilityDefinition.nullInlineUnion,
-                "list?: (string | null)[] | null;");
+            OptionalPropertiesDeclaration.questionMark,
+            NullabilityDefinition.nullInlineUnion,
+            "list?: (string | null)[] | null;");
         testCombinationOfOptionalAndNullable(
-                OptionalPropertiesDeclaration.nullableType,
-                NullabilityDefinition.nullInlineUnion,
-                "list: (string | null)[] | null;");
+            OptionalPropertiesDeclaration.nullableType,
+            NullabilityDefinition.nullInlineUnion,
+            "list: (string | null)[] | null;");
         testCombinationOfOptionalAndNullable(
-                OptionalPropertiesDeclaration.nullableAndUndefinableType,
-                NullabilityDefinition.nullAndUndefinedInlineUnion,
-                "list: (string | null | undefined)[] | null | undefined;");
+            OptionalPropertiesDeclaration.nullableAndUndefinableType,
+            NullabilityDefinition.nullAndUndefinedInlineUnion,
+            "list: (string | null | undefined)[] | null | undefined;");
         testCombinationOfOptionalAndNullable(
-                OptionalPropertiesDeclaration.nullableType,
-                NullabilityDefinition.nullAndUndefinedUnion,
-                "list: Nullable<Nullable<string>[]> | null;");
+            OptionalPropertiesDeclaration.nullableType,
+            NullabilityDefinition.nullAndUndefinedUnion,
+            "list: Nullable<Nullable<string>[]> | null;");
     }
 
     private static void testCombinationOfOptionalAndNullable(
-            OptionalPropertiesDeclaration optionalPropertiesDeclaration,
-            NullabilityDefinition nullabilityDefinition,
-            String expected
+        OptionalPropertiesDeclaration optionalPropertiesDeclaration,
+        NullabilityDefinition nullabilityDefinition,
+        String expected
     ) {
         final Settings settings = TestUtils.settings();
         settings.optionalAnnotations.add(Nullable.class);

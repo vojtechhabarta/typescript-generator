@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -64,20 +65,17 @@ public class OptionalAnnotationTest {
     }
 
     static class Jackson2Bean {
-        @Nullable
-        @JsonProperty
+        @Nullable @JsonProperty
         private String fieldProperty;
 
-        @Nullable
-        @JsonProperty
+        @Nullable @JsonProperty
         public String getMethodProperty() {
             return fieldProperty;
         }
     }
 
     static class BeanWithJavaxNullable {
-        @javax.annotation.Nullable
-        public String property1;
+        @javax.annotation.Nullable public String property1;
     }
 
     @Test
@@ -90,16 +88,14 @@ public class OptionalAnnotationTest {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
+    @Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
     public @interface NullableType {
     }
 
     private static class BeanWithNullableType {
-        @NullableType
-        public String property1;
+        @NullableType public String property1;
 
-        @NullableType
-        public String getProperty2() {
+        @NullableType public String getProperty2() {
             return null;
         }
     }
@@ -172,7 +168,8 @@ public class OptionalAnnotationTest {
 
     public class ClassWithMarkedField {
         public String a;
-        @MarkerAnnotation public String b;
+        @MarkerAnnotation
+        public String b;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

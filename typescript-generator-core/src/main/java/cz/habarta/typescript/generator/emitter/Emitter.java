@@ -112,7 +112,7 @@ public class Emitter implements EmitterExtension.Writer {
             if (settings.outputKind == TypeScriptOutputKind.module) {
                 prefix = "export ";
             }
-            writeIndentedLine(prefix +  "namespace " + settings.namespace + " {");
+            writeIndentedLine(prefix + "namespace " + settings.namespace + " {");
             indent++;
             final boolean exportElements = settings.outputFileType == TypeScriptFileType.implementationFile;
             emitElements(model, exportElements, false);
@@ -223,15 +223,15 @@ public class Emitter implements EmitterExtension.Writer {
 
     private static String formatDecoratorList(Settings settings, List<TsDecorator> decorators) {
         return decorators.stream()
-                .map(decorator -> formatDecorator(settings, decorator))
-                .collect(Collectors.joining(", "));
+            .map(decorator -> formatDecorator(settings, decorator))
+            .collect(Collectors.joining(", "));
     }
 
     private static String formatDecorator(Settings settings, TsDecorator decorator) {
         final String at = decorator.getIdentifierReference().getIdentifier().startsWith("@") ? "" : "@";
         final String parameters = decorator.getArguments() != null
-                ? ("(" + formatList(settings, decorator.getArguments()) + ")")
-                : "";
+            ? ("(" + formatList(settings, decorator.getArguments()) + ")")
+            : "";
         return at + decorator.getIdentifierReference().format(settings) + parameters;
     }
 
@@ -249,8 +249,8 @@ public class Emitter implements EmitterExtension.Writer {
 
     public static String formatList(Settings settings, List<? extends Emittable> list, String delimiter) {
         return list.stream()
-                .map(item -> item.format(settings))
-                .collect(Collectors.joining(delimiter));
+            .map(item -> item.format(settings))
+            .collect(Collectors.joining(delimiter));
     }
 
     private void emitCallable(TsCallableModel method) {
@@ -304,8 +304,8 @@ public class Emitter implements EmitterExtension.Writer {
 
     private static String joinParameters(List<String> params, boolean parentheses) {
         return parentheses
-                ? "(" + String.join(", ", params) + ")"
-                : String.join(", ", params);
+            ? "(" + String.join(", ", params) + ")"
+            : String.join(", ", params);
     }
 
     private void emitStatements(List<TsStatement> statements) {
@@ -352,7 +352,7 @@ public class Emitter implements EmitterExtension.Writer {
 
     private void emitVariableDeclarationStatement(TsVariableDeclarationStatement variableDeclarationStatement) {
         writeIndentedLine(
-                (variableDeclarationStatement.isConst() ? "const " : "let ")
+            (variableDeclarationStatement.isConst() ? "const " : "let ")
                 + variableDeclarationStatement.getName()
                 + (variableDeclarationStatement.getType() != null ? ": " + variableDeclarationStatement.getType().format(settings) : "")
                 + (variableDeclarationStatement.getInitializer() != null ? " = " + variableDeclarationStatement.getInitializer().format(settings) : "")
@@ -383,8 +383,8 @@ public class Emitter implements EmitterExtension.Writer {
         writeNewLine();
         emitComments(alias.getComments());
         final String genericParameters = alias.getTypeParameters().isEmpty()
-                ? ""
-                : "<" + formatList(settings, alias.getTypeParameters()) + ">";
+            ? ""
+            : "<" + formatList(settings, alias.getTypeParameters()) + ">";
         writeIndentedLine(exportKeyword, "type " + alias.getName().getSimpleName() + genericParameters + " = " + alias.getDefinition().format(settings) + ";");
     }
 
@@ -399,8 +399,8 @@ public class Emitter implements EmitterExtension.Writer {
             emitComments(member.getComments());
             final Object value = member.getEnumValue();
             final String initializer = value != null
-                    ? " = " + (value instanceof String ? quote((String) value, settings) : String.valueOf(value))
-                    : "";
+                ? " = " + (value instanceof String ? quote((String) value, settings) : String.valueOf(value))
+                : "";
             writeIndentedLine(member.getPropertyName() + initializer + ",");
         }
         indent--;
@@ -460,8 +460,8 @@ public class Emitter implements EmitterExtension.Writer {
                 }
             }
             writer.writeIndentedLine(line
-                    .replace("\t", settings.indentString)
-                    .replace("\"", settings.quotes)
+                .replace("\t", settings.indentString)
+                .replace("\"", settings.quotes)
             );
         }
     }

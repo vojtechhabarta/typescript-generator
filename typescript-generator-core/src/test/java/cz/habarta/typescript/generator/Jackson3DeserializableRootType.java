@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+
 /**
  * Test that root type name in a hirarchy is included iff root type itself is not abstract
  */
@@ -16,11 +18,11 @@ public class Jackson3DeserializableRootType {
     @Test
     public void testHowJacksonDeserializes() throws JsonProcessingException {
         NonAbstractRoot nar = new ObjectMapper()
-                        .readValue("{\"type\": \"rootType\"}",
-                                        NonAbstractRoot.class);
+            .readValue("{\"type\": \"rootType\"}",
+                NonAbstractRoot.class);
         NonAbstractRoot nars = new ObjectMapper()
-                        .readValue("{\"type\": \"subType\"}",
-                                        NonAbstractRoot.class);
+            .readValue("{\"type\": \"subType\"}",
+                NonAbstractRoot.class);
 
         Assertions.assertSame(NonAbstractRoot.class, nar.getClass());
         Assertions.assertSame(NonAbstractRootSub.class, nars.getClass());

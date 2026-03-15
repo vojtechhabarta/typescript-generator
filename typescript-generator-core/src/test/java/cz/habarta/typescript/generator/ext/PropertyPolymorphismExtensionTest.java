@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Input;
@@ -10,8 +11,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class PropertyPolymorphismExtensionTest {
 
@@ -36,7 +39,7 @@ public class PropertyPolymorphismExtensionTest {
     private static class TestBSub1 extends TestB {
     }
 
-    @PropertyName(name="foo")
+    @PropertyName(name = "foo")
     private static class TestBSub2 extends TestB {
     }
 
@@ -44,14 +47,14 @@ public class PropertyPolymorphismExtensionTest {
     public void test() {
         final Settings settings = TestUtils.settings();
         settings.jsonLibrary = JsonLibrary.gson;
-        settings.extensions.add(new PropertyPolymorphismExtension(cls -> cls==TestB.class, subType -> {
+        settings.extensions.add(new PropertyPolymorphismExtension(cls -> cls == TestB.class, subType -> {
             String name = subType.getSimpleName();
             return name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
 
         }));
 
         final String output = new TypeScriptGenerator(settings)
-                .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
+            .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
         assertTrue(output.contains("interface TestA {\n" + "    b: TestBRef;\n" + "}"), output);
         assertTrue(output.contains("interface TestBRef {"), output);
         assertTrue(output.contains("testBSub2: TestBSub2;"), output);
@@ -71,7 +74,7 @@ public class PropertyPolymorphismExtensionTest {
         settings.extensions.add(extension);
 
         final String output = new TypeScriptGenerator(settings)
-                .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
+            .generateTypeScript(Input.from(TestA.class, TestBSub1.class, TestBSub2.class));
         assertTrue(output.contains("b: TestBRef;"), output);
         assertTrue(output.contains("interface TestBRef {"), output);
         assertTrue(output.contains("foo: TestBSub2;"), output);

@@ -87,8 +87,8 @@ public class DateTest {
 
     public static void main(String[] args) throws JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         final Clock clock = Clock.fixed(Instant.parse("2017-09-02T19:11:00Z"), ZoneId.systemDefault());
         System.out.println(objectMapper.writeValueAsString(new Date()));
         System.out.println(objectMapper.writeValueAsString(Calendar.getInstance()));

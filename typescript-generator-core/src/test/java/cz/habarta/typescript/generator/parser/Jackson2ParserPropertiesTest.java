@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 
 
 public class Jackson2ParserPropertiesTest {
-    
-    @JsonPropertyOrder({"password1", "id2"})
+
+    @JsonPropertyOrder({ "password1", "id2" })
     public static class UserOrdered {
         public String name;
         public String id1;
@@ -35,43 +35,68 @@ public class Jackson2ParserPropertiesTest {
     }
 
     public static class UserIndexed {
-        @JsonProperty(index = 5) public String name;
-        @JsonProperty(index = 4) public String id1;
-        @JsonProperty(index = 3) public String id2;
-        @JsonProperty(index = 2) public String password1;
-        @JsonProperty(index = 1) public String password2;
+        @JsonProperty(index = 5)
+        public String name;
+        @JsonProperty(index = 4)
+        public String id1;
+        @JsonProperty(index = 3)
+        public String id2;
+        @JsonProperty(index = 2)
+        public String password1;
+        @JsonProperty(index = 1)
+        public String password2;
     }
 
     public static class User1 {
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String name;
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String id1;
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String id2;
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String password1;
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String password2;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String name;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String id1;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String id2;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String password1;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String password2;
     }
 
     public static class User2 {
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String name;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id1;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id2;
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password1;
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password2;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String name;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id1;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id2;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password1;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password2;
     }
 
     public static class User3 {
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String name;
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password1;
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password2;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id1;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id2;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String name;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password1;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password2;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id1;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id2;
     }
 
     public static class User4 {
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password1;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id1;
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) public String password2;
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)  public String id2;
-        @JsonProperty(access = JsonProperty.Access.READ_WRITE) public String name;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password1;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id1;
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public String password2;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        public String id2;
+        @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+        public String name;
     }
 
     @Test

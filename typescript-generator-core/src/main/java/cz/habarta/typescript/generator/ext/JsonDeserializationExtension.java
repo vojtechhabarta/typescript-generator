@@ -120,8 +120,8 @@ public class JsonDeserializationExtension extends Extension {
         List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
 
         final TsType.ReferenceType dataType = typeParameters.isEmpty()
-                ? new TsType.ReferenceType(beanIdentifier)
-                : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
+            ? new TsType.ReferenceType(beanIdentifier)
+            : new TsType.GenericReferenceType(beanIdentifier, typeParameters);
         final List<TsParameterModel> parameters = new ArrayList<>();
         parameters.add(new TsParameterModel("data", dataType));
         parameters.addAll(getConstructorFnOfParameters(typeParameters));
@@ -130,43 +130,43 @@ public class JsonDeserializationExtension extends Extension {
         final List<TsStatement> body = new ArrayList<>();
         body.add(ifUndefinedThenReturnItStatement("data"));
         body.add(new TsVariableDeclarationStatement(
-                /*const*/ true,
-                "instance",
-                /*type*/ null,
-                new TsBinaryExpression(
-                        new TsIdentifierReference("target"),
-                        TsBinaryOperator.BarBar,
-                        new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, getConstructorParameters(bean))
-                )
+            /*const*/ true,
+            "instance",
+            /*type*/ null,
+            new TsBinaryExpression(
+                new TsIdentifierReference("target"),
+                TsBinaryOperator.BarBar,
+                new TsNewExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), typeParameters, getConstructorParameters(bean))
+            )
         ));
         if (bean.getParent() != null) {
             body.add(new TsExpressionStatement(
-                    new TsCallExpression(
-                            new TsMemberExpression(new TsSuperExpression(), "fromData"),
-                            new TsIdentifierReference("data"),
-                            new TsIdentifierReference("instance")
-                    )
+                new TsCallExpression(
+                    new TsMemberExpression(new TsSuperExpression(), "fromData"),
+                    new TsIdentifierReference("data"),
+                    new TsIdentifierReference("instance")
+                )
             ));
         }
         for (TsPropertyModel property : bean.getProperties()) {
             final Map<String, TsType> inheritedProperties = ModelCompiler.getInheritedProperties(symbolTable, tsModel, Utils.listFromNullable(bean.getParent()));
             if (!inheritedProperties.containsKey(property.getName())) {
                 body.add(new TsExpressionStatement(new TsAssignmentExpression(
-                        new TsMemberExpression(new TsIdentifierReference("instance"), property.name),
-                        getPropertyCopy(symbolTable, tsModel, bean, property)
+                    new TsMemberExpression(new TsIdentifierReference("instance"), property.name),
+                    getPropertyCopy(symbolTable, tsModel, bean, property)
                 )));
             }
         }
         body.add(new TsReturnStatement(new TsIdentifierReference("instance")));
 
         return new TsMethodModel(
-                "fromData",
-                TsModifierFlags.None.setStatic(),
-                typeParameters,
-                parameters,
-                dataType,
-                body,
-                null
+            "fromData",
+            TsModifierFlags.None.setStatic(),
+            typeParameters,
+            parameters,
+            dataType,
+            body,
+            null
         );
     }
 
@@ -195,24 +195,24 @@ public class JsonDeserializationExtension extends Extension {
         }
         final List<TsStatement> body = new ArrayList<>();
         body.add(new TsReturnStatement(
-                new TsArrowFunction(
-                        Arrays.asList(new TsParameter("data", null)),
-                        new TsCallExpression(
-                                new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), "fromData"),
-                                null,
-                                arguments
-                        )
+            new TsArrowFunction(
+                Arrays.asList(new TsParameter("data", null)),
+                new TsCallExpression(
+                    new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(beanIdentifier)), "fromData"),
+                    null,
+                    arguments
                 )
+            )
         ));
 
         return new TsMethodModel(
-                "fromDataFn",
-                TsModifierFlags.None.setStatic(),
-                typeParameters,
-                constructorFnOfParameters,
-                new TsType.FunctionType(Arrays.asList(new TsParameter("data", dataType)), dataType),
-                body,
-                null
+            "fromDataFn",
+            TsModifierFlags.None.setStatic(),
+            typeParameters,
+            constructorFnOfParameters,
+            new TsType.FunctionType(Arrays.asList(new TsParameter("data", dataType)), dataType),
+            body,
+            null
         );
     }
 
@@ -228,8 +228,8 @@ public class JsonDeserializationExtension extends Extension {
         final List<TsParameterModel> parameters = new ArrayList<>();
         for (TsType.GenericVariableType typeParameter : typeParameters) {
             parameters.add(new TsParameterModel(
-                    "constructorFnOf" + typeParameter.name,
-                    new TsType.FunctionType(Arrays.asList(new TsParameter("data", typeParameter)), typeParameter)
+                "constructorFnOf" + typeParameter.name,
+                new TsType.FunctionType(Arrays.asList(new TsParameter("data", typeParameter)), typeParameter)
             ));
         }
         return parameters;
@@ -237,8 +237,8 @@ public class JsonDeserializationExtension extends Extension {
 
     private static TsIfStatement ifUndefinedThenReturnItStatement(String identifier) {
         return new TsIfStatement(
-                new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference(identifier)),
-                Arrays.<TsStatement>asList(new TsReturnStatement(new TsIdentifierReference(identifier)))
+            new TsPrefixUnaryExpression(TsUnaryOperator.Exclamation, new TsIdentifierReference(identifier)),
+            Arrays.<TsStatement>asList(new TsReturnStatement(new TsIdentifierReference(identifier)))
         );
     }
 
@@ -255,8 +255,8 @@ public class JsonDeserializationExtension extends Extension {
             }
         }
         return new TsCallExpression(
-                copyFunction,
-                new TsMemberExpression(new TsIdentifierReference("data"), property.name)
+            copyFunction,
+            new TsMemberExpression(new TsIdentifierReference("data"), property.name)
         );
     }
 
@@ -269,9 +269,9 @@ public class JsonDeserializationExtension extends Extension {
                 arguments.add(getCopyFunctionForTsType(symbolTable, tsModel, typeArgument));
             }
             return new TsCallExpression(
-                    new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(genericReferenceType.symbol)), "fromDataFn"),
-                    genericReferenceType.typeArguments,
-                    arguments
+                new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(genericReferenceType.symbol)), "fromDataFn"),
+                genericReferenceType.typeArguments,
+                arguments
             );
         }
         if (tsType instanceof TsType.ReferenceType) {
@@ -291,16 +291,16 @@ public class JsonDeserializationExtension extends Extension {
             // __getCopyArrayFn
             final TsType.BasicArrayType arrayType = (TsType.BasicArrayType) tsType;
             return new TsCallExpression(
-                    new TsIdentifierReference("__getCopyArrayFn"),
-                    getCopyFunctionForTsType(symbolTable, tsModel, arrayType.elementType)
+                new TsIdentifierReference("__getCopyArrayFn"),
+                getCopyFunctionForTsType(symbolTable, tsModel, arrayType.elementType)
             );
         }
         if (tsType instanceof TsType.IndexedArrayType) {
             // __getCopyObjectFn
             final TsType.IndexedArrayType objectType = (TsType.IndexedArrayType) tsType;
             return new TsCallExpression(
-                    new TsIdentifierReference("__getCopyObjectFn"),
-                    getCopyFunctionForTsType(symbolTable, tsModel, objectType.elementType)
+                new TsIdentifierReference("__getCopyObjectFn"),
+                getCopyFunctionForTsType(symbolTable, tsModel, objectType.elementType)
             );
         }
         if (tsType instanceof TsType.GenericVariableType) {
@@ -310,9 +310,9 @@ public class JsonDeserializationExtension extends Extension {
         }
         // __identity
         return new TsCallExpression(
-                new TsIdentifierReference("__identity"),
-                Arrays.asList(tsType),
-                Collections.<TsExpression>emptyList()
+            new TsIdentifierReference("__identity"),
+            Arrays.asList(tsType),
+            Collections.<TsExpression>emptyList()
         );
     }
 
@@ -321,32 +321,32 @@ public class JsonDeserializationExtension extends Extension {
         for (Class<?> cls : bean.getTaggedUnionClasses()) {
             final TsBeanModel tuBean = tsModel.getBean(cls);
             caseClauses.add(new TsSwitchCaseClause(
-                    new TsStringLiteral(tuBean.getDiscriminantLiteral()),
-                    Arrays.<TsStatement>asList(new TsReturnStatement(
-                            new TsCallExpression(
-                                    new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(symbolTable.getSymbol(cls))), "fromData"),
-                                    new TsIdentifierReference("data")
-                            )
-                    ))
+                new TsStringLiteral(tuBean.getDiscriminantLiteral()),
+                Arrays.<TsStatement>asList(new TsReturnStatement(
+                    new TsCallExpression(
+                        new TsMemberExpression(new TsTypeReferenceExpression(new TsType.ReferenceType(symbolTable.getSymbol(cls))), "fromData"),
+                        new TsIdentifierReference("data")
+                    )
+                ))
             ));
         }
 
         final List<TsStatement> body = new ArrayList<>();
         body.add(ifUndefinedThenReturnItStatement("data"));
         body.add(new TsSwitchStatement(
-                new TsMemberExpression(new TsIdentifierReference("data"), bean.getDiscriminantProperty()),
-                caseClauses,
-                null
+            new TsMemberExpression(new TsIdentifierReference("data"), bean.getDiscriminantProperty()),
+            caseClauses,
+            null
         ));
         final TsType.ReferenceType unionType = new TsType.ReferenceType(bean.getTaggedUnionAlias().getName());
         return new TsMethodModel(
-                "fromDataUnion",
-                TsModifierFlags.None.setStatic(),
-                null, //typeParameters,
-                Arrays.asList(new TsParameterModel("data", unionType)),
-                unionType,
-                body,
-                null
+            "fromDataUnion",
+            TsModifierFlags.None.setStatic(),
+            null, // typeParameters,
+            Arrays.asList(new TsParameterModel("data", unionType)),
+            unionType,
+            body,
+            null
         );
     }
 
@@ -393,8 +393,8 @@ public class JsonDeserializationExtension extends Extension {
         // todo create changed method instead of modifying existing
         final int index = Math.max(objectLiteral.getPropertyDefinitions().size() - 1, 0);
         final TsExpression copyFunction = returnDataType == TsType.Void
-                ? TsIdentifierReference.Undefined
-                : getCopyFunctionForTsType(symbolTable, tsModel, returnDataType);
+            ? TsIdentifierReference.Undefined
+            : getCopyFunctionForTsType(symbolTable, tsModel, returnDataType);
         objectLiteral.getPropertyDefinitions().add(index, new TsPropertyDefinition("copyFn", copyFunction));
         return method;
     }

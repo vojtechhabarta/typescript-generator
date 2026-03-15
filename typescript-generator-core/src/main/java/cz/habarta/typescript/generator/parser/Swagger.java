@@ -19,9 +19,9 @@ public class Swagger {
 
     public static SwaggerOperation parseSwaggerAnnotations(Method method) {
         return firstResult(
-                () -> parseSwaggerAnnotations3(method),
-                () -> parseSwaggerAnnotations1(method),
-                new SwaggerOperation());
+            () -> parseSwaggerAnnotations3(method),
+            () -> parseSwaggerAnnotations1(method),
+            new SwaggerOperation());
     }
 
     private static SwaggerOperation parseSwaggerAnnotations1(Method method) {
@@ -84,8 +84,8 @@ public class Swagger {
         }
         // @ApiResponses
         final List<Annotation> responses = firstResult(
-                () -> emptyToNull(Utils.getRepeatableAnnotation(apiResponseAnnotation, apiResponsesAnnotation)),
-                () -> emptyToNull(Arrays.asList(Utils.getAnnotationElementValue(operationAnnotation, "responses", Annotation[].class)))
+            () -> emptyToNull(Utils.getRepeatableAnnotation(apiResponseAnnotation, apiResponsesAnnotation)),
+            () -> emptyToNull(Arrays.asList(Utils.getAnnotationElementValue(operationAnnotation, "responses", Annotation[].class)))
         );
         if (responses != null) {
             swaggerOperation.possibleResponses = new ArrayList<>();
@@ -148,8 +148,8 @@ public class Swagger {
             enrichedProperties.add(enrichedProperty);
         }
         final String comment = firstResult(
-                () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.v3.oas.annotations.media.Schema", "description", String.class),
-                () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.annotations.ApiModel", "description", String.class));
+            () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.v3.oas.annotations.media.Schema", "description", String.class),
+            () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.annotations.ApiModel", "description", String.class));
         final List<String> comments = comment != null && !comment.isEmpty() ? Arrays.asList(comment) : null;
         return bean.withProperties(enrichedProperties).withComments(Utils.concat(comments, bean.getComments()));
     }
@@ -158,9 +158,9 @@ public class Swagger {
         if (property.getOriginalMember() instanceof AnnotatedElement) {
             final AnnotatedElement annotatedElement = (AnnotatedElement) property.getOriginalMember();
             return firstResult(
-                    () -> enrichProperty3(property, annotatedElement),
-                    () -> enrichProperty1(property, annotatedElement),
-                    property);
+                () -> enrichProperty3(property, annotatedElement),
+                () -> enrichProperty1(property, annotatedElement),
+                property);
         } else {
             return property;
         }

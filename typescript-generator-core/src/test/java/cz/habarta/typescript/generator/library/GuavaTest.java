@@ -39,7 +39,7 @@ public class GuavaTest {
         final ObjectMapper objectMapper = Utils.getObjectMapper();
         objectMapper.registerModule(new GuavaModule());
         final String json = objectMapper.writeValueAsString(new GuavaSerializedClasses());
-//        System.out.println(json);
+        // System.out.println(json);
     }
 
     @Test
@@ -69,16 +69,16 @@ public class GuavaTest {
         public ImmutableRangeSet<String> rangeSet = ImmutableRangeSet.of(Range.closedOpen("a", "d"));
         public Range<Named> range = Range.closedOpen(new Named("a"), new Named("f"));
         public Table<Character, Integer, Boolean> table = ImmutableTable.<Character, Integer, Boolean>builder()
-                .put(Tables.immutableCell('a', 1, false))
-                .put(Tables.immutableCell('b', 3, true))
-                .build();
+            .put(Tables.immutableCell('a', 1, false))
+            .put(Tables.immutableCell('b', 3, true))
+            .build();
         public NamedTable namedTable = new NamedTable();
         public HostAndPort hostAndPort = HostAndPort.fromParts("habarta.cz", 80);
         public InternetDomainName internetDomainName = InternetDomainName.from("habarta.cz");
         public CacheBuilderSpec cacheBuilderSpec = CacheBuilderSpec.parse("initialCapacity=5,expireAfterWrite=60s");
         public CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder()
-                .initialCapacity(5)
-                .expireAfterWrite(60, TimeUnit.SECONDS);
+            .initialCapacity(5)
+            .expireAfterWrite(60, TimeUnit.SECONDS);
         public HashCode hashCode = HashCode.fromInt(45);
         public FluentIterable<String> fluentIterable = FluentIterable.of("a", "b", "c");
         public Multimap<String, Integer> multimap = ImmutableMultimap.of("a", 1, "b", 2);

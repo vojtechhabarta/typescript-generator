@@ -38,6 +38,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+
 /**
  * Generates TypeScript declaration file from specified java classes.
  * For more information see README and Wiki on GitHub.
@@ -788,7 +789,7 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private String npmBuildScript;
-    
+
     /**
      * List of additional NPM <code>dependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
@@ -797,7 +798,7 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> npmDependencies;
-    
+
     /**
      * List of additional NPM <code>devDependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
@@ -806,7 +807,7 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> npmDevDependencies;
-    
+
     /**
      * List of additional NPM <code>peerDependencies</code>.<br>
      * Only applicable when {@link #generateNpmPackageJson} parameter is <code>true</code> and generating implementation file (.ts).<br>
@@ -1009,8 +1010,8 @@ public class GenerateMojo extends AbstractMojo {
             parameters.debug = loggingLevel == Logger.Level.Debug;
 
             final File output = outputFile != null
-                    ? outputFile
-                    : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());
+                ? outputFile
+                : new File(new File(projectBuildDirectory, "typescript-generator"), project.getArtifactId() + settings.getExtension());
             settings.validateFileName(output);
 
             new TypeScriptGenerator(settings).generateTypeScript(Input.from(parameters), Output.to(output));

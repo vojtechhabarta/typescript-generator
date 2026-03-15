@@ -110,7 +110,7 @@ public class SwaggerTest {
             return Response.ok(new TestResponse()).build();
         }
 
-        @ApiResponses({@ApiResponse(code = 400, message = "", response = TestError.class)})
+        @ApiResponses({ @ApiResponse(code = 400, message = "", response = TestError.class) })
         @GET
         public Response testOperationError() {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -129,7 +129,6 @@ public class SwaggerTest {
 
     private static class TestError {
     }
-
 
     private static class DocumentedApplication extends Application {
         @Override

@@ -70,27 +70,27 @@ public class Input {
                 if (parameters.classesImplementingInterfaces != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
                     final List<SourceType<Type>> c = fromClassNames(parameters.classesImplementingInterfaces.stream()
-                            .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames().stream())
-                            .distinct()
-                            .collect(Collectors.toList())
+                        .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames().stream())
+                        .distinct()
+                        .collect(Collectors.toList())
                     );
                     types.addAll(c);
                 }
                 if (parameters.classesExtendingClasses != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
                     final List<SourceType<Type>> c = fromClassNames(parameters.classesExtendingClasses.stream()
-                            .flatMap(superclass -> scanResult.getSubclasses(superclass).getNames().stream())
-                            .distinct()
-                            .collect(Collectors.toList())
+                        .flatMap(superclass -> scanResult.getSubclasses(superclass).getNames().stream())
+                        .distinct()
+                        .collect(Collectors.toList())
                     );
                     types.addAll(c);
                 }
                 if (parameters.classesWithAnnotations != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
                     types.addAll(fromClassNames(parameters.classesWithAnnotations.stream()
-                            .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
-                            .distinct()
-                            .collect(Collectors.toList())
+                        .flatMap(annotation -> scanResult.getClassesWithAnnotation(annotation).getNames().stream())
+                        .distinct()
+                        .collect(Collectors.toList())
                     ));
                 }
                 if (parameters.jaxrsApplicationClassName != null) {
@@ -129,11 +129,11 @@ public class Input {
                 TypeScriptGenerator.getLogger().info("Scanning classpath");
                 final Date scanStart = new Date();
                 ClassGraph classGraph = new ClassGraph()
-                        .enableClassInfo()
-                        .enableAnnotationInfo()
-                        .ignoreClassVisibility();
+                    .enableClassInfo()
+                    .enableAnnotationInfo()
+                    .ignoreClassVisibility();
                 if (classLoader != null) {
-                    classGraph = classGraph.overrideClasspath((Object[])classLoader.getURLs());
+                    classGraph = classGraph.overrideClasspath((Object[]) classLoader.getURLs());
                 }
                 if (acceptedPackages != null && !acceptedPackages.isEmpty()) {
                     classGraph = classGraph.acceptPackages(acceptedPackages.toArray(new String[0]));

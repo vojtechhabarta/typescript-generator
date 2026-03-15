@@ -1,13 +1,13 @@
 
 package cz.habarta.typescript.generator.type;
 
-
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 
 public class JWildcardType implements WildcardType {
 
@@ -46,7 +46,7 @@ public class JWildcardType implements WildcardType {
         if (obj instanceof WildcardType) {
             final WildcardType that = (WildcardType) obj;
             return Arrays.equals(lowerBounds, that.getLowerBounds()) &&
-                    Arrays.equals(upperBounds, that.getUpperBounds());
+                Arrays.equals(upperBounds, that.getUpperBounds());
         } else {
             return false;
         }
@@ -55,11 +55,11 @@ public class JWildcardType implements WildcardType {
     @Override
     public String toString() {
         final String upper = upperBounds.length > 0 && !Objects.equals(upperBounds[0], Object.class)
-                ? " extends " + Stream.of(upperBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
-                : "";
+            ? " extends " + Stream.of(upperBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
+            : "";
         final String lower = lowerBounds.length > 0
-                ? " extends " + Stream.of(lowerBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
-                : "";
+            ? " extends " + Stream.of(lowerBounds).map(Type::getTypeName).collect(Collectors.joining(" & "))
+            : "";
         return "?" + upper + lower;
     }
 
