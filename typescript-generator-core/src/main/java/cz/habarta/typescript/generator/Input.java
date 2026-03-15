@@ -164,6 +164,7 @@ public class Input {
         final List<String> allClassNames = new ArrayList<>();
         allClassNames.addAll(scanResult.getAllStandardClasses().getNames());
         allClassNames.addAll(scanResult.getAllInterfaces().getNames());
+        allClassNames.addAll(scanResult.getAllRecords().getNames());
         Collections.sort(allClassNames);
         final List<String> classNames = filterClassNames(allClassNames, classNamePatterns);
         TypeScriptGenerator.getLogger().info(String.format("Found %d classes matching pattern.", classNames.size()));

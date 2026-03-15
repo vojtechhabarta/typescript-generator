@@ -396,7 +396,7 @@ public class JsonbParser extends ModelParser {
                 readers.putAll(Stream.of(clazz.getMethods())
                         .filter(it -> it.getDeclaringClass() != Object.class && it.getParameterCount() == 0)
                         .filter(it -> !"toString".equals(it.getName()) && !"hashCode".equals(it.getName()))
-                        .filter(it -> !isIgnored(it.getName()) && johnzonAny != null && Meta.getAnnotation(it, johnzonAny) == null)
+                        .filter(it -> !isIgnored(it.getName()) && (johnzonAny == null || Meta.getAnnotation(it, johnzonAny) == null))
                         .collect(Collectors.toMap(Method::getName, it -> new MethodDecoratedType(it, it.getGenericReturnType()) {
                         })));
             } else {
