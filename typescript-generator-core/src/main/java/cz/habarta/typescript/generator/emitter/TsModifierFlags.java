@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-
 public class TsModifierFlags {
 
     public static final TsModifierFlags None = new TsModifierFlags(false, false);

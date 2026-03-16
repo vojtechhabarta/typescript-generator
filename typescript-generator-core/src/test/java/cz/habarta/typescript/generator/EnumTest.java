@@ -10,9 +10,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
+
 
 @SuppressWarnings("unused")
 public class EnumTest {
@@ -20,16 +22,14 @@ public class EnumTest {
     @Test
     public void testEnumAsUnion() {
         final Settings settings = TestUtils.settings();
-//        settings.mapEnum = EnumMapping.asUnion;
+        // settings.mapEnum = EnumMapping.asUnion;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected = (
-                "\n" +
-                "interface AClass {\n" +
-                "    direction: Direction;\n" +
-                "}\n" +
-                "\n" +
-                "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "interface AClass {\n" +
+            "    direction: Direction;\n" +
+            "}\n" +
+            "\n" +
+            "type Direction = 'North' | 'East' | 'South' | 'West';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -37,10 +37,8 @@ public class EnumTest {
     public void testSingleEnum() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Direction.class));
-        final String expected = (
-                "\n" +
-                "type Direction = 'North' | 'East' | 'South' | 'West';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type Direction = 'North' | 'East' | 'South' | 'West';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -50,11 +48,10 @@ public class EnumTest {
         settings.quotes = "'";
         settings.mapEnum = EnumMapping.asInlineUnion;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected =
-                "\n" +
-                "interface AClass {\n" +
-                "    direction: 'North' | 'East' | 'South' | 'West';\n" +
-                "}\n";
+        final String expected = "\n" +
+            "interface AClass {\n" +
+            "    direction: 'North' | 'East' | 'South' | 'West';\n" +
+            "}\n";
         assertEquals(expected, output);
     }
 
@@ -63,19 +60,17 @@ public class EnumTest {
         final Settings settings = TestUtils.settings();
         settings.mapEnum = EnumMapping.asNumberBasedEnum;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected = (
-                "\n" +
-                "interface AClass {\n" +
-                "    direction: Direction;\n" +
-                "}\n" +
-                "\n" +
-                "declare const enum Direction {\n" +
-                "    North,\n" +
-                "    East,\n" +
-                "    South,\n" +
-                "    West,\n" +
-                "}\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "interface AClass {\n" +
+            "    direction: Direction;\n" +
+            "}\n" +
+            "\n" +
+            "declare const enum Direction {\n" +
+            "    North,\n" +
+            "    East,\n" +
+            "    South,\n" +
+            "    West,\n" +
+            "}\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -84,18 +79,16 @@ public class EnumTest {
         final Settings settings = TestUtils.settings();
         settings.mapEnum = EnumMapping.asEnum;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AClass.class));
-        final String expected = (
-                "interface AClass {\n" +
-                "    direction: Direction;\n" +
-                "}\n" +
-                "\n" +
-                "declare const enum Direction {\n" +
-                "    North = 'North',\n" +
-                "    East = 'East',\n" +
-                "    South = 'South',\n" +
-                "    West = 'West',\n" +
-                "}"
-                ).replace("'", "\"");
+        final String expected = ("interface AClass {\n" +
+            "    direction: Direction;\n" +
+            "}\n" +
+            "\n" +
+            "declare const enum Direction {\n" +
+            "    North = 'North',\n" +
+            "    East = 'East',\n" +
+            "    South = 'South',\n" +
+            "    West = 'West',\n" +
+            "}").replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
     }
 
@@ -108,18 +101,16 @@ public class EnumTest {
         classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "Enum"));
         settings.extensions.add(classEnumExtension);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyEnum.class, DummyClassEnum.class));
-        final String expected = (
-                "\ndeclare const enum DummyClassEnum {\n" +
-                        "    ATYPE = 'ATYPE',\n" +
-                        "    BTYPE = 'BTYPE',\n" +
-                        "    CTYPE = 'CTYPE',\n" +
-                        "}\n" +
-                "\ndeclare const enum DummyEnum {\n" +
-                        "    Red = 'Red',\n" +
-                        "    Green = 'Green',\n" +
-                        "    Blue = 'Blue',\n" +
-                        "}\n"
-                ).replace("'", "\"");
+        final String expected = ("\ndeclare const enum DummyClassEnum {\n" +
+            "    ATYPE = 'ATYPE',\n" +
+            "    BTYPE = 'BTYPE',\n" +
+            "    CTYPE = 'CTYPE',\n" +
+            "}\n" +
+            "\ndeclare const enum DummyEnum {\n" +
+            "    Red = 'Red',\n" +
+            "    Green = 'Green',\n" +
+            "    Blue = 'Blue',\n" +
+            "}\n").replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
     }
 
@@ -133,23 +124,21 @@ public class EnumTest {
         classEnumExtension.setConfiguration(Collections.singletonMap("classEnumPattern", "Enum"));
         settings.extensions.add(classEnumExtension);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DummyEnum.class, DummyClassEnum.class, DummyMixedCaseEnum.class));
-        final String expected = (
-                "\ndeclare const enum DummyClassEnum {\n" +
-                        "    Atype = 'ATYPE',\n" +
-                        "    Btype = 'BTYPE',\n" +
-                        "    Ctype = 'CTYPE',\n" +
-                        "}\n" +
-                        "\ndeclare const enum DummyEnum {\n" +
-                        "    Red = 'Red',\n" +
-                        "    Green = 'Green',\n" +
-                        "    Blue = 'Blue',\n" +
-                        "}\n" +
-                        "\ndeclare const enum DummyMixedCaseEnum {\n" +
-                        "    CamelCaseType = 'camelCaseType',\n" +
-                        "    PascalCaseType = 'PascalCaseType',\n" +
-                        "    UpperCaseType = 'UPPER_CASE_TYPE',\n" +
-                        "}\n"
-        ).replace("'", "\"");
+        final String expected = ("\ndeclare const enum DummyClassEnum {\n" +
+            "    Atype = 'ATYPE',\n" +
+            "    Btype = 'BTYPE',\n" +
+            "    Ctype = 'CTYPE',\n" +
+            "}\n" +
+            "\ndeclare const enum DummyEnum {\n" +
+            "    Red = 'Red',\n" +
+            "    Green = 'Green',\n" +
+            "    Blue = 'Blue',\n" +
+            "}\n" +
+            "\ndeclare const enum DummyMixedCaseEnum {\n" +
+            "    CamelCaseType = 'camelCaseType',\n" +
+            "    PascalCaseType = 'PascalCaseType',\n" +
+            "    UpperCaseType = 'UPPER_CASE_TYPE',\n" +
+            "}\n").replace("'", "\"");
         assertEquals(expected.trim(), output.trim());
     }
 
@@ -168,10 +157,8 @@ public class EnumTest {
     public void testEnumWithJsonPropertyAnnotations() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonPropertyAnnotations.class));
-        final String expected = (
-                "\n" +
-                "type SideWithJsonPropertyAnnotations = 'left-side' | 'right-side';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type SideWithJsonPropertyAnnotations = 'left-side' | 'right-side';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -179,10 +166,8 @@ public class EnumTest {
     public void testEnumWithJsonValueMethodAnnotation() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueMethodAnnotation.class));
-        final String expected = (
-                "\n" +
-                "type SideWithJsonValueMethodAnnotation = 'left-side' | 'right-side';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type SideWithJsonValueMethodAnnotation = 'left-side' | 'right-side';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -190,10 +175,8 @@ public class EnumTest {
     public void testEnumWithJsonValueFieldAnnotation() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideWithJsonValueFieldAnnotation.class));
-        final String expected = (
-                "\n" +
-                "type SideWithJsonValueFieldAnnotation = 'left-side' | 'right-side';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type SideWithJsonValueFieldAnnotation = 'left-side' | 'right-side';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -203,10 +186,8 @@ public class EnumTest {
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
         settings.jackson2Configuration.enumsUsingToString = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SideUsingToString.class));
-        final String expected = (
-                "\n" +
-                "type SideUsingToString = 'toString:left-side' | 'toString:right-side';\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type SideUsingToString = 'toString:left-side' | 'toString:right-side';\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -214,10 +195,8 @@ public class EnumTest {
     public void testEmptyEnum() {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(EmptyEnum.class));
-        final String expected = (
-                "\n" +
-                "type EmptyEnum = never;\n"
-                ).replace("'", "\"");
+        final String expected = ("\n" +
+            "type EmptyEnum = never;\n").replace("'", "\"");
         assertEquals(expected, output);
     }
 
@@ -234,10 +213,10 @@ public class EnumTest {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(StatusType.class));
         final String expected = "" +
-                "interface StatusType {\n" +
-                "    code: number;\n" +
-                "    label: string;\n" +
-                "}";
+            "interface StatusType {\n" +
+            "    code: number;\n" +
+            "    label: string;\n" +
+            "}";
         assertEquals(expected.trim(), output.trim());
     }
 
@@ -274,7 +253,7 @@ public class EnumTest {
 
     enum Direction {
         North,
-        East, 
+        East,
         South,
         West
     }

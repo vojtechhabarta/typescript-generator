@@ -9,10 +9,12 @@ import org.junit.jupiter.api.Test;
 public class JaxrsApplicationParserTest {
 
     @jakarta.ws.rs.ApplicationPath("testJakarta")
-    private static class JakartaRsClass {}
+    private static class JakartaRsClass {
+    }
 
     @javax.ws.rs.ApplicationPath("testJavax")
-    private static class JavaxRsClass {}
+    private static class JavaxRsClass {
+    }
 
     @Test
     public void testJakartaAnnotation() {

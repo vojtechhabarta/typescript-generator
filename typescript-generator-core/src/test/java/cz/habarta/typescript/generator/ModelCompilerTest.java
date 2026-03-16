@@ -58,8 +58,8 @@ public class ModelCompilerTest {
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
         Assertions.assertInstanceOf(
-                TsType.UnionType.class,
-                result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType
+            TsType.UnionType.class,
+            result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType
         );
     }
 
@@ -74,18 +74,21 @@ public class ModelCompilerTest {
         final TsModel result = modelCompiler.javaToTypeScript(model);
 
         Assertions.assertInstanceOf(
-                TsType.UnionType.class,
-                result.getBean(WithTypeParam.class).getProperties().get(0).tsType
+            TsType.UnionType.class,
+            result.getBean(WithTypeParam.class).getProperties().get(0).tsType
         );
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-    private static interface WithoutTypeParam {}
+    private static interface WithoutTypeParam {
+    }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-    private static interface WithTypeParam<T> {}
+    private static interface WithTypeParam<T> {
+    }
 
-    private static class Implementation implements WithTypeParam<Integer>, WithoutTypeParam {}
+    private static class Implementation implements WithTypeParam<Integer>, WithoutTypeParam {
+    }
 
     private static Settings getTestSettings(String... excludedClassNames) {
         final Settings settings = TestUtils.settings();

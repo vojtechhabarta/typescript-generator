@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -17,6 +18,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 public class RequiredPropertyConstructorExtensionTest {
 
@@ -65,8 +67,7 @@ public class RequiredPropertyConstructorExtensionTest {
 
     static class SimpleOptionalClass {
         public String field1;
-        @Nullable
-        public Integer field2;
+        @Nullable public Integer field2;
     }
 
     static class SecondOptionalClass extends SimpleOptionalClass {

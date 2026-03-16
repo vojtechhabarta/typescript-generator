@@ -55,8 +55,11 @@ public class TypeParser {
 
     private interface LanguageTypeParser {
         public Type getFieldType(Field field);
+
         public Type getMethodReturnType(Method method);
+
         public List<Type> getMethodParameterTypes(Method method);
+
         public List<Type> getConstructorParameterTypes(Constructor<?> constructor);
     }
 
@@ -115,8 +118,8 @@ public class TypeParser {
 
         private List<Type> getExecutableParameterTypes(Executable executable) {
             return Arrays.stream(executable.getAnnotatedParameterTypes())
-                    .map(annotatedType -> getType(annotatedType))
-                    .collect(Collectors.toList());
+                .map(annotatedType -> getType(annotatedType))
+                .collect(Collectors.toList());
         }
 
         private Type getType(AnnotatedType annotatedType) {
@@ -137,9 +140,9 @@ public class TypeParser {
                 final AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) annotatedType;
                 final ParameterizedType parameterizedType = (ParameterizedType) type;
                 return new JParameterizedType(
-                        parameterizedType.getRawType(),
-                        getTypes(annotatedParameterizedType.getAnnotatedActualTypeArguments()),
-                        parameterizedType.getOwnerType());
+                    parameterizedType.getRawType(),
+                    getTypes(annotatedParameterizedType.getAnnotatedActualTypeArguments()),
+                    parameterizedType.getOwnerType());
             }
             if (annotatedType instanceof AnnotatedArrayType) {
                 final AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) annotatedType;
@@ -150,8 +153,8 @@ public class TypeParser {
 
         private Type[] getTypes(AnnotatedType[] annotatedTypes) {
             return Stream.of(annotatedTypes)
-                    .map(annotatedType -> getType(annotatedType))
-                    .toArray(Type[]::new);
+                .map(annotatedType -> getType(annotatedType))
+                .toArray(Type[]::new);
         }
 
     }
@@ -190,9 +193,9 @@ public class TypeParser {
                 // `method` might be a getter so try to find a corresponding kotlin property and use its return type
                 final KClass<?> kClass = JvmClassMappingKt.getKotlinClass(method.getDeclaringClass());
                 final Optional<KType> kType = KClasses.getMemberProperties(kClass).stream()
-                        .filter(kProperty -> Objects.equals(ReflectJvmMapping.getJavaGetter(kProperty), method))
-                        .map(KProperty1::getReturnType)
-                        .findFirst();
+                    .filter(kProperty -> Objects.equals(ReflectJvmMapping.getJavaGetter(kProperty), method))
+                    .map(KProperty1::getReturnType)
+                    .findFirst();
                 if (kType.isPresent()) {
                     return getType(kType.get(), new LinkedHashMap<>());
                 }
@@ -215,13 +218,13 @@ public class TypeParser {
         private List<Type> getKFunctionParameterTypes(Executable executable, KFunction<?> kFunction) {
             if (kFunction != null) {
                 final List<KParameter> kParameters = kFunction.getParameters().stream()
-                        .filter(kParameter -> kParameter.getKind() == KParameter.Kind.VALUE)
-                        .collect(Collectors.toList());
+                    .filter(kParameter -> kParameter.getKind() == KParameter.Kind.VALUE)
+                    .collect(Collectors.toList());
                 return getTypes(
-                        kParameters.stream()
-                                .map(parameter -> parameter.getType())
-                                .collect(Collectors.toList()),
-                        new LinkedHashMap<>()
+                    kParameters.stream()
+                        .map(parameter -> parameter.getType())
+                        .collect(Collectors.toList()),
+                    new LinkedHashMap<>()
                 );
             }
             return javaTypeParser.getExecutableParameterTypes(executable);
@@ -250,8 +253,8 @@ public class TypeParser {
                     return new JGenericArrayType(getType(arguments.get(0).getType(), typeParameters));
                 } else {
                     final List<Type> javaArguments = arguments.stream()
-                            .map(argument -> getType(argument.getType(), typeParameters))
-                            .collect(Collectors.toList());
+                        .map(argument -> getType(argument.getType(), typeParameters))
+                        .collect(Collectors.toList());
                     return Utils.createParameterizedType(javaClass, javaArguments);
                 }
             }
@@ -263,12 +266,12 @@ public class TypeParser {
                 } else {
                     final TypeVariable<?> typeVariable = getJavaTypeVariable(kType);
                     final JTypeVariable<?> newTypeVariable = new JTypeVariable<>(
-                            typeVariable != null ? getTypeVariableGenericDeclaration(typeVariable) : null,
-                            kTypeParameter.getName(),
-                            /*bounds*/ null,
-                            typeVariable != null ? getTypeVariableAnnotatedBounds(typeVariable) : null,
-                            typeVariable != null ? typeVariable.getAnnotations() : null,
-                            typeVariable != null ? typeVariable.getDeclaredAnnotations() : null
+                        typeVariable != null ? getTypeVariableGenericDeclaration(typeVariable) : null,
+                        kTypeParameter.getName(),
+                        /*bounds*/ null,
+                        typeVariable != null ? getTypeVariableAnnotatedBounds(typeVariable) : null,
+                        typeVariable != null ? typeVariable.getAnnotations() : null,
+                        typeVariable != null ? typeVariable.getDeclaredAnnotations() : null
                     );
                     typeParameters.put(kTypeParameter.getName(), newTypeVariable);
                     final Type[] bounds = getTypes(kTypeParameter.getUpperBounds(), typeParameters).toArray(new Type[0]);
@@ -297,8 +300,8 @@ public class TypeParser {
 
         private List<Type> getTypes(List<KType> kTypes, Map<String, JTypeVariable<?>> typeParameters) {
             return kTypes.stream()
-                    .map(kType -> getType(kType, typeParameters))
-                    .collect(Collectors.toList());
+                .map(kType -> getType(kType, typeParameters))
+                .collect(Collectors.toList());
         }
 
         private TypeVariable<?> getJavaTypeVariable(KType kType) {

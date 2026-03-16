@@ -52,7 +52,7 @@ public class TypeScriptGenerator {
     }
 
     public TypeScriptGenerator() {
-        this (new Settings());
+        this(new Settings());
     }
 
     public TypeScriptGenerator(Settings settings) {
@@ -125,8 +125,8 @@ public class TypeScriptGenerator {
                 final String typescriptVersion = settings.npmTypescriptVersion != null ? settings.npmTypescriptVersion : settings.typescriptVersion;
                 npmPackageJson.devDependencies.put("typescript", typescriptVersion);
                 final String npmBuildScript = settings.npmBuildScript != null
-                        ? settings.npmBuildScript
-                        : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";
+                    ? settings.npmBuildScript
+                    : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";
                 final String build = npmBuildScript.replaceAll(Pattern.quote("$outputFile"), outputFile.getName());
                 npmPackageJson.scripts = Collections.singletonMap("build", build);
             }
@@ -148,12 +148,12 @@ public class TypeScriptGenerator {
             final List<RestApplicationParser.Factory> restFactories = settings.getRestApplicationParserFactories();
             final ModelParser.Factory modelParserFactory = getModelParserFactory();
             final List<TypeProcessor> specificTypeProcessors = Stream
-                    .concat(
-                            restFactories.stream().map(factory -> factory.getSpecificTypeProcessor()),
-                            Stream.of(modelParserFactory.getSpecificTypeProcessor())
-                    )
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                .concat(
+                    restFactories.stream().map(factory -> factory.getSpecificTypeProcessor()),
+                    Stream.of(modelParserFactory.getSpecificTypeProcessor())
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
             commonTypeProcessor = createTypeProcessor(specificTypeProcessors);
         }
         return commonTypeProcessor;
@@ -182,8 +182,8 @@ public class TypeScriptGenerator {
     private ModelParser createModelParser() {
         final List<RestApplicationParser.Factory> factories = settings.getRestApplicationParserFactories();
         final List<RestApplicationParser> restApplicationParsers = factories.stream()
-                .map(factory -> factory.create(settings, getCommonTypeProcessor()))
-                .collect(Collectors.toList());
+            .map(factory -> factory.create(settings, getCommonTypeProcessor()))
+            .collect(Collectors.toList());
         return getModelParserFactory().create(settings, getCommonTypeProcessor(), restApplicationParsers);
     }
 
@@ -235,7 +235,7 @@ public class TypeScriptGenerator {
     private static String getVersion() {
         try {
             final InputStream inputStream = TypeScriptGenerator.class.getResourceAsStream(
-                    "/META-INF/maven/cz.habarta.typescript-generator/typescript-generator-core/pom.properties");
+                "/META-INF/maven/cz.habarta.typescript-generator/typescript-generator-core/pom.properties");
             if (inputStream != null) {
                 final Properties properties = new Properties();
                 properties.load(inputStream);

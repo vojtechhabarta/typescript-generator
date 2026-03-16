@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-
 public class TsReturnStatement extends TsStatement {
 
     private final TsExpression expression;

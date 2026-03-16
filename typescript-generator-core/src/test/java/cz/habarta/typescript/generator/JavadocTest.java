@@ -41,7 +41,7 @@ public class JavadocTest {
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(
-                    Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
+                Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
 
             Assertions.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
             Assertions.assertTrue(generated.contains("Second line."));
@@ -64,31 +64,31 @@ public class JavadocTest {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedClassWithoutJavadoc.class));
             final String expected = ""
-                    + "/**\n"
-                    + " * @deprecated\n"
-                    + " */\n"
-                    + "interface DeprecatedClassWithoutJavadoc {\n"
-                    + "    /**\n"
-                    + "     * @deprecated\n"
-                    + "     */\n"
-                    + "    deprecatedField: string;\n"
-                    + "}";
+                + "/**\n"
+                + " * @deprecated\n"
+                + " */\n"
+                + "interface DeprecatedClassWithoutJavadoc {\n"
+                + "    /**\n"
+                + "     * @deprecated\n"
+                + "     */\n"
+                + "    deprecatedField: string;\n"
+                + "}";
             Assertions.assertEquals(expected.trim(), generated.trim());
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedEnumWithoutJavadoc.class));
             final String expected = ""
-                    + "/**\n"
-                    + " * @deprecated\n"
-                    + " * \n"
-                    + " * Values:\n"
-                    + " * - `North`\n"
-                    + " * - `East` - @deprecated\n"
-                    + " * - `South`\n"
-                    + " * - `West`\n"
-                    + " */\n"
-                    + "type DeprecatedEnumWithoutJavadoc = \"North\" | \"East\" | \"South\" | \"West\";\n"
-                    + "";
+                + "/**\n"
+                + " * @deprecated\n"
+                + " * \n"
+                + " * Values:\n"
+                + " * - `North`\n"
+                + " * - `East` - @deprecated\n"
+                + " * - `South`\n"
+                + " * - `West`\n"
+                + " */\n"
+                + "type DeprecatedEnumWithoutJavadoc = \"North\" | \"East\" | \"South\" | \"West\";\n"
+                + "";
             Assertions.assertEquals(expected.trim(), generated.trim());
         }
         {
@@ -171,7 +171,8 @@ public class JavadocTest {
     public static enum DeprecatedEnumWithoutJavadoc {
 
         North,
-        @Deprecated East,
+        @Deprecated
+        East,
         South,
         West;
 

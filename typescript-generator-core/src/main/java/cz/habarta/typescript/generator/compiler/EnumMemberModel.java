@@ -13,11 +13,11 @@ public class EnumMemberModel {
     private final List<String> comments;
 
     public EnumMemberModel(String propertyName, String enumValue, Field originalField, List<String> comments) {
-        this(propertyName, (Object)enumValue, originalField, comments);
+        this(propertyName, (Object) enumValue, originalField, comments);
     }
 
     public EnumMemberModel(String propertyName, Number enumValue, Field originalField, List<String> comments) {
-        this(propertyName, (Object)enumValue, originalField, comments);
+        this(propertyName, (Object) enumValue, originalField, comments);
     }
 
     private EnumMemberModel(String propertyName, Object enumValue, Field originalField, List<String> comments) {

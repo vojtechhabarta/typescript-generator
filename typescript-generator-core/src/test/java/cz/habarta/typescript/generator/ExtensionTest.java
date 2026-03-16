@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 public class ExtensionTest {
 
@@ -57,6 +59,7 @@ public class ExtensionTest {
         Assertions.assertTrue(result.getBean(Implementation.class).getComments().get(0).contains("My new comment"));
     }
 
-    private static class Implementation { }
+    private static class Implementation {
+    }
 
 }

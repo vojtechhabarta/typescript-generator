@@ -28,6 +28,7 @@ public class InterfaceTest {
 
     static interface Book {
         Author getAuthor();
+
         String getTitle();
     }
 

@@ -7,12 +7,14 @@ import java.util.List;
 
 public enum NullabilityDefinition {
 
+    // spotless:off
     nullAndUndefinedUnion       (false, TsType.Null, TsType.Undefined),
     nullUnion                   (false, TsType.Null),
     undefinedUnion              (false, TsType.Undefined),
     nullAndUndefinedInlineUnion (true,  TsType.Null, TsType.Undefined),
     nullInlineUnion             (true,  TsType.Null),
     undefinedInlineUnion        (true,  TsType.Undefined);
+    // spotless:on
 
     private final boolean isInline;
     private final List<TsType> types;

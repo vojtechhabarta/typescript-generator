@@ -27,16 +27,15 @@ public class LoadedModuleDependencies {
         final Map<String, ModuleDependency> globalTypeNames = new LinkedHashMap<>();
         for (ModuleDependency dependency : dependencies) {
             try {
-                final Function<String, String> reportNullParameter = parameterName ->
-                        String.format("Missing required configuration parameter '%s' in module dependency: %s", parameterName, dependency);
+                final Function<String, String> reportNullParameter = parameterName -> String.format("Missing required configuration parameter '%s' in module dependency: %s", parameterName, dependency);
                 if (dependency.global) {
                     if (dependency.importFrom != null) {
                         throw new RuntimeException(String.format(
-                                "'importFrom' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
+                            "'importFrom' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
                     }
                     if (dependency.importAs != null) {
                         throw new RuntimeException(String.format(
-                                "'importAs' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
+                            "'importAs' parameter is only applicable when 'global' is not set to 'true' (at module dependency %s).", dependency));
                     }
                 } else {
                     Objects.requireNonNull(dependency.importFrom, () -> reportNullParameter.apply("importFrom"));
@@ -49,16 +48,16 @@ public class LoadedModuleDependencies {
                 } else {
                     if (dependency.npmPackageName != null) {
                         throw new RuntimeException(String.format(
-                                "'npmPackageName' parameter is only applicable when 'generateNpmPackageJson' is set to 'true' (at module dependency %s).", dependency));
+                            "'npmPackageName' parameter is only applicable when 'generateNpmPackageJson' is set to 'true' (at module dependency %s).", dependency));
                     }
                     if (dependency.npmVersionRange != null) {
                         throw new RuntimeException(String.format(
-                                "'npmVersionRange' parameter is only applicable when 'generateNpmPackageJson' is set to 'true' (at module dependency %s).", dependency));
+                            "'npmVersionRange' parameter is only applicable when 'generateNpmPackageJson' is set to 'true' (at module dependency %s).", dependency));
                     }
                 }
 
                 TypeScriptGenerator.getLogger().info(String.format(
-                        "Loading %s module info from: %s", dependency.toShortString(), dependency.infoJson));
+                    "Loading %s module info from: %s", dependency.toShortString(), dependency.infoJson));
 
                 if (!dependency.global) {
                     final ModuleDependency importFromConflict = importFromMap.put(dependency.importFrom, dependency);
@@ -77,14 +76,14 @@ public class LoadedModuleDependencies {
                     final Pair<ModuleDependency, String> presentMapping = classMappings.get(classInfo.javaClass);
                     if (presentMapping != null) {
                         TypeScriptGenerator.getLogger().warning(String.format(
-                                "Java class '%s' already present in '%s'", classInfo.javaClass, presentMapping.getValue1().infoJson));
+                            "Java class '%s' already present in '%s'", classInfo.javaClass, presentMapping.getValue1().infoJson));
                     } else {
                         classMappings.put(classInfo.javaClass, Pair.of(dependency, classInfo.typeName));
                     }
                     final ModuleDependency presentTypeName = globalTypeNames.get(classInfo.typeName);
                     if (presentTypeName != null) {
                         throw new RuntimeException(String.format(
-                                "Duplicate TypeScript global name '%s', declared in '%s' and also '%s'", classInfo.typeName, presentTypeName.infoJson, dependency.infoJson));
+                            "Duplicate TypeScript global name '%s', declared in '%s' and also '%s'", classInfo.typeName, presentTypeName.infoJson, dependency.infoJson));
                     } else {
                         globalTypeNames.put(classInfo.typeName, dependency);
                     }

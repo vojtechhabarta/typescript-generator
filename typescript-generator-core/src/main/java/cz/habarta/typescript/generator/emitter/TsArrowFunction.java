@@ -9,10 +9,10 @@ import java.util.List;
 public class TsArrowFunction extends TsExpression {
 
     private final List<TsParameter> parameters;
-    
+
     // ConciseBody = FunctionBody | Expression;
     private final TsExpression expression;
-//    private final List<TsStatement> body;
+    // private final List<TsStatement> body;
 
     public TsArrowFunction(List<TsParameter> parameters, TsExpression expression) {
         this.parameters = parameters;
@@ -31,5 +31,5 @@ public class TsArrowFunction extends TsExpression {
     public String format(Settings settings) {
         return Emitter.formatParameterList(parameters) + " => " + expression.format(settings);
     }
-    
+
 }

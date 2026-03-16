@@ -1,7 +1,10 @@
+
 package cz.habarta.typescript.generator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class SortedTypesTest {
 
@@ -19,16 +22,16 @@ public class SortedTypesTest {
         final Settings settings = TestUtils.settings();
         settings.sortDeclarations = true;
         String expected = "" +
-""                           + settings.newline +
-"interface A {"              + settings.newline +
-"    x: number;"             + settings.newline +
-"    yyy: number;"           + settings.newline +
-"}"                          + settings.newline +
-""                           + settings.newline +
-"interface B {"              + settings.newline +
-"    x: number;"             + settings.newline +
-"}"                          + settings.newline +
-"";
+            "" + settings.newline +
+            "interface A {" + settings.newline +
+            "    x: number;" + settings.newline +
+            "    yyy: number;" + settings.newline +
+            "}" + settings.newline +
+            "" + settings.newline +
+            "interface B {" + settings.newline +
+            "    x: number;" + settings.newline +
+            "}" + settings.newline +
+            "";
         final String actual = new TypeScriptGenerator(settings).generateTypeScript(Input.from(classes));
 
         assertEquals(expected, actual);
@@ -38,6 +41,7 @@ public class SortedTypesTest {
         public int getYYY() {
             return -1;
         }
+
         public int getX() {
             return -1;
         }

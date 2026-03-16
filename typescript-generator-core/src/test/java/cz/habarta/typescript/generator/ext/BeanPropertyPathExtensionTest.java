@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.DefaultTypeProcessor;
@@ -11,6 +12,7 @@ import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.util.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 public class BeanPropertyPathExtensionTest {
 

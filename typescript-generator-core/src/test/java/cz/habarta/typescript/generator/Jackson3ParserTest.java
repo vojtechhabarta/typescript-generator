@@ -1,7 +1,6 @@
+
 package cz.habarta.typescript.generator;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,6 +41,10 @@ import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.deser.std.StdDeserializer;
 import tools.jackson.databind.jsontype.NamedType;
 import tools.jackson.databind.module.SimpleModule;
+
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+
 
 @SuppressWarnings("unused")
 public class Jackson3ParserTest {
@@ -140,11 +143,14 @@ public class Jackson3ParserTest {
     @JsonTypeName("explicit-name1")
     private static class SubTypeDiscriminatedByName1 implements ParentWithNameDiscriminant {
     }
+
     private static class SubTypeDiscriminatedByName2 implements ParentWithNameDiscriminant {
     }
+
     @JsonTypeName(/* Default should be the simplename of the class */)
     private static class SubTypeDiscriminatedByName3 implements ParentWithNameDiscriminant {
     }
+
     private static class SubTypeDiscriminatedByName4 implements ParentWithNameDiscriminant {
     }
 
@@ -207,6 +213,7 @@ public class Jackson3ParserTest {
         @JsonProperty(required = true)
         public String jname3;
         private String jname4;
+
         @JsonProperty(required = true)
         public String getJname4() {
             return jname4;
@@ -219,6 +226,7 @@ public class Jackson3ParserTest {
         @XmlElement(required = true)
         public String xname3;
         private String xname4;
+
         @XmlElement(required = true)
         public String getXname4() {
             return xname4;
@@ -290,13 +298,13 @@ public class Jackson3ParserTest {
         public String name2;
     }
 
-//    public static void main(String[] args) throws JsonProcessingException {
-//        final ObjectMapper objectMapper = new ObjectMapper();
-//        final ClassWithIgnoredProperty instance = new ClassWithIgnoredProperty();
-//        instance.name1 = "xxx";
-//        instance.name2 = "xxx";
-//        System.out.println(objectMapper.writeValueAsString(instance));
-//    }
+    // public static void main(String[] args) throws JsonProcessingException {
+    // final ObjectMapper objectMapper = new ObjectMapper();
+    // final ClassWithIgnoredProperty instance = new ClassWithIgnoredProperty();
+    // instance.name1 = "xxx";
+    // instance.name2 = "xxx";
+    // System.out.println(objectMapper.writeValueAsString(instance));
+    // }
 
     @Test
     public void testVisibilityConfiguration() {
@@ -318,6 +326,7 @@ public class Jackson3ParserTest {
 
     private static class ClassWithDifferentMemberVisibilities {
         private String property1;
+
         public String getProperty2() {
             return null;
         }
@@ -379,6 +388,7 @@ public class Jackson3ParserTest {
         public String getId() {
             return UUID.randomUUID().toString();
         }
+
         public String getName() {
             return "myProject";
         }
@@ -464,7 +474,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testConstructor() throws JacksonException {
-//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
+        // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
 
         final Settings settings = TestUtils.settings(true);
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
@@ -488,11 +498,12 @@ public class Jackson3ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
+
     @Test
     public void testFactoryMethod() throws JacksonException {
-//        System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
+        // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
 
         final Settings settings = TestUtils.settings(true);
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
@@ -522,7 +533,7 @@ public class Jackson3ParserTest {
         public String toString() {
             return "{" + "a=" + a + ", b=" + b + '}';
         }
-        
+
     }
 
     @Retention(RetentionPolicy.RUNTIME)

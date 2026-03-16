@@ -26,5 +26,5 @@ public class TsPrefixUnaryExpression extends TsExpression {
     public String format(Settings settings) {
         return operator.format(settings) + operand.format(settings);
     }
-    
+
 }

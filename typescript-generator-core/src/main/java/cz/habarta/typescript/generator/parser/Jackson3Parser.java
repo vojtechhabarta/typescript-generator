@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -78,6 +79,7 @@ import tools.jackson.databind.ser.bean.BeanSerializerBase;
 import tools.jackson.databind.type.TypeFactory;
 import tools.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import tools.jackson.module.jaxb.JaxbAnnotationIntrospector;
+
 
 public class Jackson3Parser extends ModelParser {
 
@@ -189,8 +191,7 @@ public class Jackson3Parser extends ModelParser {
                         final JsonSerialize jsonSerialize = jackson3TypeContext.beanProperty.getAnnotation(JsonSerialize.class);
                         if (jsonSerialize != null && config != null && config.serializerTypeMappings != null) {
                             @SuppressWarnings("unchecked")
-                            final Class<? extends ValueSerializer<?>> using = (Class<? extends ValueSerializer<?>>)
-                                (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
+                            final Class<? extends ValueSerializer<?>> using = (Class<? extends ValueSerializer<?>>) (context.isInsideCollection() ? jsonSerialize.contentUsing() : jsonSerialize.using());
                             final String mappedType = config.serializerTypeMappings.get(using);
                             if (mappedType != null) {
                                 return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
@@ -200,8 +201,7 @@ public class Jackson3Parser extends ModelParser {
                         final JsonDeserialize jsonDeserialize = jackson3TypeContext.beanProperty.getAnnotation(JsonDeserialize.class);
                         if (jsonDeserialize != null && config != null && config.deserializerTypeMappings != null) {
                             @SuppressWarnings("unchecked")
-                            final Class<? extends ValueDeserializer<?>> using = (Class<? extends ValueDeserializer<?>>)
-                                (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
+                            final Class<? extends ValueDeserializer<?>> using = (Class<? extends ValueDeserializer<?>>) (context.isInsideCollection() ? jsonDeserialize.contentUsing() : jsonDeserialize.using());
                             final String mappedType = config.deserializerTypeMappings.get(using);
                             if (mappedType != null) {
                                 return new TypeProcessor.Result(new TsType.VerbatimType(mappedType));
@@ -503,7 +503,7 @@ public class Jackson3Parser extends ModelParser {
         final Collection<NamedType> serializationSubtypes = subtypeResolver.collectAndResolveSubtypesByClass(config, annotatedClass);
         final LinkedHashSet<NamedType> subtypes = Stream
             .concat(deserializationSubtypes.stream(), serializationSubtypes.stream())
-            .filter(namedType -> cls.isAssignableFrom(namedType.getType()))  // `SubtypeResolver` returns all types from `JsonSubTypes` annotations, not only subtypes
+            .filter(namedType -> cls.isAssignableFrom(namedType.getType())) // `SubtypeResolver` returns all types from `JsonSubTypes` annotations, not only subtypes
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return new ArrayList<>(subtypes);
     }
@@ -632,12 +632,13 @@ public class Jackson3Parser extends ModelParser {
                 .collect(Collectors.toCollection(ArrayList::new));
 
             // sort
-            final Comparator<Pair<BeanProperty, BeanProperty>> bySerializationOrder = (pair1, pair2) ->
-                pair1.getValue1() != null && pair2.getValue1() != null
+            final Comparator<Pair<BeanProperty, BeanProperty>> bySerializationOrder = (pair1, pair2) -> {
+                return pair1.getValue1() != null && pair2.getValue1() != null
                     ? Integer.compare(
-                    serializableProperties.indexOf(pair1.getValue1()),
-                    serializableProperties.indexOf(pair2.getValue1()))
+                        serializableProperties.indexOf(pair1.getValue1()),
+                        serializableProperties.indexOf(pair2.getValue1()))
                     : 0;
+            };
             final Comparator<Pair<BeanProperty, BeanProperty>> byIndex = Comparator.comparing(
                 pair -> getIndex(pair),
                 Comparator.nullsLast(Comparator.naturalOrder()));
@@ -708,7 +709,7 @@ public class Jackson3Parser extends ModelParser {
         }
     }
 
-    private static class BeanSerializerHelper  {
+    private static class BeanSerializerHelper {
         private final BeanSerializerBase src;
 
         public BeanSerializerHelper(BeanSerializerBase src) {
@@ -717,13 +718,13 @@ public class Jackson3Parser extends ModelParser {
 
         public List<BeanProperty> getProps() {
             return StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize(src.properties(),0), false)
+                .stream(Spliterators.spliteratorUnknownSize(src.properties(), 0), false)
                 .map(BeanProperty.class::cast)
                 .collect(Collectors.toList());
         }
     }
 
-    private static class BeanDeserializerHelper  {
+    private static class BeanDeserializerHelper {
         private final BeanDeserializerBase src;
 
         public BeanDeserializerHelper(BeanDeserializerBase src) {
@@ -732,7 +733,7 @@ public class Jackson3Parser extends ModelParser {
 
         public List<BeanProperty> getProps() {
             return StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize(src.properties(),0), false)
+                .stream(Spliterators.spliteratorUnknownSize(src.properties(), 0), false)
                 .map(BeanProperty.class::cast)
                 .collect(Collectors.toList());
         }
@@ -743,8 +744,8 @@ public class Jackson3Parser extends ModelParser {
         if (jsonFormat != null && jsonFormat.shape() == JsonFormat.Shape.OBJECT) {
             return parseBean(sourceClass, classComments);
         }
-        final boolean isNumberBased = jsonFormat != null && (
-            jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
+        final boolean isNumberBased = jsonFormat != null
+            && (jsonFormat.shape() == JsonFormat.Shape.NUMBER ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_FLOAT ||
                 jsonFormat.shape() == JsonFormat.Shape.NUMBER_INT);
 
@@ -764,7 +765,7 @@ public class Jackson3Parser extends ModelParser {
                 try {
                     constant.setAccessible(true);
                     final String enumJson = objectMapper.writeValueAsString(constant.get(null));
-                    value = objectMapper.readValue(enumJson, new TypeReference<Object>(){});
+                    value = objectMapper.readValue(enumJson, new TypeReference<Object>() {});
                 } catch (Throwable e) {
                     TypeScriptGenerator.getLogger().error(String.format("Cannot get enum value for constant '%s.%s'", enumClass.getName(), constant.getName()));
                     TypeScriptGenerator.getLogger().verbose(Utils.exceptionToString(e));

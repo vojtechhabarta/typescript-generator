@@ -28,11 +28,11 @@ public class PropertyMember {
 
     public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
         final A annotation = annotationGetter != null
-                ? annotationGetter.getAnnotation(annotationClass)
-                : annotatedElement.getAnnotation(annotationClass);
+            ? annotationGetter.getAnnotation(annotationClass)
+            : annotatedElement.getAnnotation(annotationClass);
         return annotation != null
-                ? annotation
-                : annotatedType.getAnnotation(annotationClass);
+            ? annotation
+            : annotatedType.getAnnotation(annotationClass);
     }
 
 }

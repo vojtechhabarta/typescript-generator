@@ -39,24 +39,24 @@ public class InfoJsonEmitter {
     private InfoJson getInfoJson(TsModel tsModel) {
         final LinkedHashMap<String, InfoJson.ClassInfo> map = new LinkedHashMap<>();
         Stream
-                .of(
-                        tsModel.getBeans(),
-                        tsModel.getEnums(),
-                        tsModel.getTypeAliases()
-                )
-                .flatMap(s -> s.stream())
-                .filter(declaration -> declaration.origin != null)
-                .map(declaration -> {
-                    final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo();
-                    typeMapping.javaClass = declaration.origin.getName();
-                    typeMapping.typeName = declaration.name.getFullName();
-                    return typeMapping;
-                })
-                .forEach(info -> {
-                    // remove duplicates, append new items to the end
-                    map.remove(info.javaClass);
-                    map.put(info.javaClass, info);
-                });
+            .of(
+                tsModel.getBeans(),
+                tsModel.getEnums(),
+                tsModel.getTypeAliases()
+            )
+            .flatMap(s -> s.stream())
+            .filter(declaration -> declaration.origin != null)
+            .map(declaration -> {
+                final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo();
+                typeMapping.javaClass = declaration.origin.getName();
+                typeMapping.typeName = declaration.name.getFullName();
+                return typeMapping;
+            })
+            .forEach(info -> {
+                // remove duplicates, append new items to the end
+                map.remove(info.javaClass);
+                map.put(info.javaClass, info);
+            });
 
         final InfoJson infoJson = new InfoJson();
         infoJson.classes = new ArrayList<>(map.values());

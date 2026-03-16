@@ -14,7 +14,7 @@ public class SettingsTest {
         Assertions.assertEquals(Modifier.STATIC, Settings.parseModifiers("static", Modifier.fieldModifiers()));
         Assertions.assertEquals(Modifier.STATIC | Modifier.TRANSIENT, Settings.parseModifiers("static | transient", Modifier.fieldModifiers()));
     }
-    
+
     @Test
     public void testNpmDependenciesValidation() {
         String exceptionMessage = "'npmDependencies', 'npmDevDependencies' and 'npmPeerDependencies' parameters are only applicable when generating NPM 'package.json'.";
@@ -25,7 +25,7 @@ public class SettingsTest {
             settings.jsonLibrary = JsonLibrary.jackson2;
             settings.generateNpmPackageJson = false;
             settings.npmPackageDependencies.put("dependencies", "version");
-            
+
             RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
             Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }
@@ -36,7 +36,7 @@ public class SettingsTest {
             settings.jsonLibrary = JsonLibrary.jackson2;
             settings.generateNpmPackageJson = false;
             settings.npmDevDependencies.put("dependencies", "version");
-            
+
             RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
             Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }
@@ -47,7 +47,7 @@ public class SettingsTest {
             settings.jsonLibrary = JsonLibrary.jackson2;
             settings.generateNpmPackageJson = false;
             settings.npmPeerDependencies.put("dependencies", "version");
-            
+
             RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> settings.validate());
             Assertions.assertEquals(exceptionMessage, exception.getMessage());
         }

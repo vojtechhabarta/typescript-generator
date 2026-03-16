@@ -47,8 +47,8 @@ public class JaxrsApplicationScanner {
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
         final List<String> namesOfResourceClasses = Utils.concat(
-                scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames(),
-                scanResult.getClassesWithAnnotation(javax.ws.rs.Path.class.getName()).getNames()
+            scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames(),
+            scanResult.getClassesWithAnnotation(javax.ws.rs.Path.class.getName()).getNames()
         );
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
         TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));

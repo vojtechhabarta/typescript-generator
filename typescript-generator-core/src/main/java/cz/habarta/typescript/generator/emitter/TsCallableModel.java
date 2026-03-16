@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public class TsCallableModel {
-    
+
     protected final String name;
     protected final TsModifierFlags modifiers;
     protected final List<TsType.GenericVariableType> typeParameters;
@@ -16,8 +16,10 @@ public class TsCallableModel {
     protected final List<TsStatement> body;
     protected final List<String> comments;
 
-    public TsCallableModel(String name, TsModifierFlags modifiers, List<TsType.GenericVariableType> typeParameters,
-            List<TsParameterModel> parameters, TsType returnType, List<TsStatement> body, List<String> comments) {
+    public TsCallableModel(
+        String name, TsModifierFlags modifiers, List<TsType.GenericVariableType> typeParameters,
+        List<TsParameterModel> parameters, TsType returnType, List<TsStatement> body, List<String> comments
+    ) {
         this.name = name;
         this.modifiers = modifiers != null ? modifiers : TsModifierFlags.None;
         this.typeParameters = typeParameters != null ? typeParameters : Collections.<TsType.GenericVariableType>emptyList();

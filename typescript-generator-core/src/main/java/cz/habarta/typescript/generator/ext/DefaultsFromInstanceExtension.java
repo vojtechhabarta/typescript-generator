@@ -43,8 +43,8 @@ public class DefaultsFromInstanceExtension extends Extension {
 
     protected TsModel transformModel(TsModelTransformer.Context context, TsModel model) {
         final List<TsBeanModel> beans = model.getBeans().stream()
-                .map(bean -> transformBean(context, bean))
-                .collect(Collectors.toList());
+            .map(bean -> transformBean(context, bean))
+            .collect(Collectors.toList());
         return model.withBeans(beans);
     }
 
@@ -64,13 +64,13 @@ public class DefaultsFromInstanceExtension extends Extension {
             final Constructor<?> constructor = originClass.getConstructor();
             final Object instance = constructor.newInstance();
             final List<TsPropertyModel> properties = tsBean.getProperties().stream()
-                    .map(tsProperty -> withDefaultValue(bean, instance, tsProperty))
-                    .collect(Collectors.toList());
+                .map(tsProperty -> withDefaultValue(bean, instance, tsProperty))
+                .collect(Collectors.toList());
             return tsBean.withProperties(properties);
         } catch (Exception e) {
             TypeScriptGenerator.getLogger().verbose(String.format(
-                    "Cannot create instance of class '%s' to get default values: %s",
-                    originClass.getName(), e.getMessage()));
+                "Cannot create instance of class '%s' to get default values: %s",
+                originClass.getName(), e.getMessage()));
             return tsBean;
         }
     }
@@ -111,8 +111,8 @@ public class DefaultsFromInstanceExtension extends Extension {
             return null;
         } catch (ReflectiveOperationException e) {
             TypeScriptGenerator.getLogger().verbose(String.format(
-                    "Cannot get default value of property '%s' of class '%s': %s",
-                    propertyName, bean.getOrigin().getName(), e.getMessage()));
+                "Cannot get default value of property '%s' of class '%s': %s",
+                propertyName, bean.getOrigin().getName(), e.getMessage()));
             return null;
         }
     }

@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.emitter.TsModel;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
+
 // run `tsc` compiler from `src/test/ts` directory after this test
 public class ModulesAndNamespacesTest {
 
@@ -58,7 +59,7 @@ public class ModulesAndNamespacesTest {
 
     enum Direction {
         North,
-        East, 
+        East,
         South,
         West
     }

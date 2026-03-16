@@ -34,18 +34,18 @@ public class LoadedDataLibraries {
     }
 
     public LoadedDataLibraries(
-            List<Class<?>> stringClasses,
-            List<Class<?>> numberClasses,
-            List<Class<?>> booleanClasses,
-            List<Class<?>> dateClasses,
-            List<Class<?>> anyClasses,
-            List<Class<?>> voidClasses,
-            List<Class<?>> listClasses,
-            List<Class<?>> mapClasses,
-            List<Class<?>> optionalClasses,
-            List<Class<?>> wrapperClasses,
-            List<Settings.CustomTypeMapping> typeMappings,
-            List<Settings.CustomTypeAlias> typeAliases
+        List<Class<?>> stringClasses,
+        List<Class<?>> numberClasses,
+        List<Class<?>> booleanClasses,
+        List<Class<?>> dateClasses,
+        List<Class<?>> anyClasses,
+        List<Class<?>> voidClasses,
+        List<Class<?>> listClasses,
+        List<Class<?>> mapClasses,
+        List<Class<?>> optionalClasses,
+        List<Class<?>> wrapperClasses,
+        List<Settings.CustomTypeMapping> typeMappings,
+        List<Settings.CustomTypeAlias> typeAliases
     ) {
         this.stringClasses = stringClasses;
         this.numberClasses = numberClasses;
@@ -65,40 +65,40 @@ public class LoadedDataLibraries {
         for (Class<?> cls : classes) {
             if (cls.getTypeParameters().length != required) {
                 throw new RuntimeException(String.format(
-                        "Data library class '%s' is required to have %d generic type parameters but it has %d",
-                        cls.getName(), required, cls.getTypeParameters().length));
+                    "Data library class '%s' is required to have %d generic type parameters but it has %d",
+                    cls.getName(), required, cls.getTypeParameters().length));
             }
         }
         return classes;
     }
-    
+
     public static LoadedDataLibraries join(LoadedDataLibraries... jsons) {
         return join(Arrays.asList(jsons));
     }
 
     public static LoadedDataLibraries join(List<LoadedDataLibraries> jsons) {
         return new LoadedDataLibraries(
-                joinMappedLists(jsons, j -> j.stringClasses),
-                joinMappedLists(jsons, j -> j.numberClasses),
-                joinMappedLists(jsons, j -> j.booleanClasses),
-                joinMappedLists(jsons, j -> j.dateClasses),
-                joinMappedLists(jsons, j -> j.anyClasses),
-                joinMappedLists(jsons, j -> j.voidClasses),
-                joinMappedLists(jsons, j -> j.listClasses),
-                joinMappedLists(jsons, j -> j.mapClasses),
-                joinMappedLists(jsons, j -> j.optionalClasses),
-                joinMappedLists(jsons, j -> j.wrapperClasses),
-                joinMappedLists(jsons, j -> j.typeMappings),
-                joinMappedLists(jsons, j -> j.typeAliases)
+            joinMappedLists(jsons, j -> j.stringClasses),
+            joinMappedLists(jsons, j -> j.numberClasses),
+            joinMappedLists(jsons, j -> j.booleanClasses),
+            joinMappedLists(jsons, j -> j.dateClasses),
+            joinMappedLists(jsons, j -> j.anyClasses),
+            joinMappedLists(jsons, j -> j.voidClasses),
+            joinMappedLists(jsons, j -> j.listClasses),
+            joinMappedLists(jsons, j -> j.mapClasses),
+            joinMappedLists(jsons, j -> j.optionalClasses),
+            joinMappedLists(jsons, j -> j.wrapperClasses),
+            joinMappedLists(jsons, j -> j.typeMappings),
+            joinMappedLists(jsons, j -> j.typeAliases)
         );
     }
 
     private static <T, M> List<M> joinMappedLists(List<T> list, Function<T, List<M>> mapper) {
         return list.stream()
-                .filter(Objects::nonNull)
-                .map(mapper)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+            .filter(Objects::nonNull)
+            .map(mapper)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 
 }

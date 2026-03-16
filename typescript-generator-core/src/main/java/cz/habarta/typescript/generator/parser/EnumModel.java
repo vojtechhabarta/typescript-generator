@@ -12,7 +12,7 @@ public class EnumModel extends DeclarationModel {
     private final List<EnumMemberModel> members;
 
     public EnumModel(Class<?> origin, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
-        super (origin, comments);
+        super(origin, comments);
         this.kind = kind;
         this.members = members;
     }

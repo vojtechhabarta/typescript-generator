@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator;
 
-
 /**
  * Documentation for DummyEnum.
  */

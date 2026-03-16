@@ -21,7 +21,7 @@ public class ClassesTest {
     @Test
     public void testClass() {
         testOutput(A.class,
-                "class A {\n" +
+            "class A {\n" +
                 "    a: string;\n" +
                 "}"
         );
@@ -31,7 +31,7 @@ public class ClassesTest {
     public void testInheritedClass() {
         // A and B order is important
         testOutput(B.class,
-                "class A {\n" +
+            "class A {\n" +
                 "    a: string;\n" +
                 "}\n" +
                 "\n" +
@@ -44,7 +44,7 @@ public class ClassesTest {
     @Test
     public void testClassImplementsInterface() {
         testOutput(E.class,
-                "class E implements D {\n" +
+            "class E implements D {\n" +
                 "    c: string;\n" +
                 "    d: string;\n" +
                 "    e: string;\n" +
@@ -64,7 +64,7 @@ public class ClassesTest {
     public void testComplexHierarchy() {
         // Q3 and Q5 order is important
         testOutput(Q5.class,
-                "class Q3 implements Q2 {\n" +
+            "class Q3 implements Q2 {\n" +
                 "    q1: string;\n" +
                 "    q2: string;\n" +
                 "    q3: string;\n" +
@@ -117,7 +117,6 @@ public class ClassesTest {
         public abstract String getE();
     }
 
-
     private static interface Q1 {
         public abstract String getQ1();
     }
@@ -138,17 +137,16 @@ public class ClassesTest {
         public abstract String getQ5();
     }
 
-
     @Test
     public void testClassPatterns1() {
         testClassPatterns(
-                Arrays.asList(
-                        "**Bc",
-                        "**Bi",
-                        "**Derived1",
-                        "**Derived2"
-                ),
-                ""
+            Arrays.asList(
+                "**Bc",
+                "**Bi",
+                "**Derived1",
+                "**Derived2"
+            ),
+            ""
                 + "class Bc {\n"
                 + "    x: string;\n"
                 + "}\n"
@@ -169,11 +167,11 @@ public class ClassesTest {
     @Test
     public void testClassPatterns2() {
         testClassPatterns(
-                Arrays.asList(
-                        "**Derived1",
-                        "**Derived2"
-                ),
-                ""
+            Arrays.asList(
+                "**Derived1",
+                "**Derived2"
+            ),
+            ""
                 + "interface Bc {\n"
                 + "    x: string;\n"
                 + "}\n"
@@ -195,11 +193,11 @@ public class ClassesTest {
     @Test
     public void testClassPatterns3() {
         testClassPatterns(
-                Arrays.asList(
-                        "**Bc",
-                        "**Derived2"
-                ),
-                ""
+            Arrays.asList(
+                "**Bc",
+                "**Derived2"
+            ),
+            ""
                 + "class Bc {\n"
                 + "    x: string;\n"
                 + "}\n"
@@ -221,11 +219,11 @@ public class ClassesTest {
     @Test
     public void testClassPatterns4() {
         testClassPatterns(
-                Arrays.asList(
-                        "**Bc",
-                        "**Derived1"
-                ),
-                ""
+            Arrays.asList(
+                "**Bc",
+                "**Derived1"
+            ),
+            ""
                 + "class Bc {\n"
                 + "    x: string;\n"
                 + "}\n"
@@ -287,8 +285,8 @@ public class ClassesTest {
         settings.sortDeclarations = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
         String sortedPropertyAssignments = "" +
-                "        this.bar = data.bar;" + settings.newline +
-                "        this.foo = data.foo;";
+            "        this.bar = data.bar;" + settings.newline +
+            "        this.foo = data.foo;";
         Assertions.assertTrue(output.contains(sortedPropertyAssignments));
     }
 
@@ -302,14 +300,13 @@ public class ClassesTest {
         settings.sortDeclarations = false;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(FooBar.class));
         String unsortedPropertyAssignments = "" +
-                "        this.foo = data.foo;" + settings.newline +
-                "        this.bar = data.bar;";
+            "        this.foo = data.foo;" + settings.newline +
+            "        this.bar = data.bar;";
         Assertions.assertTrue(output.contains(unsortedPropertyAssignments));
     }
 
     private static class FooBar {
-        @Nullable
-        public String foo;
+        @Nullable public String foo;
         public int bar;
     }
 

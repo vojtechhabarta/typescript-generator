@@ -247,25 +247,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.6.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>10.26.1</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <sourceDirectories>
-                        <directory>${project.build.sourceDirectory}</directory>
-                        <directory>${project.build.testSourceDirectory}</directory>
-                    </sourceDirectories>
-                    <configLocation>../checkstyle.xml</configLocation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.21.0</version>
                 <configuration>
@@ -318,6 +299,27 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <java>
+                            <eclipse>
+                                <version>4.38</version>
+                                <file>eclipse-formatter-typescript-generator.xml</file>
+                            </eclipse>
+                            <toggleOffOn />
+                            <importOrder>
+                                <order>,\#</order>
+                            </importOrder>
+                            <removeUnusedImports />
+                            <forbidWildcardImports />
+                            <forbidModuleImports />
+                            <formatAnnotations />
+                        </java>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>

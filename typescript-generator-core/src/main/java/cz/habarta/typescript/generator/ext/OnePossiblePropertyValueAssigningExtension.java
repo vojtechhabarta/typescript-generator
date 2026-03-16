@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import cz.habarta.typescript.generator.Extension;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 /**
  * The extension marks all properties which type allows only one possible value (for instance, enum with only one value
  * or {@link cz.habarta.typescript.generator.TsType.UnionType} with only one option) as read only and sets their
@@ -50,15 +52,15 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
     @Override
     public List<TransformerDefinition> getTransformers() {
         return Collections.singletonList(
-                new TransformerDefinition(ModelCompiler.TransformationPhase.AfterDeclarationSorting,
-                        OnePossiblePropertyValueAssigningExtension::transformModel)
+            new TransformerDefinition(ModelCompiler.TransformationPhase.AfterDeclarationSorting,
+                OnePossiblePropertyValueAssigningExtension::transformModel)
         );
     }
 
     private static TsModel transformModel(Context context, TsModel model) {
         List<TsBeanModel> beans = model.getBeans().stream()
-                .map(bean -> transformBean(bean, model))
-                .collect(Collectors.toList());
+            .map(bean -> transformBean(bean, model))
+            .collect(Collectors.toList());
         return model.withBeans(beans);
     }
 
@@ -76,7 +78,7 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
             Optional<TsExpression> onlyValue = findOnlyValueForProperty(property, model);
             if (onlyValue.isPresent()) {
                 newProperty = new TsPropertyModel(property.name, property.tsType,
-                        TsModifierFlags.None.setReadonly(), property.ownProperty, property.comments);
+                    TsModifierFlags.None.setReadonly(), property.ownProperty, property.comments);
 
                 TsExpressionStatement assignmentStatement = createValueAssignmentStatement(newProperty, onlyValue.get());
                 valueAssignmentStatements.add(assignmentStatement);
@@ -93,8 +95,10 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
         return newBean;
     }
 
-    private static TsConstructorModel createConstructor(TsBeanModel bean,
-                                                        Collection<TsExpressionStatement> valueAssignmentStatements) {
+    private static TsConstructorModel createConstructor(
+        TsBeanModel bean,
+        Collection<TsExpressionStatement> valueAssignmentStatements
+    ) {
         List<TsStatement> body = new ArrayList<>();
         if (bean.getParent() != null) {
             body.add(new TsExpressionStatement(new TsCallExpression(new TsSuperExpression())));
@@ -136,12 +140,14 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
         return Optional.of(expression);
     }
 
-    private static Optional<TsExpression> findOnlyValueForEnumReferenceType(TsModel model,
-                                                                            TsType.EnumReferenceType propertyType) {
+    private static Optional<TsExpression> findOnlyValueForEnumReferenceType(
+        TsModel model,
+        TsType.EnumReferenceType propertyType
+    ) {
         Symbol symbol = propertyType.symbol;
         Optional<TsEnumModel> enumModelOption = model.getOriginalStringEnums().stream()
-                .filter(candidate -> candidate.getName().getFullName().equals(symbol.getFullName()))
-                .findAny();
+            .filter(candidate -> candidate.getName().getFullName().equals(symbol.getFullName()))
+            .findAny();
         if (!enumModelOption.isPresent()) {
             return Optional.empty();
         }

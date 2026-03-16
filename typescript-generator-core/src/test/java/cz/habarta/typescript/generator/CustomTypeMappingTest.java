@@ -10,8 +10,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import org.junit.jupiter.api.Assertions;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @SuppressWarnings("unused")
 public class CustomTypeMappingTest {
@@ -24,7 +26,7 @@ public class CustomTypeMappingTest {
         settings.importDeclarations.add("import * as myModule from '../src/test/ts/my-module.d.ts'");
         settings.customTypeMappings.put("java.util.Date", "MyDate");
         settings.customTypeMappings.put("java.util.Calendar", "myModule.MyCalendar");
-//        new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomTypesUsage.class), Output.to(new File("target/CustomTypeMappingTest.d.ts")));
+        // new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomTypesUsage.class), Output.to(new File("target/CustomTypeMappingTest.d.ts")));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomTypesUsage.class));
         assertTrue(output.contains("/// <reference path='../src/test/ts/my-custom-types.d.ts' />"));
         assertTrue(output.contains("import * as myModule from '../src/test/ts/my-module.d.ts';"));
@@ -39,9 +41,9 @@ public class CustomTypeMappingTest {
 
     @Test
     public void testEnumAsMap() throws Exception {
-//        final ObjectMapper objectMapper = new ObjectMapper();
-//        final String json = objectMapper.writeValueAsString(MyEnum.MY_FIRST_VALUE);
-//        System.out.println(json);
+        // final ObjectMapper objectMapper = new ObjectMapper();
+        // final String json = objectMapper.writeValueAsString(MyEnum.MY_FIRST_VALUE);
+        // System.out.println(json);
 
         final Settings settings = TestUtils.settings();
         settings.customTypeMappings = Collections.singletonMap("cz.habarta.typescript.generator.CustomTypeMappingTest$MyEnum", "{ code: string, definition: string }");
@@ -60,10 +62,10 @@ public class CustomTypeMappingTest {
         assertTrue(output.contains("sub: SubCustomMapping;"));
     }
 
-
     @JsonSerialize(using = CodedValueSerializer.class)
     public interface CodedValue {
         String getCode();
+
         String getDefinition();
     }
 
@@ -115,9 +117,12 @@ public class CustomTypeMappingTest {
         }
     }
 
+    class BaseCustomMapping {
+    }
 
-    class BaseCustomMapping {}
-    class SubCustomMapping extends BaseCustomMapping {}
+    class SubCustomMapping extends BaseCustomMapping {
+    }
+
     interface InterfaceUsingSubCustomMapping {
         SubCustomMapping getSub();
     }

@@ -85,7 +85,7 @@ public class JodaTest {
         objectMapper.registerModule(new JodaModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         final String json = objectMapper.writeValueAsString(new JodaSerializedClasses());
-//        System.out.println(json);
+        // System.out.println(json);
     }
 
     @Test

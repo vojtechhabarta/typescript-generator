@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.parser;
 
 import com.google.gson.ExclusionStrategy;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+
 public class GsonParser extends ModelParser {
 
     public static class Factory extends ModelParser.Factory {
@@ -29,8 +31,10 @@ public class GsonParser extends ModelParser {
         }
 
         @Override
-        public GsonParser create(Settings settings, TypeProcessor commonTypeProcessor,
-                List<RestApplicationParser> restApplicationParsers) {
+        public GsonParser create(
+            Settings settings, TypeProcessor commonTypeProcessor,
+            List<RestApplicationParser> restApplicationParsers
+        ) {
             return new GsonParser(settings, commonTypeProcessor, restApplicationParsers);
         }
 
@@ -42,8 +46,10 @@ public class GsonParser extends ModelParser {
         this(settings, commonTypeProcessor, Collections.emptyList());
     }
 
-    public GsonParser(Settings settings, TypeProcessor commonTypeProcessor,
-            List<RestApplicationParser> restApplicationParsers) {
+    public GsonParser(
+        Settings settings, TypeProcessor commonTypeProcessor,
+        List<RestApplicationParser> restApplicationParsers
+    ) {
         super(settings, commonTypeProcessor, restApplicationParsers);
         if (!settings.optionalAnnotations.isEmpty()) {
 
@@ -95,8 +101,8 @@ public class GsonParser extends ModelParser {
                     name = serializedName.value();
                 }
                 final boolean optional = settings.optionalProperties == OptionalProperties.useLibraryDefinition
-                        ? true
-                        : isPropertyOptional(new PropertyMember(field, field.getGenericType(), field.getAnnotatedType(), null));
+                    ? true
+                    : isPropertyOptional(new PropertyMember(field, field.getGenericType(), field.getAnnotatedType(), null));
                 properties.add(new PropertyModel(name, field.getGenericType(), optional, null, field, null, null, null));
                 addBeanToQueue(new SourceType<>(field.getGenericType(), sourceClass.type, name));
             }
@@ -104,7 +110,7 @@ public class GsonParser extends ModelParser {
         }
 
         final Type superclass = sourceClass.type.getGenericSuperclass() == Object.class ? null
-                : sourceClass.type.getGenericSuperclass();
+            : sourceClass.type.getGenericSuperclass();
         if (superclass != null) {
             addBeanToQueue(new SourceType<>(superclass, sourceClass.type, "<superClass>"));
         }

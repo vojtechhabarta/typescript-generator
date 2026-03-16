@@ -105,7 +105,7 @@ public class Settings {
     public boolean scanSpringApplication;
     public RestNamespacing restNamespacing;
     public Class<? extends Annotation> restNamespacingAnnotation = null;
-    public String restNamespacingAnnotationElement;  // default is "value"
+    public String restNamespacingAnnotationElement; // default is "value"
     public String restResponseType = null;
     public String restOptionsType = null;
     public boolean restOptionsTypeIsGeneric;
@@ -301,7 +301,7 @@ public class Settings {
         }
         return result;
     }
-    
+
     public void validate() {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
@@ -410,8 +410,8 @@ public class Settings {
             final List<ElementType> elementTypes = target != null ? Arrays.asList(target.value()) : Arrays.asList();
             if (elementTypes.contains(ElementType.TYPE_PARAMETER) || elementTypes.contains(ElementType.TYPE_USE)) {
                 TypeScriptGenerator.getLogger().info(String.format(
-                        "Suggestion: annotation '%s' supports 'TYPE_PARAMETER' or 'TYPE_USE' target. Consider using 'nullableAnnotations' parameter instead of 'optionalAnnotations'.",
-                        annotation.getName()));
+                    "Suggestion: annotation '%s' supports 'TYPE_PARAMETER' or 'TYPE_USE' target. Consider using 'nullableAnnotations' parameter instead of 'optionalAnnotations'.",
+                    annotation.getName()));
             }
         }
         if (!optionalAnnotations.isEmpty() && !requiredAnnotations.isEmpty()) {
@@ -425,8 +425,8 @@ public class Settings {
             final List<ElementType> elementTypes = target != null ? Arrays.asList(target.value()) : Arrays.asList();
             if (!elementTypes.contains(ElementType.TYPE_PARAMETER) && !elementTypes.contains(ElementType.TYPE_USE)) {
                 throw new RuntimeException(String.format(
-                        "'%s' annotation cannot be used as nullable annotation because it doesn't have 'TYPE_PARAMETER' or 'TYPE_USE' target.",
-                        annotation.getName()));
+                    "'%s' annotation cannot be used as nullable annotation because it doesn't have 'TYPE_PARAMETER' or 'TYPE_USE' target.",
+                    annotation.getName()));
             }
         }
         if (generateJaxrsApplicationClient && outputFileType != TypeScriptFileType.implementationFile) {
@@ -496,8 +496,8 @@ public class Settings {
     public List<CustomTypeMapping> getValidatedCustomTypeMappings() {
         if (validatedCustomTypeMappings == null) {
             validatedCustomTypeMappings = Utils.concat(
-                    validateCustomTypeMappings(customTypeMappings, false),
-                    getLoadedDataLibraries().typeMappings);
+                validateCustomTypeMappings(customTypeMappings, false),
+                getLoadedDataLibraries().typeMappings);
         }
         return validatedCustomTypeMappings;
     }
@@ -517,12 +517,12 @@ public class Settings {
                 final int specified = genericJavaName.typeParameters != null ? genericJavaName.typeParameters.size() : 0;
                 if (specified != required) {
                     final String parameters = Stream.of(cls.getTypeParameters())
-                            .map(TypeVariable::getName)
-                            .collect(Collectors.joining(", "));
+                        .map(TypeVariable::getName)
+                        .collect(Collectors.joining(", "));
                     final String signature = cls.getName() + (parameters.isEmpty() ? "" : "<" + parameters + ">");
                     throw new RuntimeException(String.format(
-                            "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
-                            required, specified, signature));
+                        "Wrong number of specified generic parameters, required: %s, found: %s. Correct format is: '%s'",
+                        required, specified, signature));
                 }
                 mappings.add(new CustomTypeMapping(cls, matchSubclasses, genericJavaName, genericTsName));
             } catch (Exception e) {
@@ -535,8 +535,8 @@ public class Settings {
     public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
         if (validatedCustomTypeAliases == null) {
             validatedCustomTypeAliases = Utils.concat(
-                    validateCustomTypeAliases(customTypeAliases),
-                    getLoadedDataLibraries().typeAliases);
+                validateCustomTypeAliases(customTypeAliases),
+                getLoadedDataLibraries().typeAliases);
         }
         return validatedCustomTypeAliases;
     }
@@ -566,11 +566,11 @@ public class Settings {
         final Matcher matcher = Pattern.compile("([^<\\[]+)(<|\\[)([^>\\]]+)(>|\\])").matcher(name);
         final String rawName;
         final List<String> typeParameters;
-        if (matcher.matches()) {  // is generic?
+        if (matcher.matches()) { // is generic?
             rawName = matcher.group(1);
             typeParameters = Stream.of(matcher.group(3).split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
+                .map(String::trim)
+                .collect(Collectors.toList());
         } else {
             rawName = name;
             typeParameters = null;
@@ -640,16 +640,16 @@ public class Settings {
             }
             final DataLibraryJson dataLibrary = Utils.loadJson(objectMapper, inputStream, DataLibraryJson.class);
             final Map<String, String> typeMappings = Utils.listFromNullable(dataLibrary.classMappings).stream()
-                    .filter(mapping -> mapping.customType != null)
-                    .collect(Utils.toMap(
-                            mapping -> mapping.className,
-                            mapping -> mapping.customType
-                    ));
+                .filter(mapping -> mapping.customType != null)
+                .collect(Utils.toMap(
+                    mapping -> mapping.className,
+                    mapping -> mapping.customType
+                ));
             final Map<String, String> typeAliases = Utils.listFromNullable(dataLibrary.typeAliases).stream()
-                    .collect(Utils.toMap(
-                            alias -> alias.name,
-                            alias -> alias.definition
-                    ));
+                .collect(Utils.toMap(
+                    alias -> alias.name,
+                    alias -> alias.definition
+                ));
             loaded.add(new LoadedDataLibraries(
                 loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.String),
                 loadDataLibraryClasses(dataLibrary, DataLibraryJson.SemanticType.Number),
@@ -670,9 +670,9 @@ public class Settings {
 
     private List<Class<?>> loadDataLibraryClasses(DataLibraryJson dataLibrary, DataLibraryJson.SemanticType semanticType) {
         final List<String> classNames = dataLibrary.classMappings.stream()
-                .filter(mapping -> mapping.semanticType == semanticType)
-                .map(mapping -> mapping.className)
-                .collect(Collectors.toList());
+            .filter(mapping -> mapping.semanticType == semanticType)
+            .map(mapping -> mapping.className)
+            .collect(Collectors.toList());
         return loadClasses(classLoader, classNames, null);
     }
 
@@ -706,7 +706,7 @@ public class Settings {
                 @Override
                 public boolean test(String className) {
                     return mapClasses == ClassMapping.asClasses &&
-                            (patterns == null || Utils.classNameMatches(className, patterns));
+                        (patterns == null || Utils.classNameMatches(className, patterns));
                 }
             };
         }
@@ -757,9 +757,9 @@ public class Settings {
                     springClass = Class.forName(springClassName);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("'generateStringApplicationInterface' or 'generateStringApplicationClient' parameter "
-                            + "was specified but '" + springClassName + "' was not found. "
-                            + "Please add 'cz.habarta.typescript-generator:typescript-generator-spring' artifact "
-                            + "to typescript-generator plugin dependencies (not module dependencies).");
+                        + "was specified but '" + springClassName + "' was not found. "
+                        + "Please add 'cz.habarta.typescript-generator:typescript-generator-spring' artifact "
+                        + "to typescript-generator plugin dependencies (not module dependencies).");
                 }
                 try {
                     final Object instance = springClass.getConstructor().newInstance();
@@ -822,7 +822,7 @@ public class Settings {
             if (requiredClassType != null && !requiredClassType.isAssignableFrom(loadedClass)) {
                 throw new RuntimeException(String.format("Class '%s' is not assignable to '%s'.", loadedClass, requiredClassType));
             }
-            @SuppressWarnings("unchecked") 
+            @SuppressWarnings("unchecked")
             final Class<? extends T> castedClass = (Class<? extends T>) loadedClass;
             return castedClass;
         } catch (ReflectiveOperationException e) {
@@ -858,8 +858,8 @@ public class Settings {
     private static Class<?> loadPrimitiveOrRegularClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
         final Class<?> primitiveType = Utils.getPrimitiveType(className);
         return primitiveType != null
-                ? primitiveType
-                : classLoader.loadClass(className);
+            ? primitiveType
+            : classLoader.loadClass(className);
     }
 
     private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
@@ -904,21 +904,21 @@ public class Settings {
     }
 
     private static int modifierToBitMask(javax.lang.model.element.Modifier modifier) {
-        switch (modifier) {
-            case PUBLIC: return java.lang.reflect.Modifier.PUBLIC;
-            case PROTECTED: return java.lang.reflect.Modifier.PROTECTED;
-            case PRIVATE: return java.lang.reflect.Modifier.PRIVATE;
-            case ABSTRACT: return java.lang.reflect.Modifier.ABSTRACT;
-            // case DEFAULT: no equivalent
-            case STATIC: return java.lang.reflect.Modifier.STATIC;
-            case FINAL: return java.lang.reflect.Modifier.FINAL;
-            case TRANSIENT: return java.lang.reflect.Modifier.TRANSIENT;
-            case VOLATILE: return java.lang.reflect.Modifier.VOLATILE;
-            case SYNCHRONIZED: return java.lang.reflect.Modifier.SYNCHRONIZED;
-            case NATIVE: return java.lang.reflect.Modifier.NATIVE;
-            case STRICTFP: return java.lang.reflect.Modifier.STRICT;
-            default: return 0;
-        }
+        return switch (modifier) {
+            case PUBLIC -> java.lang.reflect.Modifier.PUBLIC;
+            case PROTECTED -> java.lang.reflect.Modifier.PROTECTED;
+            case PRIVATE -> java.lang.reflect.Modifier.PRIVATE;
+            case ABSTRACT -> java.lang.reflect.Modifier.ABSTRACT;
+            // case DEFAULT -> no equivalent
+            case STATIC -> java.lang.reflect.Modifier.STATIC;
+            case FINAL -> java.lang.reflect.Modifier.FINAL;
+            case TRANSIENT -> java.lang.reflect.Modifier.TRANSIENT;
+            case VOLATILE -> java.lang.reflect.Modifier.VOLATILE;
+            case SYNCHRONIZED -> java.lang.reflect.Modifier.SYNCHRONIZED;
+            case NATIVE -> java.lang.reflect.Modifier.NATIVE;
+            case STRICTFP -> java.lang.reflect.Modifier.STRICT;
+            default -> 0;
+        };
     }
 
 }

@@ -53,10 +53,10 @@ public final class Utils {
 
     public static String joinPath(String part1, String part2) {
         final String path = Stream.of(part1, part2)
-            .filter(part -> part != null && !part.isEmpty())  // remove empty parts
-            .reduce((a, b) -> trimRightSlash(a) + "/" + trimLeftSlash(b))  // join
-            .orElse("");  // if all parts are empty
-        return trimLeftSlash(path);  // trim leading slash
+            .filter(part -> part != null && !part.isEmpty()) // remove empty parts
+            .reduce((a, b) -> trimRightSlash(a) + "/" + trimLeftSlash(b)) // join
+            .orElse(""); // if all parts are empty
+        return trimLeftSlash(path); // trim leading slash
     }
 
     private static String trimLeftSlash(String path) {
@@ -64,20 +64,20 @@ public final class Utils {
     }
 
     private static String trimRightSlash(String path) {
-        return  path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+        return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
     }
 
     public static Class<?> getRawClassOrNull(Type type) {
         final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
         return rawClassAndTypeArguments != null ? rawClassAndTypeArguments.getValue1() : null;
     }
-    
+
     public static Pair<Class<?>, Optional<List<Type>>> getRawClassAndTypeArguments(Type type) {
         if (type instanceof Class) {
             final Class<?> javaClass = (Class<?>) type;
             return javaClass.getTypeParameters().length != 0
-                    ? Pair.of(javaClass, Optional.empty())  // raw usage of generic class
-                    : Pair.of(javaClass, Optional.of(Collections.emptyList()));  // non-generic class
+                ? Pair.of(javaClass, Optional.empty()) // raw usage of generic class
+                : Pair.of(javaClass, Optional.of(Collections.emptyList())); // non-generic class
         }
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -105,50 +105,54 @@ public final class Utils {
 
     public static List<Method> getAllMethods(Class<?> cls) {
         return getInheritanceChain(cls)
-                .flatMap(c -> Stream.of(c.getDeclaredMethods()))
-                .collect(Collectors.toList());
+            .flatMap(c -> Stream.of(c.getDeclaredMethods()))
+            .collect(Collectors.toList());
     }
 
     public static List<Field> getAllFields(Class<?> cls) {
         return getInheritanceChain(cls)
-                .flatMap(c -> Stream.of(c.getDeclaredFields()))
-                .collect(Collectors.toList());
+            .flatMap(c -> Stream.of(c.getDeclaredFields()))
+            .collect(Collectors.toList());
     }
 
     public static Stream<Class<?>> getInheritanceChain(Class<?> cls) {
         return Stream.iterate(cls, c -> c != null, (Class<?> c) -> c.getSuperclass())
-                .collect(toReversedCollection())
-                .stream();
+            .collect(toReversedCollection())
+            .stream();
     }
 
     public static <T> Collector<T, ?, Collection<T>> toReversedCollection() {
         return Collector.<T, ArrayDeque<T>, Collection<T>>of(
-                ArrayDeque::new,
-                (deque, item) -> deque.addFirst(item),
-                (deque1, deque2) -> { deque2.addAll(deque1); return deque2; },
-                deque -> deque);
+            ArrayDeque::new,
+            (deque, item) -> deque.addFirst(item),
+            (deque1, deque2) -> {
+                deque2.addAll(deque1);
+                return deque2;
+            },
+            deque -> deque);
     }
 
-    public static <T, K, U> Collector<T, ?, Map<K,U>> toMap(
-            Function<? super T, ? extends K> keyMapper,
-            Function<? super T, ? extends U> valueMapper
+    public static <T, K, U> Collector<T, ?, Map<K, U>> toMap(
+        Function<? super T, ? extends K> keyMapper,
+        Function<? super T, ? extends U> valueMapper
     ) {
         return Collectors.toMap(
-                keyMapper,
-                valueMapper,
-                (a, b) -> {
-                    throw new IllegalStateException("Duplicate key " + a);
-                },
-                LinkedHashMap::new
+            keyMapper,
+            valueMapper,
+            (a, b) -> {
+                throw new IllegalStateException("Duplicate key " + a);
+            },
+            LinkedHashMap::new
         );
     }
 
     public static boolean hasAnyAnnotation(
-            Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
-            List<Class<? extends Annotation>> annotations) {
+        Function<Class<? extends Annotation>, Annotation> getAnnotationFunction,
+        List<Class<? extends Annotation>> annotations
+    ) {
         return annotations.stream()
-                .map(getAnnotationFunction)
-                .anyMatch(Objects::nonNull);
+            .map(getAnnotationFunction)
+            .anyMatch(Objects::nonNull);
     }
 
     public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
@@ -205,7 +209,7 @@ public final class Utils {
             return annotation;
         }
         if (fallbackAnnotationClass != null) {
-            final Object fallbackAnnotation = annotatedElement.getAnnotation((Class<Annotation>)fallbackAnnotationClass);
+            final Object fallbackAnnotation = annotatedElement.getAnnotation((Class<Annotation>) fallbackAnnotationClass);
             if (fallbackAnnotation != null) {
                 return asMigrationProxy(fallbackAnnotation, annotationClass);
             }
@@ -216,19 +220,18 @@ public final class Utils {
     @SuppressWarnings("unchecked")
     public static <T> T asMigrationProxy(Object object, Class<T> clazz) {
         return (T) Proxy.newProxyInstance(
-                clazz.getClassLoader(),
-                new Class<?>[]{clazz},
-                (proxy, method, args) -> {
-                    try {
-                        final Method fallbackMethod = object.getClass().getMethod(method.getName(), method.getParameterTypes());
-                        return fallbackMethod.invoke(object, args);
-                    } catch (ReflectiveOperationException e) {
-                        return null;
-                    }
+            clazz.getClassLoader(),
+            new Class<?>[] { clazz },
+            (proxy, method, args) -> {
+                try {
+                    final Method fallbackMethod = object.getClass().getMethod(method.getName(), method.getParameterTypes());
+                    return fallbackMethod.invoke(object, args);
+                } catch (ReflectiveOperationException e) {
+                    return null;
                 }
+            }
         );
     }
-
 
     public static Type replaceRawClassInType(Type type, Class<?> newClass) {
         if (type instanceof ParameterizedType) {
@@ -250,28 +253,28 @@ public final class Utils {
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
             return new JParameterizedType(
-                    parameterizedType.getRawType(),
-                    transformTypes(parameterizedType.getActualTypeArguments(), transformer),
-                    parameterizedType.getOwnerType()
+                parameterizedType.getRawType(),
+                transformTypes(parameterizedType.getActualTypeArguments(), transformer),
+                parameterizedType.getOwnerType()
             );
         }
         if (type instanceof GenericArrayType) {
             final GenericArrayType genericArrayType = (GenericArrayType) type;
             return new JGenericArrayType(
-                    transformer.apply(genericArrayType.getGenericComponentType())
+                transformer.apply(genericArrayType.getGenericComponentType())
             );
         }
         if (type instanceof JUnionType) {
             final JUnionType unionType = (JUnionType) type;
             return new JUnionType(
-                    transformTypes(unionType.getTypes(), transformer)
+                transformTypes(unionType.getTypes(), transformer)
             );
         }
         if (type instanceof JTypeWithNullability) {
             final JTypeWithNullability typeWithNullability = (JTypeWithNullability) type;
             return new JTypeWithNullability(
-                    transformer.apply(typeWithNullability.getType()),
-                    typeWithNullability.isNullable()
+                transformer.apply(typeWithNullability.getType()),
+                typeWithNullability.isNullable()
             );
         }
         return type;
@@ -279,14 +282,14 @@ public final class Utils {
 
     private static List<Type> transformTypes(List<Type> types, Function<Type, Type> transformer) {
         return types.stream()
-                .map(transformer)
-                .collect(Collectors.toList());
+            .map(transformer)
+            .collect(Collectors.toList());
     }
 
     private static Type[] transformTypes(Type[] types, Function<Type, Type> transformer) {
         return Stream.of(types)
-                .map(transformer)
-                .toArray(Type[]::new);
+            .map(transformer)
+            .toArray(Type[]::new);
     }
 
     public static boolean isPrimitiveType(Type type) {
@@ -298,8 +301,8 @@ public final class Utils {
     }
 
     private static final Map<String, Class<?>> primitiveTypes = Stream
-            .of(byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class, char.class, void.class)
-            .collect(Utils.toMap(cls -> cls.getName(), cls -> cls));
+        .of(byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class, char.class, void.class)
+        .collect(Utils.toMap(cls -> cls.getName(), cls -> cls));
 
     public static Class<?> getPrimitiveType(String typeName) {
         return primitiveTypes.get(typeName);
@@ -345,11 +348,11 @@ public final class Utils {
 
     public static <T> Collector<T, ?, List<T>> toSortedList(Comparator<? super T> comparator) {
         return Collectors.collectingAndThen(
-                Collectors.toCollection(ArrayList::new),
-                list -> {
-                    list.sort(comparator);
-                    return list;
-                }
+            Collectors.toCollection(ArrayList::new),
+            list -> {
+                list.sort(comparator);
+                return list;
+            }
         );
     }
 

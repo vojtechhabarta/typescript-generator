@@ -5,7 +5,7 @@ import cz.habarta.typescript.generator.Settings;
 
 
 public class TsBinaryExpression extends TsExpression {
-    
+
     private final TsExpression left;
     private final TsBinaryOperator operator;
     private final TsExpression right;

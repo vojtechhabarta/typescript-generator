@@ -25,13 +25,13 @@ public class InputTest {
     @Test
     public void testMatches() {
         final List<String> result1 = Input.filterClassNames(
-                Arrays.asList(
-                        "com.example.Json",
-                        "com.example.AAAJson",
-                        "com.example.AAA",
-                        "com.example.aaa$Json"
-                ),
-                Arrays.asList("**Json")
+            Arrays.asList(
+                "com.example.Json",
+                "com.example.AAAJson",
+                "com.example.AAA",
+                "com.example.aaa$Json"
+            ),
+            Arrays.asList("**Json")
         );
         Assertions.assertTrue(result1.contains("com.example.Json"));
         Assertions.assertTrue(result1.contains("com.example.AAAJson"));
@@ -39,14 +39,14 @@ public class InputTest {
         Assertions.assertTrue(result1.contains("com.example.aaa$Json"));
 
         final List<String> result2 = Input.filterClassNames(
-                Arrays.asList(
-                        "com.example.Json",
-                        "cz.habarta.test.Json",
-                        "cz.habarta.test.BBBJson",
-                        "cz.habarta.test.aaa.BBBJson",
-                        "cz.habarta.test.CCC$Json"
-                ),
-                Arrays.asList("cz.habarta.test.*")
+            Arrays.asList(
+                "com.example.Json",
+                "cz.habarta.test.Json",
+                "cz.habarta.test.BBBJson",
+                "cz.habarta.test.aaa.BBBJson",
+                "cz.habarta.test.CCC$Json"
+            ),
+            Arrays.asList("cz.habarta.test.*")
         );
         Assertions.assertTrue(!result2.contains("com.example.Json"));
         Assertions.assertTrue(result2.contains("cz.habarta.test.Json"));
@@ -55,12 +55,12 @@ public class InputTest {
         Assertions.assertTrue(!result2.contains("cz.habarta.test.CCC$Json"));
 
         final List<String> result3 = Input.filterClassNames(
-                Arrays.asList(
-                        "cz.habarta.test.BBBJson",
-                        "cz.habarta.ddd.CCC$Json",
-                        "cz.habarta.CCC$Json"
-                ),
-                Arrays.asList("cz.habarta.*.*$*")
+            Arrays.asList(
+                "cz.habarta.test.BBBJson",
+                "cz.habarta.ddd.CCC$Json",
+                "cz.habarta.CCC$Json"
+            ),
+            Arrays.asList("cz.habarta.*.*$*")
         );
         Assertions.assertTrue(!result3.contains("cz.habarta.test.BBBJson"));
         Assertions.assertTrue(result3.contains("cz.habarta.ddd.CCC$Json"));

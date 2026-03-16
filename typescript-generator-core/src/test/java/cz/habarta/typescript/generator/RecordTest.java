@@ -12,20 +12,20 @@ public class RecordTest {
 
     // @Test
     // public void test() {
-    //     final Settings settings = TestUtils.settings();
-    //     final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Account.class));
-    //     Assertions.assertTrue(!output.contains("interface Record"));
+    // final Settings settings = TestUtils.settings();
+    // final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Account.class));
+    // Assertions.assertTrue(!output.contains("interface Record"));
     // }
 
     // @Test
     // public void testConstructor() {
-    //     final Settings settings = TestUtils.settings();
-    //     settings.outputFileType = TypeScriptFileType.implementationFile;
-    //     settings.mapClasses = ClassMapping.asClasses;
-    //     settings.generateConstructors = true;
-    //     final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Account.class));
-    //     System.out.println(output);
-    //     Assertions.assertTrue(!output.contains("interface Record"));
+    // final Settings settings = TestUtils.settings();
+    // settings.outputFileType = TypeScriptFileType.implementationFile;
+    // settings.mapClasses = ClassMapping.asClasses;
+    // settings.generateConstructors = true;
+    // final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Account.class));
+    // System.out.println(output);
+    // Assertions.assertTrue(!output.contains("interface Record"));
     // }
 
     private static class Base {

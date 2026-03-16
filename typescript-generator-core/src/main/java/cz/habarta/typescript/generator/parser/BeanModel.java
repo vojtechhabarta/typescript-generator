@@ -62,9 +62,9 @@ public class BeanModel extends DeclarationModel {
 
     public PropertyModel getProperty(String name) {
         return properties.stream()
-                .filter(property -> Objects.equals(property.getName(), name))
-                .findFirst()
-                .orElse(null);
+            .filter(property -> Objects.equals(property.getName(), name))
+            .findFirst()
+            .orElse(null);
     }
 
     public BeanModel withProperties(List<PropertyModel> properties) {

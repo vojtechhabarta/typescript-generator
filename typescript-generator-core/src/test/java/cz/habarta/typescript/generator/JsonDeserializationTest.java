@@ -98,8 +98,8 @@ public class JsonDeserializationTest {
         settings.mapClasses = ClassMapping.asClasses;
         settings.extensions.add(new JsonDeserializationExtension(/*useJsonDeserializationInJaxrsApplicationClient*/true));
         settings.extensions.add(new AxiosClientExtension());
-//        final File actualFile = new File("target/JaxrsWithJsonDeserialization-actual.ts");
-//        new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class), Output.to(actualFile));
+        // final File actualFile = new File("target/JaxrsWithJsonDeserialization-actual.ts");
+        // new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class), Output.to(actualFile));
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(JaxrsApplicationTest.OrganizationApplication.class));
         Assertions.assertTrue(output.contains("copyFn: Organization.fromData"));
         Assertions.assertTrue(output.contains("copyFn: undefined"));

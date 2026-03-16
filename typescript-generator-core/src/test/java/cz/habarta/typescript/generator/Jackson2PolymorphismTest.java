@@ -30,8 +30,8 @@ public class Jackson2PolymorphismTest {
     }
 
     @JsonSubTypes({
-            @JsonSubTypes.Type(Y.class),
-            @JsonSubTypes.Type(X.class)
+        @JsonSubTypes.Type(Y.class),
+        @JsonSubTypes.Type(X.class)
     })
     public static class Z {
     }

@@ -24,9 +24,9 @@ public class SpringTestApplication {
 
         @RequestMapping("/greeting")
         public Greeting greeting(
-                @RequestParam(value = "name", defaultValue = "World") String name,
-                @RequestParam(name = "count", defaultValue = "1") Integer count,
-                @RequestParam(defaultValue = "peace") String unnamed
+            @RequestParam(value = "name", defaultValue = "World") String name,
+            @RequestParam(name = "count", defaultValue = "1") Integer count,
+            @RequestParam(defaultValue = "peace") String unnamed
         ) {
             return new Greeting(counter.addAndGet(count), String.format(template, name, unnamed));
         }

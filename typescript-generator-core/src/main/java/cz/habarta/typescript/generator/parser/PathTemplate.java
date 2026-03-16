@@ -24,15 +24,15 @@ public class PathTemplate {
     public static PathTemplate parse(String path) {
         final List<Part> parts = new ArrayList<>();
         final String pattern = ""
-                + "\\{"
-                + "\\s*"
-                + "(?<ParamName>\\w[\\w\\.-]*)"
-                + "\\s*"
-                + "(:"
-                + "\\s*"
-                + "(?<ParamRegex>[^{}\\s]+(\\{[^{}]*\\}[^{}]*)*)"  // this handles RegExp which may contain '{}' quantifiers
-                + "\\s*)?"
-                + "\\}";
+            + "\\{"
+            + "\\s*"
+            + "(?<ParamName>\\w[\\w\\.-]*)"
+            + "\\s*"
+            + "(:"
+            + "\\s*"
+            + "(?<ParamRegex>[^{}\\s]+(\\{[^{}]*\\}[^{}]*)*)" // this handles RegExp which may contain '{}' quantifiers
+            + "\\s*)?"
+            + "\\}";
         final Matcher matcher = Pattern.compile(pattern).matcher(path);
         int index = 0;
         while (matcher.find()) {

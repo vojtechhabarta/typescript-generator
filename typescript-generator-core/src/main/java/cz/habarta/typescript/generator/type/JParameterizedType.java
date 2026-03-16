@@ -49,8 +49,8 @@ public class JParameterizedType implements ParameterizedType {
         if (obj instanceof ParameterizedType) {
             final ParameterizedType that = (ParameterizedType) obj;
             return Objects.equals(ownerType, that.getOwnerType()) &&
-                    Objects.equals(rawType, that.getRawType()) &&
-                    Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
+                Objects.equals(rawType, that.getRawType()) &&
+                Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
         } else {
             return false;
         }
@@ -58,12 +58,12 @@ public class JParameterizedType implements ParameterizedType {
 
     @Override
     public String toString() {
-        return (rawType instanceof Class ? ((Class<?>)rawType).getName() : rawType.getTypeName())
-                + "<"
-                + Stream.of(actualTypeArguments)
+        return (rawType instanceof Class ? ((Class<?>) rawType).getName() : rawType.getTypeName())
+            + "<"
+            + Stream.of(actualTypeArguments)
                 .map(type -> type.getTypeName())
                 .collect(Collectors.joining(", "))
-                + ">";
+            + ">";
     }
 
 }

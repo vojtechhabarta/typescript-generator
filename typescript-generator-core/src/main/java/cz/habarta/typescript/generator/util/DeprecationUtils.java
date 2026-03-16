@@ -1,7 +1,9 @@
+
 package cz.habarta.typescript.generator.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public final class DeprecationUtils {
 

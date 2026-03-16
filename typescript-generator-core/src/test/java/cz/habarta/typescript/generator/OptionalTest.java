@@ -18,19 +18,19 @@ public class OptionalTest {
     public void test() {
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(Person.class));
         Assertions.assertEquals(
-                "interface Person {\n" +
+            "interface Person {\n" +
                 "    name: string;\n" +
                 "    email?: string;\n" +
                 "    age?: number;\n" +
                 "}",
-                output.trim());
+            output.trim());
     }
 
     @Test
     public void testJackson2OptionalSupport() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new Jdk8Module())
-                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+            .registerModule(new Jdk8Module())
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 
         final Person personWithEmail = new Person("afh", Optional.of("af@h.cz"));
         final Person personWithEmptyEmail = new Person("afh", Optional.<String>empty());
@@ -52,7 +52,7 @@ public class OptionalTest {
     @Test
     public void testDeclarationQuestionMark() {
         testDeclaration(OptionalPropertiesDeclaration.questionMark,
-                "interface Person {\n" +
+            "interface Person {\n" +
                 "    name: string;\n" +
                 "    email?: string;\n" +
                 "    age?: number;\n" +
@@ -63,7 +63,7 @@ public class OptionalTest {
     @Test
     public void testDeclarationNullableType() {
         testDeclaration(OptionalPropertiesDeclaration.nullableType,
-                "interface Person {\n" +
+            "interface Person {\n" +
                 "    name: string;\n" +
                 "    email: string | null;\n" +
                 "    age: number | null;\n" +
@@ -74,7 +74,7 @@ public class OptionalTest {
     @Test
     public void testDeclarationQuestionMarkAndNullableType() {
         testDeclaration(OptionalPropertiesDeclaration.questionMarkAndNullableType,
-                "interface Person {\n" +
+            "interface Person {\n" +
                 "    name: string;\n" +
                 "    email?: string | null;\n" +
                 "    age?: number | null;\n" +
@@ -85,22 +85,22 @@ public class OptionalTest {
     @Test
     public void testDeclarationNullableAndUndefinableType() {
         testDeclaration(OptionalPropertiesDeclaration.nullableAndUndefinableType,
-                "interface Person {\n" +
-                        "    name: string;\n" +
-                        "    email: string | null | undefined;\n" +
-                        "    age: number | null | undefined;\n" +
-                        "}"
+            "interface Person {\n" +
+                "    name: string;\n" +
+                "    email: string | null | undefined;\n" +
+                "    age: number | null | undefined;\n" +
+                "}"
         );
     }
 
     @Test
     public void testDeclarationUndefinableType() {
         testDeclaration(OptionalPropertiesDeclaration.undefinableType,
-                "interface Person {\n" +
-                        "    name: string;\n" +
-                        "    email: string | undefined;\n" +
-                        "    age: number | undefined;\n" +
-                        "}"
+            "interface Person {\n" +
+                "    name: string;\n" +
+                "    email: string | undefined;\n" +
+                "    age: number | undefined;\n" +
+                "}"
         );
     }
 

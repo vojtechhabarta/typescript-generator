@@ -112,10 +112,12 @@ public class ObjectAsIdTest {
     private static <V> Map<String, V> generateMap(V... values) {
         final AtomicInteger index = new AtomicInteger();
         return Stream.of(values).collect(Collectors.toMap(
-                v -> "k" + index.incrementAndGet(),
-                v -> v,
-                (v1, v2) -> { throw new RuntimeException(); },
-                LinkedHashMap::new
+            v -> "k" + index.incrementAndGet(),
+            v -> v,
+            (v1, v2) -> {
+                throw new RuntimeException();
+            },
+            LinkedHashMap::new
         ));
     }
 
@@ -170,7 +172,6 @@ public class ObjectAsIdTest {
         Assertions.assertTrue(!output.contains("interface TestObjectD"));
         Assertions.assertTrue(!output.contains("interface TestObjectE"));
     }
-
 
     @Test
     public void testGenerics() {
@@ -237,7 +238,6 @@ public class ObjectAsIdTest {
         public String myProperty = "valueD";
     }
 
-
     private static class ObjectWithID {
         @JsonProperty("@@@id")
         public String myIdentification;
@@ -252,17 +252,15 @@ public class ObjectAsIdTest {
         }
     }
 
-
     private static class GenericWrapper<M extends ObjectWithID> {
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true)
+        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id")
+        @JsonIdentityReference(alwaysAsId = true)
         public M objectReference;
-
 
         public GenericWrapper(M objectReference) {
             this.objectReference = objectReference;
         }
     }
-
 
     private static class TestObjectWithGeneric {
         public GenericWrapper<ObjectWithID> genericTestObject;
@@ -271,9 +269,6 @@ public class ObjectAsIdTest {
             this.genericTestObject = genericTestObject;
         }
     }
-
-
-
 
     private static class TestObjectE {
 

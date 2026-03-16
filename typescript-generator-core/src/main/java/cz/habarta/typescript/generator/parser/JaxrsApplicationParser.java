@@ -148,8 +148,8 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         if (httpMethod != null) {
             // swagger
             final SwaggerOperation swaggerOperation = settings.ignoreSwaggerAnnotations
-                    ? new SwaggerOperation()
-                    : Swagger.parseSwaggerAnnotations(method);
+                ? new SwaggerOperation()
+                : Swagger.parseSwaggerAnnotations(method);
             if (swaggerOperation.possibleResponses != null) {
                 for (SwaggerResponse response : swaggerOperation.possibleResponses) {
                     if (response.responseType != null) {
@@ -206,7 +206,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             final Type plainReturnType = JTypeWithNullability.getPlainType(parsedReturnType);
             final Type modelReturnType;
             if (returnType == void.class) {
-                //for async response also use swagger
+                // for async response also use swagger
                 if (hasAnyAnnotation(method.getParameters(), Arrays.asList(Suspended.class, javax(Suspended.class)))) {
                     if (swaggerOperation.responseType != null) {
                         modelReturnType = swaggerOperation.responseType;
@@ -234,7 +234,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
             final List<String> comments = Swagger.getOperationComments(swaggerOperation);
             // create method
             model.getMethods().add(new RestMethodModel(resourceClass, method.getName(), resolvedModelReturnType, method,
-                    context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
+                context.rootResource, httpMethod.value(), context.path, pathParams, queryParams, entityParameter, comments));
         }
         // JAX-RS specification - 3.4.1 Sub Resources
         if (pathAnnotation != null && httpMethod == null) {
@@ -285,15 +285,15 @@ public class JaxrsApplicationParser extends RestApplicationParser {
     private MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method, List<Pair<Parameter, Type>> parameters) {
         for (Pair<Parameter, Type> pair : parameters) {
             if (!Utils.hasAnyAnnotation(annotationClass -> pair.getValue1().getAnnotation(annotationClass), Arrays.asList(
-                    MatrixParam.class, javax(MatrixParam.class),
-                    QueryParam.class, javax(QueryParam.class),
-                    PathParam.class, javax(PathParam.class),
-                    CookieParam.class, javax(CookieParam.class),
-                    HeaderParam.class, javax(HeaderParam.class),
-                    Suspended.class, javax(Suspended.class),
-                    Context.class, javax(Context.class),
-                    FormParam.class, javax(FormParam.class),
-                    BeanParam.class, javax(BeanParam.class)
+                MatrixParam.class, javax(MatrixParam.class),
+                QueryParam.class, javax(QueryParam.class),
+                PathParam.class, javax(PathParam.class),
+                CookieParam.class, javax(CookieParam.class),
+                HeaderParam.class, javax(HeaderParam.class),
+                Suspended.class, javax(Suspended.class),
+                Context.class, javax(Context.class),
+                FormParam.class, javax(FormParam.class),
+                BeanParam.class, javax(BeanParam.class)
             ))) {
                 final Type resolvedType = GenericsResolver.resolveType(resourceClass, pair.getValue2(), method.getDeclaringClass());
                 return new MethodParameterModel(pair.getValue1().getName(), resolvedType);
@@ -301,12 +301,12 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
         return null;
     }
-    
+
     private static boolean hasAnyAnnotation(Parameter[] parameters, List<Class<? extends Annotation>> annotationClasses) {
         return Stream.of(parameters)
-                .anyMatch(parameter -> Utils.hasAnyAnnotation(parameter::getAnnotation, annotationClasses));
+            .anyMatch(parameter -> Utils.hasAnyAnnotation(parameter::getAnnotation, annotationClasses));
     }
-    
+
     private static Map<Class<?>, TsType> getStandardEntityClassesMapping() {
         // JAX-RS specification - 4.2.4 Standard Entity Providers
         if (standardEntityClassesMapping == null) {
@@ -345,7 +345,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
 
     private static List<String> getDefaultExcludedClassNames() {
         return Arrays.asList(
-                "org.glassfish.jersey.media.multipart.FormDataBodyPart"
+            "org.glassfish.jersey.media.multipart.FormDataBodyPart"
         );
     }
 

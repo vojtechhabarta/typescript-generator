@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator.ext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.lang.reflect.Type;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 public class OnePossiblePropertyValueAssigningExtensionTest {
     private static final String BASE_PATH = "/ext/OnePossiblePropertyValueAssigningExtensionTest-";

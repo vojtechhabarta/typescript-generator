@@ -1,9 +1,11 @@
+
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 public class Jackson3PolymorphismTest {
 
@@ -28,8 +30,8 @@ public class Jackson3PolymorphismTest {
     }
 
     @JsonSubTypes({
-            @JsonSubTypes.Type(Y.class),
-            @JsonSubTypes.Type(X.class)
+        @JsonSubTypes.Type(Y.class),
+        @JsonSubTypes.Type(X.class)
     })
     public static class Z {
     }

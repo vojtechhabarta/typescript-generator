@@ -30,9 +30,9 @@ public class Swagger3Test {
         Assertions.assertTrue(output.contains("testOperation1a(): RestResponse<TestResponse>;"));
         Assertions.assertTrue(output.contains("testOperation1b(): RestResponse<TestResponse>;"));
         Assertions.assertTrue(output.contains("testOperation1c(): RestResponse<TestResponse>;"));
-//        Assertions.assertTrue(output.contains("testOperation2(): RestResponse<TestResponse[]>;"));
-//        Assertions.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
-//        Assertions.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
+        // Assertions.assertTrue(output.contains("testOperation2(): RestResponse<TestResponse[]>;"));
+        // Assertions.assertTrue(output.contains("testOperation3(): RestResponse<TestResponse[]>;"));
+        // Assertions.assertTrue(output.contains("testOperation4(): RestResponse<{ [index: string]: TestResponse }>;"));
         Assertions.assertTrue(!output.contains("testHiddenOperation"));
     }
 
@@ -106,25 +106,25 @@ public class Swagger3Test {
             return Response.ok(new TestResponse()).build();
         }
 
-//        @Operation(responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = TestResponse.class)))))
-//        @GET
-//        public Response testOperation2() {
-//            return Response.ok(new TestResponse()).build();
-//        }
-//
-//        @Operation(responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = TestResponse.class)))))
-//        @GET
-//        public Response testOperation3() {
-//            return Response.ok(new TestResponse()).build();
-//        }
-//
-//        @Operation(responseContainer = "Map", response = TestResponse.class)
-//        @GET
-//        public Response testOperation4() {
-//            return Response.ok(new TestResponse()).build();
-//        }
+        // @Operation(responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = TestResponse.class)))))
+        // @GET
+        // public Response testOperation2() {
+        // return Response.ok(new TestResponse()).build();
+        // }
+        //
+        // @Operation(responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = TestResponse.class)))))
+        // @GET
+        // public Response testOperation3() {
+        // return Response.ok(new TestResponse()).build();
+        // }
+        //
+        // @Operation(responseContainer = "Map", response = TestResponse.class)
+        // @GET
+        // public Response testOperation4() {
+        // return Response.ok(new TestResponse()).build();
+        // }
 
-        @ApiResponses({@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = TestError.class))})})
+        @ApiResponses({ @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = TestError.class)) }) })
         @GET
         public Response testOperationError() {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -143,7 +143,6 @@ public class Swagger3Test {
 
     private static class TestError {
     }
-
 
     private static class DocumentedApplication extends Application {
         @Override

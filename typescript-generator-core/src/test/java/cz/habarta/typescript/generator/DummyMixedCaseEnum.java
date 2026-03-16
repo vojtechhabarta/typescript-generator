@@ -1,3 +1,4 @@
+
 package cz.habarta.typescript.generator;
 
 public enum DummyMixedCaseEnum {

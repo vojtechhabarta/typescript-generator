@@ -5,13 +5,13 @@ import java.lang.reflect.Type;
 
 
 public class SourceType<T extends Type> {
-    
+
     public final T type;
     public final Class<?> usedInClass;
     public final String usedInMember;
 
     public SourceType(T type) {
-        this (type, null, null);
+        this(type, null, null);
     }
 
     public SourceType(T type, Class<?> usedInClass, String usedInMember) {
