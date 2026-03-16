@@ -237,6 +237,7 @@ Contributing
 
 ### Code formatting
 
-- use 4 spaces for indentation in Java files
-- sort java imports alphabetically (including static imports), do not use wildcard (star) imports
-- please do not reformat whole files in IDE (prevent accidental changes to unrelated lines)
+Code style is enforced by Spotless Maven plugin with Eclipse formatter. To format source code run:
+``` sh
+mvn spotless:apply
+```
