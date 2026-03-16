@@ -23,7 +23,7 @@ build_script:
     $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
     mvn -version
     mvn --batch-mode versions:set "-DnewVersion=$($env:APPVEYOR_BUILD_VERSION)"; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
-    mvn --batch-mode -P attach-artifacts clean install -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+    mvn --batch-mode -P attach-artifacts clean install spotless:check -P local-deploy; if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
     Write-Host -ForegroundColor Cyan "Archiving artifacts"
     del target\artifacts -Recurse -Include "maven-metadata.xml*"

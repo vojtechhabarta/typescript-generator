@@ -304,11 +304,10 @@
                     <artifactId>spotless-maven-plugin</artifactId>
                     <version>3.3.0</version>
                     <configuration>
-                        <skip>true</skip>
                         <java>
                             <eclipse>
                                 <version>4.38</version>
-                                <file>../eclipse-formatter-typescript-generator.xml</file>
+                                <file>eclipse-formatter-typescript-generator.xml</file>
                             </eclipse>
                             <toggleOffOn />
                             <importOrder>

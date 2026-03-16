@@ -237,7 +237,9 @@ Contributing
 
 ### Code formatting
 
-Code style is enforced by Spotless Maven plugin with Eclipse formatter. To format source code run:
-``` sh
-mvn spotless:apply
-```
+Code style is enforced by Spotless Maven plugin with Eclipse formatter. 
+
+- setup your IDE to use [eclipse-formatter-typescript-generator.xml](eclipse-formatter-typescript-generator.xml)
+- setup your IDE to order imports alphabetically with static imports after normal imports
+- run `mvn spotless:apply` in the repository **root** directory before committing (running from **module** directories doesn't work)
+- or setup git "pre-push" or "pre-commit" hook: https://github.com/diffplug/spotless/tree/main/plugin-maven#git-hook
