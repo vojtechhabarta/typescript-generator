@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class JsonbParserTest {
 
@@ -348,6 +350,16 @@ public class JsonbParserTest {
     public void testJavaxVisibilityStrategy() {
         final String output = generate(settings, SecretDataJavax.class);
         Assertions.assertFalse(output.contains("password"), output);
+    }
+
+    public record Account(Long id, String name) {}
+
+    @Test
+    public void testRecord() {
+        final String output = generate(settings, Account.class);
+        assertThat(output).doesNotContain("interface Record");
+        assertThat(output).contains("id?: number");
+        assertThat(output).contains("name?: string");
     }
 
 }
