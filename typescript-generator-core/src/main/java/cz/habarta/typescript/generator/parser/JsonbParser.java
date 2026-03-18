@@ -399,11 +399,11 @@ public class JsonbParser extends ModelParser {
         @Override
         public Map<String, DecoratedType> find(final Class<?> clazz) {
             final Map<String, DecoratedType> readers = new HashMap<>();
-            if (Records.isRecord(clazz)) {
+            if (clazz.isRecord()) {
                 readers.putAll(Stream.of(clazz.getMethods())
                     .filter(it -> it.getDeclaringClass() != Object.class && it.getParameterCount() == 0)
                     .filter(it -> !"toString".equals(it.getName()) && !"hashCode".equals(it.getName()))
-                    .filter(it -> !isIgnored(it.getName()) && johnzonAny != null && Meta.getAnnotation(it, johnzonAny) == null)
+                    .filter(it -> !isIgnored(it.getName()) && !(johnzonAny != null && Meta.getAnnotation(it, johnzonAny) != null))
                     .collect(Collectors.toMap(Method::getName, it -> new MethodDecoratedType(it, it.getGenericReturnType()) {})));
             } else {
                 final PropertyDescriptor[] propertyDescriptors = getPropertyDescriptors(clazz);
@@ -494,7 +494,7 @@ public class JsonbParser extends ModelParser {
         @Override
         public Map<String, JsonbParser.DecoratedType> find(final Class<?> clazz) {
             final Map<String, JsonbParser.DecoratedType> methodReaders = this.methods.find(clazz);
-            final boolean record = Records.isRecord(clazz);
+            final boolean record = clazz.isRecord();
             if (record) {
                 return methodReaders;
             }
@@ -719,32 +719,6 @@ public class JsonbParser extends ModelParser {
                     global.setLength(global.length() - 1); // remove last sep
                 }
                 return global.toString();
-            }
-        }
-    }
-
-    private static class Records {
-        private static final Method IS_RECORD;
-
-        static {
-            Method isRecord = null;
-            try {
-                isRecord = Class.class.getMethod("isRecord");
-            } catch (final NoSuchMethodException e) {
-                // no-op
-            }
-            IS_RECORD = isRecord;
-        }
-
-        private Records() {
-            // no-op
-        }
-
-        public static boolean isRecord(final Class<?> clazz) {
-            try {
-                return IS_RECORD != null && Boolean.class.cast(IS_RECORD.invoke(clazz));
-            } catch (final InvocationTargetException | IllegalAccessException e) {
-                return false;
             }
         }
     }

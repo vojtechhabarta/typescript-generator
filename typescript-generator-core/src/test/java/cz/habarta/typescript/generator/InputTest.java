@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SuppressWarnings("unused")
 public class InputTest {
@@ -17,7 +19,7 @@ public class InputTest {
     @Test
     public void testScanner() {
         final ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("cz.habarta").scan();
-        final List<String> allClassNames = scanResult.getAllClasses().getNames();
+        final List<String> allClassNames = scanResult.getAllStandardClasses().getNames();
         final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
         Assertions.assertTrue(testClassNames.size() > 20, "Typescript-generator must have at least 20 tests :-)");
     }
@@ -91,6 +93,15 @@ public class InputTest {
         parameters.classesExtendingClasses = Arrays.asList(MyJsonInterfaceImpl.class.getName());
         final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(parameters));
         Assertions.assertTrue(output.contains("lastName: string;"));
+    }
+
+    @Test
+    public void testRecordClass() {
+        final Input.Parameters parameters = new Input.Parameters();
+        parameters.classNamePatterns = Arrays.asList("**RecordTest$Account");
+        final Input input = Input.from(parameters);
+        assertThat(input.getSourceTypes())
+            .anyMatch(sourceType -> sourceType.type instanceof Class<?> cls ? cls.isRecord() : false);
     }
 
     @Retention(RetentionPolicy.RUNTIME)
