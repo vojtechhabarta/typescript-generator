@@ -79,7 +79,6 @@ public abstract class GenerateTask extends DefaultTask {
     public abstract Property<TypeScriptFileType> getOutputFileType();
 
     @Input
-    @Optional
     public abstract Property<TypeScriptOutputKind> getOutputKind();
 
     @Input
@@ -151,7 +150,6 @@ public abstract class GenerateTask extends DefaultTask {
     public abstract ListProperty<String> getExcludePropertyAnnotations();
 
     @Input
-    @Optional
     public abstract Property<JsonLibrary> getJsonLibrary();
 
     @Input
@@ -443,37 +441,16 @@ public abstract class GenerateTask extends DefaultTask {
     public abstract Property<Logger.Level> getLoggingLevel();
 
     @OutputFile
-    public RegularFileProperty getOutputFileProperty() {
-        RegularFileProperty output = getProject().getObjects().fileProperty();
-        if (getOutputFile().isPresent()) {
-            output.set(getProject().file(getOutputFile().get()));
-        } else {
-            // Default output location
-            String extension = ".ts"; // default extension
-            if (getOutputFileType().isPresent()) {
-                extension = getOutputFileType().get().name().toLowerCase().replace("implementation", ".ts")
-                    .replace("declaration", ".d.ts");
-            }
-            output.set(getBuildDirectory().file("typescript-generator/" + getProjectName().get() + extension));
-        }
-        return output;
-    }
+    public abstract RegularFileProperty getOutputFileProperty();
 
     @TaskAction
     public void generate() throws Exception {
-        if (!getOutputKind().isPresent()) {
-            throw new RuntimeException("Please specify 'outputKind' property.");
-        }
-        if (!getJsonLibrary().isPresent()) {
-            throw new RuntimeException("Please specify 'jsonLibrary' property.");
-        }
-
         Logger.Level logLevel = getLoggingLevel().getOrElse(Logger.Level.Info);
         TypeScriptGenerator.setLogger(new Logger(logLevel));
         TypeScriptGenerator.printVersion();
 
         // Create class loader from classpath
-        final Set<URL> urls = new LinkedHashSet<>();
+        final List<URL> urls = new ArrayList<>();
         for (File file : getClasspath().getFiles()) {
             urls.add(file.toURI().toURL());
         }
@@ -525,7 +502,7 @@ public abstract class GenerateTask extends DefaultTask {
         settings.setJackson2Configuration(classLoader, getJackson2Configuration().getOrNull());
         settings.gsonConfiguration = getGsonConfiguration().getOrNull();
         settings.jsonbConfiguration = getJsonbConfiguration().getOrNull();
-        settings.additionalDataLibraries = getAdditionalDataLibraries().getOrNull();
+        settings.additionalDataLibraries = nullableList(getAdditionalDataLibraries());
         settings.optionalProperties = getOptionalProperties().getOrNull();
         settings.optionalPropertiesDeclaration = getOptionalPropertiesDeclaration().getOrNull();
         settings.nullabilityDefinition = getNullabilityDefinition().getOrNull();
@@ -537,8 +514,8 @@ public abstract class GenerateTask extends DefaultTask {
         settings.customTypeNaming = Settings.convertToMap(getCustomTypeNaming().getOrElse(Collections.emptyList()),
             "customTypeNaming");
         settings.customTypeNamingFunction = getCustomTypeNamingFunction().getOrNull();
-        settings.referencedFiles = getReferencedFiles().getOrNull();
-        settings.importDeclarations = getImportDeclarations().getOrNull();
+        settings.referencedFiles = nullableList(getReferencedFiles());
+        settings.importDeclarations = nullableList(getImportDeclarations());
         settings.customTypeMappings = Settings.convertToMap(getCustomTypeMappings().getOrElse(Collections.emptyList()),
             "customTypeMapping");
         settings.customTypeAliases = Settings.convertToMap(getCustomTypeAliases().getOrElse(Collections.emptyList()),
@@ -548,11 +525,11 @@ public abstract class GenerateTask extends DefaultTask {
         settings.mapEnum = getMapEnum().getOrNull();
         settings.enumMemberCasing = getEnumMemberCasing().getOrNull();
         settings.nonConstEnums = getNonConstEnums().getOrElse(false);
-        settings.loadNonConstEnumAnnotations(classLoader, getNonConstEnumAnnotations().getOrNull());
+        settings.loadNonConstEnumAnnotations(classLoader, nullableList(getNonConstEnumAnnotations()));
         settings.mapClasses = getMapClasses().getOrNull();
-        settings.mapClassesAsClassesPatterns = getMapClassesAsClassesPatterns().getOrNull();
+        settings.mapClassesAsClassesPatterns = nullableList(getMapClassesAsClassesPatterns());
         settings.generateConstructors = getGenerateConstructors().getOrElse(false);
-        settings.loadDisableTaggedUnionAnnotations(classLoader, getDisableTaggedUnionAnnotations().getOrNull());
+        settings.loadDisableTaggedUnionAnnotations(classLoader, nullableList(getDisableTaggedUnionAnnotations()));
         settings.disableTaggedUnions = getDisableTaggedUnions().getOrElse(false);
         settings.generateReadonlyAndWriteonlyJSDocTags = getGenerateReadonlyAndWriteonlyJSDocTags().getOrElse(false);
         settings.ignoreSwaggerAnnotations = getIgnoreSwaggerAnnotations().getOrElse(false);
@@ -585,11 +562,11 @@ public abstract class GenerateTask extends DefaultTask {
                 getExtensionClasses().getOrElse(Collections.emptyList()),
                 getExtensionsList().getOrElse(Collections.emptyList())),
             getExtensionsWithConfiguration().getOrNull());
-        settings.loadIncludePropertyAnnotations(classLoader, getIncludePropertyAnnotations().getOrNull());
-        settings.loadExcludePropertyAnnotations(classLoader, getExcludePropertyAnnotations().getOrNull());
-        settings.loadOptionalAnnotations(classLoader, getOptionalAnnotations().getOrNull());
-        settings.loadRequiredAnnotations(classLoader, getRequiredAnnotations().getOrNull());
-        settings.loadNullableAnnotations(classLoader, getNullableAnnotations().getOrNull());
+        settings.loadIncludePropertyAnnotations(classLoader, nullableList(getIncludePropertyAnnotations()));
+        settings.loadExcludePropertyAnnotations(classLoader, nullableList(getExcludePropertyAnnotations()));
+        settings.loadOptionalAnnotations(classLoader, nullableList(getOptionalAnnotations()));
+        settings.loadRequiredAnnotations(classLoader, nullableList(getRequiredAnnotations()));
+        settings.loadNullableAnnotations(classLoader, nullableList(getNullableAnnotations()));
         settings.primitivePropertiesRequired = getPrimitivePropertiesRequired().getOrElse(false);
         settings.generateInfoJson = getGenerateInfoJson().getOrElse(false);
         settings.generateNpmPackageJson = getGenerateNpmPackageJson().getOrElse(false);
@@ -609,10 +586,21 @@ public abstract class GenerateTask extends DefaultTask {
         settings.setIndentString(getIndentString().getOrNull());
         settings.jackson2ModuleDiscovery = getJackson2ModuleDiscovery().getOrElse(false);
         settings.jackson3ModuleDiscovery = getJackson3ModuleDiscovery().getOrElse(false);
-        settings.loadJackson2Modules(classLoader, getJackson2Modules().getOrNull());
-        settings.loadJackson3Modules(classLoader, getJackson3Modules().getOrNull());
+        settings.loadJackson2Modules(classLoader, nullableList(getJackson2Modules()));
+        settings.loadJackson3Modules(classLoader, nullableList(getJackson3Modules()));
         settings.classLoader = classLoader;
 
         return settings;
+    }
+
+    /**
+     * @return null if the list is null or if the list is empty (common case for unspecified Gradle ListProperty-s)
+     */
+    private static List<String> nullableList(ListProperty<String> listProperty) {
+        List<String> list = listProperty.getOrNull();
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list;
     }
 }

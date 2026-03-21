@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator.gradle;
 
+import cz.habarta.typescript.generator.TypeScriptFileType;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -91,6 +92,18 @@ public class TypeScriptGeneratorPlugin implements Plugin<Project> {
         });
 
         task.getClasspath().from(classpath);
+
+        // computed output file
+        task.getOutputFileProperty().fileProvider(extension.getOutputFile().map(project::file)
+            .orElse(extension.getOutputFileType().orElse(TypeScriptFileType.declarationFile).map(fileType -> {
+                String fileExtension = switch (fileType) {
+                    case implementationFile -> ".ts";
+                    case declarationFile -> ".d.ts";
+                };
+                return task.getBuildDirectory()
+                    .file("typescript-generator/" + task.getProjectName().get() + fileExtension).get()
+                    .getAsFile();
+            })));
 
         // Copy all properties from extension to task
         task.getOutputFile().set(extension.getOutputFile());
