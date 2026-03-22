@@ -500,6 +500,7 @@ public abstract class GenerateTask extends DefaultTask {
             getExcludeClassPatterns().getOrElse(Collections.emptyList()));
         settings.jsonLibrary = getJsonLibrary().get();
         settings.setJackson2Configuration(classLoader, getJackson2Configuration().getOrNull());
+        settings.setJackson3Configuration(classLoader, getJackson3Configuration().getOrNull());
         settings.gsonConfiguration = getGsonConfiguration().getOrNull();
         settings.jsonbConfiguration = getJsonbConfiguration().getOrNull();
         settings.additionalDataLibraries = nullableList(getAdditionalDataLibraries());
