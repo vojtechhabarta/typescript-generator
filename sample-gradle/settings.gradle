@@ -1,0 +1,2 @@
+// for plugin development only
+includeBuild("../typescript-generator-gradle-plugin")
