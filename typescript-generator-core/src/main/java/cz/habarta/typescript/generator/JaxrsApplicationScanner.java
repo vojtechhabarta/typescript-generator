@@ -2,7 +2,6 @@
 package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.SourceType;
-import cz.habarta.typescript.generator.util.Utils;
 import io.github.classgraph.ScanResult;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -26,14 +25,12 @@ public class JaxrsApplicationScanner {
             final Set<Class<?>> applicationClasses;
             if (instance instanceof jakarta.ws.rs.core.Application) {
                 applicationClasses = ((jakarta.ws.rs.core.Application) instance).getClasses();
-            } else if (instance instanceof javax.ws.rs.core.Application) {
-                applicationClasses = ((javax.ws.rs.core.Application) instance).getClasses();
             } else {
                 applicationClasses = Collections.emptySet();
             }
             final List<Class<?>> resourceClasses = new ArrayList<>();
             for (Class<?> cls : applicationClasses) {
-                if (cls.isAnnotationPresent(jakarta.ws.rs.Path.class) || cls.isAnnotationPresent(javax.ws.rs.Path.class)) {
+                if (cls.isAnnotationPresent(jakarta.ws.rs.Path.class)) {
                     resourceClasses.add(cls);
                 }
             }
@@ -46,10 +43,7 @@ public class JaxrsApplicationScanner {
     }
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
-        final List<String> namesOfResourceClasses = Utils.concat(
-            scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames(),
-            scanResult.getClassesWithAnnotation(javax.ws.rs.Path.class.getName()).getNames()
-        );
+        final List<String> namesOfResourceClasses = scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames();
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
         TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));
         return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
