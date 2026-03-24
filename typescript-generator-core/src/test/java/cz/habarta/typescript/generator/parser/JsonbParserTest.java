@@ -15,6 +15,8 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
+import jakarta.json.bind.annotation.JsonbVisibility;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
@@ -328,12 +330,12 @@ public class JsonbParserTest {
         return new TypeScriptGenerator(settings).generateTypeScript(Input.from(cls));
     }
 
-    @jakarta.json.bind.annotation.JsonbVisibility(HideAllVisibilityStrategy.class)
+    @JsonbVisibility(HideAllVisibilityStrategy.class)
     public class SecretData {
         public String password;
     }
 
-    public static class HideAllVisibilityStrategy implements jakarta.json.bind.config.PropertyVisibilityStrategy {
+    public static class HideAllVisibilityStrategy implements PropertyVisibilityStrategy {
 
         @Override
         public boolean isVisible(Field field) {

@@ -3,6 +3,8 @@ package cz.habarta.typescript.generator;
 
 import cz.habarta.typescript.generator.parser.SourceType;
 import io.github.classgraph.ScanResult;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -23,14 +25,14 @@ public class JaxrsApplicationScanner {
             constructor.setAccessible(true);
             final Object instance = constructor.newInstance();
             final Set<Class<?>> applicationClasses;
-            if (instance instanceof jakarta.ws.rs.core.Application) {
-                applicationClasses = ((jakarta.ws.rs.core.Application) instance).getClasses();
+            if (instance instanceof Application) {
+                applicationClasses = ((Application) instance).getClasses();
             } else {
                 applicationClasses = Collections.emptySet();
             }
             final List<Class<?>> resourceClasses = new ArrayList<>();
             for (Class<?> cls : applicationClasses) {
-                if (cls.isAnnotationPresent(jakarta.ws.rs.Path.class)) {
+                if (cls.isAnnotationPresent(Path.class)) {
                     resourceClasses.add(cls);
                 }
             }
@@ -43,7 +45,7 @@ public class JaxrsApplicationScanner {
     }
 
     public static List<SourceType<Type>> scanAutomaticJaxrsApplication(ScanResult scanResult, Predicate<String> isClassNameExcluded) {
-        final List<String> namesOfResourceClasses = scanResult.getClassesWithAnnotation(jakarta.ws.rs.Path.class.getName()).getNames();
+        final List<String> namesOfResourceClasses = scanResult.getClassesWithAnnotation(Path.class.getName()).getNames();
         final List<Class<?>> resourceClasses = Input.loadClasses(namesOfResourceClasses);
         TypeScriptGenerator.getLogger().info(String.format("Found %d root resources.", resourceClasses.size()));
         return new JaxrsApplicationScanner().scanJaxrsApplication(null, resourceClasses, isClassNameExcluded);
