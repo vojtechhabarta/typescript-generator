@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.BridgeMethodResolver;
@@ -146,12 +147,11 @@ public class SpringApplicationParser extends RestApplicationParser {
         }
 
         public List<Class<?>> findRestControllers() {
+            setWebApplicationType(WebApplicationType.NONE);
             try (ConfigurableApplicationContext context = createApplicationContext()) {
                 load(context, getAllSources().toArray());
-                withSystemProperty("server.port", "0", () -> {
-                    context.refresh();
-                });
-                final List<Class<?>> classes = Stream.of(context.getBeanDefinitionNames())
+                context.refresh();
+                return Stream.of(context.getBeanDefinitionNames())
                     .map(beanName -> context.getBeanFactory().getBeanDefinition(beanName).getBeanClassName())
                     .filter(Objects::nonNull)
                     .filter(className -> isClassNameExcluded == null || !isClassNameExcluded.test(className))
@@ -164,22 +164,6 @@ public class SpringApplicationParser extends RestApplicationParser {
                     })
                     .filter(instance -> AnnotationUtils.findAnnotation(instance, Component.class) != null)
                     .collect(Collectors.toList());
-                return classes;
-            }
-        }
-
-    }
-
-    private static void withSystemProperty(String name, String value, Runnable runnable) {
-        final String original = System.getProperty(name);
-        try {
-            System.setProperty(name, value);
-            runnable.run();
-        } finally {
-            if (original != null) {
-                System.setProperty(name, original);
-            } else {
-                System.getProperties().remove(name);
             }
         }
     }
