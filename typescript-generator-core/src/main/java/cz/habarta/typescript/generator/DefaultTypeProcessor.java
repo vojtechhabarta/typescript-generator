@@ -235,7 +235,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             Arrays.asList(Collection.class),
             Arrays.asList(Map.class),
             Arrays.asList(Optional.class),
-            Arrays.asList(jakarta.xml.bind.JAXBElement.class, javax.xml.bind.JAXBElement.class),
+            Arrays.asList(jakarta.xml.bind.JAXBElement.class),
             Arrays.asList(),
             Arrays.asList()
         );

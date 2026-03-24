@@ -78,7 +78,6 @@ import tools.jackson.databind.ser.BeanSerializerFactory;
 import tools.jackson.databind.ser.bean.BeanSerializerBase;
 import tools.jackson.databind.type.TypeFactory;
 import tools.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
-import tools.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 
 public class Jackson3Parser extends ModelParser {
@@ -137,9 +136,7 @@ public class Jackson3Parser extends ModelParser {
         if (useJaxbAnnotations) {
             final AnnotationIntrospector original = builder.annotationIntrospector();
             final AnnotationIntrospector jakartaIntrospector = new JakartaXmlBindAnnotationIntrospector();
-            final AnnotationIntrospector javaxIntrospector = new JaxbAnnotationIntrospector();
-            final AnnotationIntrospectorPair jaxbPair = new AnnotationIntrospectorPair(jakartaIntrospector, javaxIntrospector);
-            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jaxbPair, original);
+            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jakartaIntrospector, original);
             builder.annotationIntrospector(pair);
         }
         final Jackson3ConfigurationResolved config = settings.jackson3Configuration;

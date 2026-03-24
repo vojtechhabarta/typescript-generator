@@ -328,12 +328,12 @@ public class JsonbParserTest {
         return new TypeScriptGenerator(settings).generateTypeScript(Input.from(cls));
     }
 
-    @javax.json.bind.annotation.JsonbVisibility(HideAllVisibilityStrategy.class)
-    public class SecretDataJavax {
+    @jakarta.json.bind.annotation.JsonbVisibility(HideAllVisibilityStrategy.class)
+    public class SecretData {
         public String password;
     }
 
-    public static class HideAllVisibilityStrategy implements javax.json.bind.config.PropertyVisibilityStrategy {
+    public static class HideAllVisibilityStrategy implements jakarta.json.bind.config.PropertyVisibilityStrategy {
 
         @Override
         public boolean isVisible(Field field) {
@@ -347,8 +347,8 @@ public class JsonbParserTest {
     }
 
     @Test
-    public void testJavaxVisibilityStrategy() {
-        final String output = generate(settings, SecretDataJavax.class);
+    public void testVisibilityStrategy() {
+        final String output = generate(settings, SecretData.class);
         Assertions.assertFalse(output.contains("password"), output);
     }
 

@@ -8,7 +8,7 @@ package cz.habarta.typescript.generator;
 public class JsonbConfiguration {
 
     /**
-     * {@link javax.json.bind.config.PropertyNamingStrategy} name.
+     * {@link jakarta.json.bind.config.PropertyNamingStrategy} name.
      */
     public String namingStrategy = "IDENTITY";
 }

@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import cz.habarta.typescript.generator.ExcludingTypeProcessor;
 import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
 import cz.habarta.typescript.generator.OptionalProperties;
@@ -136,9 +135,7 @@ public class Jackson2Parser extends ModelParser {
         if (useJaxbAnnotations) {
             final AnnotationIntrospector original = objectMapper.getSerializationConfig().getAnnotationIntrospector();
             final AnnotationIntrospector jakartaIntrospector = new JakartaXmlBindAnnotationIntrospector(objectMapper.getTypeFactory());
-            final AnnotationIntrospector javaxIntrospector = new JaxbAnnotationIntrospector(objectMapper.getTypeFactory());
-            final AnnotationIntrospectorPair jaxbPair = new AnnotationIntrospectorPair(jakartaIntrospector, javaxIntrospector);
-            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jaxbPair, original);
+            final AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(jakartaIntrospector, original);
             objectMapper.setAnnotationIntrospector(pair);
         }
         final Jackson2ConfigurationResolved config = settings.jackson2Configuration;

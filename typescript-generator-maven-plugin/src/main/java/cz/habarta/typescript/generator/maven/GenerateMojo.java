@@ -158,7 +158,7 @@ public class GenerateMojo extends AbstractMojo {
     private List<String> classesExtendingClasses;
 
     /**
-     * Scans specified JAX-RS {@link javax.ws.rs.core.Application} for classes to process.
+     * Scans specified JAX-RS {@link jakarta.ws.rs.core.Application} for classes to process.
      * Parameter contains fully-qualified class name.
      * It is possible to exclude particular REST resource classes using {@link #excludeClasses} parameter.
      */
@@ -217,9 +217,9 @@ public class GenerateMojo extends AbstractMojo {
      * Supported values are:
      * <ul>
      * <li><code>jackson2</code> - annotations from `com.fasterxml.jackson.annotation` package</li>
-     * <li><code>jaxb</code> - annotations from `javax.xml.bind.annotation` package<li>
+     * <li><code>jaxb</code> - annotations from `jakarta.xml.bind.annotation` package<li>
      * <li><code>gson</code> - annotations from `com.google.gson.annotations` package<li>
-     * <li><code>jsonb</code> - annotations from `javax.json.bind.annotation` package<li>
+     * <li><code>jsonb</code> - annotations from `jakarta.json.bind.annotation` package<li>
      * </ul>
      * Required parameter, recommended value is <code>jackson2</code>.
      */
