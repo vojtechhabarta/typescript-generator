@@ -26,6 +26,7 @@ import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.EnumModel;
 import cz.habarta.typescript.generator.parser.Jackson2Parser;
 import cz.habarta.typescript.generator.parser.Model;
+import jakarta.xml.bind.annotation.XmlElement;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,7 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import jakarta.xml.bind.annotation.XmlElement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
