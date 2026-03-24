@@ -23,7 +23,7 @@ The tool is distributed in two forms:
 | Gradle | 8.x (wrapper) | Alternative build tool and plugin distribution |
 | Jackson | 2.x / 3.x | JSON serialization library support (both versions) |
 | Spring Boot | 4.x | Spring REST framework support |
-| Jakarta / Javax APIs | 4.x+ | JAX-RS, JSON-B, JAXB support |
+| Jakarta APIs | 4.x+ | JAX-RS, JSON-B, JAXB support |
 | JUnit | 5 (Jupiter) | Testing framework |
 | Kotlin | 2.x | JVM interop and Kotlin-class generation support |
 | Spotless | 3.x | Code formatting (Eclipse formatter) |
@@ -46,7 +46,7 @@ typescript-generator/
 ├── .github/workflows/                  # GitHub Actions CI/CD
 ├── eclipse-formatter-typescript-generator.xml  # Code style config
 ├── pom.xml                             # Parent Maven POM
-└── README.md                           # User-facing documentation (may be outdated)
+└── README.md                           # User-facing documentation
 ```
 
 ---
@@ -183,13 +183,10 @@ Do **not** add new dependencies without first opening an issue for discussion. T
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
+| Appveyor | Every push / PR | Runs `mvn clean install spotless:check` – **must pass before merging** |
 | `release.yml` | Manual dispatch | Builds, signs, and uploads to Maven Central |
 | `release-gradle-plugin.yml` | Manual dispatch | Publishes Gradle plugin to Gradle Plugin Portal |
 
 Releases are signed with GPG. Credentials are stored as GitHub repository secrets.
 
 ---
-
-## Notes on README.md
-
-The `README.md` file is the primary user-facing documentation but it **may be outdated** in some areas (e.g., version numbers, configuration examples). When `README.md` and the actual source code differ, trust the source code.
