@@ -2,8 +2,8 @@ package cz.habarta.typescript.generator
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import javax.ws.rs.POST
-import javax.ws.rs.Path
+import jakarta.ws.rs.POST
+import jakarta.ws.rs.Path
 
 @Suppress("UNUSED_PARAMETER")
 class KotlinTest {

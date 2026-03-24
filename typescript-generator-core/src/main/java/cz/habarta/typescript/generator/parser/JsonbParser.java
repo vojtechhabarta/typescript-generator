@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -221,19 +220,19 @@ public class JsonbParser extends ModelParser {
         }
 
         private Type replaceType(final Type type) {
-            if (type == JsonValue.class || type == javax.json.JsonValue.class) {
+            if (type == JsonValue.class) {
                 return Object.class;
             }
-            if (type == JsonObject.class || type == javax.json.JsonObject.class) {
+            if (type == JsonObject.class) {
                 return new JParameterizedType(Map.class, new Type[] { String.class, Object.class }, null);
             }
-            if (type == JsonArray.class || type == javax.json.JsonArray.class) {
+            if (type == JsonArray.class) {
                 return new JParameterizedType(List.class, new Type[] { Object.class }, null);
             }
-            if (type == JsonString.class || type == javax.json.JsonString.class) {
+            if (type == JsonString.class) {
                 return String.class;
             }
-            if (type == JsonNumber.class || type == javax.json.JsonNumber.class) {
+            if (type == JsonNumber.class) {
                 return Double.class;
             }
             return type;
@@ -845,26 +844,8 @@ public class JsonbParser extends ModelParser {
         }
     }
 
-    static <A extends Annotation> A getJsonbAnnotation(AnnotatedElement annotatedElement, Class<A> jakartaAnnotationClass) {
-        final Class<?> javaxAnnotationClass = javax(jakartaAnnotationClass);
-        return Utils.getMigratedAnnotation(annotatedElement, jakartaAnnotationClass, javaxAnnotationClass);
+    static <A extends Annotation> A getJsonbAnnotation(AnnotatedElement annotatedElement, Class<A> annotationClass) {
+        return annotatedElement.getAnnotation(annotationClass);
     }
-
-    private static <T> Class<T> javax(Class<T> jakartaClass) {
-        @SuppressWarnings("unchecked")
-        final Class<T> cls = (Class<T>) javaxClasses.get().get(jakartaClass);
-        return cls;
-    }
-
-    private static final Supplier<Map<Class<?>, Class<?>>> javaxClasses = Utils.memoize(() -> {
-        final Map<Class<?>, Class<?>> map = new LinkedHashMap<>();
-        map.put(jakarta.json.bind.annotation.JsonbCreator.class, javax.json.bind.annotation.JsonbCreator.class);
-        map.put(jakarta.json.bind.annotation.JsonbProperty.class, javax.json.bind.annotation.JsonbProperty.class);
-        map.put(jakarta.json.bind.annotation.JsonbTransient.class, javax.json.bind.annotation.JsonbTransient.class);
-        map.put(jakarta.json.bind.annotation.JsonbVisibility.class, javax.json.bind.annotation.JsonbVisibility.class);
-        map.put(jakarta.json.bind.config.PropertyNamingStrategy.class, javax.json.bind.config.PropertyNamingStrategy.class);
-        map.put(jakarta.json.bind.config.PropertyVisibilityStrategy.class, javax.json.bind.config.PropertyVisibilityStrategy.class);
-        return map;
-    });
 
 }

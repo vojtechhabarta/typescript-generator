@@ -203,21 +203,6 @@ public final class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <A extends Annotation> A getMigratedAnnotation(AnnotatedElement annotatedElement, Class<A> annotationClass, Class<?> fallbackAnnotationClass) {
-        final A annotation = annotatedElement.getAnnotation(annotationClass);
-        if (annotation != null) {
-            return annotation;
-        }
-        if (fallbackAnnotationClass != null) {
-            final Object fallbackAnnotation = annotatedElement.getAnnotation((Class<Annotation>) fallbackAnnotationClass);
-            if (fallbackAnnotation != null) {
-                return asMigrationProxy(fallbackAnnotation, annotationClass);
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
     public static <T> T asMigrationProxy(Object object, Class<T> clazz) {
         return (T) Proxy.newProxyInstance(
             clazz.getClassLoader(),

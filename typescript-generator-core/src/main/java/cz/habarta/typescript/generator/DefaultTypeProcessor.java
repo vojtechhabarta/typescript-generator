@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
+import jakarta.xml.bind.JAXBElement;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -235,7 +236,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
             Arrays.asList(Collection.class),
             Arrays.asList(Map.class),
             Arrays.asList(Optional.class),
-            Arrays.asList(jakarta.xml.bind.JAXBElement.class, javax.xml.bind.JAXBElement.class),
+            Arrays.asList(JAXBElement.class),
             Arrays.asList(),
             Arrays.asList()
         );
