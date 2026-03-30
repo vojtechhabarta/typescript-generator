@@ -14,7 +14,6 @@
 
     <properties>
         <graalvm.version>25.0.2</graalvm.version>
-        <vavr.version>0.11.0</vavr.version>
         <org.immutables.version>2.12.1</org.immutables.version>
     </properties>
 
@@ -204,13 +203,13 @@
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
-            <version>${vavr.version}</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr-jackson</artifactId>
-            <version>${vavr.version}</version>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
