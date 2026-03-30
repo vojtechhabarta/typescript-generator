@@ -304,34 +304,30 @@
                                     <goal>test-javadoc</goal>
                                 </goals>
                                 <configuration>
-                                    <doclet>com.github.markusbernhardt.xmldoclet.XmlDoclet</doclet>
+                                    <doclet>com.manticore.tools.xmldoclet.XmlDoclet</doclet>
                                     <additionalOptions>-d ${project.basedir}/src/test/javadoc -filename test-javadoc.xml</additionalOptions>
                                     <useStandardDocletOptions>false</useStandardDocletOptions>
+                                    <disableNoFonts>true</disableNoFonts>
                                     <docletArtifacts>
                                         <docletArtifact>
-                                            <groupId>com.github.markusbernhardt</groupId>
+                                            <groupId>com.manticore-projects.tools</groupId>
                                             <artifactId>xml-doclet</artifactId>
-                                            <version>1.0.5</version>
+                                            <version>2.1.2</version>
+                                        </docletArtifact>
+                                        <docletArtifact>
+                                            <groupId>net.sf.saxon</groupId>
+                                            <artifactId>Saxon-HE</artifactId>
+                                            <version>12.9</version>
                                         </docletArtifact>
                                         <docletArtifact>
                                             <groupId>jakarta.xml.bind</groupId>
                                             <artifactId>jakarta.xml.bind-api</artifactId>
-                                            <version>2.3.3</version>
+                                            <version>4.0.2</version>
                                         </docletArtifact>
                                         <docletArtifact>
-                                            <groupId>com.sun.xml.bind</groupId>
-                                            <artifactId>jaxb-impl</artifactId>
-                                            <version>2.3.6</version>
-                                        </docletArtifact>
-                                        <docletArtifact>
-                                            <groupId>org.slf4j</groupId>
-                                            <artifactId>slf4j-api</artifactId>
-                                            <version>1.7.36</version>
-                                        </docletArtifact>
-                                        <docletArtifact>
-                                            <groupId>org.slf4j</groupId>
-                                            <artifactId>slf4j-simple</artifactId>
-                                            <version>1.7.36</version>
+                                            <groupId>org.glassfish.jaxb</groupId>
+                                            <artifactId>jaxb-runtime</artifactId>
+                                            <version>4.0.5</version>
                                         </docletArtifact>
                                     </docletArtifacts>
                                 </configuration>

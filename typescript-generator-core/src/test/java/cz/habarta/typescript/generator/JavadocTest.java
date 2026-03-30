@@ -12,6 +12,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class JavadocTest {
 
@@ -42,24 +44,25 @@ public class JavadocTest {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(
                 Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
+            System.out.println(generated);
 
-            Assertions.assertTrue(generated.contains("Documentation for ClassWithJavadoc. First line."));
-            Assertions.assertTrue(generated.contains("Second line."));
-            Assertions.assertTrue(generated.contains("Documentation for documentedField."));
-            Assertions.assertTrue(generated.contains("Documentation for documentedEnumField."));
-            Assertions.assertTrue(generated.contains("Documentation for DummyEnum."));
-            Assertions.assertTrue(generated.contains("Documentation for getter property."));
-            Assertions.assertTrue(generated.contains("Documentation for renamed field."));
-            Assertions.assertTrue(generated.contains("Documentation for InterfaceWithJavadoc."));
-            Assertions.assertTrue(generated.contains("Documentation for interface getter property."));
-            Assertions.assertTrue(generated.contains("@return value of getterPropery"));
-            Assertions.assertTrue(generated.contains("@deprecated replaced by something else\n"));
-            Assertions.assertTrue(!generated.contains("@deprecated\n"));
-            Assertions.assertTrue(generated.contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}"));
-            Assertions.assertTrue(generated.contains(" *     public List<String> generics() {\n"));
-            Assertions.assertTrue(generated.contains("ff0000"));
-            Assertions.assertTrue(generated.contains("00ff00"));
-            Assertions.assertTrue(generated.contains("0000ff"));
+            assertThat(generated).contains("Documentation for ClassWithJavadoc. First line.");
+            assertThat(generated).contains("Second line.");
+            assertThat(generated).contains("Documentation for documentedField.");
+            assertThat(generated).contains("Documentation for documentedEnumField.");
+            assertThat(generated).contains("Documentation for DummyEnum.");
+            assertThat(generated).contains("Documentation for getter property.");
+            assertThat(generated).contains("Documentation for renamed field.");
+            assertThat(generated).contains("Documentation for InterfaceWithJavadoc.");
+            assertThat(generated).contains("Documentation for interface getter property.");
+            assertThat(generated).contains("@return value of getterProperty");
+            assertThat(generated).contains("@deprecated replaced by something else\n");
+            assertThat(generated).doesNotContain("@deprecated\n");
+            assertThat(generated).contains(" *     // indentation and line breaks are kept\n * \n *     {@literal @}");
+            assertThat(generated).contains(" *     public List<String> generics() {\n");
+            assertThat(generated).contains("ff0000");
+            assertThat(generated).contains("00ff00");
+            assertThat(generated).contains("0000ff");
         }
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(Input.from(DeprecatedClassWithoutJavadoc.class));
@@ -126,7 +129,7 @@ public class JavadocTest {
         /**
          * Documentation for getter property.
          */
-        public String getGetterPropery() {
+        public String getGetterProperty() {
             return null;
         }
 
@@ -145,11 +148,11 @@ public class JavadocTest {
 
         /**
          * Documentation for interface getter property.
-         * @return value of getterPropery
+         * @return value of getterProperty
          * @deprecated replaced by something else
          */
         @Deprecated
-        public String getGetterPropery();
+        public String getGetterProperty();
 
     }
 
