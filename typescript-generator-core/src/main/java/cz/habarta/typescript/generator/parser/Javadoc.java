@@ -260,7 +260,7 @@ public class Javadoc {
         }
         if (tags != null) {
             for (TagInfo tag : tags) {
-                result.addAll(Utils.splitMultiline(tag.getName() + " " + tag.getText(), true));
+                result.addAll(Utils.splitMultiline(tag.getText(), true));
             }
         }
         return result;
