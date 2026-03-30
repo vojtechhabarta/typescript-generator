@@ -1,15 +1,12 @@
 
 package cz.habarta.typescript.generator.library;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.Input;
-import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
+import cz.habarta.typescript.generator.Jackson3ConfigurationResolved;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
-import cz.habarta.typescript.generator.util.Utils;
 import io.vavr.Lazy;
 import io.vavr.collection.CharSeq;
 import io.vavr.collection.LinkedHashMap;
@@ -27,15 +24,19 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 
 @SuppressWarnings("unused")
 public class VavrTest {
 
     @Test
-    public void testVavrInJackson() throws JsonProcessingException {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.registerModule(new VavrModule());
+    public void testVavrInJackson() throws JacksonException {
+        final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new VavrModule())
+            .build();
         final String json = objectMapper.writeValueAsString(new VavrSerializedClasses());
         // System.out.println(json);
     }
@@ -43,8 +44,8 @@ public class VavrTest {
     @Test
     public void testVavr() {
         TypeScriptGenerator.setLogger(new Logger(Logger.Level.Verbose));
-        final Settings settings = TestUtils.settings();
-        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
+        final Settings settings = TestUtils.settings(true);
+        settings.jackson3Configuration = new Jackson3ConfigurationResolved();
         settings.additionalDataLibraries = Arrays.asList("vavr");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(VavrSerializedClasses.class));
         Assertions.assertTrue(output.contains("lazy: number"));
