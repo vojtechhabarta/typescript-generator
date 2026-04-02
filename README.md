@@ -1,4 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/cz.habarta.typescript-generator/typescript-generator-core.svg)](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core/)
+[![Build](https://github.com/vojtechhabarta/typescript-generator/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/vojtechhabarta/typescript-generator/actions/workflows/build.yml)
 [![Appveyor](https://img.shields.io/appveyor/ci/vojtechhabarta/typescript-generator/main.svg)](https://ci.appveyor.com/project/vojtechhabarta/typescript-generator)
 [![Stars](https://img.shields.io/github/stars/vojtechhabarta/typescript-generator.svg?style=social)](https://github.com/vojtechhabarta/typescript-generator)
 
