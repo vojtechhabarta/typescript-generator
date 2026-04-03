@@ -3,42 +3,61 @@ name: Release to Maven Central
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release
+        required: true
+        type: string
 
 jobs:
   release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout workflow
-        uses: actions/checkout@v2
-      - name: Setup GPG signing key
-        run: |
-          if (-not $env:GPG_SIGNING_KEY) {
-            Write-Error "Please set GPG_SIGNING_KEY environment variable"
-            exit 1
-          }
-          mkdir target -Force | Out-Null
-          $gpg_signing_key = [Convert]::FromBase64String($env:GPG_SIGNING_KEY)
-          [System.IO.File]::WriteAllBytes("target/gpg_signing_key.bin", $gpg_signing_key)
-          gpg --import target/gpg_signing_key.bin
-          gpg --list-secret-keys
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+          server-id: ossrh-vojtech@habarta.cz
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD
+
+      - name: Import GPG key
+        run: echo "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-      - name: Sign and upload
-        run: |
-          ./build/release-build.ps1
+
+      - name: Set version
+        run: mvn --batch-mode versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
+
+      - name: Build, sign, and deploy to OSSRH staging
+        run: mvn --batch-mode -P attach-artifacts,sign-artifacts clean deploy
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+
+      - name: Configure git identity
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Tag release
+        run: |
+          git tag "v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
+
       - name: Build site
         run: mvn --batch-mode site
+
       - name: Deploy site to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/site
