@@ -25,9 +25,9 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: maven
-          server-id: ossrh-vojtech@habarta.cz
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_PASSWORD
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_PASSWORD
 
       - name: Import GPG key
         run: echo "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
@@ -37,11 +37,11 @@ jobs:
       - name: Set version
         run: mvn --batch-mode versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
 
-      - name: Build, sign, and deploy to OSSRH staging
+      - name: Build, sign, and publish to Maven Central
         run: mvn --batch-mode -P attach-artifacts,sign-artifacts clean deploy
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
 
       - name: Configure git identity
         run: |
