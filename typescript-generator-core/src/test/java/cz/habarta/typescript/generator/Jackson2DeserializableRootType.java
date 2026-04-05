@@ -30,7 +30,7 @@ public class Jackson2DeserializableRootType {
 
     @Test
     public void testRootTypeIncludedIfNotAbstract() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(NonAbstractRoot.class));
+        final String output = new TypeScriptGenerator(TestUtils.settings(JsonLibrary.jackson2)).generateTypeScript(Input.from(NonAbstractRoot.class));
         Assertions.assertTrue(output.contains("\"rootType\""));
     }
 
@@ -46,7 +46,7 @@ public class Jackson2DeserializableRootType {
 
     @Test
     public void testRootTypeNotIncludedIfAbstract() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(AbstractRoot.class));
+        final String output = new TypeScriptGenerator(TestUtils.settings(JsonLibrary.jackson2)).generateTypeScript(Input.from(AbstractRoot.class));
         // Root type is abstract and therefore ignored in the type list
         Assertions.assertFalse(output.contains("\"rootType\""));
     }

@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -18,13 +15,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 
 
 @SuppressWarnings("unused")
 public class ObjectAsIdTest {
 
     @Test
-    public void testJackson() throws JsonProcessingException {
+    public void testJackson() {
         final TestObjectA testObjectA = new TestObjectA();
         final TestObjectSubA testObjectSubA = new TestObjectSubA();
         final TestObjectB testObjectB = new TestObjectB();
@@ -45,7 +44,6 @@ public class ObjectAsIdTest {
         wrapper.testObjectE2 = testObjectE;
         wrapper.testObjectE3 = testObjectE;
         final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         final String json = objectMapper.writeValueAsString(wrapper);
         Assertions.assertTrue(json.contains("\"testObjectA1\": \"id1\""));
         Assertions.assertTrue(json.contains("\"testObjectA2\": \"id1\""));
@@ -62,7 +60,7 @@ public class ObjectAsIdTest {
     }
 
     @Test
-    public void testJacksonLists() throws JsonProcessingException {
+    public void testJacksonLists() {
         final TestObjectA testObjectA = new TestObjectA();
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
@@ -74,8 +72,9 @@ public class ObjectAsIdTest {
         wrapper.listOfTestObjectC = Arrays.asList(testObjectC, testObjectC);
         wrapper.listOfTestObjectD = Arrays.asList(testObjectD, testObjectD);
         wrapper.listOfTestObjectE = Arrays.asList(testObjectE, testObjectE);
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.disable(SerializationFeature.INDENT_OUTPUT);
+        final ObjectMapper objectMapper = Utils.getObjectMapper().rebuild()
+            .disable(SerializationFeature.INDENT_OUTPUT)
+            .build();
         final String json = objectMapper.writeValueAsString(wrapper);
         Assertions.assertTrue(json.contains("\"listOfTestObjectA\":[\"id1\""));
         Assertions.assertTrue(json.contains("\"listOfTestObjectB\":[{"));
@@ -85,7 +84,7 @@ public class ObjectAsIdTest {
     }
 
     @Test
-    public void testJacksonNestedMaps() throws JsonProcessingException {
+    public void testJacksonNestedMaps() {
         final TestObjectA testObjectA = new TestObjectA();
         final TestObjectB testObjectB = new TestObjectB();
         final TestObjectC<String> testObjectC = new TestObjectC<>("valueC");
@@ -97,8 +96,9 @@ public class ObjectAsIdTest {
         wrapper.listOfMapOfTestObjectC = Arrays.asList(generateMap(testObjectC, testObjectC));
         wrapper.listOfMapOfTestObjectD = Arrays.asList(generateMap(testObjectD, testObjectD));
         wrapper.listOfMapOfTestObjectE = Arrays.asList(generateMap(testObjectE, testObjectE));
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.disable(SerializationFeature.INDENT_OUTPUT);
+        final ObjectMapper objectMapper = Utils.getObjectMapper().rebuild()
+            .disable(SerializationFeature.INDENT_OUTPUT)
+            .build();
         final String json = objectMapper.writeValueAsString(wrapper);
         Assertions.assertTrue(json.contains("\"listOfMapOfTestObjectA\":[{\"k1\":\"id1\""));
         Assertions.assertTrue(json.contains("\"listOfMapOfTestObjectB\":[{\"k1\":{"));
@@ -183,8 +183,8 @@ public class ObjectAsIdTest {
     @Test
     public void testDisableObjectIdentity() {
         final Settings settings = TestUtils.settings();
-        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
-        settings.jackson2Configuration.disableObjectIdentityFeature = true;
+        settings.jackson3Configuration = new Jackson3ConfigurationResolved();
+        settings.jackson3Configuration.disableObjectIdentityFeature = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Wrapper.class));
         Assertions.assertTrue(output.contains("testObjectA1: TestObjectA"));
         Assertions.assertTrue(output.contains("testObjectB1: TestObjectB"));

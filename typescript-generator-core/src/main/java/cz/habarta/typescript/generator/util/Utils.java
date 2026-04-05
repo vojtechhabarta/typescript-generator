@@ -2,16 +2,11 @@
 package cz.habarta.typescript.generator.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import cz.habarta.typescript.generator.type.JGenericArrayType;
 import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,6 +39,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.core.util.Separators;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 
 public final class Utils {
@@ -319,6 +323,24 @@ public final class Utils {
         return map != null ? map : Collections.<K, V>emptyMap();
     }
 
+    public static <K, V> Map<K, V> mapOf() {
+        final var map = new LinkedHashMap<K, V>();
+        return map;
+    }
+
+    public static <K, V> Map<K, V> mapOf(K k1, V v1) {
+        final var map = new LinkedHashMap<K, V>();
+        map.put(k1, v1);
+        return map;
+    }
+
+    public static <K, V> Map<K, V> mapOf(K k1, V v1, K k2, V v2) {
+        final var map = new LinkedHashMap<K, V>();
+        map.put(k1, v1);
+        map.put(k2, v2);
+        return map;
+    }
+
     public static <T> List<T> removeNulls(List<T> list) {
         final ArrayList<T> result = new ArrayList<>(list);
         result.removeAll(Collections.singleton(null));
@@ -439,28 +461,53 @@ public final class Utils {
     }
 
     public static ObjectMapper getObjectMapper() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter("  ", "\n"));
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper;
+        return JsonMapper.builder()
+            .changeDefaultPropertyInclusion(v -> JsonInclude.Value.ALL_NON_NULL)
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+            .defaultPrettyPrinter(getStandardJacksonPrettyPrinter("  ", "\n"))
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .build();
+    }
+
+    public static com.fasterxml.jackson.databind.ObjectMapper getObjectMapperJ2() {
+        return new com.fasterxml.jackson.databind.ObjectMapper()
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
+            .enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
+            .setDefaultPrettyPrinter(getStandardJackson2PrettyPrinter("  ", "\n"));
+    }
+
+    public static DefaultPrettyPrinter getStandardJacksonPrettyPrinter(String indent, String eol) {
+        final Separators separators = Separators.createDefaultInstance()
+            .withObjectNameValueSpacing(Separators.Spacing.AFTER)
+            .withObjectEmptySeparator("")
+            .withArrayEmptySeparator("");
+        final DefaultIndenter indenter = new DefaultIndenter(indent, eol);
+        final DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter(separators)
+            .withObjectIndenter(indenter)
+            .withArrayIndenter(indenter);
+        return prettyPrinter;
+    }
+
+    public static com.fasterxml.jackson.core.util.DefaultPrettyPrinter getStandardJackson2PrettyPrinter(String indent, String eol) {
+        final com.fasterxml.jackson.core.util.Separators separators = com.fasterxml.jackson.core.util.Separators.createDefaultInstance()
+            .withObjectFieldValueSpacing(com.fasterxml.jackson.core.util.Separators.Spacing.AFTER)
+            .withObjectEmptySeparator("")
+            .withArrayEmptySeparator("");
+        final com.fasterxml.jackson.core.util.DefaultIndenter indenter = new com.fasterxml.jackson.core.util.DefaultIndenter(indent, eol);
+        final com.fasterxml.jackson.core.util.DefaultPrettyPrinter prettyPrinter = new com.fasterxml.jackson.core.util.DefaultPrettyPrinter(separators)
+            .withObjectIndenter(indenter)
+            .withArrayIndenter(indenter);
+        return prettyPrinter;
     }
 
     public static <T> T loadJson(ObjectMapper objectMapper, InputStream inputStream, Class<T> type) {
-        try {
-            return objectMapper.readValue(inputStream, type);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(inputStream, type);
     }
 
     public static String objectToString(Object object) {
-        try {
-            return new ObjectMapper().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return JsonMapper.builder().build().writeValueAsString(object);
     }
 
     public static String exceptionToString(Throwable e) {

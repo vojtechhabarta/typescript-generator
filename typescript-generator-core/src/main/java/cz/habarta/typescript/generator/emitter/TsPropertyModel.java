@@ -62,7 +62,7 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
 
     @Override
     public int compareTo(TsProperty o) {
-        return name.compareTo(o.getName());
+        return name.compareToIgnoreCase(o.getName());
     }
 
     @Override

@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.util.Utils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +26,7 @@ public class SortedTypesTest {
             "" + settings.newline +
             "interface A {" + settings.newline +
             "    x: number;" + settings.newline +
-            "    yyy: number;" + settings.newline +
+            "    YYY: number;" + settings.newline +
             "}" + settings.newline +
             "" + settings.newline +
             "interface B {" + settings.newline +
@@ -51,5 +52,9 @@ public class SortedTypesTest {
         public int getX() {
             return -1;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Utils.getObjectMapper().writeValueAsString(new A()));
     }
 }

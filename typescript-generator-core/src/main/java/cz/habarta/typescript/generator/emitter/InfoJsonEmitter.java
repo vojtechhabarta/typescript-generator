@@ -1,7 +1,6 @@
 
 package cz.habarta.typescript.generator.emitter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.stream.Stream;
+import tools.jackson.databind.ObjectMapper;
 
 
 public class InfoJsonEmitter {
@@ -27,13 +27,9 @@ public class InfoJsonEmitter {
     }
 
     private void emitTypeMappingJson(TsModel tsModel) {
-        try {
-            final ObjectMapper objectMapper = Utils.getObjectMapper();
-            final InfoJson infoJson = getInfoJson(tsModel);
-            objectMapper.writeValue(writer, infoJson);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        final InfoJson infoJson = getInfoJson(tsModel);
+        objectMapper.writeValue(writer, infoJson);
     }
 
     private InfoJson getInfoJson(TsModel tsModel) {

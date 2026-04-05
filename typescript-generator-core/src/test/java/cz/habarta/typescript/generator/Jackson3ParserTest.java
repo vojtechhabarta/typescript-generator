@@ -169,7 +169,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testOptionalJsonProperty() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
         Assertions.assertTrue(output.contains("oname1?: string"));
@@ -186,7 +186,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testOptionalXmlElement() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.jsonLibrary = JsonLibrary.jaxb;
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithOptionals.class));
@@ -286,7 +286,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testIgnoredProperty() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithIgnoredProperty.class));
         Assertions.assertTrue(output.contains("name1: string"));
         Assertions.assertTrue(!output.contains("name2: string"));
@@ -309,13 +309,13 @@ public class Jackson3ParserTest {
     @Test
     public void testVisibilityConfiguration() {
         {
-            final Settings settings = TestUtils.settings(true);
+            final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
             Assertions.assertTrue(!output.contains("property1: string"));
             Assertions.assertTrue(output.contains("property2: string"));
         }
         {
-            final Settings settings = TestUtils.settings(true);
+            final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
             settings.jackson3Configuration = new Jackson3ConfigurationResolved();
             settings.jackson3Configuration.setVisibility(ANY, NONE, NONE, NONE, NONE);
             final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDifferentMemberVisibilities.class));
@@ -334,7 +334,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testJsonNode() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonNode.class));
         Assertions.assertTrue(output.contains("node: any"));
         Assertions.assertTrue(output.contains("nodes: any[]"));
@@ -347,7 +347,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testDescriptions() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.mapEnum = EnumMapping.asEnum;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithDescriptions.class, EnumWithDescriptions.class));
         Assertions.assertTrue(output.contains("Class description"));
@@ -461,7 +461,7 @@ public class Jackson3ParserTest {
 
     @Test
     public void testSerializerAndDeserializer() {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.jackson3Configuration = new Jackson3ConfigurationResolved();
         settings.jackson3Configuration.serializerTypeMappings = Collections.singletonMap(IdSerializer.class, "{ id: string }");
         settings.jackson3Configuration.deserializerTypeMappings = Collections.singletonMap(LocalDateTimeJsonDeserializer.class, "\"TODAY\" | string");
@@ -476,7 +476,7 @@ public class Jackson3ParserTest {
     public void testConstructor() throws JacksonException {
         // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorConstructor.class));
 
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithJsonCreatorConstructor.class));
         Assertions.assertTrue(output.contains("a: string;"));
@@ -505,7 +505,7 @@ public class Jackson3ParserTest {
     public void testFactoryMethod() throws JacksonException {
         // System.out.println(new ObjectMapper().readValue("{\"a\":\"a\", \"b\":\"b\"}", ClassWithJsonCreatorFactoryMethod.class));
 
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.generateReadonlyAndWriteonlyJSDocTags = true;
         settings.optionalProperties = OptionalProperties.useSpecifiedAnnotations;
         settings.optionalAnnotations = Arrays.asList(MyOptional.class);
