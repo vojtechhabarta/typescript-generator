@@ -1,9 +1,6 @@
 
 package cz.habarta.typescript.generator.library;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheBuilderSpec;
 import com.google.common.collect.FluentIterable;
@@ -19,7 +16,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.InternetDomainName;
 import cz.habarta.typescript.generator.Input;
-import cz.habarta.typescript.generator.Jackson2ConfigurationResolved;
+import cz.habarta.typescript.generator.Jackson3ConfigurationResolved;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
@@ -29,15 +26,18 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 
 @SuppressWarnings("unused")
 public class GuavaTest {
 
     @Test
-    public void testGuavaInJackson() throws JsonProcessingException {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.registerModule(new GuavaModule());
+    public void testGuavaInJackson() {
+        final ObjectMapper objectMapper = Utils.getObjectMapper().rebuild()
+            .addModule(new GuavaModule())
+            .build();
         final String json = objectMapper.writeValueAsString(new GuavaSerializedClasses());
         // System.out.println(json);
     }
@@ -46,7 +46,7 @@ public class GuavaTest {
     public void testGuava() {
         TypeScriptGenerator.setLogger(new Logger(Logger.Level.Verbose));
         final Settings settings = TestUtils.settings();
-        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
+        settings.jackson3Configuration = new Jackson3ConfigurationResolved();
         settings.additionalDataLibraries = Arrays.asList("guava");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(GuavaSerializedClasses.class));
         Assertions.assertTrue(output.contains("rangeSet: GuavaRangeSet<string>"));

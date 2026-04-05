@@ -2,11 +2,10 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import cz.habarta.typescript.generator.util.StandardJsonPrettyPrinter;
+import cz.habarta.typescript.generator.util.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 
 public class JsonUnwrappedTest {
@@ -113,9 +112,7 @@ public class JsonUnwrappedTest {
         person.parentB = parent;
         final Person2 person2 = new Person2();
         person2.name = parent.name;
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.setDefaultPrettyPrinter(new StandardJsonPrettyPrinter());
+        final ObjectMapper objectMapper = Utils.getObjectMapper();
         System.out.println(objectMapper.writeValueAsString(person));
         System.out.println(objectMapper.writeValueAsString(person2));
     }

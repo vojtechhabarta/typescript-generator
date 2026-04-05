@@ -1,9 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.SymbolTable.CustomTypeNamingFunction;
 import cz.habarta.typescript.generator.emitter.EmitterExtension;
@@ -39,6 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**
@@ -630,7 +629,6 @@ public class Settings {
         }
         final List<LoadedDataLibraries> loaded = new ArrayList<>();
         final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         for (String library : additionalDataLibraries) {
             final String resource = "datalibrary/" + library + ".json";
             TypeScriptGenerator.getLogger().verbose("Loading resource " + resource);

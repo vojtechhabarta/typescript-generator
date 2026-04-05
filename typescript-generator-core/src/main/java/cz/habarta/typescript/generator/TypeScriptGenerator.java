@@ -194,7 +194,7 @@ public class TypeScriptGenerator {
             case jackson2:
                 return new Jackson2Parser.Jackson2ParserFactory();
             case jaxb:
-                return new Jackson2Parser.JaxbParserFactory();
+                return new Jackson3Parser.JaxbParserFactory();
             case gson:
                 return new GsonParser.Factory();
             case jsonb:

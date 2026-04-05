@@ -11,7 +11,7 @@ public class Jackson2PolymorphismTest {
 
     @Test
     public void testPropertyNameQuoting() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(BadFieldClass.class));
+        final String output = new TypeScriptGenerator(TestUtils.settings(JsonLibrary.jackson2)).generateTypeScript(Input.from(BadFieldClass.class));
         Assertions.assertTrue(output.contains("\"@class\""));
     }
 
@@ -21,7 +21,7 @@ public class Jackson2PolymorphismTest {
 
     @Test
     public void testInterfaceOrder() {
-        final String output = new TypeScriptGenerator(TestUtils.settings()).generateTypeScript(Input.from(Z.class));
+        final String output = new TypeScriptGenerator(TestUtils.settings(JsonLibrary.jackson2)).generateTypeScript(Input.from(Z.class));
         final int x = output.indexOf("interface X");
         final int y = output.indexOf("interface Y");
         final int z = output.indexOf("interface Z");

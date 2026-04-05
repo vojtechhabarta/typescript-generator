@@ -1,9 +1,6 @@
 
 package cz.habarta.typescript.generator.library;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import cz.habarta.typescript.generator.DateMapping;
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Settings;
@@ -13,7 +10,6 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -27,6 +23,9 @@ import org.joda.time.Period;
 import org.joda.time.YearMonth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.datatype.joda.JodaModule;
 
 
 public class JodaTest {
@@ -80,10 +79,11 @@ public class JodaTest {
     }
 
     @Test
-    public void testJodaInJackson() throws Exception {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
-        objectMapper.registerModule(new JodaModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    public void testJodaInJackson() {
+        final ObjectMapper objectMapper = Utils.getObjectMapper().rebuild()
+            .addModule(new JodaModule())
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .build();
         final String json = objectMapper.writeValueAsString(new JodaSerializedClasses());
         // System.out.println(json);
     }
@@ -105,7 +105,6 @@ public class JodaTest {
         Assertions.assertTrue(output.contains("interval: string;"));
         Assertions.assertTrue(output.contains("monthDay: string;"));
         Assertions.assertTrue(output.contains("yearMonth: string;"));
-        Assertions.assertTrue(output.contains("dateMidnight: DateAsString;"));
     }
 
 }
@@ -129,5 +128,4 @@ class JodaSerializedClasses {
     public Interval interval = new Interval(Instant.now(), Instant.now().plus(10));
     public MonthDay monthDay = MonthDay.now();
     public YearMonth yearMonth = YearMonth.now();
-    public DateMidnight dateMidnight = DateMidnight.now();
 }

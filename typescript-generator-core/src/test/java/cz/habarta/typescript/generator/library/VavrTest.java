@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.library;
 
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.Jackson3ConfigurationResolved;
+import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
@@ -44,7 +45,7 @@ public class VavrTest {
     @Test
     public void testVavr() {
         TypeScriptGenerator.setLogger(new Logger(Logger.Level.Verbose));
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         settings.jackson3Configuration = new Jackson3ConfigurationResolved();
         settings.additionalDataLibraries = Arrays.asList("vavr");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(VavrSerializedClasses.class));

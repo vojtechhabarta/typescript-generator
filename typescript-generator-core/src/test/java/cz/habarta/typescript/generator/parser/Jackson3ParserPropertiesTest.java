@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator.parser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TestUtils;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
@@ -111,7 +112,7 @@ public class Jackson3ParserPropertiesTest {
     }
 
     private List<String> getProperties(Class<?> beanClass) {
-        final Settings settings = TestUtils.settings(true);
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson3);
         final TypeScriptGenerator typeScriptGenerator = new TypeScriptGenerator(settings);
         final Jackson3Parser jackson3Parser = (Jackson3Parser) typeScriptGenerator.getModelParser();
         final List<BeanProperty> properties = jackson3Parser.getBeanProperties(beanClass);

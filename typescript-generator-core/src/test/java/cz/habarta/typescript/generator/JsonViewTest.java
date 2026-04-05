@@ -34,8 +34,8 @@ public class JsonViewTest {
     @Test
     public void test1() {
         final Settings settings = TestUtils.settings();
-        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
-        settings.jackson2Configuration.view = Views.REST.class;
+        settings.jackson3Configuration = new Jackson3ConfigurationResolved();
+        settings.jackson3Configuration.view = Views.REST.class;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeClass.class));
         assertOutput(output);
     }
@@ -43,8 +43,8 @@ public class JsonViewTest {
     @Test
     public void test2() {
         final Settings settings = TestUtils.settings();
-        settings.jackson2Configuration = new Jackson2ConfigurationResolved();
-        settings.jackson2Configuration.view = Views.REST.class;
+        settings.jackson3Configuration = new Jackson3ConfigurationResolved();
+        settings.jackson3Configuration.view = Views.REST.class;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SomeClassGetters.class));
         assertOutput(output);
     }

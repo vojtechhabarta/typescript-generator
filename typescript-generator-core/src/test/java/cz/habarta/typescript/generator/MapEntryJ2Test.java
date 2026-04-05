@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class MapEntryTest {
+public class MapEntryJ2Test {
 
     public static class ClassWithEntries {
         public String name = "ClassWithEntries";
@@ -57,7 +57,7 @@ public class MapEntryTest {
 
     @Test
     public void testDefaultShapes() throws Exception {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        final ObjectMapper objectMapper = Utils.getObjectMapperJ2();
         final ClassWithEntries classWithEntries = new ClassWithEntries();
         final String json = objectMapper.writeValueAsString(classWithEntries);
         final String expectedJson = (""
@@ -80,7 +80,7 @@ public class MapEntryTest {
             .replace("'", "\"");
         Assertions.assertEquals(expectedJson, json);
 
-        final Settings settings = TestUtils.settings();
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson2);
         settings.setExcludeFilter(
             Arrays.asList(Serializable.class.getName(), AbstractMap.SimpleEntry.class.getName()),
             null);
@@ -97,7 +97,7 @@ public class MapEntryTest {
 
     @Test
     public void testOverriddenShapes() throws Exception {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        final ObjectMapper objectMapper = Utils.getObjectMapperJ2();
         objectMapper.configOverride(Entry1.class).setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.OBJECT));
         objectMapper.configOverride(Entry2.class).setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.NATURAL));
         final ClassWithEntries classWithEntries = new ClassWithEntries();
@@ -122,7 +122,7 @@ public class MapEntryTest {
             .replace("'", "\"");
         Assertions.assertEquals(expectedJson, json);
 
-        final Settings settings = TestUtils.settings();
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson2);
         settings.jackson2Configuration = new Jackson2ConfigurationResolved();
         settings.jackson2Configuration.shapeConfigOverrides = new LinkedHashMap<>();
         settings.jackson2Configuration.shapeConfigOverrides.put(Entry1.class, JsonFormat.Shape.OBJECT);
@@ -152,7 +152,7 @@ public class MapEntryTest {
 
     @Test
     public void testListOfMapEntry() throws Exception {
-        final ObjectMapper objectMapper = Utils.getObjectMapper();
+        final ObjectMapper objectMapper = Utils.getObjectMapperJ2();
         final ClassWithListOfEntries classWithListOfEntries = new ClassWithListOfEntries();
         final String json = objectMapper.writeValueAsString(classWithListOfEntries);
         final String expectedJson = (""
@@ -179,7 +179,7 @@ public class MapEntryTest {
             .replace("'", "\"");
         Assertions.assertEquals(expectedJson, json);
 
-        final Settings settings = TestUtils.settings();
+        final Settings settings = TestUtils.settings(JsonLibrary.jackson2);
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ClassWithListOfEntries.class));
         Assertions.assertTrue(output.contains("entries1: { [index: string]: string }[]"));
         Assertions.assertTrue(output.contains("entries2: Entry2<string, string>[]"));

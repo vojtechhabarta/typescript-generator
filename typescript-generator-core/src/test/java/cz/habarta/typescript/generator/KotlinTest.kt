@@ -172,7 +172,7 @@ class KotlinTest {
 
     private fun testOutput(inputClass: Class<*>, expected: String) {
         val settings = TestUtils.settings()
-        settings.jackson2Configuration = Jackson2ConfigurationResolved()
+        settings.jackson3Configuration = Jackson3ConfigurationResolved()
         settings.outputFileType = TypeScriptFileType.implementationFile
         settings.mapClasses = ClassMapping.asClasses
         settings.nullabilityDefinition = NullabilityDefinition.undefinedInlineUnion

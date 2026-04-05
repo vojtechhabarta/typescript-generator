@@ -212,21 +212,12 @@ public class Jackson3Parser extends ModelParser {
                             }
                         }
                         // Map.Entry
+                        // Jackson 3 always serializes Map.Entry as NATURAL (map-like) regardless of
+                        // @JsonFormat annotations or config overrides, so always emit as Map type.
                         final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
                         if (rawClass != null && Map.Entry.class.isAssignableFrom(rawClass)) {
-                            final ObjectMapper objectMapper = jackson3TypeContext.parser.objectMapper;
-                            final SerializationConfig serializationConfig = objectMapper.serializationConfig();
-                            final ClassIntrospector classIntrospector = serializationConfig.classIntrospectorInstance();
-                            final JavaType javaJavaType = TypeFactory.createDefaultInstance().constructType(rawClass);
-                            final AnnotatedClass annotatedClass = classIntrospector.introspectClassAnnotations(javaJavaType);
-                            final BeanDescription beanDescription = classIntrospector.introspectForSerialization(javaJavaType, annotatedClass);
-                            final JsonFormat.Value formatOverride = serializationConfig.getDefaultPropertyFormat(Map.Entry.class);
-                            final JsonFormat.Value formatFromAnnotation = beanDescription.supplier().findExpectedFormat(null);
-                            final JsonFormat.Value format = JsonFormat.Value.merge(formatFromAnnotation, formatOverride);
-                            if (format.getShape() != JsonFormat.Shape.OBJECT) {
-                                final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
-                                return context.processType(mapType);
-                            }
+                            final Type mapType = Utils.replaceRawClassInType(javaType, Map.class);
+                            return context.processType(mapType);
                         }
                     }
                     return null;
