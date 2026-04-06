@@ -11,12 +11,18 @@ buildscript {
 plugins {
     id 'java'
     id 'groovy'
-    id "org.jetbrains.kotlin.jvm" version "2.3.10"
+    id 'org.jetbrains.kotlin.jvm' version '2.3.10'
     id 'scala'
     id 'cz.habarta.typescript-generator'
 }
 
 version = '4.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -31,11 +37,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.21.1'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add('-parameters')
 }
