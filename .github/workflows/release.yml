@@ -54,11 +54,11 @@ jobs:
           git push origin "v${{ inputs.version }}"
 
       - name: Build site
-        run: mvn --batch-mode site
+        run: mvn --batch-mode site site:stage
 
       - name: Deploy site to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/site
+          publish_dir: ./target/staging
           destination_dir: maven
