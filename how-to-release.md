@@ -7,6 +7,7 @@
    - Enter the version to release (e.g. `4.1.0`)
    - The workflow builds, signs, publishes to Maven Central, and tags the commit automatically
    - Wait for the workflow to finish — it waits until the artifacts are fully available in Central
+   - Deployment to Maven Central can be checked here: https://central.sonatype.com/publishing/deployments
 
 - Verify the release appeared in Maven Central:
    - https://repo1.maven.org/maven2/cz/habarta/typescript-generator/
