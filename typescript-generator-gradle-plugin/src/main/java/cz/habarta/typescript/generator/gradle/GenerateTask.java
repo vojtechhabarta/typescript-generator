@@ -462,17 +462,16 @@ public abstract class GenerateTask extends DefaultTask {
             final Settings settings = createSettings(classLoader);
 
             final cz.habarta.typescript.generator.Input.Parameters parameters = new cz.habarta.typescript.generator.Input.Parameters();
-            parameters.classNames = getClasses().getOrElse(Collections.emptyList());
-            parameters.classNamePatterns = getClassPatterns().getOrElse(Collections.emptyList());
-            parameters.classesWithAnnotations = getClassesWithAnnotations().getOrElse(Collections.emptyList());
-            parameters.classesImplementingInterfaces = getClassesImplementingInterfaces()
-                .getOrElse(Collections.emptyList());
-            parameters.classesExtendingClasses = getClassesExtendingClasses().getOrElse(Collections.emptyList());
+            parameters.classNames = nullableList(getClasses());
+            parameters.classNamePatterns = nullableList(getClassPatterns());
+            parameters.classesWithAnnotations = nullableList(getClassesWithAnnotations());
+            parameters.classesImplementingInterfaces = nullableList(getClassesImplementingInterfaces());
+            parameters.classesExtendingClasses = nullableList(getClassesExtendingClasses());
             parameters.jaxrsApplicationClassName = getClassesFromJaxrsApplication().getOrNull();
             parameters.automaticJaxrsApplication = getClassesFromAutomaticJaxrsApplication().getOrElse(false);
             parameters.isClassNameExcluded = settings.getExcludeFilter();
             parameters.classLoader = classLoader;
-            parameters.scanningAcceptedPackages = getScanningAcceptedPackages().getOrElse(Collections.emptyList());
+            parameters.scanningAcceptedPackages = nullableList(getScanningAcceptedPackages());
             parameters.debug = logLevel == Logger.Level.Debug;
 
             final File output = getOutputFileProperty().getAsFile().get();
@@ -494,10 +493,11 @@ public abstract class GenerateTask extends DefaultTask {
         settings.namespace = getNamespace().getOrNull();
         settings.mapPackagesToNamespaces = getMapPackagesToNamespaces().getOrElse(false);
         settings.umdNamespace = getUmdNamespace().getOrNull();
-        settings.moduleDependencies = getModuleDependencies().getOrNull();
+        settings.moduleDependencies = nullableList(getModuleDependencies());
         settings.setExcludeFilter(
-            getExcludeClasses().getOrElse(Collections.emptyList()),
-            getExcludeClassPatterns().getOrElse(Collections.emptyList()));
+            nullableList(getExcludeClasses()),
+            nullableList(getExcludeClassPatterns())
+        );
         settings.jsonLibrary = getJsonLibrary().get();
         settings.setJackson2Configuration(classLoader, getJackson2Configuration().getOrNull());
         settings.setJackson3Configuration(classLoader, getJackson3Configuration().getOrNull());
@@ -512,15 +512,12 @@ public abstract class GenerateTask extends DefaultTask {
         settings.removeTypeNameSuffix = getRemoveTypeNameSuffix().getOrNull();
         settings.addTypeNamePrefix = getAddTypeNamePrefix().getOrNull();
         settings.addTypeNameSuffix = getAddTypeNameSuffix().getOrNull();
-        settings.customTypeNaming = Settings.convertToMap(getCustomTypeNaming().getOrElse(Collections.emptyList()),
-            "customTypeNaming");
+        settings.customTypeNaming = Settings.convertToMap(nullableList(getCustomTypeNaming()), "customTypeNaming");
         settings.customTypeNamingFunction = getCustomTypeNamingFunction().getOrNull();
         settings.referencedFiles = nullableList(getReferencedFiles());
         settings.importDeclarations = nullableList(getImportDeclarations());
-        settings.customTypeMappings = Settings.convertToMap(getCustomTypeMappings().getOrElse(Collections.emptyList()),
-            "customTypeMapping");
-        settings.customTypeAliases = Settings.convertToMap(getCustomTypeAliases().getOrElse(Collections.emptyList()),
-            "customTypeAlias");
+        settings.customTypeMappings = Settings.convertToMap(nullableList(getCustomTypeMappings()), "customTypeMapping");
+        settings.customTypeAliases = Settings.convertToMap(nullableList(getCustomTypeAliases()), "customTypeAlias");
         settings.mapDate = getMapDate().getOrNull();
         settings.mapMap = getMapMap().getOrNull();
         settings.mapEnum = getMapEnum().getOrNull();
@@ -560,9 +557,10 @@ public abstract class GenerateTask extends DefaultTask {
         settings.loadExtensions(
             classLoader,
             Utils.concat(
-                getExtensionClasses().getOrElse(Collections.emptyList()),
-                getExtensionsList().getOrElse(Collections.emptyList())),
-            getExtensionsWithConfiguration().getOrNull());
+                nullableList(getExtensionClasses()),
+                nullableList(getExtensionsList())
+            ),
+            nullableList(getExtensionsWithConfiguration()));
         settings.loadIncludePropertyAnnotations(classLoader, nullableList(getIncludePropertyAnnotations()));
         settings.loadExcludePropertyAnnotations(classLoader, nullableList(getExcludePropertyAnnotations()));
         settings.loadOptionalAnnotations(classLoader, nullableList(getOptionalAnnotations()));
@@ -577,12 +575,9 @@ public abstract class GenerateTask extends DefaultTask {
             : (getGenerateNpmPackageJson().getOrElse(false) ? settings.getDefaultNpmVersion() : null);
         settings.npmTypescriptVersion = getNpmTypescriptVersion().getOrNull();
         settings.npmBuildScript = getNpmBuildScript().getOrNull();
-        settings.npmPackageDependencies = Settings.convertToMap(getNpmDependencies().getOrElse(Collections.emptyList()),
-            "npmDependencies");
-        settings.npmDevDependencies = Settings.convertToMap(getNpmDevDependencies().getOrElse(Collections.emptyList()),
-            "npmDevDependencies");
-        settings.npmPeerDependencies = Settings
-            .convertToMap(getNpmPeerDependencies().getOrElse(Collections.emptyList()), "npmPeerDependencies");
+        settings.npmPackageDependencies = Settings.convertToMap(nullableList(getNpmDependencies()), "npmDependencies");
+        settings.npmDevDependencies = Settings.convertToMap(nullableList(getNpmDevDependencies()), "npmDevDependencies");
+        settings.npmPeerDependencies = Settings.convertToMap(nullableList(getNpmPeerDependencies()), "npmPeerDependencies");
         settings.setStringQuotes(getStringQuotes().getOrNull());
         settings.setIndentString(getIndentString().getOrNull());
         settings.jackson2ModuleDiscovery = getJackson2ModuleDiscovery().getOrElse(false);
@@ -597,8 +592,8 @@ public abstract class GenerateTask extends DefaultTask {
     /**
      * @return null if the list is null or if the list is empty (common case for unspecified Gradle ListProperty-s)
      */
-    private static List<String> nullableList(ListProperty<String> listProperty) {
-        List<String> list = listProperty.getOrNull();
+    private static <T> List<T> nullableList(ListProperty<T> listProperty) {
+        List<T> list = listProperty.getOrNull();
         if (list == null || list.isEmpty()) {
             return null;
         }
