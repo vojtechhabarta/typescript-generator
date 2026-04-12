@@ -38,7 +38,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jsonLibrary>jackson2</jsonLibrary>
+                    <jsonLibrary>jackson3</jsonLibrary>
                     <classes>
                         <class>cz.habarta.typescript.generator.sample.Person</class>
                     </classes>

@@ -1,10 +1,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/cz.habarta.typescript-generator/typescript-generator-core.svg)](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core/)
 [![Build](https://github.com/vojtechhabarta/typescript-generator/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/vojtechhabarta/typescript-generator/actions/workflows/build.yml)
-[![Appveyor](https://img.shields.io/appveyor/ci/vojtechhabarta/typescript-generator/main.svg)](https://ci.appveyor.com/project/vojtechhabarta/typescript-generator)
 [![Stars](https://img.shields.io/github/stars/vojtechhabarta/typescript-generator.svg?style=social)](https://github.com/vojtechhabarta/typescript-generator)
 
 Quick links:
-[Configuration parameters](https://www.habarta.cz/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
+[Configuration parameters](https://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html)
 |
 [Breaking changes](https://github.com/vojtechhabarta/typescript-generator/wiki/Breaking-Changes)
 |
@@ -83,30 +82,34 @@ In Maven build you can use `typescript-generator-maven-plugin` like this:
 ```
 
 More complete sample can be found [here](sample-maven).
-Detailed description how to configure typescript-generator-maven-plugin is on generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
+Detailed description how to configure typescript-generator-maven-plugin is on generated [site](https://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
 
 
 Gradle
 ------
 
 In Gradle build you can use `cz.habarta.typescript-generator` plugin like this:
+### build.gradle
 ```groovy
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.TypeScriptOutputKind
+
 plugins {
     id 'cz.habarta.typescript-generator' version 'x.y.z'
 }
 
 generateTypeScript {
-    jsonLibrary = 'jackson3'
+    jsonLibrary = JsonLibrary.jackson3
     classes = [
         'cz.habarta.typescript.generator.sample.Person'
     ]
-    outputKind = 'module'
+    outputKind = TypeScriptOutputKind.module
 }
 ```
 
 For the Kotlin Gradle DSL you can alternatively use the `cz.habarta.typescript-generator` plugin like this:
 
-#### build.gradle.kts
+### build.gradle.kts
 ```kotlin
 import cz.habarta.typescript.generator.JsonLibrary
 import cz.habarta.typescript.generator.TypeScriptFileType
@@ -130,7 +133,7 @@ You can run typescript-generator on demand using `gradle generateTypeScript` com
 or you can invoke it as part of another task by adding dependency from that task to `generateTypeScript` task in Gradle build file.
 
 More complete sample can be found [here](sample-gradle).
-Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](http://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html). 
+Gradle plugin has the same features as Maven plugin, for detailed description see Maven generated [site](https://vojtechhabarta.github.io/typescript-generator/maven/typescript-generator-maven-plugin/generate-mojo.html).
 
 
 Direct invocation
@@ -161,7 +164,7 @@ Output is configured using several parameters:
     - values are: `declarationFile` (.d.ts) or `implementationFile` (.ts)
 - `outputFile` - specifies path and name of output file
 
-For more details see [Modules and Namespaces](http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html) page.
+For more details see [Modules and Namespaces](https://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html) page.
 
 
 REST frameworks
@@ -190,8 +193,8 @@ Typescript-generator can generate not only TypeScript declarations for JSON Java
 Download
 --------
 Releases are available from Maven Central Repository.
-[Search](http://search.maven.org/#search%7Cga%7C1%7Ccz.habarta.typescript-generator) for dependency information for your build tool
-or download [typescript-generator-core](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core) directly.
+[Search](https://central.sonatype.com/search?q=cz.habarta.typescript-generator) for dependency information for your build tool
+or browse [typescript-generator-core](https://repo1.maven.org/maven2/cz/habarta/typescript-generator/typescript-generator-core) directly.
 
 
 Wiki
@@ -225,16 +228,15 @@ Links
 -----
 
 - http://www.rainerhahnekamp.com/type-safe-endpoints-with-typescript-and-java - blog post about using typescript-generator not only with Spring MVC
-- http://www.jsweet.org/10-reasons-to-use-jsweet - blog post about JSweet transpiler mentions typescript-generator
-- https://github.com/raphaeljolivet/java2typescript - tool similar to typescript-generator
 
 
 Contributing
 ------------
 
-- current major version supports Java 8 and later (version 1 supported Java 7 and 8)
+- requires Java 17 or later
 - keep pull requests small and focused ([10 tips for better Pull Requests](http://blog.ploeh.dk/2015/01/15/10-tips-for-better-pull-requests/))
 - do not add dependencies unless previously discussed in issue
+- this project maintains a linear history — pull requests are merged by squashing all commits into one
 
 ### Code formatting
 

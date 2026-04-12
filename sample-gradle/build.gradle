@@ -29,12 +29,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.21.1'
+    implementation 'tools.jackson.jaxrs:jackson-jaxrs-json-provider:3.1.2'
     implementation 'org.codehaus.groovy:groovy:3.0.25'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
     implementation 'org.scala-lang:scala3-library_3:3.8.2'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1'
-    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.21.1'
+    implementation 'tools.jackson.module:jackson-module-kotlin:3.1.2'
+    implementation 'tools.jackson.module:jackson-module-scala_3:3.1.2'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -48,7 +48,7 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.PersonKt',
         'cz.habarta.typescript.generator.sample.PersonScala',
     ]
-    jsonLibrary = JsonLibrary.jackson2
+    jsonLibrary = JsonLibrary.jackson3
     outputKind = TypeScriptOutputKind.module
     excludeClasses = [
         'groovy.lang.GroovyObject',
@@ -58,9 +58,9 @@ generateTypeScript {
         'scala.Product',
         'scala.Serializable',
     ]
-    jackson2Modules = [
-        'com.fasterxml.jackson.module.scala.DefaultScalaModule',
-        'com.fasterxml.jackson.module.kotlin.KotlinModule',
+    jackson3Modules = [
+        'tools.jackson.module.scala.DefaultScalaModule',
+        'tools.jackson.module.kotlin.KotlinModule',
     ]
 }
 
