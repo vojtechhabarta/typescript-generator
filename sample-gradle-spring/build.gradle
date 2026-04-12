@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:4.0.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web:4.0.5'
 }
 
 generateTypeScript {
@@ -35,7 +35,7 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.spring.SpringTestApplication'
     ]
     outputFileType = TypeScriptFileType.implementationFile
-    jsonLibrary = JsonLibrary.jackson2
+    jsonLibrary = JsonLibrary.jackson3
     outputKind = TypeScriptOutputKind.module
     scanSpringApplication = true
     generateSpringApplicationClient = true

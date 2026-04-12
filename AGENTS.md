@@ -42,9 +42,9 @@ typescript-generator/
 ├── sample-gradle/                      # Example: Gradle + Jackson
 ├── sample-maven-spring/                # Example: Maven + Spring
 ├── sample-gradle-spring/               # Example: Gradle + Spring
-├── build/                              # Release scripts and docs
 ├── .github/workflows/                  # GitHub Actions CI/CD
 ├── eclipse-formatter-typescript-generator.xml  # Code style config
+├── how-to-release.md                   # Release process documentation
 ├── pom.xml                             # Parent Maven POM
 └── README.md                           # User-facing documentation
 ```
@@ -183,10 +183,12 @@ Do **not** add new dependencies without first opening an issue for discussion. T
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| Appveyor | Every push / PR | Runs `mvn clean install spotless:check` – **must pass before merging** |
-| `release.yml` | Manual dispatch | Builds, signs, and uploads to Maven Central |
+| `build.yml` | Every push / PR | Runs `mvn clean install spotless:check` on Java 17 and 26 – **must pass before merging** |
+| `release.yml` | Manual dispatch | Sets version, builds, signs, publishes to Maven Central, tags commit |
 | `release-gradle-plugin.yml` | Manual dispatch | Publishes Gradle plugin to Gradle Plugin Portal |
 
-Releases are signed with GPG. Credentials are stored as GitHub repository secrets.
+Releases are signed with GPG. Credentials and Maven Central token are stored as GitHub repository secrets.
+
+See [how-to-release.md](how-to-release.md) for step-by-step release instructions.
 
 ---
