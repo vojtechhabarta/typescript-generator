@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -177,6 +178,9 @@ public class ModelCompiler {
 
         // after enum transformations transform Maps with rest of the enums (not unions) used in keys
         tsModel = transformNonStringEnumKeyMaps(symbolTable, tsModel);
+
+        // exclude sealed marker types (sealed classes/interfaces without @JsonSubTypes)
+        tsModel = excludeSealedMarkerTypes(symbolTable, tsModel);
 
         // tagged unions
         tsModel = createAndUseTaggedUnions(symbolTable, tsModel);
@@ -1040,6 +1044,159 @@ public class ModelCompiler {
         } else {
             return enumModel;
         }
+    }
+
+    /**
+     * Excludes sealed marker types from the model.
+     * A sealed marker is a sealed class/interface without @JsonSubTypes annotation.
+     * These are intermediate grouping types that should not appear in the output.
+     * Their permitted subclasses are expanded into parent unions instead.
+     */
+    private TsModel excludeSealedMarkerTypes(final SymbolTable symbolTable, TsModel tsModel) {
+        // Identify sealed marker types: sealed AND no @JsonSubTypes
+        final Set<Class<?>> sealedMarkers = tsModel.getBeans().stream()
+            .map(TsBeanModel::getOrigin)
+            .filter(cls -> cls != null && isSealedMarker(cls))
+            .collect(Collectors.toSet());
+
+        if (sealedMarkers.isEmpty()) {
+            return tsModel;
+        }
+
+        // Build map from sealed marker to its parent (for replacing parent refs)
+        final Map<Class<?>, Class<?>> sealedMarkerToParent = new HashMap<>();
+        for (Class<?> marker : sealedMarkers) {
+            // Find the marker's parent that is NOT a sealed marker
+            Class<?> parent = findNonSealedParent(marker, sealedMarkers);
+            if (parent != null) {
+                sealedMarkerToParent.put(marker, parent);
+            }
+        }
+
+        // Remove sealed markers from beans list and update parent references
+        final List<TsBeanModel> updatedBeans = new ArrayList<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            if (sealedMarkers.contains(bean.getOrigin())) {
+                // Skip sealed markers - don't generate them
+                continue;
+            }
+
+            TsBeanModel updatedBean = bean;
+
+            // Update parent if it points to a sealed marker
+            if (bean.getParent() != null) {
+                final Class<?> parentClass = getOriginClass(symbolTable, bean.getParent());
+                if (parentClass != null && sealedMarkers.contains(parentClass)) {
+                    final Class<?> newParent = sealedMarkerToParent.get(parentClass);
+                    if (newParent != null) {
+                        updatedBean = updatedBean.withParent(typeFromJava(symbolTable, newParent));
+                    }
+                }
+            }
+
+            // Update extendsList to replace sealed markers with their parents
+            if (!bean.getExtendsList().isEmpty()) {
+                final List<TsType> newExtends = new ArrayList<>();
+                for (TsType ext : bean.getExtendsList()) {
+                    final Class<?> extClass = getOriginClass(symbolTable, ext);
+                    if (extClass != null && sealedMarkers.contains(extClass)) {
+                        final Class<?> newExt = sealedMarkerToParent.get(extClass);
+                        if (newExt != null) {
+                            newExtends.add(typeFromJava(symbolTable, newExt));
+                        }
+                    } else {
+                        newExtends.add(ext);
+                    }
+                }
+                if (!newExtends.equals(bean.getExtendsList())) {
+                    updatedBean = updatedBean.withExtends(newExtends);
+                }
+            }
+
+            // Update taggedUnionClasses to expand sealed markers
+            if (!bean.getTaggedUnionClasses().isEmpty()) {
+                final List<Class<?>> expandedClasses = new ArrayList<>();
+                for (Class<?> cls : bean.getTaggedUnionClasses()) {
+                    if (sealedMarkers.contains(cls)) {
+                        expandedClasses.addAll(getSealedPermittedSubclasses(cls, sealedMarkers));
+                    } else {
+                        expandedClasses.add(cls);
+                    }
+                }
+                if (!expandedClasses.equals(bean.getTaggedUnionClasses())) {
+                    updatedBean = updatedBean.withTaggedUnion(expandedClasses, bean.getDiscriminantProperty(), bean.getDiscriminantLiteral());
+                }
+            }
+
+            updatedBeans.add(updatedBean);
+        }
+
+        return tsModel.withBeans(updatedBeans);
+    }
+
+    /**
+     * Finds the first non-sealed parent of a class.
+     */
+    private static Class<?> findNonSealedParent(Class<?> cls, Set<Class<?>> sealedMarkers) {
+        // Check superclass first
+        Class<?> superClass = cls.getSuperclass();
+        if (superClass != null && superClass != Object.class) {
+            if (!sealedMarkers.contains(superClass)) {
+                return superClass;
+            } else {
+                return findNonSealedParent(superClass, sealedMarkers);
+            }
+        }
+        // Check interfaces
+        for (Class<?> iface : cls.getInterfaces()) {
+            if (!sealedMarkers.contains(iface)) {
+                return iface;
+            } else {
+                Class<?> parent = findNonSealedParent(iface, sealedMarkers);
+                if (parent != null) {
+                    return parent;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if a class is a sealed marker (sealed without @JsonSubTypes and not a tagged union parent).
+     * A sealed marker is an intermediate sealed type that just groups other types but doesn't define
+     * its own discriminant or subtypes via Jackson annotations.
+     */
+    private static boolean isSealedMarker(Class<?> cls) {
+        if (!cls.isSealed()) {
+            return false;
+        }
+        // Check if it has @JsonSubTypes - if it does, it's not just a marker
+        final com.fasterxml.jackson.annotation.JsonSubTypes subTypesAnn = cls.getAnnotation(com.fasterxml.jackson.annotation.JsonSubTypes.class);
+        if (subTypesAnn != null && subTypesAnn.value().length > 0) {
+            return false;
+        }
+        // Check if it's a tagged union parent (has @JsonTypeInfo with NAME) - if so, it's not just a marker
+        final com.fasterxml.jackson.annotation.JsonTypeInfo typeInfoAnn = cls.getAnnotation(com.fasterxml.jackson.annotation.JsonTypeInfo.class);
+        if (typeInfoAnn != null && typeInfoAnn.use() == com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gets all permitted subclasses of a sealed type, recursively expanding nested sealed markers.
+     */
+    private static List<Class<?>> getSealedPermittedSubclasses(Class<?> sealedClass, Set<Class<?>> sealedMarkers) {
+        final List<Class<?>> result = new ArrayList<>();
+        for (Class<?> permitted : sealedClass.getPermittedSubclasses()) {
+            if (sealedMarkers.contains(permitted)) {
+                // Recursively expand nested sealed markers
+                result.addAll(getSealedPermittedSubclasses(permitted, sealedMarkers));
+            } else {
+                result.add(permitted);
+            }
+        }
+        return result;
     }
 
     private TsModel createAndUseTaggedUnions(final SymbolTable symbolTable, TsModel tsModel) {
