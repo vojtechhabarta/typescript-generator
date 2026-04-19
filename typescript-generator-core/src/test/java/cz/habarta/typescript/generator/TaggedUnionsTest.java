@@ -681,6 +681,61 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Mammal.class, name = "mammal"),
+        @JsonSubTypes.Type(value = Bird.class, name = "bird"),
+    })
+    static abstract class Animal {
+    }
+
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Cat.class, name = "cat"),
+        @JsonSubTypes.Type(value = Dog.class, name = "dog"),
+    })
+    static abstract class Mammal extends Animal {
+    }
+
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Parrot.class, name = "parrot"),
+        @JsonSubTypes.Type(value = Duck.class, name = "duck"),
+    })
+    static abstract class Bird extends Animal {
+    }
+
+    @JsonTypeName("cat")
+    static class Cat extends Mammal {
+    }
+
+    @JsonTypeName("dog")
+    static class Dog extends Mammal {
+    }
+
+    @JsonTypeName("parrot")
+    static class Parrot extends Bird {
+    }
+
+    @JsonTypeName("duck")
+    static class Duck extends Bird {
+    }
+
+    static class Zoo {
+        public List<Animal> animals;
+    }
+
+    @Test
+    public void testNestedSubtypesTaggedUnion() {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(Zoo.class));
+        Assertions.assertTrue(output.contains("type AnimalUnion = MammalUnion | BirdUnion"),
+            "AnimalUnion should reference MammalUnion and BirdUnion, not Mammal and Bird directly.\n" + output);
+        Assertions.assertTrue(output.contains("type MammalUnion = Cat | Dog"),
+            "MammalUnion should be Cat | Dog.\n" + output);
+        Assertions.assertTrue(output.contains("type BirdUnion = Parrot | Duck"),
+            "BirdUnion should be Parrot | Duck.\n" + output);
+    }
+
     @Test
     public void testJaxb() {
         final Settings settings = TestUtils.settings();

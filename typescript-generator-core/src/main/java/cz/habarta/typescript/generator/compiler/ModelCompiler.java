@@ -1049,14 +1049,38 @@ public class ModelCompiler {
         // create tagged unions
         final List<TsBeanModel> beans = new ArrayList<>();
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
+        // Pass 1: build map of origin class -> union symbol for all beans that have taggedUnionClasses
+        final Map<Class<?>, Symbol> classToUnionSymbol = new LinkedHashMap<>();
         for (TsBeanModel bean : tsModel.getBeans()) {
             if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null) {
-                final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
+                classToUnionSymbol.put(bean.getOrigin(), symbolTable.getSymbol(bean.getOrigin(), "Union"));
+            }
+        }
+        // Pass 2: create union aliases, resolving nested union references via the map.
+        // A nested sub-class is replaced by its own union alias only when it appears as a named entry
+        // (non-empty @JsonSubTypes name) in its parent's discriminated union, meaning it is a first-class
+        // discriminated type in its own right and not merely an intermediate abstract grouping.
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null) {
+                final Symbol unionName = classToUnionSymbol.get(bean.getOrigin());
                 final boolean isGeneric = !bean.getTypeParameters().isEmpty();
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
+                    final Symbol clsUnionSymbol = classToUnionSymbol.containsKey(cls)
+                        && hasNamedJsonSubtype(bean.getOrigin(), cls) ? classToUnionSymbol.get(cls) : null;
                     final TsType type;
-                    if (isGeneric && cls.getTypeParameters().length != 0) {
+                    if (clsUnionSymbol != null) {
+                        if (isGeneric && cls.getTypeParameters().length != 0) {
+                            final List<String> mappedGenericVariables = GenericsResolver.mapGenericVariablesToBase(cls, bean.getOrigin());
+                            type = new TsType.GenericReferenceType(
+                                clsUnionSymbol,
+                                mappedGenericVariables.stream()
+                                    .map(TsType.GenericVariableType::new)
+                                    .collect(Collectors.toList()));
+                        } else {
+                            type = new TsType.ReferenceType(clsUnionSymbol);
+                        }
+                    } else if (isGeneric && cls.getTypeParameters().length != 0) {
                         final List<String> mappedGenericVariables = GenericsResolver.mapGenericVariablesToBase(cls, bean.getOrigin());
                         type = new TsType.GenericReferenceType(
                             symbolTable.getSymbol(cls),
@@ -1097,6 +1121,24 @@ public class ModelCompiler {
             }
         });
         return modelWithUsedTaggedUnions;
+    }
+
+    /**
+     * Returns true if {@code subClass} appears in the {@code @JsonSubTypes} annotation of {@code parentClass}
+     * with a non-empty name. Such a class is a first-class discriminated member of the union and may therefore
+     * be replaced by its own union alias when building the parent's tagged union.
+     */
+    private static boolean hasNamedJsonSubtype(Class<?> parentClass, Class<?> subClass) {
+        final com.fasterxml.jackson.annotation.JsonSubTypes ann = parentClass.getAnnotation(com.fasterxml.jackson.annotation.JsonSubTypes.class);
+        if (ann == null) {
+            return false;
+        }
+        for (com.fasterxml.jackson.annotation.JsonSubTypes.Type type : ann.value()) {
+            if (type.value() == subClass && !type.name().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // example: transforms property `text: string | undefined` to `text?: string | undefined`
