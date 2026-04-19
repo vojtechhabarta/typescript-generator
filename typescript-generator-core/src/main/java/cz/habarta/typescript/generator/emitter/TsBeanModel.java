@@ -183,4 +183,9 @@ public class TsBeanModel extends TsDeclarationModel {
             taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
     }
 
+    public TsBeanModel withParent(TsType parent) {
+        return new TsBeanModel(origin, category, isClass, decorators, name, typeParameters, parent, extendsList, implementsList,
+            taggedUnionClasses, discriminantProperty, discriminantLiteral, taggedUnionAlias, properties, constructor, methods, comments);
+    }
+
 }
