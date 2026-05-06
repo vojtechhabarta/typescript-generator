@@ -9,23 +9,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 
 
 public class Jackson2ConfigurationResolved {
 
-    public JsonAutoDetect.Visibility fieldVisibility;
-    public JsonAutoDetect.Visibility getterVisibility;
-    public JsonAutoDetect.Visibility isGetterVisibility;
-    public JsonAutoDetect.Visibility setterVisibility;
-    public JsonAutoDetect.Visibility creatorVisibility;
-    public Map<Class<?>, JsonFormat.Shape> shapeConfigOverrides;
+    public JsonAutoDetect.@Nullable Visibility fieldVisibility;
+    public JsonAutoDetect.@Nullable Visibility getterVisibility;
+    public JsonAutoDetect.@Nullable Visibility isGetterVisibility;
+    public JsonAutoDetect.@Nullable Visibility setterVisibility;
+    public JsonAutoDetect.@Nullable Visibility creatorVisibility;
+    public @Nullable Map<Class<?>, JsonFormat.Shape> shapeConfigOverrides;
     public boolean enumsUsingToString;
     public boolean disableObjectIdentityFeature;
     @SuppressWarnings("rawtypes")
-    public Map<Class<? extends JsonSerializer>, String> serializerTypeMappings;
+    public @Nullable Map<Class<? extends JsonSerializer>, String> serializerTypeMappings;
     @SuppressWarnings("rawtypes")
-    public Map<Class<? extends JsonDeserializer>, String> deserializerTypeMappings;
-    public Class<?> view;
+    public @Nullable Map<Class<? extends JsonDeserializer>, String> deserializerTypeMappings;
+    public @Nullable Class<?> view;
 
     public static Jackson2ConfigurationResolved from(Jackson2Configuration configuration, ClassLoader classLoader) {
         final Jackson2ConfigurationResolved resolved = new Jackson2ConfigurationResolved();
@@ -47,9 +48,12 @@ public class Jackson2ConfigurationResolved {
         return resolved;
     }
 
-    private static <C, V> Map<Class<? extends C>, V> resolveClassMappings(
-        List<String> mappings, String mappingName, ClassLoader classLoader,
-        Class<? extends C> key, Function<String, V> valueConvertor
+    private static <C, V> @Nullable Map<Class<? extends C>, V> resolveClassMappings(
+        @Nullable List<String> mappings,
+        String mappingName,
+        ClassLoader classLoader,
+        Class<? extends C> key,
+        Function<String, V> valueConvertor
     ) {
         if (mappings == null) {
             return null;

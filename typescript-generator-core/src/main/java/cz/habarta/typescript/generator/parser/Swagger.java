@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 
 
 public class Swagger {
@@ -24,7 +25,7 @@ public class Swagger {
             new SwaggerOperation());
     }
 
-    private static SwaggerOperation parseSwaggerAnnotations1(Method method) {
+    private static @Nullable SwaggerOperation parseSwaggerAnnotations1(Method method) {
         final Annotation apiOperation = Utils.getAnnotation(method, "io.swagger.annotations.ApiOperation");
         final Annotation[] apiResponses = Utils.getAnnotationElementValue(method, "io.swagger.annotations.ApiResponses", "value", Annotation[].class);
         if (apiOperation == null && apiResponses == null) {
@@ -33,8 +34,8 @@ public class Swagger {
         final SwaggerOperation swaggerOperation = new SwaggerOperation();
         // @ApiOperation
         if (apiOperation != null) {
-            final Class<?> response = Utils.getAnnotationElementValue(apiOperation, "response", Class.class);
-            final String responseContainer = Utils.getAnnotationElementValue(apiOperation, "responseContainer", String.class);
+            final Class<?> response = Utils.getRequiredAnnotationElementValue(apiOperation, "response", Class.class);
+            final String responseContainer = Utils.getRequiredAnnotationElementValue(apiOperation, "responseContainer", String.class);
             if (responseContainer == null || responseContainer.isEmpty()) {
                 swaggerOperation.responseType = response;
             } else {
@@ -50,8 +51,8 @@ public class Swagger {
                         break;
                 }
             }
-            swaggerOperation.hidden = Utils.getAnnotationElementValue(apiOperation, "hidden", Boolean.class);
-            swaggerOperation.comment = Utils.getAnnotationElementValue(apiOperation, "value", String.class);
+            swaggerOperation.hidden = Utils.getRequiredAnnotationElementValue(apiOperation, "hidden", Boolean.class);
+            swaggerOperation.comment = Utils.getRequiredAnnotationElementValue(apiOperation, "value", String.class);
             swaggerOperation.comment = swaggerOperation.comment.isEmpty() ? null : swaggerOperation.comment;
         }
         // @ApiResponses
@@ -59,16 +60,16 @@ public class Swagger {
             swaggerOperation.possibleResponses = new ArrayList<>();
             for (Annotation apiResponse : apiResponses) {
                 final SwaggerResponse response = new SwaggerResponse();
-                response.code = String.valueOf(Utils.getAnnotationElementValue(apiResponse, "code", Integer.class));
-                response.comment = Utils.getAnnotationElementValue(apiResponse, "message", String.class);
-                response.responseType = Utils.getAnnotationElementValue(apiResponse, "response", Class.class);
+                response.code = String.valueOf(Utils.getRequiredAnnotationElementValue(apiResponse, "code", Integer.class));
+                response.comment = Utils.getRequiredAnnotationElementValue(apiResponse, "message", String.class);
+                response.responseType = Utils.getRequiredAnnotationElementValue(apiResponse, "response", Class.class);
                 swaggerOperation.possibleResponses.add(response);
             }
         }
         return swaggerOperation;
     }
 
-    private static SwaggerOperation parseSwaggerAnnotations3(Method method) {
+    private static @Nullable SwaggerOperation parseSwaggerAnnotations3(Method method) {
         final Annotation operationAnnotation = Utils.getAnnotation(method, "io.swagger.v3.oas.annotations.Operation");
         final Annotation apiResponseAnnotation = Utils.getAnnotation(method, "io.swagger.v3.oas.annotations.responses.ApiResponse");
         final Annotation apiResponsesAnnotation = Utils.getAnnotation(method, "io.swagger.v3.oas.annotations.responses.ApiResponses");
@@ -78,8 +79,8 @@ public class Swagger {
         final SwaggerOperation swaggerOperation = new SwaggerOperation();
         // @Operation
         if (operationAnnotation != null) {
-            swaggerOperation.hidden = Utils.getAnnotationElementValue(operationAnnotation, "hidden", Boolean.class);
-            swaggerOperation.comment = Utils.getAnnotationElementValue(operationAnnotation, "description", String.class);
+            swaggerOperation.hidden = Utils.getRequiredAnnotationElementValue(operationAnnotation, "hidden", Boolean.class);
+            swaggerOperation.comment = Utils.getRequiredAnnotationElementValue(operationAnnotation, "description", String.class);
             swaggerOperation.comment = swaggerOperation.comment.isEmpty() ? null : swaggerOperation.comment;
         }
         // @ApiResponses
@@ -91,13 +92,13 @@ public class Swagger {
             swaggerOperation.possibleResponses = new ArrayList<>();
             for (Annotation apiResponse : responses) {
                 final SwaggerResponse response = new SwaggerResponse();
-                final String code = Utils.getAnnotationElementValue(apiResponse, "responseCode", String.class);
+                final String code = Utils.getRequiredAnnotationElementValue(apiResponse, "responseCode", String.class);
                 response.code = Objects.equals(code, "default") ? null : code;
-                response.comment = Utils.getAnnotationElementValue(apiResponse, "description", String.class);
-                final Annotation[] content = Utils.getAnnotationElementValue(apiResponse, "content", Annotation[].class);
+                response.comment = Utils.getRequiredAnnotationElementValue(apiResponse, "description", String.class);
+                final Annotation[] content = Utils.getRequiredAnnotationElementValue(apiResponse, "content", Annotation[].class);
                 if (content.length > 0) {
-                    final Annotation schema = Utils.getAnnotationElementValue(content[0], "schema", Annotation.class);
-                    final Class<?> implementation = Utils.getAnnotationElementValue(schema, "implementation", Class.class);
+                    final Annotation schema = Utils.getRequiredAnnotationElementValue(content[0], "schema", Annotation.class);
+                    final Class<?> implementation = Utils.getRequiredAnnotationElementValue(schema, "implementation", Class.class);
                     if (!Objects.equals(implementation, Void.class)) {
                         response.responseType = implementation;
                         if (swaggerOperation.responseType == null) {
@@ -119,7 +120,7 @@ public class Swagger {
         return code.startsWith("2");
     }
 
-    static List<String> getOperationComments(SwaggerOperation operation) {
+    static @Nullable List<String> getOperationComments(SwaggerOperation operation) {
         final List<String> comments = new ArrayList<>();
         if (operation.comment != null) {
             comments.add(operation.comment);
@@ -151,7 +152,7 @@ public class Swagger {
             () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.v3.oas.annotations.media.Schema", "description", String.class),
             () -> Utils.getAnnotationElementValue(bean.getOrigin(), "io.swagger.annotations.ApiModel", "description", String.class));
         final List<String> comments = comment != null && !comment.isEmpty() ? Arrays.asList(comment) : null;
-        return bean.withProperties(enrichedProperties).withComments(Utils.concat(comments, bean.getComments()));
+        return bean.withProperties(enrichedProperties).withComments(Utils.concatToNullable(comments, bean.getComments()));
     }
 
     private static PropertyModel enrichProperty(PropertyModel property) {
@@ -166,48 +167,48 @@ public class Swagger {
         }
     }
 
-    private static PropertyModel enrichProperty1(PropertyModel property, AnnotatedElement annotatedElement) {
+    private static @Nullable PropertyModel enrichProperty1(PropertyModel property, AnnotatedElement annotatedElement) {
         final Annotation apiModelProperty = Utils.getAnnotation(annotatedElement, "io.swagger.annotations.ApiModelProperty");
         if (apiModelProperty == null) {
             return null;
         }
         final String comment = Utils.getAnnotationElementValue(apiModelProperty, "value", String.class);
         final List<String> comments = comment != null && !comment.isEmpty() ? Arrays.asList(comment) : null;
-        final PropertyModel propertyModel = property.withComments(Utils.concat(comments, property.getComments()));
+        final PropertyModel propertyModel = property.withComments(Utils.concatToNullable(comments, property.getComments()));
         final String dataTypeString = Utils.getAnnotationElementValue(apiModelProperty, "dataType", String.class);
         if (dataTypeString == null || dataTypeString.isEmpty()) {
             return propertyModel;
         }
         try {
             final Type type = Class.forName(dataTypeString);
-            final boolean required = Utils.getAnnotationElementValue(apiModelProperty, "required", Boolean.class);
+            final boolean required = Utils.getRequiredAnnotationElementValue(apiModelProperty, "required", Boolean.class);
             return propertyModel.withType(type).withOptional(!required);
         } catch (ClassNotFoundException | ClassCastException e) {
             return propertyModel;
         }
     }
 
-    private static PropertyModel enrichProperty3(PropertyModel property, AnnotatedElement annotatedElement) {
+    private static @Nullable PropertyModel enrichProperty3(PropertyModel property, AnnotatedElement annotatedElement) {
         final Annotation schema = Utils.getAnnotation(annotatedElement, "io.swagger.v3.oas.annotations.media.Schema");
         if (schema == null) {
             return null;
         }
         final String comment = Utils.getAnnotationElementValue(schema, "description", String.class);
         final List<String> comments = comment != null && !comment.isEmpty() ? Arrays.asList(comment) : null;
-        final PropertyModel propertyModel = property.withComments(Utils.concat(comments, property.getComments()));
+        final PropertyModel propertyModel = property.withComments(Utils.concatToNullable(comments, property.getComments()));
         final Class<?> implementation = Utils.getAnnotationElementValue(schema, "implementation", Class.class);
         if (implementation == null || Objects.equals(implementation, Void.class)) {
             return propertyModel;
         }
-        final boolean required = Utils.getAnnotationElementValue(schema, "required", Boolean.class);
+        final boolean required = Utils.getRequiredAnnotationElementValue(schema, "required", Boolean.class);
         return propertyModel.withType(implementation).withOptional(!required);
     }
 
-    private static <T> T firstResult(Supplier<? extends T> supplier1, Supplier<? extends T> supplier2) {
+    private static <T> @Nullable T firstResult(Supplier<? extends T> supplier1, Supplier<? extends T> supplier2) {
         return firstResult(supplier1, supplier2, null);
     }
 
-    private static <T> T firstResult(Supplier<? extends T> supplier1, Supplier<? extends T> supplier2, T defaultResult) {
+    private static <T extends @Nullable Object> T firstResult(Supplier<? extends T> supplier1, Supplier<? extends T> supplier2, T defaultResult) {
         final T result1 = supplier1.get();
         if (result1 != null) {
             return result1;
@@ -219,7 +220,7 @@ public class Swagger {
         return defaultResult;
     }
 
-    private static <T> List<T> emptyToNull(List<T> list) {
+    private static <T> @Nullable List<T> emptyToNull(@Nullable List<T> list) {
         return list != null && !list.isEmpty() ? list : null;
     }
 

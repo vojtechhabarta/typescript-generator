@@ -3,19 +3,20 @@ package cz.habarta.typescript.generator.emitter;
 
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsIfStatement extends TsStatement {
 
     private final TsExpression expression;
     private final List<TsStatement> thenStatements;
-    private final List<TsStatement> elseStatements;
+    private final @Nullable List<TsStatement> elseStatements;
 
     public TsIfStatement(TsExpression expression, List<TsStatement> thenStatements) {
         this(expression, thenStatements, null);
     }
 
-    public TsIfStatement(TsExpression expression, List<TsStatement> thenStatements, List<TsStatement> elseStatements) {
+    public TsIfStatement(TsExpression expression, List<TsStatement> thenStatements, @Nullable List<TsStatement> elseStatements) {
         Objects.requireNonNull(expression);
         Objects.requireNonNull(thenStatements);
         this.expression = expression;
@@ -31,7 +32,7 @@ public class TsIfStatement extends TsStatement {
         return thenStatements;
     }
 
-    public List<TsStatement> getElseStatements() {
+    public @Nullable List<TsStatement> getElseStatements() {
         return elseStatements;
     }
 

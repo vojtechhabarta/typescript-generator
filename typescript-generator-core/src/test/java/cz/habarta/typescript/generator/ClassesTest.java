@@ -335,10 +335,12 @@ public class ClassesTest {
         Assertions.assertTrue(output.contains("super(data);"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassA<T> {
         public String a;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassB extends ClassA<String> {
         public String b;
     }

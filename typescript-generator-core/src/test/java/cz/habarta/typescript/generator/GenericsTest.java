@@ -142,6 +142,7 @@ public class GenericsTest {
         assertEquals(expected, output.trim());
     }
 
+    @SuppressWarnings("NullAway.Init")
     class A<U, V> {
         public A<String, String> x;
         public A<A<String, B>, List<String>> y;
@@ -151,10 +152,12 @@ public class GenericsTest {
     class B {
     }
 
+    @SuppressWarnings("NullAway.Init")
     class C {
         public List<? extends String> x;
     }
 
+    @SuppressWarnings("NullAway.Init")
     class D<T> {
         public T x;
     }
@@ -173,19 +176,23 @@ public class GenericsTest {
         public T getX();
     }
 
+    @SuppressWarnings("NullAway.Init")
     class Table<T> {
         public List<T> rows;
     }
 
+    @SuppressWarnings("NullAway.Init")
     class Page1 {
         public Table<String> stringTable;
     }
 
+    @SuppressWarnings("NullAway.Init")
     class Page2 {
         @SuppressWarnings("rawtypes")
         public Table someTable;
     }
 
+    @SuppressWarnings("NullAway.Init")
     class TableGA<T> {
         public T[] rows;
     }
@@ -220,6 +227,7 @@ public class GenericsTest {
     public interface Entity1IdView extends IdView<MyId> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static abstract class Entity1View implements Entity1IdView {
         public String name;
     }

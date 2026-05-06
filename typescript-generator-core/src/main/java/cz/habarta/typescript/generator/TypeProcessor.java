@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public interface TypeProcessor {
@@ -15,18 +16,18 @@ public interface TypeProcessor {
     /**
      * @return <code>null</code> if this processor didn't process passed java type
      */
-    public Result processType(Type javaType, Context context);
+    public @Nullable Result processType(Type javaType, Context context);
 
-    public default Result processTypeInTemporaryContext(Type type, Object typeContext, Settings settings) {
+    public default @Nullable Result processTypeInTemporaryContext(Type type, @Nullable Object typeContext, Settings settings) {
         return processType(type, new Context(new SymbolTable(settings), this, typeContext));
     }
 
-    public default List<Class<?>> discoverClassesUsedInType(Type type, Object typeContext, Settings settings) {
+    public default List<Class<?>> discoverClassesUsedInType(Type type, @Nullable Object typeContext, Settings settings) {
         final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
         return result != null ? result.getDiscoveredClasses() : Collections.emptyList();
     }
 
-    public default boolean isTypeExcluded(Type type, Object typeContext, Settings settings) {
+    public default boolean isTypeExcluded(Type type, @Nullable Object typeContext, Settings settings) {
         final TypeProcessor.Result result = processTypeInTemporaryContext(type, typeContext, settings);
         return result != null && result.tsType == TsType.Any;
     }
@@ -35,14 +36,14 @@ public interface TypeProcessor {
 
         private final SymbolTable symbolTable;
         private final TypeProcessor typeProcessor;
-        private final Object typeContext;
+        private final @Nullable Object typeContext;
         private final boolean insideCollection;
 
-        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, Object typeContext) {
+        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, @Nullable Object typeContext) {
             this(symbolTable, typeProcessor, typeContext, false);
         }
 
-        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, Object typeContext, boolean insideCollection) {
+        public Context(SymbolTable symbolTable, TypeProcessor typeProcessor, @Nullable Object typeContext, boolean insideCollection) {
             this.symbolTable = Objects.requireNonNull(symbolTable, "symbolTable");
             this.typeProcessor = Objects.requireNonNull(typeProcessor, "typeProcessor");
             this.typeContext = typeContext;
@@ -53,19 +54,19 @@ public interface TypeProcessor {
             return symbolTable.getSymbol(cls);
         }
 
-        public Symbol getSymbolIfImported(Class<?> cls) {
+        public @Nullable Symbol getSymbolIfImported(Class<?> cls) {
             return symbolTable.getSymbolIfImported(cls);
         }
 
-        public Result processType(Type javaType) {
+        public @Nullable Result processType(Type javaType) {
             return typeProcessor.processType(javaType, this);
         }
 
-        public Result processTypeInsideCollection(Type javaType) {
+        public @Nullable Result processTypeInsideCollection(Type javaType) {
             return typeProcessor.processType(javaType, this.withInsideCollection());
         }
 
-        public Object getTypeContext() {
+        public @Nullable Object getTypeContext() {
             return typeContext;
         }
 
@@ -73,7 +74,7 @@ public interface TypeProcessor {
             return insideCollection;
         }
 
-        public Context withTypeContext(Object typeContext) {
+        public Context withTypeContext(@Nullable Object typeContext) {
             return new Context(symbolTable, typeProcessor, typeContext, insideCollection);
         }
 
@@ -121,7 +122,7 @@ public interface TypeProcessor {
         }
 
         @Override
-        public Result processType(Type javaType, Context context) {
+        public @Nullable Result processType(Type javaType, Context context) {
             for (TypeProcessor processor : processors) {
                 final Result result = processor.processType(javaType, context);
                 if (result != null) {

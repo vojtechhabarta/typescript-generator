@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator.emitter;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 
 public class EmitterExtensionFeatures {
@@ -14,10 +15,10 @@ public class EmitterExtensionFeatures {
 
     // overridden settings
     public boolean generatesJaxrsApplicationClient = false;
-    public String restResponseType = null;
-    public String restOptionsType = null;
-    public Map<String, String> npmPackageDependencies = null;
-    public Map<String, String> npmDevDependencies = null;
-    public Map<String, String> npmPeerDependencies = null;
+    public @Nullable String restResponseType = null;
+    public @Nullable String restOptionsType = null;
+    public @Nullable Map<String, String> npmPackageDependencies = null;
+    public @Nullable Map<String, String> npmDevDependencies = null;
+    public @Nullable Map<String, String> npmPeerDependencies = null;
 
 }

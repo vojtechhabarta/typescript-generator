@@ -87,6 +87,7 @@ public class FullyQualifiedNamesTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Outer {
         public String outer;
 

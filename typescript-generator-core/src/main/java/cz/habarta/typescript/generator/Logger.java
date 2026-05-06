@@ -1,6 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
+import org.jspecify.annotations.Nullable;
+
+
 public class Logger {
 
     private final Level level;
@@ -13,7 +16,7 @@ public class Logger {
         this(null);
     }
 
-    public Logger(Level level) {
+    public Logger(@Nullable Level level) {
         this.level = level != null ? level : Level.Verbose;
     }
 

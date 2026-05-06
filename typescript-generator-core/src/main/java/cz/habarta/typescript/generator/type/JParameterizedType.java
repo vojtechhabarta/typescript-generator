@@ -7,15 +7,16 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public class JParameterizedType implements ParameterizedType {
 
     private final Type rawType;
     private final Type[] actualTypeArguments;
-    private final Type ownerType;
+    private final @Nullable Type ownerType;
 
-    public JParameterizedType(Type rawType, Type[] actualTypeArguments, Type ownerType) {
+    public JParameterizedType(Type rawType, Type @Nullable [] actualTypeArguments, @Nullable Type ownerType) {
         this.rawType = Objects.requireNonNull(rawType, "rawType");
         this.actualTypeArguments = actualTypeArguments != null ? actualTypeArguments : new Type[0];
         this.ownerType = ownerType;
@@ -32,7 +33,7 @@ public class JParameterizedType implements ParameterizedType {
     }
 
     @Override
-    public Type getOwnerType() {
+    public @Nullable Type getOwnerType() {
         return ownerType;
     }
 

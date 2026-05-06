@@ -37,6 +37,7 @@ public class NullabilityTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class A<T> {
 
         public @Nullable String nullableString;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "NullAway.Init" })
 public class DummyBean {
 
     public String firstProperty;

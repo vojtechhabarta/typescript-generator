@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -255,7 +256,7 @@ public abstract class TsType implements Emittable {
         }
 
         public UnionType add(List<TsType> types) {
-            return new UnionType(Utils.concat(this.types, types));
+            return new UnionType(Utils.concatToNonNull(this.types, types));
         }
 
         public UnionType remove(List<TsType> types) {
@@ -359,7 +360,7 @@ public abstract class TsType implements Emittable {
 
         public final List<TsProperty> properties;
 
-        public ObjectType(TsProperty... properties) {
+        public ObjectType(@Nullable TsProperty... properties) {
             this(Utils.removeNulls(Arrays.asList(properties)));
         }
 
@@ -470,7 +471,8 @@ public abstract class TsType implements Emittable {
             final TsType.FunctionType functionType = (TsType.FunctionType) type;
             final List<TsParameter> parameters = new ArrayList<>();
             for (TsParameter parameter : functionType.parameters) {
-                parameters.add(new TsParameter(parameter.name, transformTsType(context, parameter.tsType, transformer)));
+                final TsType transformedParameterType = parameter.tsType != null ? transformTsType(context, parameter.tsType, transformer) : null;
+                parameters.add(new TsParameter(parameter.name, transformedParameterType));
             }
             return new TsType.FunctionType(parameters, transformTsType(context, functionType.type, transformer));
         }

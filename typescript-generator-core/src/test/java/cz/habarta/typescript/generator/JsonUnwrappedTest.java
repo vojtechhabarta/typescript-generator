@@ -65,6 +65,7 @@ public class JsonUnwrappedTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Person {
         @JsonUnwrapped(prefix = "A", suffix = "A")
         public Parent parentA;
@@ -72,6 +73,7 @@ public class JsonUnwrappedTest {
         public Parent parentB;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Parent {
         public int age;
         @JsonUnwrapped
@@ -82,10 +84,12 @@ public class JsonUnwrappedTest {
         public Name name3;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Name {
         public String first, last;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Person2 {
         @JsonUnwrapped
         private Name name;

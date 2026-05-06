@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 
 public class MethodModel {
@@ -14,9 +15,9 @@ public class MethodModel {
     protected final List<MethodParameterModel> parameters;
     protected final Type returnType;
     protected final Method originalMethod;
-    protected final List<String> comments;
+    protected final @Nullable List<String> comments;
 
-    public MethodModel(Class<?> originClass, String name, List<MethodParameterModel> parameters, Type returnType, Method originalMethod, List<String> comments) {
+    public MethodModel(Class<?> originClass, String name, @Nullable List<MethodParameterModel> parameters, Type returnType, Method originalMethod, @Nullable List<String> comments) {
         this.originClass = originClass;
         this.name = name;
         this.parameters = parameters != null ? parameters : Collections.<MethodParameterModel>emptyList();
@@ -45,11 +46,11 @@ public class MethodModel {
         return originalMethod;
     }
 
-    public List<String> getComments() {
+    public @Nullable List<String> getComments() {
         return comments;
     }
 
-    public MethodModel withComments(List<String> comments) {
+    public MethodModel withComments(@Nullable List<String> comments) {
         return new MethodModel(originClass, name, parameters, returnType, originalMethod, comments);
     }
 

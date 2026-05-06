@@ -26,8 +26,7 @@ public class JTypeWithNullability implements Type {
 
     // shallow
     public static Type getPlainType(Type type) {
-        if (type instanceof JTypeWithNullability) {
-            final JTypeWithNullability typeWithNullability = (JTypeWithNullability) type;
+        if (type instanceof JTypeWithNullability typeWithNullability) {
             return typeWithNullability.getType();
         } else {
             return type;
@@ -36,8 +35,7 @@ public class JTypeWithNullability implements Type {
 
     // deep
     public static Type removeNullability(Type type) {
-        if (type instanceof JTypeWithNullability) {
-            final JTypeWithNullability typeWithNullability = (JTypeWithNullability) type;
+        if (type instanceof JTypeWithNullability typeWithNullability) {
             return removeNullability(typeWithNullability.getType());
         }
         return Utils.transformContainedTypes(type, JTypeWithNullability::removeNullability);

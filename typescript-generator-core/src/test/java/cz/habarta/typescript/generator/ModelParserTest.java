@@ -77,22 +77,27 @@ public class ModelParserTest {
 
 }
 
+@SuppressWarnings("NullAway.Init")
 class RootClass1 {
     public NodeClassA node;
 }
 
+@SuppressWarnings("NullAway.Init")
 class RootClass2 {
     public List<NodeClassA> nodes;
 }
 
+@SuppressWarnings("NullAway.Init")
 class NodeClassA {
     public String name;
 }
 
+@SuppressWarnings("NullAway.Init")
 class RootClass3 {
     public Map<String, NodeClassB> nodes;
 }
 
+@SuppressWarnings("NullAway.Init")
 class NodeClassB {
     public String name;
     public NodeClassB leftNode;

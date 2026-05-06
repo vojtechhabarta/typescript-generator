@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
+
 
 public class DecoratorsTest {
 
@@ -31,7 +33,7 @@ public class DecoratorsTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.outputKind = TypeScriptOutputKind.module;
         settings.mapClasses = ClassMapping.asClasses;
-        settings.importDeclarations.add("import { JsonObject, JsonProperty } from \"json2typescript\"");
+        settings.importDeclarations = List.of("import { JsonObject, JsonProperty } from \"json2typescript\"");
         settings.extensions.add(new ClassNameDecoratorExtension());
         settings.optionalProperties = OptionalProperties.useLibraryDefinition;
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(City.class));
@@ -64,7 +66,7 @@ public class DecoratorsTest {
         }
 
         private TsBeanModel decorateClass(TsBeanModel bean) {
-            if (!bean.isClass()) {
+            if (!bean.isClass() || bean.getOrigin() == null) {
                 return bean;
             }
             return bean
@@ -91,6 +93,7 @@ public class DecoratorsTest {
 
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class City {
         public String name;
     }
@@ -105,10 +108,11 @@ public class DecoratorsTest {
         final TypeScriptGenerator typeScriptGenerator = new TypeScriptGenerator(settings);
         final Model model = typeScriptGenerator.getModelParser().parseModel(City.class);
         final TsModel tsModel = typeScriptGenerator.getModelCompiler().javaToTypeScript(model);
-        final TsBeanModel bean = tsModel.getBean(City.class);
+        final TsBeanModel bean = requireNonNull(tsModel.getBean(City.class));
+        final var constructor = requireNonNull(bean.getConstructor());
         final TsBeanModel bean2 = bean
-            .withConstructor(bean.getConstructor()
-                .withParameters(Arrays.asList(bean.getConstructor().getParameters().get(0)
+            .withConstructor(constructor
+                .withParameters(Arrays.asList(constructor.getParameters().get(0)
                     .withDecorators(Arrays.asList(new TsDecorator(
                         new TsIdentifierReference("Inject"),
                         Arrays.asList(new TsStringLiteral("token"))
@@ -122,14 +126,15 @@ public class DecoratorsTest {
                 )))
             ));
         final TsModel tsModel2 = tsModel.withBeans(Arrays.asList(bean2));
-        final String output = emit(typeScriptGenerator.getEmitter(), tsModel2);
+        final String output = emit(settings, tsModel2);
         Assertions.assertTrue(output.contains("@Inject(\"token\")"));
         Assertions.assertTrue(output.contains("@enumerable(false)"));
     }
 
-    private static String emit(Emitter emitter, TsModel model) {
+    private static String emit(Settings settings, TsModel model) {
         final StringWriter writer = new StringWriter();
-        emitter.emit(model, writer, "test", true);
+        final Emitter emitter = new Emitter(settings, writer, "test");
+        emitter.emit(model, true);
         return writer.toString();
     }
 

@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.IOException;
 import java.io.Writer;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 
@@ -12,11 +13,14 @@ public class NpmPackageJsonEmitter {
 
     private Writer writer;
 
-    public void emit(NpmPackageJson npmPackageJson, Writer output, String outputName, boolean closeOutput) {
+    public NpmPackageJsonEmitter(Writer output, @Nullable String outputName) {
         this.writer = output;
         if (outputName != null) {
             TypeScriptGenerator.getLogger().info("Writing NPM package to: " + outputName);
         }
+    }
+
+    public void emit(NpmPackageJson npmPackageJson, boolean closeOutput) {
         emitPackageJson(npmPackageJson);
         if (closeOutput) {
             close();

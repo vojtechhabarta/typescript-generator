@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 
@@ -15,11 +16,14 @@ public class InfoJsonEmitter {
 
     private Writer writer;
 
-    public void emit(TsModel tsModel, Writer output, String outputName, boolean closeOutput) {
+    public InfoJsonEmitter(Writer output, @Nullable String outputName) {
         this.writer = output;
         if (outputName != null) {
             TypeScriptGenerator.getLogger().info("Writing module info to: " + outputName);
         }
+    }
+
+    public void emit(TsModel tsModel, boolean closeOutput) {
         emitTypeMappingJson(tsModel);
         if (closeOutput) {
             close();
@@ -43,9 +47,10 @@ public class InfoJsonEmitter {
             .flatMap(s -> s.stream())
             .filter(declaration -> declaration.origin != null)
             .map(declaration -> {
-                final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo();
-                typeMapping.javaClass = declaration.origin.getName();
-                typeMapping.typeName = declaration.name.getFullName();
+                final InfoJson.ClassInfo typeMapping = new InfoJson.ClassInfo(
+                    declaration.origin.getName(),
+                    declaration.name.getFullName()
+                );
                 return typeMapping;
             })
             .forEach(info -> {
@@ -54,8 +59,7 @@ public class InfoJsonEmitter {
                 map.put(info.javaClass, info);
             });
 
-        final InfoJson infoJson = new InfoJson();
-        infoJson.classes = new ArrayList<>(map.values());
+        final InfoJson infoJson = new InfoJson(new ArrayList<>(map.values()));
         return infoJson;
     }
 

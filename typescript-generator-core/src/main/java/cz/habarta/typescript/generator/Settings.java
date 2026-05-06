@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.ObjectMapper;
 
@@ -50,48 +51,48 @@ public class Settings {
     public String quotes = "\"";
     public String indentString = "    ";
     public TypeScriptFileType outputFileType = TypeScriptFileType.declarationFile;
-    public TypeScriptOutputKind outputKind = null;
-    public String module = null;
-    public String namespace = null;
+    public @Nullable TypeScriptOutputKind outputKind = null;
+    public @Nullable String module = null;
+    public @Nullable String namespace = null;
     public boolean mapPackagesToNamespaces = false;
-    public String umdNamespace = null;
-    public List<ModuleDependency> moduleDependencies = new ArrayList<>();
-    private LoadedModuleDependencies loadedModuleDependencies = null;
-    public JsonLibrary jsonLibrary = null;
-    public Jackson2ConfigurationResolved jackson2Configuration = null;
-    public Jackson3ConfigurationResolved jackson3Configuration = null;
-    public GsonConfiguration gsonConfiguration = null;
-    public JsonbConfiguration jsonbConfiguration = null;
-    public List<String> additionalDataLibraries = new ArrayList<>();
-    private LoadedDataLibraries loadedDataLibrariesClasses = null;
-    private Predicate<String> excludeFilter = null;
-    public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
-    public OptionalPropertiesDeclaration optionalPropertiesDeclaration; // default is OptionalPropertiesDeclaration.questionMark
-    public NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullInlineUnion
-    private TypeParser typeParser = null;
+    public @Nullable String umdNamespace = null;
+    public @Nullable List<ModuleDependency> moduleDependencies = new ArrayList<>();
+    private @Nullable LoadedModuleDependencies loadedModuleDependencies = null;
+    public @Nullable JsonLibrary jsonLibrary = null;
+    public @Nullable Jackson2ConfigurationResolved jackson2Configuration = null;
+    public @Nullable Jackson3ConfigurationResolved jackson3Configuration = null;
+    public @Nullable GsonConfiguration gsonConfiguration = null;
+    public @Nullable JsonbConfiguration jsonbConfiguration = null;
+    public @Nullable List<String> additionalDataLibraries = new ArrayList<>();
+    private @Nullable LoadedDataLibraries loadedDataLibrariesClasses = null;
+    private @Nullable Predicate<String> excludeFilter = null;
+    public @Nullable OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
+    public @Nullable OptionalPropertiesDeclaration optionalPropertiesDeclaration; // default is OptionalPropertiesDeclaration.questionMark
+    public @Nullable NullabilityDefinition nullabilityDefinition; // default is NullabilityDefinition.nullInlineUnion
+    private @Nullable TypeParser typeParser = null;
     public boolean declarePropertiesAsReadOnly = false;
-    public String removeTypeNamePrefix = null;
-    public String removeTypeNameSuffix = null;
-    public String addTypeNamePrefix = null;
-    public String addTypeNameSuffix = null;
+    public @Nullable String removeTypeNamePrefix = null;
+    public @Nullable String removeTypeNameSuffix = null;
+    public @Nullable String addTypeNamePrefix = null;
+    public @Nullable String addTypeNameSuffix = null;
     public Map<String, String> customTypeNaming = new LinkedHashMap<>();
-    public String customTypeNamingFunction = null;
-    public CustomTypeNamingFunction customTypeNamingFunctionImpl = null;
-    public List<String> referencedFiles = new ArrayList<>();
-    public List<String> importDeclarations = new ArrayList<>();
+    public @Nullable String customTypeNamingFunction = null;
+    public @Nullable CustomTypeNamingFunction customTypeNamingFunctionImpl = null;
+    public @Nullable List<String> referencedFiles = new ArrayList<>();
+    public @Nullable List<String> importDeclarations = new ArrayList<>();
     public Map<String, String> customTypeMappings = new LinkedHashMap<>();
-    private List<CustomTypeMapping> validatedCustomTypeMappings = null;
+    private @Nullable List<CustomTypeMapping> validatedCustomTypeMappings = null;
     public Map<String, String> customTypeAliases = new LinkedHashMap<>();
-    private List<CustomTypeAlias> validatedCustomTypeAliases = null;
-    public DateMapping mapDate; // default is DateMapping.asDate
-    public MapMapping mapMap; // default is MapMapping.asIndexedArray
-    public EnumMapping mapEnum; // default is EnumMapping.asUnion
-    public IdentifierCasing enumMemberCasing; // default is IdentifierCasing.keepOriginal
+    private @Nullable List<CustomTypeAlias> validatedCustomTypeAliases = null;
+    public @Nullable DateMapping mapDate; // default is DateMapping.asDate
+    public @Nullable MapMapping mapMap; // default is MapMapping.asIndexedArray
+    public @Nullable EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public @Nullable IdentifierCasing enumMemberCasing; // default is IdentifierCasing.keepOriginal
     public boolean nonConstEnums = false;
     public List<Class<? extends Annotation>> nonConstEnumAnnotations = new ArrayList<>();
-    public ClassMapping mapClasses; // default is ClassMapping.asInterfaces
-    public List<String> mapClassesAsClassesPatterns;
-    private Predicate<String> mapClassesAsClassesFilter = null;
+    public @Nullable ClassMapping mapClasses; // default is ClassMapping.asInterfaces
+    public @Nullable List<String> mapClassesAsClassesPatterns;
+    private @Nullable Predicate<String> mapClassesAsClassesFilter = null;
     public boolean generateConstructors = false;
     public List<Class<? extends Annotation>> disableTaggedUnionAnnotations = new ArrayList<>();
     public boolean disableTaggedUnions = false;
@@ -102,21 +103,21 @@ public class Settings {
     public boolean generateSpringApplicationInterface = false;
     public boolean generateSpringApplicationClient = false;
     public boolean scanSpringApplication;
-    public RestNamespacing restNamespacing;
-    public Class<? extends Annotation> restNamespacingAnnotation = null;
-    public String restNamespacingAnnotationElement; // default is "value"
-    public String restResponseType = null;
-    public String restOptionsType = null;
+    public @Nullable RestNamespacing restNamespacing;
+    public @Nullable Class<? extends Annotation> restNamespacingAnnotation = null;
+    public @Nullable String restNamespacingAnnotationElement; // default is "value"
+    public @Nullable String restResponseType = null;
+    public @Nullable String restOptionsType = null;
     public boolean restOptionsTypeIsGeneric;
-    private List<RestApplicationParser.Factory> restApplicationParserFactories;
-    public TypeProcessor customTypeProcessor = null;
+    private @Nullable List<RestApplicationParser.Factory> restApplicationParserFactories;
+    public @Nullable TypeProcessor customTypeProcessor = null;
     public boolean sortDeclarations = false;
     public boolean sortTypeDeclarations = false;
     public boolean noFileComment = false;
     public boolean noTslintDisable = false;
     public boolean noEslintDisable = false;
     public boolean tsNoCheck = false;
-    public List<File> javadocXmlFiles = null;
+    public @Nullable List<File> javadocXmlFiles = null;
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> excludePropertyAnnotations = new ArrayList<>();
@@ -126,25 +127,25 @@ public class Settings {
     public boolean primitivePropertiesRequired = false;
     public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
-    public String npmName = null;
-    public String npmVersion = null;
+    public @Nullable String npmName = null;
+    public @Nullable String npmVersion = null;
     public Map<String, String> npmPackageDependencies = new LinkedHashMap<>();
     public Map<String, String> npmDevDependencies = new LinkedHashMap<>();
     public Map<String, String> npmPeerDependencies = new LinkedHashMap<>();
     public String typescriptVersion = "^2.4";
-    public String npmTypescriptVersion = null;
-    public String npmBuildScript = null;
+    public @Nullable String npmTypescriptVersion = null;
+    public @Nullable String npmBuildScript = null;
     public boolean jackson2ModuleDiscovery = false;
     public List<Class<? extends Module>> jackson2Modules = new ArrayList<>();
     public boolean jackson3ModuleDiscovery = false;
     public List<Class<? extends JacksonModule>> jackson3Modules = new ArrayList<>();
-    public ClassLoader classLoader = null;
+    public ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
     public static class ConfiguredExtension {
-        public String className;
-        public Map<String, String> configuration;
+        public @Nullable String className; // required
+        public @Nullable Map<String, String> configuration;
     }
 
     public static class CustomTypeMapping {
@@ -178,9 +179,9 @@ public class Settings {
 
     public static class GenericName {
         public final String rawName;
-        public final List<String> typeParameters;
+        public final @Nullable List<String> typeParameters;
 
-        public GenericName(String rawName, List<String> typeParameters) {
+        public GenericName(String rawName, @Nullable List<String> typeParameters) {
             this.rawName = Objects.requireNonNull(rawName);
             this.typeParameters = typeParameters;
         }
@@ -210,37 +211,40 @@ public class Settings {
         return new TypeScriptGeneratorURLClassLoader(name, urls, parent);
     }
 
-    public void setStringQuotes(StringQuotes quotes) {
+    public void setStringQuotes(@Nullable StringQuotes quotes) {
         this.quotes = quotes == StringQuotes.singleQuotes ? "'" : "\"";
     }
 
-    public void setIndentString(String indentString) {
+    public void setIndentString(@Nullable String indentString) {
         this.indentString = indentString != null ? indentString : "    ";
     }
 
-    public void setJackson2Configuration(ClassLoader classLoader, Jackson2Configuration configuration) {
+    public void setJackson2Configuration(ClassLoader classLoader, @Nullable Jackson2Configuration configuration) {
         if (configuration != null) {
             jackson2Configuration = Jackson2ConfigurationResolved.from(configuration, classLoader);
         }
     }
 
-    public void setJackson3Configuration(ClassLoader classLoader, Jackson3Configuration configuration) {
+    public void setJackson3Configuration(ClassLoader classLoader, @Nullable Jackson3Configuration configuration) {
         if (configuration != null) {
             jackson3Configuration = Jackson3ConfigurationResolved.from(configuration, classLoader);
         }
     }
 
-    public void loadCustomTypeProcessor(ClassLoader classLoader, String customTypeProcessor) {
+    public void loadCustomTypeProcessor(ClassLoader classLoader, @Nullable String customTypeProcessor) {
         if (customTypeProcessor != null) {
             this.customTypeProcessor = loadInstance(classLoader, customTypeProcessor, TypeProcessor.class);
         }
     }
 
-    public void loadExtensions(ClassLoader classLoader, List<String> extensions, List<Settings.ConfiguredExtension> extensionsWithConfiguration) {
+    public void loadExtensions(ClassLoader classLoader, @Nullable List<String> extensions, @Nullable List<Settings.ConfiguredExtension> extensionsWithConfiguration) {
         this.extensions = new ArrayList<>();
         this.extensions.addAll(loadInstances(classLoader, extensions, EmitterExtension.class));
         if (extensionsWithConfiguration != null) {
             for (ConfiguredExtension configuredExtension : extensionsWithConfiguration) {
+                if (configuredExtension.className == null) {
+                    throw new RuntimeException("Extension class name is not specified in 'extensionsWithConfiguration'.");
+                }
                 final EmitterExtension emitterExtension = loadInstance(classLoader, configuredExtension.className, EmitterExtension.class);
                 if (emitterExtension instanceof Extension) {
                     final Extension extension = (Extension) emitterExtension;
@@ -251,43 +255,43 @@ public class Settings {
         }
     }
 
-    public void loadNonConstEnumAnnotations(ClassLoader classLoader, List<String> stringAnnotations) {
+    public void loadNonConstEnumAnnotations(ClassLoader classLoader, @Nullable List<String> stringAnnotations) {
         this.nonConstEnumAnnotations = loadClasses(classLoader, stringAnnotations, Annotation.class);
     }
 
-    public void loadIncludePropertyAnnotations(ClassLoader classLoader, List<String> includePropertyAnnotations) {
+    public void loadIncludePropertyAnnotations(ClassLoader classLoader, @Nullable List<String> includePropertyAnnotations) {
         this.includePropertyAnnotations = loadClasses(classLoader, includePropertyAnnotations, Annotation.class);
     }
 
-    public void loadExcludePropertyAnnotations(ClassLoader classLoader, List<String> excludePropertyAnnotations) {
+    public void loadExcludePropertyAnnotations(ClassLoader classLoader, @Nullable List<String> excludePropertyAnnotations) {
         this.excludePropertyAnnotations = loadClasses(classLoader, excludePropertyAnnotations, Annotation.class);
     }
 
-    public void loadOptionalAnnotations(ClassLoader classLoader, List<String> optionalAnnotations) {
+    public void loadOptionalAnnotations(ClassLoader classLoader, @Nullable List<String> optionalAnnotations) {
         this.optionalAnnotations = loadClasses(classLoader, optionalAnnotations, Annotation.class);
     }
 
-    public void loadRequiredAnnotations(ClassLoader classLoader, List<String> requiredAnnotations) {
+    public void loadRequiredAnnotations(ClassLoader classLoader, @Nullable List<String> requiredAnnotations) {
         this.requiredAnnotations = loadClasses(classLoader, requiredAnnotations, Annotation.class);
     }
 
-    public void loadNullableAnnotations(ClassLoader classLoader, List<String> nullableAnnotations) {
+    public void loadNullableAnnotations(ClassLoader classLoader, @Nullable List<String> nullableAnnotations) {
         this.nullableAnnotations = loadClasses(classLoader, nullableAnnotations, Annotation.class);
     }
 
-    public void loadDisableTaggedUnionAnnotations(ClassLoader classLoader, List<String> disableTaggedUnionAnnotations) {
+    public void loadDisableTaggedUnionAnnotations(ClassLoader classLoader, @Nullable List<String> disableTaggedUnionAnnotations) {
         this.disableTaggedUnionAnnotations = loadClasses(classLoader, disableTaggedUnionAnnotations, Annotation.class);
     }
 
-    public void loadJackson2Modules(ClassLoader classLoader, List<String> jackson2Modules) {
+    public void loadJackson2Modules(ClassLoader classLoader, @Nullable List<String> jackson2Modules) {
         this.jackson2Modules = loadClasses(classLoader, jackson2Modules, Module.class);
     }
 
-    public void loadJackson3Modules(ClassLoader classLoader, List<String> jackson3Modules) {
+    public void loadJackson3Modules(ClassLoader classLoader, @Nullable List<String> jackson3Modules) {
         this.jackson3Modules = loadClasses(classLoader, jackson3Modules, JacksonModule.class);
     }
 
-    public static Map<String, String> convertToMap(List<String> items, String itemName) {
+    public static Map<String, String> convertToMap(@Nullable List<String> items, String itemName) {
         final Map<String, String> result = new LinkedHashMap<>();
         if (items != null) {
             for (String item : items) {
@@ -494,7 +498,7 @@ public class Settings {
 
     public List<CustomTypeMapping> getValidatedCustomTypeMappings() {
         if (validatedCustomTypeMappings == null) {
-            validatedCustomTypeMappings = Utils.concat(
+            validatedCustomTypeMappings = Utils.concatToNonNull(
                 validateCustomTypeMappings(customTypeMappings, false),
                 getLoadedDataLibraries().typeMappings);
         }
@@ -533,7 +537,7 @@ public class Settings {
 
     public List<CustomTypeAlias> getValidatedCustomTypeAliases() {
         if (validatedCustomTypeAliases == null) {
-            validatedCustomTypeAliases = Utils.concat(
+            validatedCustomTypeAliases = Utils.concatToNonNull(
                 validateCustomTypeAliases(customTypeAliases),
                 getLoadedDataLibraries().typeAliases);
         }
@@ -577,7 +581,7 @@ public class Settings {
         return new GenericName(rawName, typeParameters);
     }
 
-    private static void validateTypeParameters(List<String> typeParameters) {
+    private static void validateTypeParameters(@Nullable List<String> typeParameters) {
         if (typeParameters == null) {
             return;
         }
@@ -676,18 +680,18 @@ public class Settings {
 
     public Predicate<String> getExcludeFilter() {
         if (excludeFilter == null) {
-            setExcludeFilter(null, null);
+            excludeFilter = createExcludeFilter(null, null);
         }
         return excludeFilter;
     }
 
-    public void setExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
-        this.excludeFilter = createExcludeFilter(excludedClasses, excludedClassPatterns);
+    public void setExcludeFilter(@Nullable List<String> excludedClasses, @Nullable List<String> excludedClassPatterns) {
+        excludeFilter = createExcludeFilter(excludedClasses, excludedClassPatterns);
     }
 
-    public static Predicate<String> createExcludeFilter(List<String> excludedClasses, List<String> excludedClassPatterns) {
+    public static Predicate<String> createExcludeFilter(@Nullable List<String> excludedClasses, @Nullable List<String> excludedClassPatterns) {
         final Set<String> names = new LinkedHashSet<>(excludedClasses != null ? excludedClasses : Collections.<String>emptyList());
-        names.add("java.lang.Record");
+        names.add(Record.class.getName());
         final List<Pattern> patterns = Utils.globsToRegexps(excludedClassPatterns != null ? excludedClassPatterns : Collections.<String>emptyList());
         return new Predicate<String>() {
             @Override
@@ -699,7 +703,7 @@ public class Settings {
 
     public Predicate<String> getMapClassesAsClassesFilter() {
         if (mapClassesAsClassesFilter == null) {
-            final List<Pattern> patterns = Utils.globsToRegexps(mapClassesAsClassesPatterns);
+            final List<Pattern> patterns = Utils.globsToRegexpsNullable(mapClassesAsClassesPatterns);
             mapClassesAsClassesFilter = new Predicate<String>() {
                 @Override
                 public boolean test(String className) {
@@ -711,7 +715,7 @@ public class Settings {
         return mapClassesAsClassesFilter;
     }
 
-    public void setRestNamespacingAnnotation(ClassLoader classLoader, String restNamespacingAnnotation) {
+    public void setRestNamespacingAnnotation(ClassLoader classLoader, @Nullable String restNamespacingAnnotation) {
         final Pair<Class<? extends Annotation>, String> pair = resolveRestNamespacingAnnotation(classLoader, restNamespacingAnnotation);
         if (pair != null) {
             this.restNamespacingAnnotation = pair.getValue1();
@@ -719,7 +723,7 @@ public class Settings {
         }
     }
 
-    private static Pair<Class<? extends Annotation>, String> resolveRestNamespacingAnnotation(ClassLoader classLoader, String restNamespacingAnnotation) {
+    private static @Nullable Pair<Class<? extends Annotation>, String> resolveRestNamespacingAnnotation(ClassLoader classLoader, @Nullable String restNamespacingAnnotation) {
         if (restNamespacingAnnotation == null) {
             return null;
         }
@@ -730,7 +734,7 @@ public class Settings {
         return Pair.of(annotationClass, elementName);
     }
 
-    public void setRestOptionsType(String restOptionsType) {
+    public void setRestOptionsType(@Nullable String restOptionsType) {
         if (restOptionsType != null) {
             if (restOptionsType.startsWith("<") && restOptionsType.endsWith(">")) {
                 this.restOptionsType = restOptionsType.substring(1, restOptionsType.length() - 1);
@@ -754,7 +758,7 @@ public class Settings {
                 try {
                     springClass = Class.forName(springClassName);
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("'generateStringApplicationInterface' or 'generateStringApplicationClient' parameter "
+                    throw new RuntimeException("'generateSpringApplicationInterface' or 'generateSpringApplicationClient' parameter "
                         + "was specified but '" + springClassName + "' was not found. "
                         + "Please add 'cz.habarta.typescript-generator:typescript-generator-spring' artifact "
                         + "to typescript-generator plugin dependencies (not module dependencies).");
@@ -791,7 +795,7 @@ public class Settings {
         return "For more information see 'http://vojtechhabarta.github.io/typescript-generator/doc/ModulesAndNamespaces.html'.";
     }
 
-    private static <T> List<Class<? extends T>> loadClasses(ClassLoader classLoader, List<String> classNames, Class<T> requiredClassType) {
+    private static <T> List<Class<? extends T>> loadClasses(ClassLoader classLoader, @Nullable List<String> classNames, @Nullable Class<T> requiredClassType) {
         if (classNames == null) {
             return Collections.emptyList();
         }
@@ -802,7 +806,7 @@ public class Settings {
         return classes;
     }
 
-    static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, Class<T> requiredClassType) {
+    static <T> Class<? extends T> loadClass(ClassLoader classLoader, String className, @Nullable Class<T> requiredClassType) {
         Objects.requireNonNull(classLoader, "classLoader");
         Objects.requireNonNull(className, "className");
         try {
@@ -832,7 +836,7 @@ public class Settings {
         annotationClasses.forEach(Settings::checkAnnotationHasRuntimeRetention);
     }
 
-    private static void checkAnnotationHasRuntimeRetention(Class<? extends Annotation> annotationClass) {
+    private static void checkAnnotationHasRuntimeRetention(@Nullable Class<? extends Annotation> annotationClass) {
         if (annotationClass == null) {
             return;
         }
@@ -860,7 +864,7 @@ public class Settings {
             : classLoader.loadClass(className);
     }
 
-    private static <T> List<T> loadInstances(ClassLoader classLoader, List<String> classNames, Class<T> requiredType) {
+    private static <T> List<T> loadInstances(ClassLoader classLoader, @Nullable List<String> classNames, Class<T> requiredType) {
         if (classNames == null) {
             return Collections.emptyList();
         }

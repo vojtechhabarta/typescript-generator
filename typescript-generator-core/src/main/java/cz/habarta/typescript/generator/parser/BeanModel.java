@@ -6,40 +6,50 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class BeanModel extends DeclarationModel {
 
-    private final Type parent;
-    private final List<Class<?>> taggedUnionClasses;
-    private final String discriminantProperty;
-    private final String discriminantLiteral;
+    private final @Nullable Type parent;
+    private final @Nullable List<Class<?>> taggedUnionClasses;
+    private final @Nullable String discriminantProperty;
+    private final @Nullable String discriminantLiteral;
     private final List<Type> interfaces;
     private final List<PropertyModel> properties;
 
-    public BeanModel(Class<?> origin, Type parent, List<Class<?>> taggedUnionClasses, String discriminantProperty, String discriminantLiteral, List<Type> interfaces, List<PropertyModel> properties, List<String> comments) {
+    public BeanModel(
+        Class<?> origin,
+        @Nullable Type parent,
+        @Nullable List<Class<?>> taggedUnionClasses,
+        @Nullable String discriminantProperty,
+        @Nullable String discriminantLiteral,
+        @Nullable List<Type> interfaces,
+        @Nullable List<PropertyModel> properties,
+        @Nullable List<String> comments
+    ) {
         super(origin, comments);
         this.parent = parent;
         this.taggedUnionClasses = taggedUnionClasses;
         this.discriminantProperty = discriminantProperty;
         this.discriminantLiteral = discriminantLiteral;
         this.interfaces = Utils.listFromNullable(interfaces);
-        this.properties = properties;
+        this.properties = Utils.listFromNullable(properties);
     }
 
-    public Type getParent() {
+    public @Nullable Type getParent() {
         return parent;
     }
 
-    public List<Class<?>> getTaggedUnionClasses() {
+    public @Nullable List<Class<?>> getTaggedUnionClasses() {
         return taggedUnionClasses;
     }
 
-    public String getDiscriminantProperty() {
+    public @Nullable String getDiscriminantProperty() {
         return discriminantProperty;
     }
 
-    public String getDiscriminantLiteral() {
+    public @Nullable String getDiscriminantLiteral() {
         return discriminantLiteral;
     }
 
@@ -60,7 +70,7 @@ public class BeanModel extends DeclarationModel {
         return properties;
     }
 
-    public PropertyModel getProperty(String name) {
+    public @Nullable PropertyModel getProperty(String name) {
         return properties.stream()
             .filter(property -> Objects.equals(property.getName(), name))
             .findFirst()
@@ -72,7 +82,7 @@ public class BeanModel extends DeclarationModel {
     }
 
     @Override
-    public BeanModel withComments(List<String> comments) {
+    public BeanModel withComments(@Nullable List<String> comments) {
         return new BeanModel(origin, parent, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, comments);
     }
 

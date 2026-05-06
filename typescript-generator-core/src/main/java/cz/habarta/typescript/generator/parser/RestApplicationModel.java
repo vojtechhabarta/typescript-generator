@@ -4,13 +4,14 @@ package cz.habarta.typescript.generator.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class RestApplicationModel {
 
     private final RestApplicationType type;
-    private String applicationPath;
-    private String applicationName;
+    private @Nullable String applicationPath;
+    private @Nullable String applicationName;
     private final List<RestMethodModel> methods;
 
     public RestApplicationModel(RestApplicationType type) {
@@ -18,7 +19,12 @@ public class RestApplicationModel {
         this.methods = new ArrayList<>();
     }
 
-    public RestApplicationModel(RestApplicationType type, String applicationPath, String applicationName, List<RestMethodModel> methods) {
+    public RestApplicationModel(
+        RestApplicationType type,
+        @Nullable String applicationPath,
+        @Nullable String applicationName,
+        List<RestMethodModel> methods
+    ) {
         this.type = Objects.requireNonNull(type);
         this.applicationPath = applicationPath;
         this.applicationName = applicationName;
@@ -29,19 +35,19 @@ public class RestApplicationModel {
         return type;
     }
 
-    public String getApplicationPath() {
+    public @Nullable String getApplicationPath() {
         return applicationPath;
     }
 
-    public void setApplicationPath(String applicationPath) {
+    public void setApplicationPath(@Nullable String applicationPath) {
         this.applicationPath = applicationPath;
     }
 
-    public String getApplicationName() {
+    public @Nullable String getApplicationName() {
         return applicationName;
     }
 
-    public void setApplicationName(String applicationName) {
+    public void setApplicationName(@Nullable String applicationName) {
         this.applicationName = applicationName;
     }
 

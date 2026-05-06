@@ -6,13 +6,14 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsObjectLiteral extends TsExpression {
 
     private final List<TsPropertyDefinition> propertyDefinitions;
 
-    public TsObjectLiteral(TsPropertyDefinition... propertyDefinitions) {
+    public TsObjectLiteral(@Nullable TsPropertyDefinition... propertyDefinitions) {
         this(Utils.removeNulls(Arrays.asList(propertyDefinitions)));
     }
 

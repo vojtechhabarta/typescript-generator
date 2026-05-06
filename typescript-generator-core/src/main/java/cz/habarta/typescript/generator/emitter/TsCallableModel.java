@@ -2,8 +2,9 @@
 package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.TsType;
-import java.util.Collections;
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsCallableModel {
@@ -12,17 +13,22 @@ public class TsCallableModel {
     protected final TsModifierFlags modifiers;
     protected final List<TsType.GenericVariableType> typeParameters;
     protected final List<TsParameterModel> parameters;
-    protected final TsType returnType;
-    protected final List<TsStatement> body;
-    protected final List<String> comments;
+    protected final @Nullable TsType returnType;
+    protected final @Nullable List<TsStatement> body;
+    protected final @Nullable List<String> comments;
 
     public TsCallableModel(
-        String name, TsModifierFlags modifiers, List<TsType.GenericVariableType> typeParameters,
-        List<TsParameterModel> parameters, TsType returnType, List<TsStatement> body, List<String> comments
+        String name,
+        @Nullable TsModifierFlags modifiers,
+        @Nullable List<TsType.GenericVariableType> typeParameters,
+        List<TsParameterModel> parameters,
+        @Nullable TsType returnType,
+        @Nullable List<TsStatement> body,
+        @Nullable List<String> comments
     ) {
         this.name = name;
         this.modifiers = modifiers != null ? modifiers : TsModifierFlags.None;
-        this.typeParameters = typeParameters != null ? typeParameters : Collections.<TsType.GenericVariableType>emptyList();
+        this.typeParameters = Utils.listFromNullable(typeParameters);
         this.parameters = parameters;
         this.returnType = returnType;
         this.body = body;
@@ -45,15 +51,15 @@ public class TsCallableModel {
         return parameters;
     }
 
-    public TsType getReturnType() {
+    public @Nullable TsType getReturnType() {
         return returnType;
     }
 
-    public List<TsStatement> getBody() {
+    public @Nullable List<TsStatement> getBody() {
         return body;
     }
 
-    public List<String> getComments() {
+    public @Nullable List<String> getComments() {
         return comments;
     }
 

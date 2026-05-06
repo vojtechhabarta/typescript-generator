@@ -5,6 +5,7 @@ import cz.habarta.typescript.generator.TsProperty;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsPropertyModel extends TsProperty implements Comparable<TsProperty> {
@@ -12,14 +13,22 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
     public final List<TsDecorator> decorators;
     public final TsModifierFlags modifiers;
     public final boolean ownProperty; // property exists directly on the bean, should not be inherited
-    public final TsExpression defaultValue;
-    public final List<String> comments;
+    public final @Nullable TsExpression defaultValue;
+    public final @Nullable List<String> comments;
 
-    public TsPropertyModel(String name, TsType tsType, TsModifierFlags modifiers, boolean ownProperty, List<String> comments) {
+    public TsPropertyModel(String name, TsType tsType, @Nullable TsModifierFlags modifiers, boolean ownProperty, @Nullable List<String> comments) {
         this(name, tsType, /*decorators*/ null, modifiers, ownProperty, /*defaultValue*/ null, comments);
     }
 
-    public TsPropertyModel(String name, TsType tsType, List<TsDecorator> decorators, TsModifierFlags modifiers, boolean ownProperty, TsExpression defaultValue, List<String> comments) {
+    public TsPropertyModel(
+        String name,
+        TsType tsType,
+        @Nullable List<TsDecorator> decorators,
+        @Nullable TsModifierFlags modifiers,
+        boolean ownProperty,
+        @Nullable TsExpression defaultValue,
+        @Nullable List<String> comments
+    ) {
         super(name, tsType);
         this.decorators = Utils.listFromNullable(decorators);
         this.modifiers = modifiers != null ? modifiers : TsModifierFlags.None;
@@ -44,15 +53,15 @@ public class TsPropertyModel extends TsProperty implements Comparable<TsProperty
         return ownProperty;
     }
 
-    public TsExpression getDefaultValue() {
+    public @Nullable TsExpression getDefaultValue() {
         return defaultValue;
     }
 
-    public TsPropertyModel withDefaultValue(TsExpression defaultValue) {
+    public TsPropertyModel withDefaultValue(@Nullable TsExpression defaultValue) {
         return new TsPropertyModel(name, tsType, decorators, modifiers, ownProperty, defaultValue, comments);
     }
 
-    public List<String> getComments() {
+    public @Nullable List<String> getComments() {
         return comments;
     }
 

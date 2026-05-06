@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
+
 
 public class Jackson3ConfigurationResolvedTest {
 
@@ -13,7 +15,7 @@ public class Jackson3ConfigurationResolvedTest {
         final Jackson3Configuration configuration = new Jackson3Configuration();
         configuration.serializerTypeMappings = Arrays.asList(Jackson3ParserTest.IdSerializer.class.getName() + ":" + "string");
         final Jackson3ConfigurationResolved resolved = Jackson3ConfigurationResolved.from(configuration, Thread.currentThread().getContextClassLoader());
-        Assertions.assertEquals("string", resolved.serializerTypeMappings.get(Jackson3ParserTest.IdSerializer.class));
+        Assertions.assertEquals("string", requireNonNull(resolved.serializerTypeMappings).get(Jackson3ParserTest.IdSerializer.class));
     }
 
 }

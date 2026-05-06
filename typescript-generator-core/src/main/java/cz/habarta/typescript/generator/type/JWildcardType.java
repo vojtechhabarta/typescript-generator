@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public class JWildcardType implements WildcardType {
@@ -18,7 +19,7 @@ public class JWildcardType implements WildcardType {
         this(null, null);
     }
 
-    public JWildcardType(Type[] upperBounds, Type[] lowerBounds) {
+    public JWildcardType(Type @Nullable [] upperBounds, Type @Nullable [] lowerBounds) {
         this.upperBounds = upperBounds != null ? upperBounds : new Type[0];
         this.lowerBounds = lowerBounds != null ? lowerBounds : new Type[0];
     }

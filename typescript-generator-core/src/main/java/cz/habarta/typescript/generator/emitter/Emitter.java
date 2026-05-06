@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 public class Emitter implements EmitterExtension.Writer {
@@ -26,16 +27,16 @@ public class Emitter implements EmitterExtension.Writer {
     private Writer writer;
     private int indent;
 
-    public Emitter(Settings settings) {
+    public Emitter(Settings settings, Writer output, @Nullable String outputName) {
         this.settings = settings;
-    }
-
-    public void emit(TsModel model, Writer output, String outputName, boolean closeOutput) {
         this.writer = output;
         this.indent = 0;
         if (outputName != null) {
             TypeScriptGenerator.getLogger().info("Writing declarations to: " + outputName);
         }
+    }
+
+    public void emit(TsModel model, boolean closeOutput) {
         emitFileComment();
         emitReferences();
         emitImports();
@@ -75,7 +76,7 @@ public class Emitter implements EmitterExtension.Writer {
         if (settings.moduleDependencies != null && !settings.moduleDependencies.isEmpty()) {
             writeNewLine();
             for (ModuleDependency dependency : settings.moduleDependencies) {
-                if (!dependency.global) {
+                if (!dependency.global && dependency.importAs != null && dependency.importFrom != null) {
                     writeIndentedLine("import * as " + dependency.importAs + " from " + quote(dependency.importFrom, settings) + ";");
                 }
             }
@@ -89,7 +90,7 @@ public class Emitter implements EmitterExtension.Writer {
     }
 
     private void emitModule(TsModel model) {
-        if (settings.outputKind == TypeScriptOutputKind.ambientModule) {
+        if (settings.outputKind == TypeScriptOutputKind.ambientModule && settings.module != null) {
             writeNewLine();
             writeIndentedLine("declare module " + quote(settings.module, settings) + " {");
             indent++;
@@ -442,7 +443,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    private void emitComments(List<String> comments) {
+    private void emitComments(@Nullable List<String> comments) {
         if (comments != null) {
             writeIndentedLine("/**");
             for (String comment : comments) {
@@ -452,7 +453,7 @@ public class Emitter implements EmitterExtension.Writer {
         }
     }
 
-    public static void writeTemplate(EmitterExtension.Writer writer, Settings settings, List<String> template, Map<String, String> replacements) {
+    public static void writeTemplate(EmitterExtension.Writer writer, Settings settings, List<String> template, @Nullable Map<String, String> replacements) {
         for (String line : template) {
             if (replacements != null) {
                 for (Map.Entry<String, String> entry : replacements.entrySet()) {

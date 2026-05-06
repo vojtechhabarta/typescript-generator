@@ -3,11 +3,12 @@ package cz.habarta.typescript.generator.parser;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class SwaggerOperation {
-    public Type responseType;
-    public List<SwaggerResponse> possibleResponses;
+    public @Nullable Type responseType;
+    public @Nullable List<SwaggerResponse> possibleResponses;
     public boolean hidden;
-    public String comment;
+    public @Nullable String comment;
 }

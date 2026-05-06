@@ -9,9 +9,11 @@ import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.io.File;
 import java.util.Arrays;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -25,14 +27,14 @@ public class JavadocTest {
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithJavadoc.class);
             final BeanModel bean = model.getBeans().get(0);
-            Assertions.assertEquals("Documentation for ClassWithJavadoc. First line.", bean.getComments().get(0));
-            Assertions.assertEquals("Second line.", bean.getComments().get(1));
+            Assertions.assertEquals("Documentation for ClassWithJavadoc. First line.", requireNonNull(bean.getComments()).get(0));
+            Assertions.assertEquals("Second line.", requireNonNull(bean.getComments()).get(1));
             final PropertyModel property1 = bean.getProperties().get(0);
-            Assertions.assertEquals("Documentation for documentedField.", property1.getComments().get(0));
+            Assertions.assertEquals("Documentation for documentedField.", requireNonNull(property1.getComments()).get(0));
             final PropertyModel property2 = bean.getProperties().get(1);
-            Assertions.assertEquals("Documentation for documentedEnumField.", property2.getComments().get(0));
+            Assertions.assertEquals("Documentation for documentedEnumField.", requireNonNull(property2.getComments()).get(0));
             final EnumModel enumModel = model.getEnums().get(0);
-            Assertions.assertEquals("Documentation for DummyEnum.", enumModel.getComments().get(0));
+            Assertions.assertEquals("Documentation for DummyEnum.", requireNonNull(enumModel.getComments()).get(0));
         }
         {
             final Model model = new Jackson2Parser(settings, typeProcessor).parseModel(ClassWithoutJavadoc.class);
@@ -114,6 +116,7 @@ public class JavadocTest {
      * Documentation for ClassWithJavadoc. First line.
      * Second line.
      */
+    @SuppressWarnings("NullAway.Init")
     public static class ClassWithJavadoc {
 
         /**
@@ -129,7 +132,7 @@ public class JavadocTest {
         /**
          * Documentation for getter property.
          */
-        public String getGetterProperty() {
+        public @Nullable String getGetterProperty() {
             return null;
         }
 
@@ -156,6 +159,7 @@ public class JavadocTest {
 
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class ClassWithoutJavadoc {
 
         public String undocumentedField;
@@ -163,6 +167,7 @@ public class JavadocTest {
     }
 
     @Deprecated
+    @SuppressWarnings("NullAway.Init")
     public static class DeprecatedClassWithoutJavadoc {
 
         @Deprecated
@@ -195,6 +200,7 @@ public class JavadocTest {
      * }
      * }</pre>
      */
+    @SuppressWarnings("NullAway.Init")
     public static class ClassWithEmbeddedExample {
 
         public String field;

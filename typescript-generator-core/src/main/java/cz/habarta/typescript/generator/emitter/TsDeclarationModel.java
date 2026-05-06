@@ -4,27 +4,28 @@ package cz.habarta.typescript.generator.emitter;
 import cz.habarta.typescript.generator.compiler.Symbol;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
 
-    protected final Class<?> origin;
-    protected final TsBeanCategory category;
+    protected final @Nullable Class<?> origin;
+    protected final @Nullable TsBeanCategory category;
     protected final Symbol name;
-    protected final List<String> comments;
+    protected final @Nullable List<String> comments;
 
-    public TsDeclarationModel(Class<?> origin, TsBeanCategory category, Symbol name, List<String> comments) {
+    public TsDeclarationModel(@Nullable Class<?> origin, @Nullable TsBeanCategory category, Symbol name, @Nullable List<String> comments) {
         this.origin = origin;
         this.category = category;
         this.name = Objects.requireNonNull(name);
         this.comments = comments;
     }
 
-    public Class<?> getOrigin() {
+    public @Nullable Class<?> getOrigin() {
         return origin;
     }
 
-    public TsBeanCategory getCategory() {
+    public @Nullable TsBeanCategory getCategory() {
         return category;
     }
 
@@ -32,7 +33,7 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
         return name;
     }
 
-    public List<String> getComments() {
+    public @Nullable List<String> getComments() {
         return comments;
     }
 
@@ -52,7 +53,7 @@ public class TsDeclarationModel implements Comparable<TsDeclarationModel> {
     /**
      * Natural order with null last.
      */
-    private static <T extends Comparable<T>> int compare(T o1, T o2) {
+    private static <T extends Comparable<T>> int compare(@Nullable T o1, @Nullable T o2) {
         if (o1 != null) {
             return o2 != null ? o1.compareTo(o2) : -1;
         } else {
