@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 
 public class JsonDeserializationExtension extends Extension {
@@ -98,14 +99,21 @@ public class JsonDeserializationExtension extends Extension {
             if (bean.isDataClass()) {
                 final List<TsMethodModel> methods = new ArrayList<>(bean.getMethods());
                 final TsMethodModel deserializationMethod = createDeserializationMethod(symbolTable, tsModel, bean);
+                if (deserializationMethod == null) {
+                    continue;
+                }
                 methods.add(0, deserializationMethod);
                 if (!bean.getTypeParameters().isEmpty()) {
                     final TsMethodModel genericFunctionConstructor = createDeserializationGenericFunctionConstructor(symbolTable, tsModel, bean);
-                    methods.add(0, genericFunctionConstructor);
+                    if (genericFunctionConstructor != null) {
+                        methods.add(0, genericFunctionConstructor);
+                    }
                 }
                 if (bean.getTaggedUnionAlias() != null) {
                     final TsMethodModel unionDeserializationMethod = createDeserializationMethodForTaggedUnion(symbolTable, tsModel, bean);
-                    methods.add(1, unionDeserializationMethod);
+                    if (unionDeserializationMethod != null) {
+                        methods.add(1, unionDeserializationMethod);
+                    }
                 }
                 beans.add(bean.withMethods(methods));
             } else {
@@ -115,7 +123,10 @@ public class JsonDeserializationExtension extends Extension {
         return tsModel.withBeans(beans);
     }
 
-    private static TsMethodModel createDeserializationMethod(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+    private static @Nullable TsMethodModel createDeserializationMethod(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+        if (bean.getOrigin() == null) {
+            return null;
+        }
         final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
         List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
 
@@ -170,7 +181,7 @@ public class JsonDeserializationExtension extends Extension {
         );
     }
 
-    private static List<TsIdentifierReference> getConstructorParameters(TsBeanModel bean) {
+    private static @Nullable List<TsIdentifierReference> getConstructorParameters(TsBeanModel bean) {
         TsConstructorModel constructor = bean.getConstructor();
         if (constructor == null) {
             return null;
@@ -182,7 +193,10 @@ public class JsonDeserializationExtension extends Extension {
         return parameters;
     }
 
-    private static TsMethodModel createDeserializationGenericFunctionConstructor(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+    private static @Nullable TsMethodModel createDeserializationGenericFunctionConstructor(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+        if (bean.getOrigin() == null) {
+            return null;
+        }
         final Symbol beanIdentifier = symbolTable.getSymbol(bean.getOrigin());
         List<TsType.GenericVariableType> typeParameters = getTypeParameters(bean.getOrigin());
         final TsType.ReferenceType dataType = new TsType.GenericReferenceType(beanIdentifier, typeParameters);
@@ -316,10 +330,14 @@ public class JsonDeserializationExtension extends Extension {
         );
     }
 
-    private static TsMethodModel createDeserializationMethodForTaggedUnion(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+    private static @Nullable TsMethodModel createDeserializationMethodForTaggedUnion(SymbolTable symbolTable, TsModel tsModel, TsBeanModel bean) {
+        if (bean.getTaggedUnionClasses() == null || bean.getDiscriminantProperty() == null || bean.getTaggedUnionAlias() == null) {
+            return null;
+        }
         final List<TsSwitchCaseClause> caseClauses = new ArrayList<>();
         for (Class<?> cls : bean.getTaggedUnionClasses()) {
             final TsBeanModel tuBean = tsModel.getBean(cls);
+            if (tuBean == null || tuBean.getDiscriminantLiteral() == null) continue;
             caseClauses.add(new TsSwitchCaseClause(
                 new TsStringLiteral(tuBean.getDiscriminantLiteral()),
                 Arrays.<TsStatement>asList(new TsReturnStatement(
@@ -367,7 +385,7 @@ public class JsonDeserializationExtension extends Extension {
         return tsModel.withBeans(beans);
     }
 
-    private static TsMethodModel addCopyFnToJaxrsMethod(SymbolTable symbolTable, TsModel tsModel, TsMethodModel method) {
+    private static @Nullable TsMethodModel addCopyFnToJaxrsMethod(SymbolTable symbolTable, TsModel tsModel, TsMethodModel method) {
         final TsType returnType = method.getReturnType();
         if (!(returnType instanceof TsType.GenericReferenceType)) return null;
         final TsType.GenericReferenceType genericReferenceReturnType = (TsType.GenericReferenceType) returnType;

@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 
 
 public class CustomMappingTypeProcessor implements TypeProcessor {
@@ -18,7 +19,7 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
     }
 
     @Override
-    public Result processType(Type javaType, Context context) {
+    public @Nullable Result processType(Type javaType, Context context) {
         final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
         if (rawClass == null) {
             return null;
@@ -39,6 +40,9 @@ public class CustomMappingTypeProcessor implements TypeProcessor {
         final Function<Integer, TsType> processGenericParameter = index -> {
             final Type typeArgument = resolvedTypeParameters.get(index);
             final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
+            if (typeArgumentResult == null) {
+                return TsType.Any;
+            }
             discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
             return typeArgumentResult.getTsType();
         };

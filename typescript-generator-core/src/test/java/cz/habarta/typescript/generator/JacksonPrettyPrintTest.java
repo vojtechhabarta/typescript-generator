@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,7 @@ public class JacksonPrettyPrintTest {
         public String string1 = "string1";
         public int number2 = 123;
         public boolean boolean3 = true;
-        public Object null4 = null;
+        public @Nullable Object null4 = null;
         public List<String> list5 = List.of("one", "two", "three");
         public Map<String, String> map6 = Utils.mapOf("key1", "value1", "key2", "value2");
         public List<String> emptyList7 = List.of();

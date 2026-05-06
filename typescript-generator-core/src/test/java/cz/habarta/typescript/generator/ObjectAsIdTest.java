@@ -238,6 +238,7 @@ public class ObjectAsIdTest {
         public String myProperty = "valueD";
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ObjectWithID {
         @JsonProperty("@@@id")
         public String myIdentification;
@@ -278,6 +279,7 @@ public class ObjectAsIdTest {
         public String myProperty = "valueE";
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Wrapper {
         public TestObjectA testObjectA1;
         public TestObjectA testObjectA2;
@@ -293,6 +295,7 @@ public class ObjectAsIdTest {
         public TestObjectE testObjectE3;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class WrapperWithLists {
         public List<TestObjectA> listOfTestObjectA;
         public List<TestObjectB> listOfTestObjectB;
@@ -301,6 +304,7 @@ public class ObjectAsIdTest {
         public @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "@@@id") @JsonIdentityReference(alwaysAsId = true) List<TestObjectE> listOfTestObjectE;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class WrapperWithNestedMaps {
         public List<Map<String, TestObjectA>> listOfMapOfTestObjectA;
         public List<Map<String, TestObjectB>> listOfMapOfTestObjectB;

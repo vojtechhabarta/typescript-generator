@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -146,7 +147,10 @@ public class BeanPropertyPathExtension extends EmitterExtension {
         return type;
     }
 
-    private static TsBeanModel getBeanModelByType(TsModel model, TsType type) {
+    private static @Nullable TsBeanModel getBeanModelByType(TsModel model, @Nullable TsType type) {
+        if (type == null) {
+            return null;
+        }
         TsType originalType = extractOriginalTsType(type);
         if (!(originalType instanceof TsType.ReferenceType)) {
             return null;

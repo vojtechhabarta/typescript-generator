@@ -11,6 +11,7 @@ public class ParentClassExclusionTest {
     private static class Base {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Derived extends Base {
         public String name;
     }

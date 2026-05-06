@@ -13,13 +13,13 @@ public class StyleConfigurationTest {
             return -1;
         }
 
-        public B getB() {
+        public @org.jspecify.annotations.Nullable B getB() {
             return null;
         }
     }
 
     public static class B {
-        public String getS() {
+        public @org.jspecify.annotations.Nullable String getS() {
             return null;
         }
     }

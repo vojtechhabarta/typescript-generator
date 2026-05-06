@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 public class DuplicatePropertyTest {
 
+    @SuppressWarnings("NullAway.Init")
     public static class DuplicateKindUsage {
         public DuplicateKind duplicateKind;
     }
@@ -24,6 +25,7 @@ public class DuplicatePropertyTest {
         // public String kind;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class DuplicateKind1 extends DuplicateKind {
         public String kind;
     }

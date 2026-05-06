@@ -8,15 +8,16 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import org.jspecify.annotations.Nullable;
 
 
 public class Output {
 
     private final Writer writer;
-    private final String name;
+    private final @Nullable String name;
     private final boolean closeWriter;
 
-    private Output(Writer writer, String name, boolean closeWriter) {
+    private Output(Writer writer, @Nullable String name, boolean closeWriter) {
         this.writer = writer;
         this.name = name;
         this.closeWriter = closeWriter;
@@ -26,7 +27,7 @@ public class Output {
         return writer;
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 

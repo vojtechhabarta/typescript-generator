@@ -20,6 +20,7 @@ public class OnePossiblePropertyValueAssigningExtensionTest {
     private static final String BASE_PATH = "/ext/OnePossiblePropertyValueAssigningExtensionTest-";
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "discriminator")
+    @SuppressWarnings("NullAway.Init")
     abstract static class BaseClass {
 
         @JsonProperty
@@ -29,12 +30,14 @@ public class OnePossiblePropertyValueAssigningExtensionTest {
         private OneValueEnum field2;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class SubClass extends BaseClass {
 
         @JsonProperty
         private String testField1;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class OtherSubClass extends BaseClass {
 
         @JsonProperty

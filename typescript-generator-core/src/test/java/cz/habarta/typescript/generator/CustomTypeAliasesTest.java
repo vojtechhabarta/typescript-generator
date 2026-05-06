@@ -20,10 +20,12 @@ public class CustomTypeAliasesTest {
         Assertions.assertTrue(output.contains("export type Id<T> = string"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class MyEntityRepresentation {
         public IdRepresentation<MyEntityRepresentation> id;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class IdRepresentation<T> {
         public String id;
     }

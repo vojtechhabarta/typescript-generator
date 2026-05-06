@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 
@@ -16,7 +17,7 @@ public class LoadedModuleDependencies {
 
     private final Map<String/*javaClass*/, Pair<ModuleDependency, String/*namespacedName*/>> classMappings = new LinkedHashMap<>();
 
-    public LoadedModuleDependencies(Settings settings, List<ModuleDependency> dependencies) {
+    public LoadedModuleDependencies(Settings settings, @Nullable List<ModuleDependency> dependencies) {
         if (dependencies == null) {
             return;
         }
@@ -89,7 +90,7 @@ public class LoadedModuleDependencies {
         }
     }
 
-    public Pair<String/*module*/, String/*namespacedName*/> getFullName(Class<?> cls) {
+    public @Nullable Pair<@Nullable String/*module*/, String/*namespacedName*/> getFullName(Class<?> cls) {
         final Pair<ModuleDependency, String> mapping = classMappings.get(cls.getName());
         if (mapping != null) {
             return Pair.of(mapping.getValue1().importAs, mapping.getValue2());

@@ -4,23 +4,29 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
+import org.jspecify.annotations.Nullable;
 
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ModuleDependency {
 
     public boolean global;
-    public String importFrom;
-    public String importAs;
+    public @Nullable String importFrom;
+    public @Nullable String importAs;
     public File infoJson;
-    public String npmPackageName;
-    public String npmVersionRange;
+    public @Nullable String npmPackageName;
+    public @Nullable String npmVersionRange;
     public boolean peerDependency;
 
-    public ModuleDependency() {
-    }
-
-    private ModuleDependency(boolean global, String importFrom, String importAs, File infoJson, String npmPackageName, String npmVersionRange, boolean peerDependency) {
+    public ModuleDependency(
+        boolean global,
+        @Nullable String importFrom,
+        @Nullable String importAs,
+        File infoJson,
+        @Nullable String npmPackageName,
+        @Nullable String npmVersionRange,
+        boolean peerDependency
+    ) {
         this.global = global;
         this.importFrom = importFrom;
         this.importAs = importAs;

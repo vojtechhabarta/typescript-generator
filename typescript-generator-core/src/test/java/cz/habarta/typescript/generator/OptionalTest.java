@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -112,14 +113,14 @@ public class OptionalTest {
     }
 
     private static class Person {
-        public String name;
-        public Optional<String> email;
-        public OptionalInt age;
+        public @Nullable String name;
+        public @Nullable Optional<String> email;
+        public @Nullable OptionalInt age;
 
         public Person() {
         }
 
-        public Person(String name, Optional<String> email) {
+        public Person(String name, @Nullable Optional<String> email) {
             this.name = name;
             this.email = email;
         }

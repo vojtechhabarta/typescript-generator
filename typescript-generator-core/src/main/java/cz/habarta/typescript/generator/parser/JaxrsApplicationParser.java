@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public class JaxrsApplicationParser extends RestApplicationParser {
@@ -81,7 +82,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
     }
 
     @Override
-    public Result tryParse(SourceType<?> sourceType) {
+    public @Nullable Result tryParse(SourceType<?> sourceType) {
         if (!(sourceType.type instanceof Class<?>)) {
             return null;
         }
@@ -239,7 +240,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
     }
 
-    private static HttpMethod getHttpMethod(Method method) {
+    private static @Nullable HttpMethod getHttpMethod(Method method) {
         for (Annotation annotation : method.getAnnotations()) {
             final HttpMethod httpMethodAnnotation = getRsAnnotation(annotation.annotationType(), HttpMethod.class);
             if (httpMethodAnnotation != null) {
@@ -249,7 +250,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         return null;
     }
 
-    private static BeanModel getQueryParameters(Class<?> paramBean) {
+    private static @Nullable BeanModel getQueryParameters(Class<?> paramBean) {
         final List<PropertyModel> properties = new ArrayList<>();
         final List<Field> fields = Utils.getAllFields(paramBean);
         for (Field field : fields) {
@@ -279,7 +280,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         }
     }
 
-    private MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method, List<Pair<Parameter, Type>> parameters) {
+    private @Nullable MethodParameterModel getEntityParameter(Class<?> resourceClass, Method method, List<Pair<Parameter, Type>> parameters) {
         for (Pair<Parameter, Type> pair : parameters) {
             if (!Utils.hasAnyAnnotation(annotationClass -> pair.getValue1().getAnnotation(annotationClass), Arrays.asList(
                 MatrixParam.class,
@@ -335,7 +336,7 @@ public class JaxrsApplicationParser extends RestApplicationParser {
         return standardEntityClassesMapping;
     }
 
-    private static Map<Class<?>, TsType> standardEntityClassesMapping;
+    private static @Nullable Map<Class<?>, TsType> standardEntityClassesMapping;
 
     private static List<String> getDefaultExcludedClassNames() {
         return Arrays.asList(

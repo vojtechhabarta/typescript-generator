@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsModel {
@@ -33,7 +34,7 @@ public class TsModel {
         return beans;
     }
 
-    public TsBeanModel getBean(Class<?> origin) {
+    public @Nullable TsBeanModel getBean(@Nullable Class<?> origin) {
         if (origin != null) {
             for (TsBeanModel bean : beans) {
                 if (Objects.equals(bean.getOrigin(), origin)) {
@@ -44,7 +45,7 @@ public class TsModel {
         return null;
     }
 
-    public TsBeanModel getBean(Symbol name) {
+    public @Nullable TsBeanModel getBean(@Nullable Symbol name) {
         if (name != null) {
             for (TsBeanModel bean : beans) {
                 if (Objects.equals(bean.getName(), name)) {
@@ -82,7 +83,7 @@ public class TsModel {
     }
 
     public TsModel withAddedEnums(List<TsEnumModel> enums) {
-        return new TsModel(beans, Utils.concat(this.enums, enums), originalStringEnums, typeAliases, helpers);
+        return new TsModel(beans, Utils.concatToNonNull(this.enums, enums), originalStringEnums, typeAliases, helpers);
     }
 
     public TsModel withRemovedEnums(List<TsEnumModel> enums) {
@@ -101,7 +102,7 @@ public class TsModel {
         return typeAliases;
     }
 
-    public TsAliasModel getTypeAlias(Class<?> origin) {
+    public @Nullable TsAliasModel getTypeAlias(@Nullable Class<?> origin) {
         if (origin != null) {
             for (TsAliasModel alias : typeAliases) {
                 if (Objects.equals(alias.getOrigin(), origin)) {
@@ -117,7 +118,7 @@ public class TsModel {
     }
 
     public TsModel withAddedTypeAliases(List<TsAliasModel> typeAliases) {
-        return new TsModel(beans, enums, originalStringEnums, Utils.concat(this.typeAliases, typeAliases), helpers);
+        return new TsModel(beans, enums, originalStringEnums, Utils.concatToNonNull(this.typeAliases, typeAliases), helpers);
     }
 
     public TsModel withRemovedTypeAliases(List<TsAliasModel> typeAliases) {

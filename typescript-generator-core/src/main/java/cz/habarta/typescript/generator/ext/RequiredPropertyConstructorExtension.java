@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -40,7 +41,7 @@ import java.util.regex.Pattern;
 public class RequiredPropertyConstructorExtension extends Extension {
     static final String CFG_CLASSES = "classes";
 
-    private List<String> classes;
+    private @Nullable List<String> classes;
 
     @Override
     public EmitterExtensionFeatures getFeatures() {
@@ -76,7 +77,7 @@ public class RequiredPropertyConstructorExtension extends Extension {
         TsBeanModel bean, TsModel model,
         Map<String, TsConstructorModel> generatedConstructors
     ) {
-        if (classes != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
+        if (classes != null && bean.getOrigin() != null && !classes.contains(bean.getOrigin().getCanonicalName())) {
             return bean;
         }
         if (!bean.isClass() || bean.getConstructor() != null) {
@@ -174,8 +175,10 @@ public class RequiredPropertyConstructorExtension extends Extension {
             }
             EnumMemberModel singleElement = enumModel.getMembers().iterator().next();
             Object enumValue = singleElement.getEnumValue();
-            TsStringLiteral expression = new TsStringLiteral((String) enumValue);
-            return Optional.of(expression);
+            if (enumValue instanceof String stringEnumValue) {
+                TsStringLiteral expression = new TsStringLiteral(stringEnumValue);
+                return Optional.of(expression);
+            }
         }
         return Optional.empty();
     }

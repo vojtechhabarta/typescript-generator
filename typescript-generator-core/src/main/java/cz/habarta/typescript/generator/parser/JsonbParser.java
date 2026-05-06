@@ -53,12 +53,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 // simplified+dependency free version of apache johnzon JsonbAccessMode
 public class JsonbParser extends ModelParser {
 
-    private final Class<? extends Annotation> johnzonAny;
+    private final @Nullable Class<? extends Annotation> johnzonAny;
 
     public static class Factory extends ModelParser.Factory {
 
@@ -90,7 +91,7 @@ public class JsonbParser extends ModelParser {
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends Annotation> loadJohnzonAnyClass() {
+    private @Nullable Class<? extends Annotation> loadJohnzonAnyClass() {
         try {
             return (Class<? extends Annotation>) settings.classLoader
                 .loadClass("org.apache.johnzon.mapper.JohnzonAny");
@@ -136,13 +137,13 @@ public class JsonbParser extends ModelParser {
     }
 
     private class JsonbPropertyExtractor {
-        private final Class<? extends Annotation> johnzonAny;
+        private final @Nullable Class<? extends Annotation> johnzonAny;
         private final PropertyNamingStrategy naming;
         private final PropertyVisibilityStrategy visibility;
         private final BaseAccessMode delegate;
 
         private JsonbPropertyExtractor(
-            final Class<? extends Annotation> johnzonAny,
+            final @Nullable Class<? extends Annotation> johnzonAny,
             final PropertyNamingStrategy propertyNamingStrategy,
             final PropertyVisibilityStrategy visibilityStrategy,
             final BaseAccessMode delegate
@@ -294,9 +295,9 @@ public class JsonbParser extends ModelParser {
     private interface DecoratedType {
         Type getType();
 
-        <T extends Annotation> T getAnnotation(Class<T> clazz);
+        <T extends Annotation> @Nullable T getAnnotation(Class<T> clazz);
 
-        <T extends Annotation> T getClassOrPackageAnnotation(Class<T> clazz);
+        <T extends Annotation> @Nullable T getClassOrPackageAnnotation(Class<T> clazz);
     }
 
     private interface BaseAccessMode {
@@ -304,9 +305,9 @@ public class JsonbParser extends ModelParser {
     }
 
     private static class FieldAccessMode implements BaseAccessMode {
-        private final Class<? extends Annotation> johnzonAny;
+        private final @Nullable Class<? extends Annotation> johnzonAny;
 
-        public FieldAccessMode(final Class<? extends Annotation> johnzonAny) {
+        public FieldAccessMode(final @Nullable Class<? extends Annotation> johnzonAny) {
             this.johnzonAny = johnzonAny;
         }
 
@@ -361,7 +362,7 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <T extends Annotation> T getClassOrPackageAnnotation(final Class<T> clazz) {
+            public <T extends Annotation> @Nullable T getClassOrPackageAnnotation(final Class<T> clazz) {
                 return Meta.getClassOrPackageAnnotation(field, clazz);
             }
 
@@ -375,7 +376,7 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <T extends Annotation> T getAnnotation(final Class<T> clazz) {
+            public <T extends Annotation> @Nullable T getAnnotation(final Class<T> clazz) {
                 return Meta.getAnnotation(field, clazz);
             }
 
@@ -389,9 +390,9 @@ public class JsonbParser extends ModelParser {
     }
 
     private static class MethodAccessMode implements BaseAccessMode {
-        private final Class<? extends Annotation> johnzonAny;
+        private final @Nullable Class<? extends Annotation> johnzonAny;
 
-        public MethodAccessMode(final Class<? extends Annotation> johnzonAny) {
+        public MethodAccessMode(final @Nullable Class<? extends Annotation> johnzonAny) {
             this.johnzonAny = johnzonAny;
         }
 
@@ -454,7 +455,7 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <T extends Annotation> T getClassOrPackageAnnotation(final Class<T> clazz) {
+            public <T extends Annotation> @Nullable T getClassOrPackageAnnotation(final Class<T> clazz) {
                 return Meta.getClassOrPackageAnnotation(method, clazz);
             }
 
@@ -468,7 +469,7 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <T extends Annotation> T getAnnotation(final Class<T> clazz) {
+            public <T extends Annotation> @Nullable T getAnnotation(final Class<T> clazz) {
                 return Meta.getAnnotation(method, clazz);
             }
 
@@ -485,7 +486,7 @@ public class JsonbParser extends ModelParser {
         private final FieldAccessMode fields;
         private final MethodAccessMode methods;
 
-        private FieldAndMethodAccessMode(final Class<? extends Annotation> johnzonAny) {
+        private FieldAndMethodAccessMode(final @Nullable Class<? extends Annotation> johnzonAny) {
             this.fields = new FieldAccessMode(johnzonAny);
             this.methods = new MethodAccessMode(johnzonAny);
         }
@@ -526,7 +527,7 @@ public class JsonbParser extends ModelParser {
             return readers;
         }
 
-        private Field getField(final String fieldName, final Class<?> type) {
+        private @Nullable Field getField(final String fieldName, final Class<?> type) {
             Class<?> t = type;
             while (t != Object.class && t != null) {
                 try {
@@ -549,14 +550,14 @@ public class JsonbParser extends ModelParser {
             }
 
             @Override
-            public <A extends Annotation> A getClassOrPackageAnnotation(final Class<A> clazz) {
-                final A found = type1.getClassOrPackageAnnotation(clazz);
+            public <A extends Annotation> @Nullable A getClassOrPackageAnnotation(final Class<A> clazz) {
+                final @Nullable A found = type1.getClassOrPackageAnnotation(clazz);
                 return found == null ? type2.getClassOrPackageAnnotation(clazz) : found;
             }
 
             @Override
-            public <A extends Annotation> A getAnnotation(final Class<A> clazz) {
-                final A found = type1.getAnnotation(clazz);
+            public <A extends Annotation> @Nullable A getAnnotation(final Class<A> clazz) {
+                final @Nullable A found = type1.getAnnotation(clazz);
                 return found == null ? type2.getAnnotation(clazz) : found;
             }
 
@@ -727,19 +728,19 @@ public class JsonbParser extends ModelParser {
             // no-op
         }
 
-        private static <T extends Annotation> T getAnnotation(final AnnotatedElement holder, final Class<T> api) {
+        private static <T extends Annotation> @Nullable T getAnnotation(final AnnotatedElement holder, final Class<T> api) {
             return getDirectAnnotation(holder, api);
         }
 
-        private static <T extends Annotation> T getClassOrPackageAnnotation(final Method holder, final Class<T> api) {
+        private static <T extends Annotation> @Nullable T getClassOrPackageAnnotation(final Method holder, final Class<T> api) {
             return getIndirectAnnotation(api, holder::getDeclaringClass, () -> holder.getDeclaringClass().getPackage());
         }
 
-        private static <T extends Annotation> T getClassOrPackageAnnotation(final Field holder, final Class<T> api) {
+        private static <T extends Annotation> @Nullable T getClassOrPackageAnnotation(final Field holder, final Class<T> api) {
             return getIndirectAnnotation(api, holder::getDeclaringClass, () -> holder.getDeclaringClass().getPackage());
         }
 
-        private static <T extends Annotation> T getDirectAnnotation(final AnnotatedElement holder, final Class<T> api) {
+        private static <T extends Annotation> @Nullable T getDirectAnnotation(final AnnotatedElement holder, final Class<T> api) {
             final T annotation = getJsonbAnnotation(holder, api);
             if (annotation != null) {
                 return annotation;
@@ -747,7 +748,7 @@ public class JsonbParser extends ModelParser {
             return findMeta(holder.getAnnotations(), api);
         }
 
-        private static <T extends Annotation> T getIndirectAnnotation(
+        private static <T extends Annotation> @Nullable T getIndirectAnnotation(
             final Class<T> api,
             final Supplier<Class<?>> ownerSupplier,
             final Supplier<Package> packageSupplier
@@ -763,7 +764,7 @@ public class JsonbParser extends ModelParser {
             return null;
         }
 
-        public static <T extends Annotation> T findMeta(final Annotation[] annotations, final Class<T> api) {
+        public static <T extends Annotation> @Nullable T findMeta(final Annotation[] annotations, final Class<T> api) {
             for (final Annotation a : annotations) {
                 final Class<? extends Annotation> userType = a.annotationType();
                 final T aa = getJsonbAnnotation(userType, api);
@@ -788,7 +789,7 @@ public class JsonbParser extends ModelParser {
         private static <T extends Annotation> T newAnnotation(final Map<String, Method> methodMapping, final Annotation user, final T johnzon) {
             return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { johnzon.annotationType() },
                 (proxy, method, args) -> {
-                    final Method m = methodMapping.get(method.getName());
+                    final Method m = Objects.requireNonNull(methodMapping.get(method.getName()));
                     try {
                         if (m.getDeclaringClass() == user.annotationType()) {
                             return m.invoke(user, args);

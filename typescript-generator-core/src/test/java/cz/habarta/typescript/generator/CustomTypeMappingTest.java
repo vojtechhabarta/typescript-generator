@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +23,8 @@ public class CustomTypeMappingTest {
     public void test() {
         final Settings settings = TestUtils.settings();
         settings.quotes = "'";
-        settings.referencedFiles.add("../src/test/ts/my-custom-types.d.ts");
-        settings.importDeclarations.add("import * as myModule from '../src/test/ts/my-module.d.ts'");
+        settings.referencedFiles = List.of("../src/test/ts/my-custom-types.d.ts");
+        settings.importDeclarations = List.of("import * as myModule from '../src/test/ts/my-module.d.ts'");
         settings.customTypeMappings.put("java.util.Date", "MyDate");
         settings.customTypeMappings.put("java.util.Calendar", "myModule.MyCalendar");
         // new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomTypesUsage.class), Output.to(new File("target/CustomTypeMappingTest.d.ts")));
@@ -34,6 +35,7 @@ public class CustomTypeMappingTest {
         assertTrue(output.contains("calendar1: myModule.MyCalendar;"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class CustomTypesUsage {
         public Date date1;
         public Calendar calendar1;
@@ -135,6 +137,7 @@ public class CustomTypeMappingTest {
         Assertions.assertEquals("", output);
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class GenericClass<D> {
         public D type;
     }

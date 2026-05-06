@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -86,7 +87,7 @@ public class DefaultsFromInstanceExtension extends Extension {
         }
     }
 
-    protected Object getDefaultValue(BeanModel bean, Object instance, String propertyName) {
+    protected @Nullable Object getDefaultValue(BeanModel bean, Object instance, String propertyName) {
         final PropertyModel property = bean.getProperty(propertyName);
         if (property == null) {
             return null;

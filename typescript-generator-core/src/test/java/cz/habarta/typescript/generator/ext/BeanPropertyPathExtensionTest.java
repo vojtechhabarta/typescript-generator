@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 public class BeanPropertyPathExtensionTest {
 
+    @SuppressWarnings("NullAway.Init")
     static class ClassA {
         public String field1;
         public ClassB field2;

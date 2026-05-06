@@ -92,10 +92,11 @@ public class OptionalAnnotationTest {
     public @interface NullableType {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class BeanWithNullableType {
         @NullableType public String property1;
 
-        @NullableType public String getProperty2() {
+        @NullableType public @org.jspecify.annotations.Nullable String getProperty2() {
             return null;
         }
     }
@@ -108,6 +109,7 @@ public class OptionalAnnotationTest {
         Assertions.assertTrue(output.contains("selectedId?: number;"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public class SearchDTO {
 
         private Integer year;
@@ -166,6 +168,7 @@ public class OptionalAnnotationTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public class ClassWithMarkedField {
         public String a;
         @MarkerAnnotation
@@ -216,6 +219,7 @@ public class OptionalAnnotationTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public class ClassWithPrimitiveField {
         public char charVar1;
         public byte byteVar1;

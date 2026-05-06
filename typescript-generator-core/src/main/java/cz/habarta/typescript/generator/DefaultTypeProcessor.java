@@ -28,6 +28,7 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 public class DefaultTypeProcessor implements TypeProcessor {
@@ -35,7 +36,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
     private final LoadedDataLibraries known;
 
     public DefaultTypeProcessor() {
-        this(null);
+        this(new LoadedDataLibraries());
     }
 
     public DefaultTypeProcessor(LoadedDataLibraries dataLibraries) {
@@ -51,7 +52,7 @@ public class DefaultTypeProcessor implements TypeProcessor {
     }
 
     @Override
-    public Result processType(Type javaType, Context context) {
+    public @Nullable Result processType(Type javaType, Context context) {
         if (Objects.equals(javaType, Object.class)) {
             return new Result(TsType.Any);
         }
@@ -87,6 +88,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
             }
             if (javaClass.isArray()) {
                 final Result result = context.processTypeInsideCollection(javaClass.getComponentType());
+                if (result == null) {
+                    return null;
+                }
                 return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
             }
             if (javaClass.isEnum()) {
@@ -129,6 +133,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
                 final List<TsType> tsTypeArguments = new ArrayList<>();
                 for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
                     final TypeProcessor.Result typeArgumentResult = context.processType(typeArgument);
+                    if (typeArgumentResult == null) {
+                        return null;
+                    }
                     tsTypeArguments.add(typeArgumentResult.getTsType());
                     discoveredClasses.addAll(typeArgumentResult.getDiscoveredClasses());
                 }
@@ -138,6 +145,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (javaType instanceof GenericArrayType) {
             final GenericArrayType genericArrayType = (GenericArrayType) javaType;
             final Result result = context.processTypeInsideCollection(genericArrayType.getGenericComponentType());
+            if (result == null) {
+                return null;
+            }
             return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
         }
         if (javaType instanceof TypeVariable) {
@@ -172,6 +182,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (javaType instanceof JTypeWithNullability) {
             final JTypeWithNullability typeWithNullability = (JTypeWithNullability) javaType;
             final Result result = context.processType(typeWithNullability.getType());
+            if (result == null) {
+                return null;
+            }
             return new Result(
                 typeWithNullability.isNullable() ? new TsType.NullableType(result.getTsType()) : result.getTsType(),
                 result.getDiscoveredClasses()
@@ -180,12 +193,15 @@ public class DefaultTypeProcessor implements TypeProcessor {
         return null;
     }
 
-    private Result processKnownGenericType(Type javaType, Class<?> rawClass, Context context) {
+    private @Nullable Result processKnownGenericType(Type javaType, Class<?> rawClass, Context context) {
 
         final Optional<Class<?>> listBaseClass = assignableFrom(known.listClasses, rawClass);
         if (listBaseClass.isPresent()) {
             final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(listBaseClass.get(), javaType);
             final Result result = context.processTypeInsideCollection(resolvedGenericVariables.get(0));
+            if (result == null) {
+                return null;
+            }
             return new Result(new TsType.BasicArrayType(result.getTsType()), result.getDiscoveredClasses());
         }
 
@@ -194,11 +210,14 @@ public class DefaultTypeProcessor implements TypeProcessor {
             final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(mapBaseClass.get(), javaType);
             final Result keyResult = context.processType(resolvedGenericVariables.get(0));
             final Result valueResult = context.processTypeInsideCollection(resolvedGenericVariables.get(1));
+            if (keyResult == null || valueResult == null) {
+                return null;
+            }
             final TsType valueTsType = valueResult.getTsType();
             if (keyResult.getTsType() instanceof TsType.EnumReferenceType) {
                 return new Result(
                     new TsType.MappedType(keyResult.getTsType(), TsType.MappedType.QuestionToken.Question, valueTsType),
-                    Utils.concat(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
+                    Utils.concatToNonNull(keyResult.getDiscoveredClasses(), valueResult.getDiscoveredClasses())
                 );
             } else {
                 return new Result(
@@ -212,6 +231,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (optionalBaseClass.isPresent()) {
             final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(optionalBaseClass.get(), javaType);
             final Result result = context.processType(resolvedGenericVariables.get(0));
+            if (result == null) {
+                return null;
+            }
             return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
         }
 
@@ -219,6 +241,9 @@ public class DefaultTypeProcessor implements TypeProcessor {
         if (wrapperBaseClass.isPresent()) {
             final List<Type> resolvedGenericVariables = GenericsResolver.resolveBaseGenericVariables(wrapperBaseClass.get(), javaType);
             final Result result = context.processType(resolvedGenericVariables.get(0));
+            if (result == null) {
+                return null;
+            }
             return new Result(result.getTsType(), result.getDiscoveredClasses());
         }
 

@@ -4,10 +4,13 @@ package cz.habarta.typescript.generator;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,7 +23,7 @@ public class CustomTypeConversionTest {
         // suppose we want to override how A is parsed
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
-            public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+            public TypeProcessor.@Nullable Result processType(Type javaType, TypeProcessor.Context context) {
                 if (javaType.equals(B.class)) {
                     return new Result(TsType.Number.optional());
                 }
@@ -35,13 +38,13 @@ public class CustomTypeConversionTest {
     }
 
     public static class A {
-        public B getX() {
+        public @Nullable B getX() {
             return null;
         }
     }
 
     public static class B {
-        public B getX() {
+        public @Nullable B getX() {
             return null;
         }
     }
@@ -52,11 +55,13 @@ public class CustomTypeConversionTest {
         settings.mapDate = DateMapping.asString;
         settings.customTypeProcessor = new TypeProcessor() {
             @Override
-            public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+            public TypeProcessor.@Nullable Result processType(Type javaType, TypeProcessor.Context context) {
                 final Type[] typeArguments = tryGetParameterizedTypeArguments(javaType, CustomOptional.class);
                 if (typeArguments != null) {
                     final TypeProcessor.Result result = context.processType(typeArguments[0]);
-                    return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
+                    if (result != null) {
+                        return new Result(result.getTsType().optional(), result.getDiscoveredClasses());
+                    }
                 }
                 return null;
             }
@@ -65,8 +70,8 @@ public class CustomTypeConversionTest {
         final TypeProcessor.Context context = DefaultTypeProcessorTest.getTestContext(typeProcessor);
         {
             final Type maybeObjectFieldType = CustomOptionalUsage.class.getField("maybeObject").getGenericType();
-            final TypeProcessor.Result result = typeProcessor.processType(maybeObjectFieldType, context);
-            assertEquals(Arrays.asList(SomeObject.class), result.getDiscoveredClasses());
+            final TypeProcessor.Result result = requireNonNull(typeProcessor.processType(maybeObjectFieldType, context));
+            assertThat(result.getDiscoveredClasses()).isEqualTo(List.of(SomeObject.class));
         }
         {
             final String dts = new TypeScriptGenerator(settings).generateTypeScript(Input.from(CustomOptionalUsage.class));
@@ -75,7 +80,7 @@ public class CustomTypeConversionTest {
         }
     }
 
-    private static Type[] tryGetParameterizedTypeArguments(Type javaType, Class<?> requiredRawType) {
+    private static Type @Nullable [] tryGetParameterizedTypeArguments(Type javaType, Class<?> requiredRawType) {
         if (javaType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) javaType;
             if (parameterizedType.getRawType() instanceof Class) {
@@ -88,6 +93,7 @@ public class CustomTypeConversionTest {
         return null;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class CustomOptionalUsage {
         public CustomOptional<SomeObject> maybeObject;
         public CustomOptional<Date> maybeDate;

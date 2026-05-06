@@ -10,11 +10,13 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.BeanProperty;
 
 
+@NullUnmarked
 public class Jackson3ParserPropertiesTest {
 
     @JsonPropertyOrder({ "password1", "id2" })

@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.parser.PropertyModel;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 @FunctionalInterface
@@ -29,12 +30,12 @@ public interface TsModelTransformer {
             return symbolTable;
         }
 
-        public BeanModel getBeanModelOrigin(TsBeanModel tsBean) {
+        public @Nullable BeanModel getBeanModelOrigin(TsBeanModel tsBean) {
             final BeanModel bean = model.getBean(tsBean.getOrigin());
             return bean;
         }
 
-        public PropertyModel getPropertyModelOrigin(TsBeanModel tsBean, TsPropertyModel tsProperty) {
+        public @Nullable PropertyModel getPropertyModelOrigin(TsBeanModel tsBean, TsPropertyModel tsProperty) {
             final BeanModel bean = getBeanModelOrigin(tsBean);
             if (bean == null) {
                 return null;

@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -104,7 +105,7 @@ public class SpringTest {
     @RequestMapping
     public static class ControllerWithReservedWord {
         @GetMapping(value = "/logs/{class}")
-        public Collection<String> getLogs(@PathVariable("class") String clazz) {
+        public @Nullable Collection<String> getLogs(@PathVariable("class") String clazz) {
             return null;
         }
     }
@@ -173,7 +174,7 @@ public class SpringTest {
     @RequestMapping("/owners/{ownerId}")
     public static class Controller1 {
         @GetMapping("/pets/{petId}")
-        public Pet findPet(
+        public @Nullable Pet findPet(
             @PathVariable("ownerId") Long ownerId,
             @PathVariable(name = "petId") Long petId
         ) {
@@ -219,6 +220,7 @@ public class SpringTest {
             return nested.getMessage();
         }
 
+        @SuppressWarnings("NullAway.Init")
         static class FilterParams {
             private String message;
 
@@ -242,7 +244,7 @@ public class SpringTest {
     @RestController
     public static class Controller4 {
         @RequestMapping(path = "/data2", method = RequestMethod.GET)
-        public ResponseEntity<Data2> getEntity() {
+        public @Nullable ResponseEntity<Data2> getEntity() {
             return null;
         }
     }
@@ -251,7 +253,7 @@ public class SpringTest {
     @RequestMapping("/owners2/{ownerId}")
     public static class Controller5 {
         @GetMapping("/pets2/{petId}")
-        public Pet findPet(
+        public @Nullable Pet findPet(
             @PathVariable Long ownerId,
             @PathVariable Long petId
         ) {
@@ -282,7 +284,7 @@ public class SpringTest {
     static abstract class Controller6Super<A extends Enum<A>, B> {
 
         @PostMapping("a")
-        List<Map<A, ?>> doSomething(@RequestBody List<B> input) {
+        @Nullable List<Map<A, ?>> doSomething(@RequestBody List<B> input) {
             return null;
         }
 
@@ -312,7 +314,7 @@ public class SpringTest {
         settings.outputFileType = TypeScriptFileType.implementationFile;
         settings.generateSpringApplicationClient = true;
         settings.customTypeMappings.put("cz.habarta.typescript.generator.spring.SpringTest$Wrapper<T>", "Unwrap<T>");
-        settings.importDeclarations.add("import { Unwrap } from './unwrap'");
+        settings.importDeclarations = List.of("import { Unwrap } from './unwrap'");
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ControllerWithWrapper.class));
         Assertions.assertTrue(output.contains("getEntity(): RestResponse<Unwrap<string>>"));
     }
@@ -330,11 +332,12 @@ public class SpringTest {
     @RestController
     public static class ControllerWithWrapper {
         @RequestMapping(path = "/data", method = RequestMethod.GET)
-        public Wrapper<String> getEntity() {
+        public @Nullable Wrapper<String> getEntity() {
             return null;
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Wrapper<T> {
         public T value;
     }
@@ -376,7 +379,7 @@ public class SpringTest {
     @RestController
     public static abstract class PageableController {
         @GetMapping("/pageable")
-        public Page<String> post(Pageable page) {
+        public @Nullable Page<String> post(Pageable page) {
             return null;
         }
     }

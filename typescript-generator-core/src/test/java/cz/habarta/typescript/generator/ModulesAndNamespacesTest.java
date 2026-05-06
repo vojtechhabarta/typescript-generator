@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsModel;
 import java.io.File;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 
@@ -34,7 +35,7 @@ public class ModulesAndNamespacesTest {
         file("Test8", null, "NS8", mapPackages, TypeScriptOutputKind.module, TypeScriptFileType.implementationFile, new File(outputDir, "test-mn8.ts"));
     }
 
-    private static void file(String prefix, String module, String namespace, boolean mapPackagesToNamespaces, TypeScriptOutputKind outputKind, TypeScriptFileType outputFileType, File output) {
+    private static void file(String prefix, @Nullable String module, @Nullable String namespace, boolean mapPackagesToNamespaces, TypeScriptOutputKind outputKind, TypeScriptFileType outputFileType, File output) {
         final Settings settings = new Settings();
         settings.jsonLibrary = JsonLibrary.jackson2;
         settings.mapEnum = EnumMapping.asEnum;

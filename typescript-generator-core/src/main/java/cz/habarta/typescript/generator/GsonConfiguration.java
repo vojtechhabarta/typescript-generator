@@ -1,6 +1,9 @@
 
 package cz.habarta.typescript.generator;
 
+import org.jspecify.annotations.Nullable;
+
+
 /**
  * This class is used for configuration in Maven and Gradle plugins so we need
  * to pay attention to use only types supported in both build plugins.
@@ -15,6 +18,6 @@ public class GsonConfiguration {
      * Note: single charater <code>|</code> can be used to pass empty list of modifiers
      * (in Maven empty string is interpreted as <code>null</code> which means "not set").
      */
-    public String excludeFieldsWithModifiers;
+    public @Nullable String excludeFieldsWithModifiers;
 
 }

@@ -1,12 +1,15 @@
 
 package cz.habarta.typescript.generator;
 
+import org.jspecify.annotations.Nullable;
+
+
 public class TsParameter {
 
     public final String name;
-    public final TsType tsType;
+    public final @Nullable TsType tsType;
 
-    public TsParameter(String name, TsType tsType) {
+    public TsParameter(String name, @Nullable TsType tsType) {
         this.name = name;
         this.tsType = tsType;
     }
@@ -15,7 +18,7 @@ public class TsParameter {
         return name;
     }
 
-    public TsType getTsType() {
+    public @Nullable TsType getTsType() {
         return tsType;
     }
 
