@@ -19,6 +19,7 @@ import javax.script.ScriptException;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -29,7 +30,7 @@ public class SymbolTable {
     private final Settings settings;
     private final LinkedHashMap<Pair<Class<?>, String>, Symbol> symbols = new LinkedHashMap<>();
     private final LinkedHashMap<String, Symbol> syntheticSymbols = new LinkedHashMap<>();
-    private CustomTypeNamingFunction customTypeNamingFunction;
+    private @Nullable CustomTypeNamingFunction customTypeNamingFunction;
 
     public SymbolTable(Settings settings) {
         this.settings = settings;
@@ -39,7 +40,7 @@ public class SymbolTable {
         return getSymbol(cls, null);
     }
 
-    public Symbol getSymbol(Class<?> cls, String suffix) {
+    public Symbol getSymbol(Class<?> cls, @Nullable String suffix) {
         final String suffixString = suffix != null ? suffix : "";
         final Pair<Class<?>, String> key = Pair.<Class<?>, String>of(cls, suffixString);
         if (!symbols.containsKey(key)) {
@@ -48,11 +49,11 @@ public class SymbolTable {
         return symbols.get(key);
     }
 
-    public Symbol hasSymbol(Class<?> cls, String suffix) {
+    public @Nullable Symbol hasSymbol(Class<?> cls, String suffix) {
         return symbols.get(Pair.<Class<?>, String>of(cls, suffix));
     }
 
-    public Class<?> getSymbolClass(Symbol symbol) {
+    public @Nullable Class<?> getSymbolClass(Symbol symbol) {
         for (Map.Entry<Pair<Class<?>, String>, Symbol> entry : symbols.entrySet()) {
             if (entry.getValue() == symbol) {
                 return entry.getKey().getValue1();
@@ -68,7 +69,7 @@ public class SymbolTable {
         return syntheticSymbols.get(name);
     }
 
-    public Symbol getSyntheticSymbol(String name, String suffix) {
+    public Symbol getSyntheticSymbol(String name, @Nullable String suffix) {
         return getSyntheticSymbol(name + (suffix != null ? suffix : ""));
     }
 
@@ -120,7 +121,7 @@ public class SymbolTable {
     private void setSymbolQualifiedName(Symbol symbol, Class<?> cls, String suffix) {
         final String module;
         final String namespacedName;
-        final Pair<String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
+        final Pair<@Nullable String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
         if (fullNameFromDependency != null) {
             module = fullNameFromDependency.getValue1();
             namespacedName = fullNameFromDependency.getValue2();
@@ -132,7 +133,7 @@ public class SymbolTable {
         symbol.setFullName(module, namespacedName + suffixString);
     }
 
-    public String getMappedNamespacedName(Class<?> cls) {
+    public @Nullable String getMappedNamespacedName(@Nullable Class<?> cls) {
         if (cls == null) {
             return null;
         }
@@ -230,10 +231,10 @@ public class SymbolTable {
         public Object getName(String className, String classSimpleName);
     }
 
-    public Symbol getSymbolIfImported(Class<?> cls) {
-        final Pair<String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
+    public @Nullable Symbol getSymbolIfImported(Class<?> cls) {
+        final Pair<@Nullable String/*module*/, String/*namespacedName*/> fullNameFromDependency = settings.getModuleDependencies().getFullName(cls);
         if (fullNameFromDependency != null) {
-            final Symbol symbol = new Symbol(null);
+            final Symbol symbol = new Symbol("");
             symbol.setFullName(fullNameFromDependency.getValue1(), fullNameFromDependency.getValue2());
             return symbol;
         } else {

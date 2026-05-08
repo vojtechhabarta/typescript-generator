@@ -1,8 +1,11 @@
 
 package cz.habarta.typescript.generator.parser;
 
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 
 public class Model {
@@ -11,17 +14,21 @@ public class Model {
     private final List<EnumModel> enums;
     private final List<RestApplicationModel> restApplications;
 
-    public Model(List<BeanModel> beans, List<EnumModel> enums, List<RestApplicationModel> restApplications) {
-        this.beans = Objects.requireNonNull(beans);
-        this.enums = Objects.requireNonNull(enums);
-        this.restApplications = restApplications;
+    public Model(List<BeanModel> beans, List<EnumModel> enums, @Nullable List<RestApplicationModel> restApplications) {
+        this.beans = requireNonNull(beans);
+        this.enums = requireNonNull(enums);
+        this.restApplications = Utils.listFromNullable(restApplications);
     }
 
     public List<BeanModel> getBeans() {
         return beans;
     }
 
-    public BeanModel getBean(Class<?> beanClass) {
+    public BeanModel getBeanNonNull(@Nullable Class<?> beanClass) {
+        return requireNonNull(getBean(beanClass));
+    }
+
+    public @Nullable BeanModel getBean(@Nullable Class<?> beanClass) {
         for (BeanModel bean : beans) {
             if (bean.getOrigin().equals(beanClass)) {
                 return bean;

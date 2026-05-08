@@ -6,6 +6,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class PropertyMember {
@@ -13,9 +14,14 @@ public class PropertyMember {
     private final AnnotatedElement annotatedElement;
     private final Type type;
     private final AnnotatedType annotatedType;
-    private final AnnotationGetter annotationGetter;
+    private final @Nullable AnnotationGetter annotationGetter;
 
-    public PropertyMember(AnnotatedElement annotatedElement, Type type, AnnotatedType annotatedType, AnnotationGetter annotationGetter) {
+    public PropertyMember(
+        AnnotatedElement annotatedElement,
+        Type type,
+        AnnotatedType annotatedType,
+        @Nullable AnnotationGetter annotationGetter
+    ) {
         this.annotatedElement = Objects.requireNonNull(annotatedElement);
         this.type = Objects.requireNonNull(type);
         this.annotatedType = Objects.requireNonNull(annotatedType);

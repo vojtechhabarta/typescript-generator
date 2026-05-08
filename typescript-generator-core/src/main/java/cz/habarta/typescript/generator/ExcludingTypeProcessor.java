@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.jspecify.annotations.Nullable;
 
 
 public class ExcludingTypeProcessor implements TypeProcessor {
@@ -30,7 +31,7 @@ public class ExcludingTypeProcessor implements TypeProcessor {
     }
 
     @Override
-    public Result processType(Type javaType, Context context) {
+    public @Nullable Result processType(Type javaType, Context context) {
         final Class<?> rawClass = Utils.getRawClassOrNull(javaType);
         if (rawClass != null && excludeFilter.test(rawClass.getName())) {
             return new Result(TsType.Any);

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.JacksonException;
@@ -44,6 +45,7 @@ import tools.jackson.databind.module.SimpleModule;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import static java.util.Objects.requireNonNull;
 
 
 @SuppressWarnings("unused")
@@ -86,13 +88,12 @@ public class Jackson3ParserTest {
         final Jackson3Parser jacksonParser = getJackson3Parser();
         final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName1.class);
         Assertions.assertEquals(5, model.getBeans().size());
-        final BeanModel bean0 = model.getBean(ParentWithNameDiscriminant.class);
-        final BeanModel bean1 = model.getBean(SubTypeDiscriminatedByName1.class);
-        final BeanModel bean2 = model.getBean(SubTypeDiscriminatedByName2.class);
-        final BeanModel bean3 = model.getBean(SubTypeDiscriminatedByName3.class);
-        final BeanModel bean4 = model.getBean(SubTypeDiscriminatedByName4.class);
-        final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
-        Assertions.assertEquals(4, bean0.getTaggedUnionClasses().size());
+        final BeanModel bean0 = model.getBeanNonNull(ParentWithNameDiscriminant.class);
+        final BeanModel bean1 = model.getBeanNonNull(SubTypeDiscriminatedByName1.class);
+        final BeanModel bean2 = model.getBeanNonNull(SubTypeDiscriminatedByName2.class);
+        final BeanModel bean3 = model.getBeanNonNull(SubTypeDiscriminatedByName3.class);
+        final BeanModel bean4 = model.getBeanNonNull(SubTypeDiscriminatedByName4.class);
+        Assertions.assertEquals(4, requireNonNull(bean0.getTaggedUnionClasses()).size());
         Assertions.assertNull(bean1.getTaggedUnionClasses());
         Assertions.assertNull(bean2.getTaggedUnionClasses());
         Assertions.assertNull(bean3.getTaggedUnionClasses());
@@ -107,7 +108,7 @@ public class Jackson3ParserTest {
     public void testRegisteredSubtypeName() {
         final Jackson3Parser jacksonParser = getJackson3Parser();
         final Model model = jacksonParser.parseModel(SubTypeDiscriminatedByName5.class);
-        final BeanModel bean5 = model.getBean(SubTypeDiscriminatedByName5.class);
+        final BeanModel bean5 = requireNonNull(model.getBean(SubTypeDiscriminatedByName5.class));
         Assertions.assertEquals("NamedByModule", bean5.getDiscriminantLiteral());
     }
 
@@ -118,6 +119,7 @@ public class Jackson3ParserTest {
         return new Jackson3Parser(settings, new DefaultTypeProcessor());
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class DummyBeanJackson3 {
 
         @JsonProperty("changedNameProperty")
@@ -126,6 +128,7 @@ public class Jackson3ParserTest {
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @SuppressWarnings("NullAway.Init")
     public class InheritedClass {
         public String type;
     }
@@ -202,6 +205,7 @@ public class Jackson3ParserTest {
         Assertions.assertTrue(output.contains("xname4: string"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class ClassWithOptionals {
         public String oname1;
         public Optional<String> oname2;
@@ -292,6 +296,7 @@ public class Jackson3ParserTest {
         Assertions.assertTrue(!output.contains("name2: string"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithIgnoredProperty {
         public String name1;
         @JsonIgnore
@@ -324,10 +329,11 @@ public class Jackson3ParserTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithDifferentMemberVisibilities {
         private String property1;
 
-        public String getProperty2() {
+        public @Nullable String getProperty2() {
             return null;
         }
     }
@@ -340,6 +346,7 @@ public class Jackson3ParserTest {
         Assertions.assertTrue(output.contains("nodes: any[]"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithJsonNode {
         public JsonNode node;
         public List<JsonNode> nodes;
@@ -358,6 +365,7 @@ public class Jackson3ParserTest {
     }
 
     @JsonClassDescription("Class description\nsecond line")
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithDescriptions {
         @JsonPropertyDescription("Property description\nsecond line")
         public String value;
@@ -394,6 +402,7 @@ public class Jackson3ParserTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Contract {
 
         @JsonSerialize(using = IdSerializer.class)

@@ -22,6 +22,7 @@ public class JaxbTest {
     }
 
     @XmlRootElement
+    @SuppressWarnings("NullAway.Init")
     private static class MyJaxbBean {
 
         @XmlElement(name = "king")
@@ -44,6 +45,7 @@ public class JaxbTest {
     }
 
     @XmlRootElement
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithJAXBElements {
         @XmlElement(name = "ExternalReference")
         protected String externalReference;

@@ -11,10 +11,12 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
+@NullUnmarked
 public class Jackson2ParserPropertiesTest {
 
     @JsonPropertyOrder({ "password1", "id2" })

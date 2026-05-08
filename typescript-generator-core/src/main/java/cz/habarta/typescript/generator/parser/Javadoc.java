@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class Javadoc {
@@ -32,7 +33,7 @@ public class Javadoc {
         this.dRoots = loadJavadocXmlFiles(settings.javadocXmlFiles);
     }
 
-    private static List<Root> loadJavadocXmlFiles(List<File> javadocXmlFiles) {
+    private static List<Root> loadJavadocXmlFiles(@Nullable List<File> javadocXmlFiles) {
         final List<Root> dRoots = new ArrayList<>();
         if (javadocXmlFiles != null) {
             for (File file : javadocXmlFiles) {
@@ -129,7 +130,7 @@ public class Javadoc {
             .withComments(combineComments(getComments(enumComment, tags), enumModel.getComments()));
     }
 
-    private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember, Enum dEnum) {
+    private EnumMemberModel enrichEnumMember(EnumMemberModel enumMember, @Nullable Enum dEnum) {
         final EnumConstant dConstant = findJavadocEnumConstant(enumMember.getPropertyName(), dEnum);
         final List<TagInfo> tags = dConstant != null ? dConstant.getTag() : null;
         final String memberComment = dConstant != null ? dConstant.getComment() : null;
@@ -156,7 +157,7 @@ public class Javadoc {
 
     // finders
 
-    private static Method findJavadocMethod(java.lang.Class<?> cls, String name, List<Root> dRoots) {
+    private static @Nullable Method findJavadocMethod(java.lang.Class<?> cls, String name, List<Root> dRoots) {
         final Class dClass = findJavadocClass(cls, dRoots);
         final Interface dInterface = findJavadocInterface(cls, dRoots);
         if (dClass != null) {
@@ -168,7 +169,7 @@ public class Javadoc {
         }
     }
 
-    private static Class findJavadocClass(java.lang.Class<?> cls, List<Root> dRoots) {
+    private static @Nullable Class findJavadocClass(java.lang.Class<?> cls, List<Root> dRoots) {
         final String name = cls.getName().replace('$', '.');
         for (Root dRoot : dRoots) {
             for (Package dPackage : dRoot.getPackage()) {
@@ -182,7 +183,7 @@ public class Javadoc {
         return null;
     }
 
-    private static Interface findJavadocInterface(java.lang.Class<?> cls, List<Root> dRoots) {
+    private static @Nullable Interface findJavadocInterface(java.lang.Class<?> cls, List<Root> dRoots) {
         final String name = cls.getName().replace('$', '.');
         for (Root dRoot : dRoots) {
             for (Package dPackage : dRoot.getPackage()) {
@@ -196,7 +197,7 @@ public class Javadoc {
         return null;
     }
 
-    private static Field findJavadocField(String name, List<Field> dFields) {
+    private static @Nullable Field findJavadocField(String name, List<Field> dFields) {
         if (dFields != null) {
             for (Field dField : dFields) {
                 if (dField.getName().equals(name)) {
@@ -207,7 +208,7 @@ public class Javadoc {
         return null;
     }
 
-    private static Method findJavadocMethod(String name, List<Method> dMethods) {
+    private static @Nullable Method findJavadocMethod(String name, List<Method> dMethods) {
         if (dMethods != null) {
             for (Method dMethod : dMethods) {
                 if (dMethod.getName().equals(name)) {
@@ -218,7 +219,7 @@ public class Javadoc {
         return null;
     }
 
-    private static Enum findJavadocEnum(java.lang.Class<?> cls, List<Root> dRoots) {
+    private static @Nullable Enum findJavadocEnum(java.lang.Class<?> cls, List<Root> dRoots) {
         final String name = cls.getName().replace('$', '.');
         for (Root dRoot : dRoots) {
             for (Package dPackage : dRoot.getPackage()) {
@@ -232,7 +233,7 @@ public class Javadoc {
         return null;
     }
 
-    private static EnumConstant findJavadocEnumConstant(String name, Enum dEnum) {
+    private static @Nullable EnumConstant findJavadocEnumConstant(String name, @Nullable Enum dEnum) {
         if (dEnum != null) {
             for (EnumConstant dEnumConstant : dEnum.getConstant()) {
                 if (dEnumConstant.getName().equals(name)) {
@@ -243,7 +244,7 @@ public class Javadoc {
         return null;
     }
 
-    private List<String> getComments(String dComments, List<TagInfo> tags) {
+    private @Nullable List<String> getComments(@Nullable String dComments, @Nullable List<TagInfo> tags) {
         if (dComments == null && (tags == null || tags.isEmpty())) {
             return null;
         }
@@ -266,9 +267,9 @@ public class Javadoc {
         return result;
     }
 
-    private static List<String> combineComments(List<String> firstComments, List<String> secondComments) {
+    private static @Nullable List<String> combineComments(@Nullable List<String> firstComments, @Nullable List<String> secondComments) {
         // consider putting tags (from both comments) after regular comments
-        return Utils.concat(firstComments, secondComments);
+        return Utils.concatToNullable(firstComments, secondComments);
     }
 
 }

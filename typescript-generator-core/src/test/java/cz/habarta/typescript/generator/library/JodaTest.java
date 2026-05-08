@@ -109,6 +109,7 @@ public class JodaTest {
 
 }
 
+@SuppressWarnings("NullAway.Init")
 class JodaDates {
     public org.joda.time.DateTime date;
     public List<org.joda.time.DateTime> dateList;
@@ -116,6 +117,7 @@ class JodaDates {
     public org.joda.time.DateTime[] dates;
 }
 
+@SuppressWarnings("NullAway.Init")
 class JodaSerializedClasses {
     public DateTime dateTime = DateTime.now();
     public DateTimeZone dateTimeZone = DateTimeZone.UTC;

@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public abstract class ModelParser {
@@ -41,7 +42,7 @@ public abstract class ModelParser {
 
     public static abstract class Factory {
 
-        public TypeProcessor getSpecificTypeProcessor() {
+        public @Nullable TypeProcessor getSpecificTypeProcessor() {
             return null;
         }
 
@@ -128,8 +129,8 @@ public abstract class ModelParser {
 
     protected abstract DeclarationModel parseClass(SourceType<Class<?>> sourceClass);
 
-    protected static PropertyMember wrapMember(
-        TypeParser typeParser, Member propertyMember, Integer creatorIndex, AnnotationGetter annotationGetter,
+    protected static @Nullable PropertyMember wrapMember(
+        TypeParser typeParser, Member propertyMember, @Nullable Integer creatorIndex, AnnotationGetter annotationGetter,
         String propertyName, Class<?> sourceClass
     ) {
         if (propertyMember instanceof Field) {
@@ -214,8 +215,15 @@ public abstract class ModelParser {
     }
 
     protected PropertyModel processTypeAndCreateProperty(
-        String name, Type type, Object typeContext, boolean optional, PropertyAccess access, Class<?> usedInClass,
-        Member originalMember, PropertyModel.PullProperties pullProperties, List<String> comments
+        String name,
+        Type type,
+        @Nullable Object typeContext,
+        boolean optional,
+        @Nullable PropertyAccess access,
+        Class<?> usedInClass,
+        Member originalMember,
+        PropertyModel.@Nullable PullProperties pullProperties,
+        @Nullable List<String> comments
     ) {
         final Type resolvedType = GenericsResolver.resolveType(usedInClass, type, originalMember.getDeclaringClass());
         final List<Class<?>> classes = commonTypeProcessor.discoverClassesUsedInType(resolvedType, typeContext, settings);

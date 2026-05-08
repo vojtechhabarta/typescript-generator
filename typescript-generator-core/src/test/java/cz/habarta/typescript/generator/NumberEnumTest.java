@@ -28,8 +28,8 @@ public class NumberEnumTest {
         final EnumModel enumModel = model.getEnums().get(0);
         Assertions.assertEquals(EnumKind.NumberBased, enumModel.getKind());
         Assertions.assertEquals(2, enumModel.getMembers().size());
-        Assertions.assertEquals(10, ((Number) enumModel.getMembers().get(0).getEnumValue()).intValue());
-        Assertions.assertEquals(11, ((Number) enumModel.getMembers().get(1).getEnumValue()).intValue());
+        Assertions.assertEquals(10, enumModel.getMembers().get(0).getEnumValue());
+        Assertions.assertEquals(11, enumModel.getMembers().get(1).getEnumValue());
     }
 
     @Test

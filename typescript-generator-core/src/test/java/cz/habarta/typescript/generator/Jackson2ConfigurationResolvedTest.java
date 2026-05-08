@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
+
 
 public class Jackson2ConfigurationResolvedTest {
 
@@ -13,7 +15,7 @@ public class Jackson2ConfigurationResolvedTest {
         final Jackson2Configuration configuration = new Jackson2Configuration();
         configuration.serializerTypeMappings = Arrays.asList(Jackson2ParserTest.IdSerializer.class.getName() + ":" + "string");
         final Jackson2ConfigurationResolved resolved = Jackson2ConfigurationResolved.from(configuration, Thread.currentThread().getContextClassLoader());
-        Assertions.assertEquals("string", resolved.serializerTypeMappings.get(Jackson2ParserTest.IdSerializer.class));
+        Assertions.assertEquals("string", requireNonNull(resolved.serializerTypeMappings).get(Jackson2ParserTest.IdSerializer.class));
     }
 
 }

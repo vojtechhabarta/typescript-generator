@@ -4,6 +4,7 @@ package cz.habarta.typescript.generator.parser;
 import cz.habarta.typescript.generator.compiler.EnumKind;
 import cz.habarta.typescript.generator.compiler.EnumMemberModel;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class EnumModel extends DeclarationModel {
@@ -11,7 +12,7 @@ public class EnumModel extends DeclarationModel {
     private final EnumKind kind;
     private final List<EnumMemberModel> members;
 
-    public EnumModel(Class<?> origin, EnumKind kind, List<EnumMemberModel> members, List<String> comments) {
+    public EnumModel(Class<?> origin, EnumKind kind, List<EnumMemberModel> members, @Nullable List<String> comments) {
         super(origin, comments);
         this.kind = kind;
         this.members = members;
@@ -30,7 +31,7 @@ public class EnumModel extends DeclarationModel {
     }
 
     @Override
-    public EnumModel withComments(List<String> comments) {
+    public EnumModel withComments(@Nullable List<String> comments) {
         return new EnumModel(origin, kind, members, comments);
     }
 

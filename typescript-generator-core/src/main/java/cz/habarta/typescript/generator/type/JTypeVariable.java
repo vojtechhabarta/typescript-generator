@@ -7,22 +7,33 @@ import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable<D> {
 
-    private final D genericDeclaration; // should not be null but for Kotlin KTypeParameter we don't have it
+    private final @Nullable D genericDeclaration; // should not be null but for Kotlin KTypeParameter we don't have it
     private final String name;
     private Type[] bounds;
     private final AnnotatedType[] annotatedBounds;
     private final Annotation[] annotations;
     private final Annotation[] declaredAnnotations;
 
-    public JTypeVariable(D genericDeclaration, String name) {
+    public JTypeVariable(
+        @Nullable D genericDeclaration,
+        String name
+    ) {
         this(genericDeclaration, name, null, null, null, null);
     }
 
-    public JTypeVariable(D genericDeclaration, String name, Type[] bounds, AnnotatedType[] annotatedBounds, Annotation[] annotations, Annotation[] declaredAnnotations) {
+    public JTypeVariable(
+        @Nullable D genericDeclaration,
+        String name,
+        Type @Nullable [] bounds,
+        AnnotatedType @Nullable [] annotatedBounds,
+        Annotation @Nullable [] annotations,
+        Annotation @Nullable [] declaredAnnotations
+    ) {
         this.genericDeclaration = genericDeclaration;
         this.name = Objects.requireNonNull(name, "name");
         this.bounds = bounds != null ? bounds : new Type[0];
@@ -41,7 +52,7 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
     }
 
     @Override
-    public D getGenericDeclaration() {
+    public @Nullable D getGenericDeclaration() {
         return genericDeclaration;
     }
 
@@ -57,7 +68,7 @@ public class JTypeVariable<D extends GenericDeclaration> implements TypeVariable
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+    public <T extends Annotation> @Nullable T getAnnotation(Class<T> annotationClass) {
         for (Annotation annotation : getAnnotations()) {
             if (annotationClass.isInstance(annotation)) {
                 return (T) annotation;

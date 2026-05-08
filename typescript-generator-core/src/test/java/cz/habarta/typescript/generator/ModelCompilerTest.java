@@ -14,6 +14,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Objects.requireNonNull;
+
 
 @SuppressWarnings("unused")
 public class ModelCompilerTest {
@@ -59,7 +61,7 @@ public class ModelCompilerTest {
 
         Assertions.assertInstanceOf(
             TsType.UnionType.class,
-            result.getBean(WithoutTypeParam.class).getProperties().get(0).tsType
+            requireNonNull(result.getBean(WithoutTypeParam.class)).getProperties().get(0).tsType
         );
     }
 
@@ -75,7 +77,7 @@ public class ModelCompilerTest {
 
         Assertions.assertInstanceOf(
             TsType.UnionType.class,
-            result.getBean(WithTypeParam.class).getProperties().get(0).tsType
+            requireNonNull(result.getBean(WithTypeParam.class)).getProperties().get(0).tsType
         );
     }
 
@@ -101,6 +103,7 @@ public class ModelCompilerTest {
         North, East, South, West
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class A {
         public List<Map<String, Direction>> directions;
         public Date timestamp;

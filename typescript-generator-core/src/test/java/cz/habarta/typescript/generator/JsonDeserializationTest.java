@@ -123,6 +123,7 @@ public class JsonDeserializationTest {
         Assertions.assertEquals(Authentication.Password, data.authentication);
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class User {
         public String name;
         public Authentication authentication;
@@ -146,17 +147,20 @@ public class JsonDeserializationTest {
         Password, Token, Fingerprint, Voice
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Address {
         public String street;
         public String city;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class PagedList<T, A> {
         public int page;
         public List<T> items;
         public A additionalInfo;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Order {
         public String id;
     }
@@ -167,6 +171,7 @@ public class JsonDeserializationTest {
         @JsonSubTypes.Type(Rectangle.class),
         @JsonSubTypes.Type(Circle.class),
     })
+    @SuppressWarnings("NullAway.Init")
     private abstract static class Shape {
         public ShapeMetadata metadata;
     }
@@ -187,6 +192,7 @@ public class JsonDeserializationTest {
         public double radius;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ShapeMetadata {
         public String group;
     }

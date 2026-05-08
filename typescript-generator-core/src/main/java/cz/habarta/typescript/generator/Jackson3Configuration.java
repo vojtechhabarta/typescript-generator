@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -14,27 +15,27 @@ public class Jackson3Configuration {
     /**
      * Minimum visibility required for fields to be auto-detected.
      */
-    public JsonAutoDetect.Visibility fieldVisibility;
+    public JsonAutoDetect.@Nullable Visibility fieldVisibility;
 
     /**
      * Minimum visibility required for getters to be auto-detected (doesn't include "is getters").
      */
-    public JsonAutoDetect.Visibility getterVisibility;
+    public JsonAutoDetect.@Nullable Visibility getterVisibility;
 
     /**
      * Minimum visibility required for "is getters" to be auto-detected.
      */
-    public JsonAutoDetect.Visibility isGetterVisibility;
+    public JsonAutoDetect.@Nullable Visibility isGetterVisibility;
 
     /**
      * Minimum visibility required for setters to be auto-detected.
      */
-    public JsonAutoDetect.Visibility setterVisibility;
+    public JsonAutoDetect.@Nullable Visibility setterVisibility;
 
     /**
      * Minimum visibility required for creators to be auto-detected.
      */
-    public JsonAutoDetect.Visibility creatorVisibility;
+    public JsonAutoDetect.@Nullable Visibility creatorVisibility;
 
     /**
      * Shape format overrides for specified classes.
@@ -43,7 +44,7 @@ public class Jackson3Configuration {
      * <a href="https://github.com/FasterXML/jackson-annotations/blob/master/src/main/java/com/fasterxml/jackson/annotation/JsonFormat.java">JsonFormat.Shape</a> enum.
      * Example: <code>java.util.Map$Entry:OBJECT</code>
      */
-    public List<String> shapeConfigOverrides;
+    public @Nullable List<String> shapeConfigOverrides;
 
     /**
      * Feature that determines standard Enum values representation:
@@ -67,19 +68,19 @@ public class Jackson3Configuration {
      * Multiple mappings can be specified, each using following format: <code>serializerClassName:typescriptType</code>.
      * Example: <code>org.example.IdSerializer:string</code> or <code>org.example.IdSerializer:{ id: string }</code>
      */
-    public List<String> serializerTypeMappings;
+    public @Nullable List<String> serializerTypeMappings;
 
     /**
      * Types produced by <code>JsonDeserializer</code>s.
      * Multiple mappings can be specified, each using following format: <code>deserializerClassName:typescriptType</code>.
      * Example: <code>org.example.MyDeserializer:string</code>
      */
-    public List<String> deserializerTypeMappings;
+    public @Nullable List<String> deserializerTypeMappings;
 
     /**
      * Specifies ObjectMapper's active view (as a fully-qualified class name).
      * Properties can be annotated with <code>@JsonView</code> to indicate which views they are part of.
      */
-    public String view;
+    public @Nullable String view;
 
 }

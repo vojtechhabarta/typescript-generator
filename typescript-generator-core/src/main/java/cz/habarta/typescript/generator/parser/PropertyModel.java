@@ -5,6 +5,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
 public class PropertyModel {
@@ -12,11 +13,11 @@ public class PropertyModel {
     private final String name;
     private final Type type;
     private final boolean optional;
-    private final PropertyAccess access;
-    private final Member originalMember;
-    private final PullProperties pullProperties;
-    private final Object context;
-    private final List<String> comments;
+    private final @Nullable PropertyAccess access;
+    private final @Nullable Member originalMember;
+    private final @Nullable PullProperties pullProperties;
+    private final @Nullable Object context;
+    private final @Nullable List<String> comments;
 
     public static class PullProperties {
         public final String prefix;
@@ -28,7 +29,16 @@ public class PropertyModel {
         }
     }
 
-    public PropertyModel(String name, Type type, boolean optional, PropertyAccess access, Member originalMember, PullProperties pullProperties, Object context, List<String> comments) {
+    public PropertyModel(
+        String name,
+        Type type,
+        boolean optional,
+        @Nullable PropertyAccess access,
+        @Nullable Member originalMember,
+        @Nullable PullProperties pullProperties,
+        @Nullable Object context,
+        @Nullable List<String> comments
+    ) {
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.optional = optional;
@@ -51,31 +61,31 @@ public class PropertyModel {
         return optional;
     }
 
-    public PropertyAccess getAccess() {
+    public @Nullable PropertyAccess getAccess() {
         return access;
     }
 
-    public Member getOriginalMember() {
+    public @Nullable Member getOriginalMember() {
         return originalMember;
     }
 
-    public PropertyModel originalMember(Member originalMember) {
+    public PropertyModel originalMember(@Nullable Member originalMember) {
         return new PropertyModel(name, type, optional, access, originalMember, pullProperties, context, comments);
     }
 
-    public PullProperties getPullProperties() {
+    public @Nullable PullProperties getPullProperties() {
         return pullProperties;
     }
 
-    public Object getContext() {
+    public @Nullable Object getContext() {
         return context;
     }
 
-    public List<String> getComments() {
+    public @Nullable List<String> getComments() {
         return comments;
     }
 
-    public PropertyModel withComments(List<String> comments) {
+    public PropertyModel withComments(@Nullable List<String> comments) {
         return new PropertyModel(name, type, optional, access, originalMember, pullProperties, context, comments);
     }
 

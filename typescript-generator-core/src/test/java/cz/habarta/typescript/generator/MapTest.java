@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 public class MapTest {
 
+    @SuppressWarnings("NullAway.Init")
     public static class ClassWithMap {
         public Map<String, Person> people;
     }

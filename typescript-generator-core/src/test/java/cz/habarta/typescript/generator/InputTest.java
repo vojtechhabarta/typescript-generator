@@ -111,15 +111,18 @@ public class InputTest {
     private interface MyJsonInterface {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class MyJsonInterfaceImpl implements MyJsonInterface {
         public String firstName;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class MyJsonInterfaceSubclass extends MyJsonInterfaceImpl {
         public String lastName;
     }
 
     @MyJsonClass
+    @SuppressWarnings("NullAway.Init")
     private static class MyData {
         public String name;
     }

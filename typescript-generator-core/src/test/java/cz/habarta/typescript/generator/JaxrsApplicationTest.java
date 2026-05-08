@@ -58,6 +58,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -201,45 +202,45 @@ public class JaxrsApplicationTest {
         }
 
         @GET
-        public Response getResponse() {
+        public @Nullable Response getResponse() {
             return null;
         }
 
         @GET
         @Path("a")
-        public GenericEntity<A> getA() {
+        public @Nullable GenericEntity<A> getA() {
             return null;
         }
 
         @GET
-        public GenericEntity<List<B>> getB() {
+        public @Nullable GenericEntity<List<B>> getB() {
             return null;
         }
 
         @GET
-        public C getC() {
+        public @Nullable C getC() {
             return null;
         }
 
         @GET
-        public List<D> getD() {
+        public @Nullable List<D> getD() {
             return null;
         }
 
         @SuppressWarnings("rawtypes")
         @GET
-        public List getRawList() {
+        public @Nullable List getRawList() {
             return null;
         }
 
         @GET
         @Path("e")
-        public E getE() {
+        public @Nullable E getE() {
             return null;
         }
 
         @Path("f")
-        public SubResource1 getSubResource1() {
+        public @Nullable SubResource1 getSubResource1() {
             return null;
         }
 
@@ -343,7 +344,7 @@ public class JaxrsApplicationTest {
 
     private static class SubResource1 {
         @GET
-        public List<F> getFs() {
+        public @Nullable List<F> getFs() {
             return null;
         }
     }
@@ -554,19 +555,19 @@ public class JaxrsApplicationTest {
         protected long organizationId;
 
         @GET
-        public List<Organization> searchOrganizations(@QueryParam("name") String oranizationName, @QueryParam("search-limit") int searchLimit) {
+        public @Nullable List<Organization> searchOrganizations(@QueryParam("name") String oranizationName, @QueryParam("search-limit") int searchLimit) {
             return null;
         }
 
         @Path("{ organizationCode : [a-z]+ }/{organizationId}")
-        public OrganizationResource getOrganizationResource() {
+        public @Nullable OrganizationResource getOrganizationResource() {
             return null;
         }
     }
 
     public static class OrganizationResource {
         @GET
-        public Organization getOrganization() {
+        public @Nullable Organization getOrganization() {
             return null;
         }
 
@@ -575,6 +576,7 @@ public class JaxrsApplicationTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Organization {
         public String name;
     }
@@ -594,18 +596,19 @@ public class JaxrsApplicationTest {
             @ApiResponse(code = 400, message = "not ok"),
         })
         @GET
-        public Person getPerson() {
+        public @Nullable Person getPerson() {
             return null;
         }
 
         @GET
         @Path("address/{address-id}")
         @Deprecated
-        public Address getAddress(@PathParam("address-id") long addressId) {
+        public @Nullable Address getAddress(@PathParam("address-id") long addressId) {
             return null;
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Person {
         public String name;
 
@@ -614,6 +617,7 @@ public class JaxrsApplicationTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class Address {
         public String name;
     }
@@ -690,6 +694,7 @@ public class JaxrsApplicationTest {
         Assertions.assertTrue(output.contains("queryParams?: SearchParams1QueryParams & SearchParams2QueryParams & { message?: string; }"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class SearchParams1 {
         @QueryParam("id")
         private Integer id;
@@ -698,6 +703,7 @@ public class JaxrsApplicationTest {
         private String name;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class SearchParams2 {
         private String description;
 
@@ -724,7 +730,7 @@ public class JaxrsApplicationTest {
 
         @GET
         @Path("/logs/{class}")
-        public Collection<String> getLogs(@PathParam("class") String clazz) {
+        public @Nullable Collection<String> getLogs(@PathParam("class") String clazz) {
             return null;
         }
     }
@@ -760,7 +766,7 @@ public class JaxrsApplicationTest {
         @GET
         @Path("{id: [0-9]{1,99}}")
         // @Path("{id: [0-9]+}")
-        public String getWithId(@PathParam("id") long id) {
+        public @Nullable String getWithId(@PathParam("id") long id) {
             return null;
         }
     }
@@ -776,6 +782,7 @@ public class JaxrsApplicationTest {
         Assertions.assertTrue(output.contains("interface AccountDto"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class AccountDto {
         public Integer id;
         public String name;

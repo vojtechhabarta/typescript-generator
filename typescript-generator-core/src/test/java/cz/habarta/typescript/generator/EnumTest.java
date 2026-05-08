@@ -243,10 +243,12 @@ public class EnumTest {
         assertTrue(output.contains("enumA: any"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithEnum {
         public Enum<?> enumA;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class AClass {
         public Direction direction;
     }
@@ -323,6 +325,7 @@ public class EnumTest {
     enum EmptyEnum {
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class ClassWithObjectEnum {
         public StatusType status;
         public List<Map<String, StatusType>> statuses;
@@ -385,6 +388,7 @@ public class EnumTest {
         assertTrue(output.contains("labels: { [index: string]: string }"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class ClassWithMapWithEnumKeys {
         public Map<Direction, String> labels;
     }
@@ -415,6 +419,7 @@ public class EnumTest {
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class ClassWithMixedEnum {
         public MixedEnum mixedEnum;
         public Map<MixedEnum, String> mixedEnumMap;
@@ -435,6 +440,7 @@ public class EnumTest {
         VALUE1;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class ClassWithNumberEnum {
         public NumberEnum numberEnum;
         public Map<NumberEnum, String> numberEnumMap;

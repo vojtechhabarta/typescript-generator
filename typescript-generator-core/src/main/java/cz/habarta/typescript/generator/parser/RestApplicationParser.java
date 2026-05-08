@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.jspecify.annotations.Nullable;
 
 
 public abstract class RestApplicationParser {
@@ -21,7 +22,7 @@ public abstract class RestApplicationParser {
 
     public static abstract class Factory {
 
-        public TypeProcessor getSpecificTypeProcessor() {
+        public @Nullable TypeProcessor getSpecificTypeProcessor() {
             return null;
         }
 
@@ -40,7 +41,7 @@ public abstract class RestApplicationParser {
         return model;
     }
 
-    protected abstract Result tryParse(SourceType<?> sourceType);
+    protected abstract @Nullable Result tryParse(SourceType<?> sourceType);
 
     public static class Result {
         public List<SourceType<Type>> discoveredTypes;
@@ -62,20 +63,20 @@ public abstract class RestApplicationParser {
 
     protected static class ResourceContext {
         public final Class<?> rootResource;
-        public final String path;
+        public final @Nullable String path;
         public final Map<String, Type> pathParamTypes;
 
-        public ResourceContext(Class<?> rootResource, String path) {
+        public ResourceContext(Class<?> rootResource, @Nullable String path) {
             this(rootResource, path, new LinkedHashMap<String, Type>());
         }
 
-        private ResourceContext(Class<?> rootResource, String path, Map<String, Type> pathParamTypes) {
+        private ResourceContext(Class<?> rootResource, @Nullable String path, Map<String, Type> pathParamTypes) {
             this.rootResource = rootResource;
             this.path = path;
             this.pathParamTypes = pathParamTypes;
         }
 
-        public ResourceContext subPath(String subPath) {
+        public ResourceContext subPath(@Nullable String subPath) {
             return new ResourceContext(rootResource, Utils.joinPath(path, subPath), pathParamTypes);
         }
 

@@ -3,9 +3,10 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsCallExpression extends TsExpression {
@@ -18,9 +19,9 @@ public class TsCallExpression extends TsExpression {
         this(expression, null, Arrays.asList(arguments));
     }
 
-    public TsCallExpression(TsExpression expression, List<TsType> typeArguments, List<TsExpression> arguments) {
+    public TsCallExpression(TsExpression expression, @Nullable List<TsType> typeArguments, List<TsExpression> arguments) {
         this.expression = expression;
-        this.typeArguments = typeArguments != null ? typeArguments : Collections.<TsType>emptyList();
+        this.typeArguments = Utils.listFromNullable(typeArguments);
         this.arguments = arguments;
     }
 

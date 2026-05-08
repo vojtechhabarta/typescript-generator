@@ -24,15 +24,18 @@ public class RequiredPropertyConstructorExtensionTest {
 
     private static final String BASE_PATH = "/ext/RequiredPropertyConstructorExtensionTest-";
 
+    @SuppressWarnings("NullAway.Init")
     static class SimpleClass {
         public String field1;
         public PolymorphicClass field2;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class OtherClass {
         public String field2;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class MultipleEnumContainerClass {
         public MultipleEntryEnum multiple;
     }
@@ -43,6 +46,7 @@ public class RequiredPropertyConstructorExtensionTest {
         ENTRY_3
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class SingleEnumContainerClass {
         public SingleEntryEnum single;
     }
@@ -61,15 +65,18 @@ public class RequiredPropertyConstructorExtensionTest {
         public int field1;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class SecondClass extends SimpleClass {
         public int field3;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class SimpleOptionalClass {
         public String field1;
         @Nullable public Integer field2;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class SecondOptionalClass extends SimpleOptionalClass {
         public String field3;
     }

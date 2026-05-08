@@ -2,9 +2,10 @@
 package cz.habarta.typescript.generator.util;
 
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 
-public class Pair<T1, T2> {
+public class Pair<T1 extends @Nullable Object, T2 extends @Nullable Object> {
 
     private final T1 value1;
     private final T2 value2;
@@ -14,7 +15,7 @@ public class Pair<T1, T2> {
         this.value2 = value2;
     }
 
-    public static <T1, T2> Pair<T1, T2> of(T1 value1, T2 value2) {
+    public static <T1 extends @Nullable Object, T2 extends @Nullable Object> Pair<T1, T2> of(T1 value1, T2 value2) {
         return new Pair<>(value1, value2);
     }
 

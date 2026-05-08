@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.TsType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsNewExpression extends TsExpression {
@@ -18,7 +19,7 @@ public class TsNewExpression extends TsExpression {
         this(expression, null, arguments);
     }
 
-    public TsNewExpression(TsExpression expression, List<? extends TsType> typeArguments, List<? extends TsExpression> arguments) {
+    public TsNewExpression(TsExpression expression, @Nullable List<? extends TsType> typeArguments, @Nullable List<? extends TsExpression> arguments) {
         this.expression = expression;
         this.typeArguments = typeArguments != null ? new ArrayList<TsType>(typeArguments) : Collections.<TsType>emptyList();
         this.arguments = arguments != null ? new ArrayList<TsExpression>(arguments) : Collections.<TsExpression>emptyList();

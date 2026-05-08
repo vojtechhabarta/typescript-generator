@@ -8,6 +8,7 @@ import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 
 public abstract class Extension extends EmitterExtension {
@@ -21,8 +22,8 @@ public abstract class Extension extends EmitterExtension {
 
     public static class TransformerDefinition {
         public final ModelCompiler.TransformationPhase phase;
-        public final ModelTransformer transformer;
-        public final TsModelTransformer tsTransformer;
+        public final @Nullable ModelTransformer transformer;
+        public final @Nullable TsModelTransformer tsTransformer;
 
         public TransformerDefinition(ModelCompiler.TransformationPhase phase, ModelTransformer transformer) {
             if (phase != ModelCompiler.TransformationPhase.BeforeTsModel) {

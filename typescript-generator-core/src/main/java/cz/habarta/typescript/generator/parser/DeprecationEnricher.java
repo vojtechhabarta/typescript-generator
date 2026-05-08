@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 public class DeprecationEnricher {
@@ -77,16 +78,16 @@ public class DeprecationEnricher {
         return list.stream().map(mapper).collect(Collectors.toList());
     }
 
-    private static List<String> addDeprecation(List<String> comments, AnnotatedElement annotatedElement) {
+    private static @Nullable List<String> addDeprecation(@Nullable List<String> comments, @Nullable AnnotatedElement annotatedElement) {
         if (annotatedElement == null || !annotatedElement.isAnnotationPresent(Deprecated.class) || containsDeprecatedTag(comments)) {
             return comments;
         }
 
         String deprecatedComment = DeprecationUtils.convertToComment(annotatedElement.getAnnotation(Deprecated.class));
-        return Utils.concat(comments, Collections.singletonList(deprecatedComment));
+        return Utils.concatToNullable(comments, Collections.singletonList(deprecatedComment));
     }
 
-    private static boolean containsDeprecatedTag(List<String> comments) {
+    private static boolean containsDeprecatedTag(@Nullable List<String> comments) {
         return comments != null
             ? comments.stream().anyMatch(comment -> comment.startsWith(DeprecationUtils.DEPRECATED))
             : false;

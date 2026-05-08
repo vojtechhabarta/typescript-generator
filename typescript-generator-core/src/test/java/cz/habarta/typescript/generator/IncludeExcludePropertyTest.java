@@ -67,6 +67,7 @@ public class IncludeExcludePropertyTest {
     private static @interface MyExclude {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ClassWithAnnotatedProperties {
 
         public String property1;

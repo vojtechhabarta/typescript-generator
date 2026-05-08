@@ -4,21 +4,30 @@ package cz.habarta.typescript.generator.parser;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class RestMethodModel extends MethodModel {
 
     private final Class<?> rootResource;
     private final String httpMethod;
-    private final String path;
+    private final @Nullable String path;
     private final List<MethodParameterModel> pathParams;
     private final List<RestQueryParam> queryParams;
-    private final MethodParameterModel entityParam;
+    private final @Nullable MethodParameterModel entityParam;
 
     public RestMethodModel(
-        Class<?> originClass, String name, Type returnType, Method originalMethod,
-        Class<?> rootResource, String httpMethod, String path, List<MethodParameterModel> pathParams, List<RestQueryParam> queryParams, MethodParameterModel entityParam,
-        List<String> comments
+        Class<?> originClass,
+        String name,
+        Type returnType,
+        Method originalMethod,
+        Class<?> rootResource,
+        String httpMethod,
+        @Nullable String path,
+        List<MethodParameterModel> pathParams,
+        List<RestQueryParam> queryParams,
+        @Nullable MethodParameterModel entityParam,
+        @Nullable List<String> comments
     ) {
         super(originClass, name, null, returnType, originalMethod, comments);
         this.rootResource = rootResource;
@@ -37,7 +46,7 @@ public class RestMethodModel extends MethodModel {
         return httpMethod;
     }
 
-    public String getPath() {
+    public @Nullable String getPath() {
         return path;
     }
 
@@ -49,12 +58,12 @@ public class RestMethodModel extends MethodModel {
         return queryParams;
     }
 
-    public MethodParameterModel getEntityParam() {
+    public @Nullable MethodParameterModel getEntityParam() {
         return entityParam;
     }
 
     @Override
-    public RestMethodModel withComments(List<String> comments) {
+    public RestMethodModel withComments(@Nullable List<String> comments) {
         return new RestMethodModel(originClass, name, returnType, originalMethod, rootResource, httpMethod, path, pathParams, queryParams, entityParam, comments);
     }
 

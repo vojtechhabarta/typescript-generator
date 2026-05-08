@@ -130,10 +130,12 @@ public class ModuleDependenciesTest {
 
     /// module "a"
 
+    @SuppressWarnings("NullAway.Init")
     private static class A1 {
         public String a;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class A2 {
         public String a;
     }
@@ -158,6 +160,7 @@ public class ModuleDependenciesTest {
 
     /// module "b"
 
+    @SuppressWarnings("NullAway.Init")
     private static class B1 extends A1 {
         public String b;
         public A1 objectA;
@@ -166,19 +169,23 @@ public class ModuleDependenciesTest {
         public List<ABase<String>> aBases;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class B2 extends A2 {
         public String b;
         public A2 objectA;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class C<T> {
         public T c;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class D1 extends C<A1> {
         public String d;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class D2 extends C<A2> {
         public String d;
     }

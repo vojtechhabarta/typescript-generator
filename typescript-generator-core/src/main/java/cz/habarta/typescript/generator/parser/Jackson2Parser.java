@@ -78,6 +78,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public class Jackson2Parser extends ModelParser {
@@ -156,7 +157,7 @@ public class Jackson2Parser extends ModelParser {
         }
     }
 
-    private void setVisibility(PropertyAccessor accessor, JsonAutoDetect.Visibility visibility) {
+    private void setVisibility(PropertyAccessor accessor, JsonAutoDetect.@Nullable Visibility visibility) {
         if (visibility != null) {
             objectMapper.setVisibility(accessor, visibility);
         }
@@ -175,7 +176,7 @@ public class Jackson2Parser extends ModelParser {
             new ExcludingTypeProcessor(Arrays.asList(JsonNode.class.getName())),
             new TypeProcessor() {
                 @Override
-                public TypeProcessor.Result processType(Type javaType, TypeProcessor.Context context) {
+                public TypeProcessor.@Nullable Result processType(Type javaType, TypeProcessor.Context context) {
                     if (context.getTypeContext() instanceof Jackson2TypeContext) {
                         final Jackson2TypeContext jackson2TypeContext = (Jackson2TypeContext) context.getTypeContext();
                         final Jackson2ConfigurationResolved config = jackson2TypeContext.parser.settings.jackson2Configuration;
@@ -250,7 +251,7 @@ public class Jackson2Parser extends ModelParser {
         }
     }
 
-    private BeanModel parseBean(SourceType<Class<?>> sourceClass, List<String> classComments) {
+    private BeanModel parseBean(SourceType<Class<?>> sourceClass, @Nullable List<String> classComments) {
         final List<PropertyModel> properties = new ArrayList<>();
 
         final Class<?> view = settings.jackson2Configuration != null ? settings.jackson2Configuration.view : null;
@@ -296,7 +297,7 @@ public class Jackson2Parser extends ModelParser {
         final String discriminantLiteral;
 
         final Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo = Pair.of(sourceClass.type, sourceClass.type.getAnnotation(JsonTypeInfo.class));
-        final Pair<Class<?>, JsonTypeInfo> parentClassWithJsonTypeInfo;
+        final Pair<@Nullable Class<?>, @Nullable JsonTypeInfo> parentClassWithJsonTypeInfo;
         final boolean isTaggedUnionParent = isTaggedUnion(classWithJsonTypeInfo);
         if (isTaggedUnionParent) {
             // this is parent
@@ -304,7 +305,7 @@ public class Jackson2Parser extends ModelParser {
             discriminantProperty = getDiscriminantPropertyName(jsonTypeInfo);
             syntheticDiscriminantProperty = isDiscriminantPropertySynthetic(jsonTypeInfo);
             discriminantLiteral = isInterfaceOrAbstract(sourceClass.type) ? null : getTypeName(sourceClass.type);
-        } else if (isTaggedUnion(parentClassWithJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class))) {
+        } else if (isTaggedUnion(parentClassWithJsonTypeInfo = getAnnotationRecursive(sourceClass.type, JsonTypeInfo.class)) && parentClassWithJsonTypeInfo.getValue2() != null) {
             // this is child class
             final JsonTypeInfo parentJsonTypeInfo = parentClassWithJsonTypeInfo.getValue2();
             discriminantProperty = getDiscriminantPropertyName(parentJsonTypeInfo);
@@ -351,7 +352,7 @@ public class Jackson2Parser extends ModelParser {
         return new BeanModel(sourceClass.type, superclass, taggedUnionClasses, discriminantProperty, discriminantLiteral, interfaces, properties, classComments);
     }
 
-    private static Integer getCreatorIndex(BeanProperty beanProperty) {
+    private static @Nullable Integer getCreatorIndex(BeanProperty beanProperty) {
         if (beanProperty instanceof CreatorProperty) {
             final CreatorProperty creatorProperty = (CreatorProperty) beanProperty;
             return creatorProperty.getCreatorIndex();
@@ -361,7 +362,7 @@ public class Jackson2Parser extends ModelParser {
     }
 
     // @JsonIdentityInfo and @JsonIdentityReference
-    private Type processIdentity(Type propertyType, BeanProperty beanProperty) {
+    private @Nullable Type processIdentity(Type propertyType, BeanProperty beanProperty) {
 
         final Class<?> clsT = Utils.getRawClassOrNull(propertyType);
         final Class<?> clsW = beanProperty.getType().getRawClass();
@@ -415,7 +416,7 @@ public class Jackson2Parser extends ModelParser {
         return null;
     }
 
-    private boolean isTaggedUnion(Pair<Class<?>, JsonTypeInfo> classWithJsonTypeInfo) {
+    private boolean isTaggedUnion(Pair<? extends @Nullable Class<?>, ? extends @Nullable JsonTypeInfo> classWithJsonTypeInfo) {
         final Class<?> cls = classWithJsonTypeInfo.getValue1();
         final JsonTypeInfo jsonTypeInfo = classWithJsonTypeInfo.getValue2();
         if (cls == null || Utils.hasAnyAnnotation(cls::getAnnotation, settings.disableTaggedUnionAnnotations)) {
@@ -436,7 +437,7 @@ public class Jackson2Parser extends ModelParser {
             : jsonTypeInfo.property();
     }
 
-    private String getTypeName(Class<?> cls) {
+    private @Nullable String getTypeName(Class<?> cls) {
         try {
             final SerializationConfig config = objectMapper.getSerializationConfig();
             final JavaType javaType = config.constructType(cls);
@@ -500,11 +501,18 @@ public class Jackson2Parser extends ModelParser {
         return cls.isInterface() || Modifier.isAbstract(cls.getModifiers());
     }
 
-    private static <T extends Annotation> Pair<Class<?>, T> getAnnotationRecursive(Class<?> cls, Class<T> annotationClass) {
+    private static <T extends Annotation> Pair<@Nullable Class<?>, @Nullable T> getAnnotationRecursive(
+        Class<?> cls,
+        Class<T> annotationClass
+    ) {
         return getAnnotationRecursive(cls, annotationClass, null);
     }
 
-    private static <T extends Annotation> Pair<Class<?>, T> getAnnotationRecursive(Class<?> cls, Class<T> annotationClass, Predicate<T> annotationFilter) {
+    private static <T extends Annotation> Pair<@Nullable Class<?>, @Nullable T> getAnnotationRecursive(
+        @Nullable Class<?> cls,
+        Class<T> annotationClass,
+        @Nullable Predicate<T> annotationFilter
+    ) {
         if (cls == null) {
             return Pair.of(null, null);
         }
@@ -513,19 +521,19 @@ public class Jackson2Parser extends ModelParser {
             return Pair.of(cls, annotation);
         }
         for (Class<?> aInterface : cls.getInterfaces()) {
-            final Pair<Class<?>, T> classWithAnnotation = getAnnotationRecursive(aInterface, annotationClass, annotationFilter);
+            final Pair<@Nullable Class<?>, @Nullable T> classWithAnnotation = getAnnotationRecursive(aInterface, annotationClass, annotationFilter);
             if (classWithAnnotation.getValue2() != null) {
                 return classWithAnnotation;
             }
         }
-        final Pair<Class<?>, T> classWithAnnotation = getAnnotationRecursive(cls.getSuperclass(), annotationClass, annotationFilter);
+        final Pair<@Nullable Class<?>, @Nullable T> classWithAnnotation = getAnnotationRecursive(cls.getSuperclass(), annotationClass, annotationFilter);
         if (classWithAnnotation.getValue2() != null) {
             return classWithAnnotation;
         }
         return Pair.of(null, null);
     }
 
-    private BeanHelpers getBeanHelpers(Class<?> beanClass, Class<?> view) {
+    private @Nullable BeanHelpers getBeanHelpers(@Nullable Class<?> beanClass, @Nullable Class<?> view) {
         if (beanClass == null) {
             return null;
         }
@@ -541,7 +549,7 @@ public class Jackson2Parser extends ModelParser {
         return null;
     }
 
-    private BeanSerializerHelper createBeanSerializerHelper(JavaType javaType) {
+    private @Nullable BeanSerializerHelper createBeanSerializerHelper(JavaType javaType) {
         try {
             final DefaultSerializerProvider.Impl serializerProvider = new DefaultSerializerProvider.Impl()
                 .createInstance(objectMapper.getSerializationConfig(), objectMapper.getSerializerFactory());
@@ -556,7 +564,7 @@ public class Jackson2Parser extends ModelParser {
         }
     }
 
-    private BeanDeserializerHelper createBeanDeserializerHelper(JavaType javaType) {
+    private @Nullable BeanDeserializerHelper createBeanDeserializerHelper(JavaType javaType) {
         try {
             final DeserializationContext deserializationContext = new DefaultDeserializationContext.Impl(objectMapper.getDeserializationContext().getFactory())
                 .createInstance(objectMapper.getDeserializationConfig(), null, null);
@@ -574,16 +582,17 @@ public class Jackson2Parser extends ModelParser {
 
     // for tests
     protected List<BeanProperty> getBeanProperties(Class<?> beanClass) {
-        return getBeanHelpers(beanClass, null).getProperties();
+        final BeanHelpers beanHelpers = getBeanHelpers(beanClass, null);
+        return beanHelpers != null ? beanHelpers.getProperties() : Collections.emptyList();
     }
 
     private static class BeanHelpers {
         public final Class<?> beanClass;
-        public final Class<?> view;
-        public final BeanSerializerHelper serializer;
-        public final BeanDeserializerHelper deserializer;
+        public final @Nullable Class<?> view;
+        public final @Nullable BeanSerializerHelper serializer;
+        public final @Nullable BeanDeserializerHelper deserializer;
 
-        public BeanHelpers(Class<?> beanClass, Class<?> view, BeanSerializerHelper serializer, BeanDeserializerHelper deserializer) {
+        public BeanHelpers(Class<?> beanClass, @Nullable Class<?> view, @Nullable BeanSerializerHelper serializer, @Nullable BeanDeserializerHelper deserializer) {
             this.beanClass = beanClass;
             this.view = view;
             this.serializer = serializer;
@@ -605,10 +614,10 @@ public class Jackson2Parser extends ModelParser {
                 .collect(Collectors.toList());
         }
 
-        private List<Pair<BeanProperty, BeanProperty>> getPropertiesPairs() {
+        private List<Pair<@Nullable BeanProperty, @Nullable BeanProperty>> getPropertiesPairs() {
             final List<BeanProperty> serializableProperties = getSerializableProperties();
             final List<BeanProperty> deserializableProperties = getDeserializableProperties();
-            final List<Pair<BeanProperty, BeanProperty>> properties = Stream
+            final List<Pair<@Nullable BeanProperty, @Nullable BeanProperty>> properties = Stream
                 .concat(
                     serializableProperties.stream()
                         .filter(this::inView)
@@ -616,7 +625,7 @@ public class Jackson2Parser extends ModelParser {
                     deserializableProperties.stream()
                         .filter(this::inView)
                         .filter(property -> getBeanProperty(serializableProperties, property.getName()) == null)
-                        .map(property -> Pair.of((BeanProperty) null, property))
+                        .map(property -> Pair.of((@Nullable BeanProperty) null, property))
                 )
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -651,31 +660,31 @@ public class Jackson2Parser extends ModelParser {
                 .anyMatch(v -> v.isAssignableFrom(view));
         }
 
-        private static BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
+        private static @Nullable BeanProperty getBeanProperty(List<BeanProperty> properties, String name) {
             return properties.stream()
                 .filter(dp -> Objects.equals(dp.getName(), name))
                 .findFirst()
                 .orElse(null);
         }
 
-        private static Integer getIndex(Pair<BeanProperty, BeanProperty> pair) {
+        private static @Nullable Integer getIndex(Pair<BeanProperty, BeanProperty> pair) {
             final Integer index1 = getIndex(pair.getValue1());
             return index1 != null ? index1 : getIndex(pair.getValue2());
         }
 
-        private static Integer getIndex(BeanProperty property) {
+        private static @Nullable Integer getIndex(BeanProperty property) {
             if (property == null) {
                 return null;
             }
             return property.getMetadata().getIndex();
         }
 
-        private static Integer getFieldIndex(List<Field> fields, Pair<BeanProperty, BeanProperty> pair) {
+        private static @Nullable Integer getFieldIndex(List<Field> fields, Pair<BeanProperty, BeanProperty> pair) {
             final Integer fieldIndex1 = getFieldIndex(fields, pair.getValue1());
             return fieldIndex1 != null ? fieldIndex1 : getFieldIndex(fields, pair.getValue2());
         }
 
-        private static Integer getFieldIndex(List<Field> fields, BeanProperty property) {
+        private static @Nullable Integer getFieldIndex(List<Field> fields, @Nullable BeanProperty property) {
             if (property == null) {
                 return null;
             }
@@ -720,7 +729,7 @@ public class Jackson2Parser extends ModelParser {
         }
     }
 
-    private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass, List<String> classComments) {
+    private DeclarationModel parseEnumOrObjectEnum(SourceType<Class<?>> sourceClass, @Nullable List<String> classComments) {
         final JsonFormat jsonFormat = sourceClass.type.getAnnotation(JsonFormat.class);
         if (jsonFormat != null && jsonFormat.shape() == JsonFormat.Shape.OBJECT) {
             return parseBean(sourceClass, classComments);
@@ -767,13 +776,13 @@ public class Jackson2Parser extends ModelParser {
         return new EnumModel(sourceClass.type, isNumberBased ? EnumKind.NumberBased : EnumKind.StringBased, enumMembers, classComments);
     }
 
-    private static List<String> getComments(JsonClassDescription classDescriptionAnnotation) {
+    private static @Nullable List<String> getComments(JsonClassDescription classDescriptionAnnotation) {
         final String propertyDescriptionValue = classDescriptionAnnotation != null ? classDescriptionAnnotation.value() : null;
         final List<String> classComments = Utils.splitMultiline(propertyDescriptionValue, false);
         return classComments;
     }
 
-    private static List<String> getComments(JsonPropertyDescription propertyDescriptionAnnotation) {
+    private static @Nullable List<String> getComments(JsonPropertyDescription propertyDescriptionAnnotation) {
         final String propertyDescriptionValue = propertyDescriptionAnnotation != null ? propertyDescriptionAnnotation.value() : null;
         final List<String> propertyComments = Utils.splitMultiline(propertyDescriptionValue, false);
         return propertyComments;

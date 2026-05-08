@@ -70,6 +70,7 @@ public class JsonViewTest {
 
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class SomeClass {
 
         @JsonView({ Views.BaseConfig.class, Views.REST.class })
@@ -89,6 +90,7 @@ public class JsonViewTest {
 
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class SomeClassGetters {
 
         private Integer id;

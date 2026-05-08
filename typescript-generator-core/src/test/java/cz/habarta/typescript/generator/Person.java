@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@SuppressWarnings("NullAway.Init")
 public class Person {
 
     public String name;

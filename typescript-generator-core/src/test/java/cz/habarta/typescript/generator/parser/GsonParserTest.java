@@ -14,6 +14,7 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -118,6 +119,7 @@ public class GsonParserTest {
         Assertions.assertTrue(output.contains("property1?: string;"));
     }
 
+    @NullUnmarked
     private static class BeanWithOptionalProperty {
         @OptionalProperty
         private String property1;

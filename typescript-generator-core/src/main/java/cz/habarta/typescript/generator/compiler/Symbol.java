@@ -1,10 +1,13 @@
 
 package cz.habarta.typescript.generator.compiler;
 
+import org.jspecify.annotations.Nullable;
+
+
 public class Symbol {
 
-    private String module;
-    private String namespace;
+    private @Nullable String module;
+    private @Nullable String namespace;
     private String simpleName;
     private boolean isResolved = false;
 
@@ -12,11 +15,11 @@ public class Symbol {
         this.simpleName = temporaryName;
     }
 
-    public String getModule() {
+    public @Nullable String getModule() {
         return module;
     }
 
-    public String getNamespace() {
+    public @Nullable String getNamespace() {
         return namespace;
     }
 
@@ -39,7 +42,7 @@ public class Symbol {
         return fullName;
     }
 
-    public void setFullName(String module, String namespacedName) {
+    public void setFullName(@Nullable String module, String namespacedName) {
         this.module = module;
         final int index = namespacedName.lastIndexOf('.');
         if (index == -1) {

@@ -7,6 +7,7 @@ import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import cz.habarta.typescript.generator.type.JUnionType;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -19,6 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -39,6 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
@@ -55,7 +57,7 @@ public final class Utils {
     private Utils() {
     }
 
-    public static String joinPath(String part1, String part2) {
+    public static String joinPath(@Nullable String part1, @Nullable String part2) {
         final String path = Stream.of(part1, part2)
             .filter(part -> part != null && !part.isEmpty()) // remove empty parts
             .reduce((a, b) -> trimRightSlash(a) + "/" + trimLeftSlash(b)) // join
@@ -71,12 +73,12 @@ public final class Utils {
         return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
     }
 
-    public static Class<?> getRawClassOrNull(Type type) {
-        final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
+    public static @Nullable Class<?> getRawClassOrNull(@Nullable Type type) {
+        final var rawClassAndTypeArguments = getRawClassAndTypeArguments(type);
         return rawClassAndTypeArguments != null ? rawClassAndTypeArguments.getValue1() : null;
     }
 
-    public static Pair<Class<?>, Optional<List<Type>>> getRawClassAndTypeArguments(Type type) {
+    public static @Nullable Pair<Class<?>, Optional<List<Type>>> getRawClassAndTypeArguments(@Nullable Type type) {
         if (type instanceof Class) {
             final Class<?> javaClass = (Class<?>) type;
             return javaClass.getTypeParameters().length != 0
@@ -159,12 +161,12 @@ public final class Utils {
             .anyMatch(Objects::nonNull);
     }
 
-    public static <T> T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
-        final Annotation annotation = getAnnotation(annotatedElement, annotationClassName);
+    public static <T> @Nullable T getAnnotationElementValue(AnnotatedElement annotatedElement, String annotationClassName, String annotationElementName, Class<T> annotationElementType) {
+        final var annotation = getAnnotation(annotatedElement, annotationClassName);
         return getAnnotationElementValue(annotation, annotationElementName, annotationElementType);
     }
 
-    public static Annotation getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
+    public static @Nullable Annotation getAnnotation(AnnotatedElement annotatedElement, String annotationClassName) {
         if (annotatedElement != null) {
             for (Annotation annotation : annotatedElement.getAnnotations()) {
                 if (annotation.annotationType().getName().equals(annotationClassName)) {
@@ -175,8 +177,12 @@ public final class Utils {
         return null;
     }
 
+    public static <T> T getRequiredAnnotationElementValue(Annotation annotation, String annotationElementName, Class<T> annotationElementType) {
+        return Objects.requireNonNull(getAnnotationElementValue(annotation, annotationElementName, annotationElementType));
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T> T getAnnotationElementValue(Annotation annotation, String annotationElementName, Class<T> annotationElementType) {
+    public static <T> @Nullable T getAnnotationElementValue(@Nullable Annotation annotation, String annotationElementName, Class<T> annotationElementType) {
         try {
             if (annotation != null) {
                 for (Method method : annotation.getClass().getMethods()) {
@@ -194,7 +200,7 @@ public final class Utils {
         }
     }
 
-    public static List<Annotation> getRepeatableAnnotation(Annotation directAnnotation, Annotation containerAnnotation) {
+    public static List<Annotation> getRepeatableAnnotation(@Nullable Annotation directAnnotation, @Nullable Annotation containerAnnotation) {
         final List<Annotation> repeatableAnnotations = new ArrayList<>();
         if (directAnnotation != null) {
             repeatableAnnotations.add(directAnnotation);
@@ -293,7 +299,7 @@ public final class Utils {
         .of(byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class, char.class, void.class)
         .collect(Utils.toMap(cls -> cls.getName(), cls -> cls));
 
-    public static Class<?> getPrimitiveType(String typeName) {
+    public static @Nullable Class<?> getPrimitiveType(String typeName) {
         return primitiveTypes.get(typeName);
     }
 
@@ -301,25 +307,34 @@ public final class Utils {
         return Array.newInstance(componentType, new int[dimensions]).getClass();
     }
 
-    public static <T> List<T> concat(List<? extends T> list1, List<? extends T> list2) {
-        if (list1 == null && list2 == null) {
-            return null;
-        }
+    public static <T> @Nullable List<T> nullIfEmpty(@Nullable List<T> list) {
+        return list == null || list.isEmpty() ? null : list;
+    }
+
+    public static <K, V> @Nullable Map<K, V> nullIfEmpty(@Nullable Map<K, V> map) {
+        return map == null || map.isEmpty() ? null : map;
+    }
+
+    public static <T> @Nullable List<T> concatToNullable(@Nullable List<? extends T> list1, @Nullable List<? extends T> list2) {
+        return nullIfEmpty(concatToNonNull(list1, list2));
+    }
+
+    public static <T> List<T> concatToNonNull(@Nullable List<? extends T> list1, @Nullable List<? extends T> list2) {
         final List<T> result = new ArrayList<>();
         if (list1 != null) result.addAll(list1);
         if (list2 != null) result.addAll(list2);
         return result;
     }
 
-    public static <T> List<T> listFromNullable(T item) {
+    public static <T> List<T> listFromNullable(@Nullable T item) {
         return item != null ? Arrays.asList(item) : Collections.<T>emptyList();
     }
 
-    public static <T> List<T> listFromNullable(List<T> list) {
+    public static <T> List<T> listFromNullable(@Nullable List<T> list) {
         return list != null ? list : Collections.<T>emptyList();
     }
 
-    public static <K, V> Map<K, V> mapFromNullable(Map<K, V> map) {
+    public static <K, V> Map<K, V> mapFromNullable(@Nullable Map<K, V> map) {
         return map != null ? map : Collections.<K, V>emptyMap();
     }
 
@@ -373,13 +388,14 @@ public final class Utils {
     }
 
     public static List<String> readLines(InputStream stream) {
-        return splitMultiline(readString(stream), false);
+        return splitMultilineNonNull(readString(stream), false);
     }
 
     public static String readString(InputStream stream) {
-        try (Scanner scanner = new Scanner(stream, "UTF-8")) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+        try {
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -391,10 +407,14 @@ public final class Utils {
         return text.replaceAll("\\r\\n|\\n|\\r", lineEndings);
     }
 
-    public static List<String> splitMultiline(String text, boolean trimOneLeadingSpaceOnLines) {
+    public static @Nullable List<String> splitMultiline(@Nullable String text, boolean trimOneLeadingSpaceOnLines) {
         if (text == null) {
             return null;
         }
+        return splitMultilineNonNull(text, trimOneLeadingSpaceOnLines);
+    }
+
+    public static List<String> splitMultilineNonNull(String text, boolean trimOneLeadingSpaceOnLines) {
         final List<String> result = new ArrayList<>();
         final String[] lines = text.split("\\r\\n|\\n|\\r");
         for (String line : lines) {
@@ -426,10 +446,14 @@ public final class Utils {
         return false;
     }
 
-    public static List<Pattern> globsToRegexps(List<String> globs) {
+    public static @Nullable List<Pattern> globsToRegexpsNullable(@Nullable List<String> globs) {
         if (globs == null) {
             return null;
         }
+        return globsToRegexps(globs);
+    }
+
+    public static List<Pattern> globsToRegexps(List<String> globs) {
         final List<Pattern> regexps = new ArrayList<>();
         for (String glob : globs) {
             regexps.add(globToRegexp(glob));

@@ -5,22 +5,23 @@ import cz.habarta.typescript.generator.TsParameter;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsParameterModel extends TsParameter {
 
     protected final List<TsDecorator> decorators;
-    private final TsAccessibilityModifier accessibilityModifier;
+    private final @Nullable TsAccessibilityModifier accessibilityModifier;
 
-    public TsParameterModel(String name, TsType tsType) {
+    public TsParameterModel(String name, @Nullable TsType tsType) {
         this(null, name, tsType);
     }
 
-    public TsParameterModel(TsAccessibilityModifier accessibilityModifier, String name, TsType tsType) {
+    public TsParameterModel(@Nullable TsAccessibilityModifier accessibilityModifier, String name, @Nullable TsType tsType) {
         this(null, accessibilityModifier, name, tsType);
     }
 
-    private TsParameterModel(List<TsDecorator> decorators, TsAccessibilityModifier accessibilityModifier, String name, TsType tsType) {
+    private TsParameterModel(@Nullable List<TsDecorator> decorators, @Nullable TsAccessibilityModifier accessibilityModifier, String name, @Nullable TsType tsType) {
         super(name, tsType);
         this.decorators = Utils.listFromNullable(decorators);
         this.accessibilityModifier = accessibilityModifier;
@@ -30,11 +31,11 @@ public class TsParameterModel extends TsParameter {
         return decorators;
     }
 
-    public TsAccessibilityModifier getAccessibilityModifier() {
+    public @Nullable TsAccessibilityModifier getAccessibilityModifier() {
         return accessibilityModifier;
     }
 
-    public TsParameterModel withTsType(TsType tsType) {
+    public TsParameterModel withTsType(@Nullable TsType tsType) {
         return new TsParameterModel(decorators, accessibilityModifier, name, tsType);
     }
 

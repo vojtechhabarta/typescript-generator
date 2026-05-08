@@ -22,26 +22,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 
 public class TypeScriptGenerator {
 
-    public static final String Version = getVersion();
+    public static final @Nullable String Version = getVersion();
 
     private static Logger logger = new Logger();
 
     private final Settings settings;
-    private TypeProcessor commonTypeProcessor = null;
-    private ModelParser modelParser = null;
-    private ModelCompiler modelCompiler = null;
-    private Emitter emitter = null;
-    private InfoJsonEmitter infoJsonEmitter = null;
-    private NpmPackageJsonEmitter npmPackageJsonEmitter = null;
+    private @Nullable TypeProcessor commonTypeProcessor = null;
+    private @Nullable ModelParser modelParser = null;
+    private @Nullable ModelCompiler modelCompiler = null;
 
     public static Logger getLogger() {
         return logger;
@@ -79,7 +78,8 @@ public class TypeScriptGenerator {
     }
 
     private void generateTypeScript(TsModel tsModel, Output output) {
-        getEmitter().emit(tsModel, output.getWriter(), output.getName(), output.shouldCloseWriter());
+        new Emitter(settings, output.getWriter(), output.getName())
+            .emit(tsModel, output.shouldCloseWriter());
     }
 
     private void generateInfoJson(TsModel tsModel, Output output) {
@@ -89,7 +89,8 @@ public class TypeScriptGenerator {
             }
             final File outputFile = new File(output.getName());
             final Output out = Output.to(new File(outputFile.getParent(), "typescript-generator-info.json"));
-            getInfoJsonEmitter().emit(tsModel, out.getWriter(), out.getName(), out.shouldCloseWriter());
+            new InfoJsonEmitter(out.getWriter(), out.getName())
+                .emit(tsModel, out.shouldCloseWriter());
         }
     }
 
@@ -100,46 +101,51 @@ public class TypeScriptGenerator {
             }
             final File outputFile = new File(output.getName());
             final Output npmOutput = Output.to(new File(outputFile.getParent(), "package.json"));
-            final NpmPackageJson npmPackageJson = new NpmPackageJson();
-            npmPackageJson.name = settings.npmName;
-            npmPackageJson.version = settings.npmVersion;
-            npmPackageJson.types = outputFile.getName();
-            npmPackageJson.dependencies = new LinkedHashMap<>();
-            npmPackageJson.devDependencies = new LinkedHashMap<>();
-            npmPackageJson.peerDependencies = new LinkedHashMap<>();
+            final String types;
+            final String main;
+            final Map<String, String> dependencies = new LinkedHashMap<>();
+            final Map<String, String> devDependencies = new LinkedHashMap<>();
+            final Map<String, String> peerDependencies = new LinkedHashMap<>();
+            final Map<String, String> scripts;
             if (settings.moduleDependencies != null) {
                 for (ModuleDependency dependency : settings.moduleDependencies) {
                     if (dependency.peerDependency) {
-                        npmPackageJson.peerDependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
+                        peerDependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
                     } else {
-                        npmPackageJson.dependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
+                        dependencies.put(dependency.npmPackageName, dependency.npmVersionRange);
                     }
                 }
             }
             if (settings.outputFileType == TypeScriptFileType.implementationFile) {
-                npmPackageJson.types = Utils.replaceExtension(outputFile, ".d.ts").getName();
-                npmPackageJson.main = Utils.replaceExtension(outputFile, ".js").getName();
-                npmPackageJson.dependencies.putAll(settings.npmPackageDependencies);
-                npmPackageJson.devDependencies.putAll(settings.npmDevDependencies);
-                npmPackageJson.peerDependencies.putAll(settings.npmPeerDependencies);
+                types = Utils.replaceExtension(outputFile, ".d.ts").getName();
+                main = Utils.replaceExtension(outputFile, ".js").getName();
+                dependencies.putAll(settings.npmPackageDependencies);
+                devDependencies.putAll(settings.npmDevDependencies);
+                peerDependencies.putAll(settings.npmPeerDependencies);
                 final String typescriptVersion = settings.npmTypescriptVersion != null ? settings.npmTypescriptVersion : settings.typescriptVersion;
-                npmPackageJson.devDependencies.put("typescript", typescriptVersion);
+                devDependencies.put("typescript", typescriptVersion);
                 final String npmBuildScript = settings.npmBuildScript != null
                     ? settings.npmBuildScript
                     : "tsc --module umd --moduleResolution node --typeRoots --target es5 --lib es6 --declaration --sourceMap $outputFile";
                 final String build = npmBuildScript.replaceAll(Pattern.quote("$outputFile"), outputFile.getName());
-                npmPackageJson.scripts = Collections.singletonMap("build", build);
+                scripts = Collections.singletonMap("build", build);
+            } else {
+                types = outputFile.getName();
+                main = null;
+                scripts = null;
             }
-            if (npmPackageJson.dependencies.isEmpty()) {
-                npmPackageJson.dependencies = null;
-            }
-            if (npmPackageJson.devDependencies.isEmpty()) {
-                npmPackageJson.devDependencies = null;
-            }
-            if (npmPackageJson.peerDependencies.isEmpty()) {
-                npmPackageJson.peerDependencies = null;
-            }
-            getNpmPackageJsonEmitter().emit(npmPackageJson, npmOutput.getWriter(), npmOutput.getName(), npmOutput.shouldCloseWriter());
+            final NpmPackageJson npmPackageJson = new NpmPackageJson(
+                settings.npmName,
+                settings.npmVersion,
+                types,
+                main,
+                dependencies,
+                devDependencies,
+                peerDependencies,
+                scripts
+            );
+            new NpmPackageJsonEmitter(npmOutput.getWriter(), npmOutput.getName())
+                .emit(npmPackageJson, npmOutput.shouldCloseWriter());
         }
     }
 
@@ -188,20 +194,16 @@ public class TypeScriptGenerator {
     }
 
     private ModelParser.Factory getModelParserFactory() {
-        switch (settings.jsonLibrary) {
-            case jackson3:
-                return new Jackson3Parser.Jackson3ParserFactory();
-            case jackson2:
-                return new Jackson2Parser.Jackson2ParserFactory();
-            case jaxb:
-                return new Jackson3Parser.JaxbParserFactory();
-            case gson:
-                return new GsonParser.Factory();
-            case jsonb:
-                return new JsonbParser.Factory();
-            default:
-                throw new RuntimeException();
+        if (settings.jsonLibrary == null) {
+            throw new RuntimeException();
         }
+        return switch (settings.jsonLibrary) {
+            case jackson3 -> new Jackson3Parser.Jackson3ParserFactory();
+            case jackson2 -> new Jackson2Parser.Jackson2ParserFactory();
+            case jaxb -> new Jackson3Parser.JaxbParserFactory();
+            case gson -> new GsonParser.Factory();
+            case jsonb -> new JsonbParser.Factory();
+        };
     }
 
     public ModelCompiler getModelCompiler() {
@@ -211,28 +213,7 @@ public class TypeScriptGenerator {
         return modelCompiler;
     }
 
-    public Emitter getEmitter() {
-        if (emitter == null) {
-            emitter = new Emitter(settings);
-        }
-        return emitter;
-    }
-
-    public InfoJsonEmitter getInfoJsonEmitter() {
-        if (infoJsonEmitter == null) {
-            infoJsonEmitter = new InfoJsonEmitter();
-        }
-        return infoJsonEmitter;
-    }
-
-    public NpmPackageJsonEmitter getNpmPackageJsonEmitter() {
-        if (npmPackageJsonEmitter == null) {
-            npmPackageJsonEmitter = new NpmPackageJsonEmitter();
-        }
-        return npmPackageJsonEmitter;
-    }
-
-    private static String getVersion() {
+    private static @Nullable String getVersion() {
         try {
             final InputStream inputStream = TypeScriptGenerator.class.getResourceAsStream(
                 "/META-INF/maven/cz.habarta.typescript-generator/typescript-generator-core/pom.properties");

@@ -105,6 +105,7 @@ public class DateTest {
 
 }
 
+@SuppressWarnings("NullAway.Init")
 class Dates {
     public Date date;
     public List<Date> dateList;
@@ -113,6 +114,7 @@ class Dates {
     public Calendar calendar;
 }
 
+@SuppressWarnings("NullAway.Init")
 class Java8Dates {
     public LocalDateTime date;
     public List<LocalDateTime> dateList;
@@ -120,6 +122,7 @@ class Java8Dates {
     public LocalDateTime[] dates;
 }
 
+@SuppressWarnings("NullAway.Init")
 class Java8Jackson2Dates {
     public LocalDate date;
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 
 
 // see org.glassfish.jersey.uri.internal.UriTemplateParser
@@ -21,7 +22,10 @@ public class PathTemplate {
         return parts;
     }
 
-    public static PathTemplate parse(String path) {
+    public static PathTemplate parse(@Nullable String path) {
+        if (path == null) {
+            return new PathTemplate(List.of());
+        }
         final List<Part> parts = new ArrayList<>();
         final String pattern = ""
             + "\\{"

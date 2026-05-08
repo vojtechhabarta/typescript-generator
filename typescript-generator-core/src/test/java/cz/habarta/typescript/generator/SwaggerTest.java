@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -118,7 +119,7 @@ public class SwaggerTest {
 
         @ApiOperation(value = "", hidden = true)
         @GET
-        public Response testHiddenOperation() {
+        public @Nullable Response testHiddenOperation() {
             return null;
         }
 
@@ -146,13 +147,14 @@ public class SwaggerTest {
             @ApiResponse(code = 404, message = "Not Found"),
         })
         @GET
-        public DocumentedBean documentedOperation1() {
+        public @Nullable DocumentedBean documentedOperation1() {
             return null;
         }
 
     }
 
     @ApiModel(description = "Documentation for the bean.")
+    @SuppressWarnings("NullAway.Init")
     private static class DocumentedBean {
 
         @ApiModelProperty("Documentation for property 1.")

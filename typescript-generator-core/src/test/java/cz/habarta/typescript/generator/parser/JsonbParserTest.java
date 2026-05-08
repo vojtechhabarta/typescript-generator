@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@NullUnmarked
 public class JsonbParserTest {
 
     private Settings settings;

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 public class ReadOnlyWriteOnlyTest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @SuppressWarnings("NullAway.Init")
     public static class ReadOnlyWriteOnlyUser {
 
         public String name;

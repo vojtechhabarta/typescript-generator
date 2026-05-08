@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 public class GenericsResolver {
@@ -28,7 +29,7 @@ public class GenericsResolver {
         return resolvedClass != null ? resolvedClass.resolveType(type) : type;
     }
 
-    public static List<String> mapGenericVariablesToBase(Class<?> derivedClass, Class<?> baseClass) {
+    public static @Nullable List<String> mapGenericVariablesToBase(Class<?> derivedClass, Class<?> baseClass) {
         final List<ResolvedClass> path = traverseSomeInheritancePath(derivedClass, baseClass);
         if (path == null) {
             return null;
@@ -51,15 +52,17 @@ public class GenericsResolver {
             if (!rawClassAndTypeArguments.getValue2().isPresent()) {
                 return Collections.nCopies(baseClass.getTypeParameters().length, Object.class);
             }
-            final ResolvedClass resolvedContextType = new ResolvedClass(null, null, null).resolveAncestor(contextType);
-            final List<ResolvedClass> path = traverseSomeInheritancePath(resolvedContextType, baseClass);
-            final ResolvedClass resolvedClass = path != null && !path.isEmpty() ? path.get(0) : resolvedContextType;
-            return new ArrayList<>(resolvedClass.resolvedTypeParameters.values());
+            final ResolvedClass resolvedContextType = resolveAncestor(Map.of(), contextType);
+            if (resolvedContextType != null) {
+                final @Nullable List<ResolvedClass> path = traverseSomeInheritancePath(resolvedContextType, baseClass);
+                final ResolvedClass resolvedClass = path != null && !path.isEmpty() ? path.get(0) : resolvedContextType;
+                return new ArrayList<>(resolvedClass.resolvedTypeParameters.values());
+            }
         }
         return Arrays.asList(baseClass.getTypeParameters());
     }
 
-    private static String mapGenericVariableToParent(String typeVariableName, ResolvedClass resolvedParent) {
+    private static @Nullable String mapGenericVariableToParent(String typeVariableName, ResolvedClass resolvedParent) {
         if (typeVariableName == null) {
             return null;
         }
@@ -75,11 +78,11 @@ public class GenericsResolver {
         return null;
     }
 
-    private static List<ResolvedClass> traverseSomeInheritancePath(Class<?> descendant, Class<?> ancestor) {
+    private static @Nullable List<ResolvedClass> traverseSomeInheritancePath(Class<?> descendant, Class<?> ancestor) {
         return traverseSomeInheritancePath(new ResolvedClass(descendant, null, null), ancestor);
     }
 
-    private static List<ResolvedClass> traverseSomeInheritancePath(ResolvedClass descendant, Class<?> ancestor) {
+    private static @Nullable List<ResolvedClass> traverseSomeInheritancePath(ResolvedClass descendant, Class<?> ancestor) {
         if (descendant.rawClass == ancestor) {
             return new ArrayList<>();
         }
@@ -93,12 +96,36 @@ public class GenericsResolver {
         return null;
     }
 
+    private static @Nullable ResolvedClass resolveAncestor(Map<String, Type> resolvedTypeParameters, Type ancestor) {
+        final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(ancestor);
+        if (rawClassAndTypeArguments == null || !rawClassAndTypeArguments.getValue2().isPresent()) {
+            return null;
+        }
+        final Class<?> cls = rawClassAndTypeArguments.getValue1();
+        final List<TypeVariable<?>> typeVariables = Arrays.asList(cls.getTypeParameters());
+        final List<Type> arguments = rawClassAndTypeArguments.getValue2().get();
+        final Map<String, Type> typeParameters = new LinkedHashMap<>();
+        final int count = Math.min(typeVariables.size(), arguments.size());
+        for (int i = 0; i < count; i++) {
+            typeParameters.put(typeVariables.get(i).getName(), resolveType(resolvedTypeParameters, arguments.get(i)));
+        }
+        return new ResolvedClass(cls, arguments, typeParameters);
+    }
+
+    private static Type resolveType(Map<String, Type> resolvedTypeParameters, Type type) {
+        if (type instanceof TypeVariable) {
+            final TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+            return resolvedTypeParameters.getOrDefault(typeVariable.getName(), typeVariable);
+        }
+        return Utils.transformContainedTypes(type, (t) -> resolveType(resolvedTypeParameters, t));
+    }
+
     private static class ResolvedClass {
         public final Class<?> rawClass;
         public final List<Type> typeArguments;
         public final Map<String, Type> resolvedTypeParameters;
 
-        public ResolvedClass(Class<?> rawClass, List<Type> typeArguments, Map<String, Type> resolvedTypeParameters) {
+        public ResolvedClass(Class<?> rawClass, @Nullable List<Type> typeArguments, @Nullable Map<String, Type> resolvedTypeParameters) {
             this.rawClass = rawClass;
             this.typeArguments = Utils.listFromNullable(typeArguments);
             this.resolvedTypeParameters = Utils.mapFromNullable(resolvedTypeParameters);
@@ -112,33 +139,13 @@ public class GenericsResolver {
             }
             ancestors.addAll(Arrays.asList(cls.getGenericInterfaces()));
             return ancestors.stream()
-                .map(this::resolveAncestor)
+                .map(ancestor -> resolveAncestor(resolvedTypeParameters, ancestor))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
 
-        public ResolvedClass resolveAncestor(Type ancestor) {
-            final Pair<Class<?>, Optional<List<Type>>> rawClassAndTypeArguments = Utils.getRawClassAndTypeArguments(ancestor);
-            if (rawClassAndTypeArguments == null || !rawClassAndTypeArguments.getValue2().isPresent()) {
-                return null;
-            }
-            final Class<?> cls = rawClassAndTypeArguments.getValue1();
-            final List<TypeVariable<?>> typeVariables = Arrays.asList(cls.getTypeParameters());
-            final List<Type> arguments = rawClassAndTypeArguments.getValue2().get();
-            final Map<String, Type> typeParameters = new LinkedHashMap<>();
-            final int count = Math.min(typeVariables.size(), arguments.size());
-            for (int i = 0; i < count; i++) {
-                typeParameters.put(typeVariables.get(i).getName(), resolveType(arguments.get(i)));
-            }
-            return new ResolvedClass(cls, arguments, typeParameters);
-        }
-
         private Type resolveType(Type type) {
-            if (type instanceof TypeVariable) {
-                final TypeVariable<?> typeVariable = (TypeVariable<?>) type;
-                return resolvedTypeParameters.getOrDefault(typeVariable.getName(), typeVariable);
-            }
-            return Utils.transformContainedTypes(type, this::resolveType);
+            return GenericsResolver.resolveType(resolvedTypeParameters, type);
         }
 
         @Override

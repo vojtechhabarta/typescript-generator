@@ -109,8 +109,8 @@ public class PropertyPolymorphismExtension extends Extension {
      */
     public Function<Class<?>, String> getPropertyName;
 
+    @SuppressWarnings("NullAway.Init")
     PropertyPolymorphismExtension() {
-
     }
 
     public PropertyPolymorphismExtension(
@@ -192,7 +192,7 @@ public class PropertyPolymorphismExtension extends Extension {
                             if (property.tsType instanceof ReferenceType) {
                                 ReferenceType type = (ReferenceType) property.tsType;
                                 TsBeanModel referencedBean = model.getBean(type.symbol);
-                                if (isPolymorphicBase.test(referencedBean.getOrigin())) {
+                                if (referencedBean != null && referencedBean.getOrigin() != null && isPolymorphicBase.test(referencedBean.getOrigin())) {
                                     Symbol refSymbol = context.getSymbolTable().addSuffixToSymbol(type.symbol, "Ref");
                                     newProperties.add(property.withTsType(new TsType.ReferenceType(refSymbol)));
                                     continue;
@@ -224,8 +224,13 @@ public class PropertyPolymorphismExtension extends Extension {
                         for (TsBeanModel base : bases) {
                             List<TsPropertyModel> refProperties = new ArrayList<>();
                             for (Class<?> subType : subTypes.getOrDefault(base.getOrigin(), Collections.emptySet())) {
-                                refProperties.add(new TsPropertyModel(getPropertyName.apply(subType),
-                                    new ReferenceType(context.getSymbolTable().getSymbol(subType)), null, true, null));
+                                refProperties.add(new TsPropertyModel(
+                                    getPropertyName.apply(subType),
+                                    new ReferenceType(context.getSymbolTable().getSymbol(subType)),
+                                    null,
+                                    true,
+                                    null
+                                ));
                             }
                             newBeans.add(new TsBeanModel(base.getOrigin(), TsBeanCategory.Data, false,
                                 context.getSymbolTable().addSuffixToSymbol(base.getName(), "Ref"), null, null, null, null,

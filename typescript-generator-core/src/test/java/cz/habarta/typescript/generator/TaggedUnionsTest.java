@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("unused")
 public class TaggedUnionsTest {
 
+    @SuppressWarnings("NullAway.Init")
     private static class Geometry {
         public List<Shape> shapes;
     }
@@ -130,6 +131,7 @@ public class TaggedUnionsTest {
         @JsonSubTypes.Type(DieselCar.class),
         @JsonSubTypes.Type(ElectricCar.class),
     })
+    @SuppressWarnings("NullAway.Init")
     private abstract static class Car {
         public String name;
     }
@@ -180,6 +182,7 @@ public class TaggedUnionsTest {
         public double altitude;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Earth {
         public List<Vehicule<Engine>> vehicules;
     }
@@ -402,14 +405,17 @@ public class TaggedUnionsTest {
         public double progress;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class FinishedResult<T> extends AsyncOperationResult<T> {
         public T value;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class FailedResult<T> extends AsyncOperationResult<T> {
         public String error;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class AsyncUsage {
         public AsyncOperationResult<String> result;
     }
@@ -430,15 +436,18 @@ public class TaggedUnionsTest {
     public static class Base<A, B> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class ResultA<A, B> extends Base<A, B> {
         public A a;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class FlippedGenericParameters<A, B> extends Base<B, A> {
         public A aFlipped;
         public B bFlipped;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class BaseUsage {
         public Base<String, Number> result;
     }
@@ -457,6 +466,7 @@ public class TaggedUnionsTest {
         @JsonSubTypes.Type(value = Foo.class, name = "Foo"),
         @JsonSubTypes.Type(value = Bar.class, name = "Bar")
     })
+    @SuppressWarnings("NullAway.Init")
     public static abstract class Entity<T> {
         public T id;
     }
@@ -467,6 +477,7 @@ public class TaggedUnionsTest {
     public static class Bar extends Entity<Integer> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     public class EntityCollection {
         public List<Entity<?>> entities;
     }
@@ -552,6 +563,7 @@ public class TaggedUnionsTest {
     @interface TestMarker {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Geometry2 {
         public List<Shape2> shapes;
     }
@@ -592,6 +604,7 @@ public class TaggedUnionsTest {
         public double radius;
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class RecordUsage {
         public List<Record> records;
         public List<FormRecord> formRecords;

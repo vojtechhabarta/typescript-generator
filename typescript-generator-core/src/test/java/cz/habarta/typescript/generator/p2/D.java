@@ -6,6 +6,7 @@ import cz.habarta.typescript.generator.p1.C;
 import cz.habarta.typescript.generator.p1.E;
 
 
+@SuppressWarnings("NullAway.Init")
 public class D {
 
     public A a;

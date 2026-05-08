@@ -41,6 +41,7 @@ import kotlin.reflect.KTypeParameter;
 import kotlin.reflect.KTypeProjection;
 import kotlin.reflect.full.KClasses;
 import kotlin.reflect.jvm.ReflectJvmMapping;
+import org.jspecify.annotations.Nullable;
 
 
 public class TypeParser {
@@ -215,7 +216,7 @@ public class TypeParser {
             return getKFunctionParameterTypes(constructor, kFunction);
         }
 
-        private List<Type> getKFunctionParameterTypes(Executable executable, KFunction<?> kFunction) {
+        private List<Type> getKFunctionParameterTypes(Executable executable, @Nullable KFunction<?> kFunction) {
             if (kFunction != null) {
                 final List<KParameter> kParameters = kFunction.getParameters().stream()
                     .filter(kParameter -> kParameter.getKind() == KParameter.Kind.VALUE)
@@ -230,7 +231,7 @@ public class TypeParser {
             return javaTypeParser.getExecutableParameterTypes(executable);
         }
 
-        private Type getType(KType kType, Map<String, JTypeVariable<?>> typeParameters) {
+        private Type getType(@Nullable KType kType, Map<String, JTypeVariable<?>> typeParameters) {
             if (kType == null) {
                 return new JWildcardType();
             }
@@ -282,7 +283,7 @@ public class TypeParser {
             throw new RuntimeException("Unexpected type: " + kType.toString());
         }
 
-        private <D extends GenericDeclaration> D getTypeVariableGenericDeclaration(TypeVariable<D> typeVariable) {
+        private <D extends GenericDeclaration> @Nullable D getTypeVariableGenericDeclaration(TypeVariable<D> typeVariable) {
             try {
                 return typeVariable.getGenericDeclaration();
             } catch (NotImplementedError e) {
@@ -290,7 +291,7 @@ public class TypeParser {
             }
         }
 
-        private <D extends GenericDeclaration> AnnotatedType[] getTypeVariableAnnotatedBounds(TypeVariable<D> typeVariable) {
+        private <D extends GenericDeclaration> AnnotatedType @Nullable [] getTypeVariableAnnotatedBounds(TypeVariable<D> typeVariable) {
             try {
                 return typeVariable.getAnnotatedBounds();
             } catch (AbstractMethodError e) {
@@ -304,7 +305,7 @@ public class TypeParser {
                 .collect(Collectors.toList());
         }
 
-        private TypeVariable<?> getJavaTypeVariable(KType kType) {
+        private @Nullable TypeVariable<?> getJavaTypeVariable(KType kType) {
             try {
                 final Type javaType = ReflectJvmMapping.getJavaType(kType);
                 if (javaType instanceof TypeVariable) {

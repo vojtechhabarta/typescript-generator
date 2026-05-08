@@ -27,6 +27,7 @@ public class PropertyPolymorphismExtensionTest {
         String name();
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class TestA {
         @SuppressWarnings("unused")
         TestB b;

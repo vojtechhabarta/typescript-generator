@@ -39,12 +39,14 @@ public class NamingTest {
     }
 
     private static class A {
+        @SuppressWarnings("NullAway.Init")
         private static class ConflictingClass {
             public String conflictingProperty;
         }
     }
 
     private static class B {
+        @SuppressWarnings("NullAway.Init")
         private static class ConflictingClass {
             public String conflictingProperty;
         }
@@ -99,10 +101,12 @@ public class NamingTest {
         Assertions.assertTrue(output.contains("objectC: NS.C"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class C {
         public String c;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class D extends C {
         public String d;
         public C objectC;

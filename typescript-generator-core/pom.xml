@@ -20,6 +20,11 @@
     <dependencies>
         <!--compile dependencies-->
         <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
@@ -234,7 +239,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
                 <configuration>
-                    <annotationProcessorPaths>
+                    <annotationProcessorPaths combine.children="append">
                         <path>
                             <groupId>org.immutables</groupId>
                             <artifactId>value</artifactId>

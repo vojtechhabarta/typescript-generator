@@ -3,8 +3,9 @@ package cz.habarta.typescript.generator.emitter;
 
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.Symbol;
-import java.util.Collections;
+import cz.habarta.typescript.generator.util.Utils;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 public class TsAliasModel extends TsDeclarationModel {
@@ -12,9 +13,9 @@ public class TsAliasModel extends TsDeclarationModel {
     private final List<TsType.GenericVariableType> typeParameters;
     private final TsType definition;
 
-    public TsAliasModel(Class<?> origin, Symbol name, List<TsType.GenericVariableType> typeParameters, TsType definition, List<String> comments) {
+    public TsAliasModel(@Nullable Class<?> origin, Symbol name, @Nullable List<TsType.GenericVariableType> typeParameters, TsType definition, @Nullable List<String> comments) {
         super(origin, null, name, comments);
-        this.typeParameters = typeParameters != null ? typeParameters : Collections.emptyList();
+        this.typeParameters = Utils.listFromNullable(typeParameters);
         this.definition = definition;
     }
 

@@ -157,8 +157,11 @@ public class OnePossiblePropertyValueAssigningExtension extends Extension {
         }
         EnumMemberModel singleElement = enumModel.getMembers().iterator().next();
         Object enumValue = singleElement.getEnumValue();
-        TsStringLiteral expression = new TsStringLiteral((String) enumValue);
-        return Optional.of(expression);
+        if (enumValue instanceof String stringEnumValue) {
+            TsStringLiteral expression = new TsStringLiteral(stringEnumValue);
+            return Optional.of(expression);
+        }
+        return Optional.empty();
     }
 
 }

@@ -9,6 +9,7 @@ import cz.habarta.typescript.generator.emitter.EmitterExtension;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
 import cz.habarta.typescript.generator.emitter.TsBeanModel;
 import cz.habarta.typescript.generator.emitter.TsModel;
+import org.jspecify.annotations.Nullable;
 
 
 public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension {
@@ -55,9 +56,9 @@ public class TypeGuardsForJackson2PolymorphismExtension extends EmitterExtension
         }
     }
 
-    static String findTypeName(Class<?> beanClass, TsModel model) {
+    static @Nullable String findTypeName(Class<?> beanClass, TsModel model) {
         for (TsBeanModel bean : model.getBeans()) {
-            if (bean.getOrigin().equals(beanClass)) {
+            if (bean.getOrigin() != null && bean.getOrigin().equals(beanClass)) {
                 return bean.getName().getSimpleName();
             }
         }

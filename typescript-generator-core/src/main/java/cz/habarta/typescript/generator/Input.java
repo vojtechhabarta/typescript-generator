@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 
 public class Input {
@@ -40,16 +41,16 @@ public class Input {
     }
 
     public static class Parameters {
-        public List<String> classNames;
-        public List<String> classNamePatterns;
-        public List<String> classesWithAnnotations;
-        public List<String> classesImplementingInterfaces;
-        public List<String> classesExtendingClasses;
-        public String jaxrsApplicationClassName;
+        public @Nullable List<String> classNames;
+        public @Nullable List<String> classNamePatterns;
+        public @Nullable List<String> classesWithAnnotations;
+        public @Nullable List<String> classesImplementingInterfaces;
+        public @Nullable List<String> classesExtendingClasses;
+        public @Nullable String jaxrsApplicationClassName;
         public boolean automaticJaxrsApplication;
-        public Predicate<String> isClassNameExcluded;
-        public URLClassLoader classLoader;
-        public List<String> scanningAcceptedPackages;
+        public @Nullable Predicate<String> isClassNameExcluded;
+        public @Nullable URLClassLoader classLoader;
+        public @Nullable List<String> scanningAcceptedPackages;
         public boolean debug;
     }
 
@@ -113,12 +114,12 @@ public class Input {
 
     private static class ClasspathScanner implements AutoCloseable {
 
-        private final URLClassLoader classLoader;
-        private final List<String> acceptedPackages;
+        private final @Nullable URLClassLoader classLoader;
+        private final @Nullable List<String> acceptedPackages;
         private final boolean verbose;
-        private ScanResult scanResult = null;
+        private @Nullable ScanResult scanResult = null;
 
-        public ClasspathScanner(URLClassLoader classLoader, List<String> acceptedPackages, boolean verbose) {
+        public ClasspathScanner(@Nullable URLClassLoader classLoader, @Nullable List<String> acceptedPackages, boolean verbose) {
             this.classLoader = classLoader;
             this.acceptedPackages = acceptedPackages;
             this.verbose = verbose;

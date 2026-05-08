@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -94,7 +95,7 @@ public class SpringApplicationParser extends RestApplicationParser {
     }
 
     @Override
-    public JaxrsApplicationParser.Result tryParse(SourceType<?> sourceType) {
+    public JaxrsApplicationParser.@Nullable Result tryParse(SourceType<?> sourceType) {
         if (!(sourceType.type instanceof Class<?>)) {
             return null;
         }
@@ -353,7 +354,7 @@ public class SpringApplicationParser extends RestApplicationParser {
         return GenericsResolver.resolveType(controllerClass, modelReturnType, method.getDeclaringClass());
     }
 
-    private MethodParameterModel getEntityParameter(Class<?> controller, Method method) {
+    private @Nullable MethodParameterModel getEntityParameter(Class<?> controller, Method method) {
         final List<Type> parameterTypes = settings.getTypeParser().getMethodParameterTypes(method);
         final List<Pair<Parameter, Type>> parameters = Utils.zip(Arrays.asList(method.getParameters()), parameterTypes);
         for (Pair<Parameter, Type> pair : parameters) {
@@ -374,7 +375,7 @@ public class SpringApplicationParser extends RestApplicationParser {
         return standardEntityClassesMapping;
     }
 
-    private static Map<Class<?>, TsType> standardEntityClassesMapping;
+    private static @Nullable Map<Class<?>, TsType> standardEntityClassesMapping;
 
     private static List<String> getDefaultExcludedClassNames() {
         return Arrays.asList(

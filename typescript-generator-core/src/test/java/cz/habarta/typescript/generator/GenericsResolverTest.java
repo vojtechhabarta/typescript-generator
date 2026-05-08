@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
+@SuppressWarnings("rawtypes")
 public class GenericsResolverTest {
 
     @Test
@@ -22,6 +23,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(String.class, type);
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class F1<T> {
         public T field;
     }
@@ -36,6 +38,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(Utils.createParameterizedType(List.class, String.class), type);
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class F2<T> {
         public List<T> list;
     }
@@ -50,6 +53,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(Utils.createParameterizedType(Map.class, String.class, Utils.createParameterizedType(List.class, Long.class)), type);
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class F3<K, V> {
         public Map<K, List<V>> map;
     }
@@ -78,6 +82,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(new JTypeVariable<>(P12.class, "V"), type);
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class P1<T> {
         public T field;
     }
@@ -142,6 +147,7 @@ public class GenericsResolverTest {
     static class SubClass3<X, Y, Z> extends BaseClass<Z, Y> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class MyClass {
         public SubClass1<Integer> property1;
         public SubClass3<String, Boolean, Integer> property3;
@@ -162,6 +168,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(Arrays.asList("java.lang.Object", "java.lang.Object"), getTypeNames(resolvedTypeParameters));
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class RawUsage {
         public Map rawMap;
         public StringKeyMap rawStringKeyMap;
@@ -177,6 +184,7 @@ public class GenericsResolverTest {
         Assertions.assertEquals(Arrays.asList("java.lang.String", "java.lang.String"), getTypeNames(resolvedTypeParameters));
     }
 
+    @SuppressWarnings("NullAway.Init")
     static class StringMapDescendantUsage {
         public StringMapDescendant stringMapDescendant;
     }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
+@SuppressWarnings("rawtypes")
 public class MapExtensionTest {
 
     @Test
@@ -33,10 +34,12 @@ public class MapExtensionTest {
         assertEquals(expectedB, actualB);
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class A {
         public MapExtension mapExt;
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class B {
         public MapExtension<String> mapExt;
     }
@@ -54,6 +57,7 @@ public class MapExtensionTest {
     public static interface StringList extends List<String> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class C {
         public StringList stringList;
     }
@@ -65,6 +69,7 @@ public class MapExtensionTest {
         Assertions.assertTrue(output.contains("stringKeyMap: { [index: string]: number };"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class D {
         public StringKeyMap<Number> stringKeyMap;
     }
@@ -76,6 +81,7 @@ public class MapExtensionTest {
         Assertions.assertTrue(output.contains("stringKeyMap: { [index: string]: T };"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class E<T> {
         public StringKeyMap<T> stringKeyMap;
     }

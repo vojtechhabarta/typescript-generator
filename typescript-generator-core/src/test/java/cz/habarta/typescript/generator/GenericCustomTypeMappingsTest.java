@@ -22,15 +22,18 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(output.contains("list2: ListWrapper<number>"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Class1 {
         public ListWrapper1<String> list1;
         public ListWrapper2<Number> list2;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ListWrapper1<T> {
         public List<T> values;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class ListWrapper2<T> {
         public List<T> values;
     }
@@ -45,6 +48,7 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(output.contains("dateMap: Map<string, DateAsString>"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Class2 {
         public Map<String, Object> someMap;
         public Map<String, Date> dateMap;
@@ -59,10 +63,12 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(!output.contains("IdRepresentation"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class MyEntityRepresentation {
         public IdRepresentation<MyEntityRepresentation> id;
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class IdRepresentation<T> {
         public String id;
     }
@@ -113,6 +119,7 @@ public class GenericCustomTypeMappingsTest {
     private static class NonGeneric {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class NonGenericUsage {
         public NonGeneric nonGeneric;
     }
@@ -120,6 +127,7 @@ public class GenericCustomTypeMappingsTest {
     private static class Generic2<T1, T2> {
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class Usage {
         public Generic2<String, Integer> generic;
     }
@@ -140,6 +148,7 @@ public class GenericCustomTypeMappingsTest {
         Assertions.assertTrue(output.contains("generic: string[]"));
     }
 
+    @SuppressWarnings("NullAway.Init")
     private static class BinaryData {
         public byte[] data;
         public byte[][] dataArray;
