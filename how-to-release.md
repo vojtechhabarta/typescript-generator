@@ -18,6 +18,9 @@
    - Go to **Actions** → **Release to Gradle plugin portal** → **Run workflow**
    - Enter the same version number
 
+- Verify the release appeared in Gradle Plugin portal:
+   - https://plugins.gradle.org/plugin/cz.habarta.typescript-generator
+
 ## After release
 
 - Write release notes on GitHub (create a release from the tag `vX.Y.Z`)

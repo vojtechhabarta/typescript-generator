@@ -21,6 +21,10 @@ dependencies {
     implementation "cz.habarta.typescript-generator:typescript-generator-spring:${version}"
 }
 
+tasks.withType(Javadoc).configureEach {
+    enabled = false
+}
+
 gradlePlugin {
     website = "https://github.com/vojtechhabarta/typescript-generator"
     vcsUrl = "https://github.com/vojtechhabarta/typescript-generator.git"
