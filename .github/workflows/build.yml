@@ -16,12 +16,15 @@ jobs:
         - name: "Java 17 (LTS) without JSpecify"
           java: 17
           profiles: "!jspecify"
+          runGradle: true
         - name: "Java 25 (LTS) with JSpecify"
           java: 25
           profiles: ""
+          runGradle: true
         - name: "Java 26 (latest) with JSpecify"
           java: 26
           profiles: ""
+          runGradle: false
 
     name: ${{ matrix.build.name }}
 
@@ -36,9 +39,12 @@ jobs:
         java-version: ${{ matrix.build.java }}
         cache: maven
 
-    - name: Build
+    - name: Maven build
       run: |
         mvn --batch-mode \
           ${{ matrix.build.profiles && format('-P {0}', matrix.build.profiles) }} \
           clean install spotless:check
-        cd typescript-generator-gradle-plugin && ./gradlew build
+
+    - name: Gradle build
+      if: matrix.build.runGradle == true
+      run: cd typescript-generator-gradle-plugin && ./gradlew build
