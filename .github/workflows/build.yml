@@ -41,3 +41,4 @@ jobs:
         mvn --batch-mode \
           ${{ matrix.build.profiles && format('-P {0}', matrix.build.profiles) }} \
           clean install spotless:check
+        cd typescript-generator-gradle-plugin && ./gradlew build
