@@ -556,7 +556,7 @@ public abstract class GenerateTask extends DefaultTask {
 
         settings.loadExtensions(
             classLoader,
-            Utils.concat(
+            Utils.concatToNullable(
                 nullableList(getExtensionClasses()),
                 nullableList(getExtensionsList())
             ),
