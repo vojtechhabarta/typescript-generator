@@ -13,7 +13,7 @@
     <name>typescript-generator-core</name>
 
     <properties>
-        <graalvm.version>25.0.3</graalvm.version>
+        <graalvm.version>25.1.3</graalvm.version>
         <org.immutables.version>2.12.1</org.immutables.version>
     </properties>
 
