@@ -17,6 +17,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,6 +153,24 @@ public abstract class ModelParser {
         }
         if (propertyMember instanceof Constructor) {
             final Constructor<?> constructor = (Constructor<?>) propertyMember;
+            if(constructor.getDeclaringClass().isRecord()) {
+            	Class<?> recordClass = constructor.getDeclaringClass();
+            	try {
+					Constructor<?> canonical = recordClass.getDeclaredConstructor(
+							Arrays.stream(recordClass.getRecordComponents())
+								.map(RecordComponent::getType)
+								.toArray(Class<?>[]::new));
+					if(canonical.equals(constructor)) {
+						// We ignore the canonical constructor in favour of the component access
+						// methods. Any relevant annotations are mirrored to them 
+						return null;
+					}
+				} catch (Exception e) {
+					// This shouldn't be possible. All records must have a
+					// canonical constructor matching their types
+					throw new IllegalArgumentException("The type " + recordClass + " did not have a canonical constructor");
+				}
+            }
             if (creatorIndex != null) {
                 return new PropertyMember(constructor, typeParser.getConstructorParameterTypes(constructor).get(creatorIndex), constructor.getAnnotatedParameterTypes()[creatorIndex], annotationGetter);
             }
