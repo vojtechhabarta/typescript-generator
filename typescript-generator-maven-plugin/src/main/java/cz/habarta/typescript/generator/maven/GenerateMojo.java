@@ -13,7 +13,6 @@ import cz.habarta.typescript.generator.JsonLibrary;
 import cz.habarta.typescript.generator.JsonbConfiguration;
 import cz.habarta.typescript.generator.Logger;
 import cz.habarta.typescript.generator.MapMapping;
-import cz.habarta.typescript.generator.ModuleDependency;
 import cz.habarta.typescript.generator.NullabilityDefinition;
 import cz.habarta.typescript.generator.OptionalProperties;
 import cz.habarta.typescript.generator.OptionalPropertiesDeclaration;
@@ -30,6 +29,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -900,7 +900,13 @@ public class GenerateMojo extends AbstractMojo {
         settings.namespace = namespace;
         settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
         settings.umdNamespace = umdNamespace;
-        settings.moduleDependencies = moduleDependencies;
+        settings.moduleDependencies = Optional.ofNullable(moduleDependencies)
+                .map(list -> list.stream().map(md -> {
+                	return new cz.habarta.typescript.generator.ModuleDependency(false,
+                		md.importFrom, md.importAs, md.infoJson, md.npmPackageName, md.npmVersionRange,
+                		md.npmPackageName != null);
+                	}).toList())
+                .orElse(List.of());
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
         settings.setJackson2Configuration(classLoader, jackson2Configuration);
