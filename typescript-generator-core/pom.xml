@@ -13,7 +13,7 @@
     <name>typescript-generator-core</name>
 
     <properties>
-        <graalvm.version>25.0.3</graalvm.version>
+        <graalvm.version>25.2.4</graalvm.version>
         <org.immutables.version>2.12.1</org.immutables.version>
     </properties>
 
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.184</version>
+            <version>4.8.186</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
