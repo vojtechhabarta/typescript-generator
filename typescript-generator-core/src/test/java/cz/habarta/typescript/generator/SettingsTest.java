@@ -1,4 +1,3 @@
-
 package cz.habarta.typescript.generator;
 
 import org.junit.jupiter.api.Assertions;
