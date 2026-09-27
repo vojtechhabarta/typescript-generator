@@ -1,26 +1,49 @@
 
 package cz.habarta.typescript.generator;
 
+import cz.habarta.typescript.generator.type.JParameterizedType;
 import cz.habarta.typescript.generator.type.JTypeVariable;
 import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Utils;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SuppressWarnings("rawtypes")
 public class GenericsResolverTest {
+    /**
+     * Checks that the method returns the formal type parameter names declared on the generic class/interface,
+     * not the actual type arguments used at a given usage site.
+     * For instance, for {@code List<E>} it returns {@code ["E"]}, regardless of the concrete type used to parameterize it.
+     *
+     * <p>The concrete argument ({@code BigDecimal}) is lost to type erasure as soon as the {@link JParameterizedType}
+     * is reduced to a raw {@link Class}, since a {@code Class} object has no way to represent it.
+     * The returned {@code "E"} is unrelated to that loss: it comes from {@code List}'s own declaration
+     * (the {@code Signature} attribute the compiler keeps for reflection), so it would be {@code "E"} regardless
+     * of how {@code List} was parameterized at the call site.</p>
+     */
+    @Test
+    void testTypeParameterNameList() {
+        // A type for a generic attribute that is List<BigDecimal>
+        final var javaType = new JParameterizedType(List.class, new Type[]{BigDecimal.class}, null);
+        final Class<?> attributeRawClass = Objects.requireNonNull(Utils.getRawClassOrNull(javaType));
+        assertEquals(List.of("E"), GenericsResolver.typeParameterNameList(attributeRawClass));
+    }
 
     @Test
     public void testStringField() throws Exception {
         final Class<?> cls = F1String.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("field"));
-        Assertions.assertEquals(String.class, type);
+        assertEquals(String.class, type);
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -35,7 +58,7 @@ public class GenericsResolverTest {
     public void testListOfStringField() throws Exception {
         final Class<?> cls = F2String.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("list"));
-        Assertions.assertEquals(Utils.createParameterizedType(List.class, String.class), type);
+        assertEquals(Utils.createParameterizedType(List.class, String.class), type);
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -50,7 +73,7 @@ public class GenericsResolverTest {
     public void testMapOfStringAndListOfLongField() throws Exception {
         final Class<?> cls = F3StringLong.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("map"));
-        Assertions.assertEquals(Utils.createParameterizedType(Map.class, String.class, Utils.createParameterizedType(List.class, Long.class)), type);
+        assertEquals(Utils.createParameterizedType(Map.class, String.class, Utils.createParameterizedType(List.class, Long.class)), type);
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -65,21 +88,21 @@ public class GenericsResolverTest {
     public void testInheritancePath() throws Exception {
         final Class<?> cls = P123Number.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("field"));
-        Assertions.assertEquals(Utils.createParameterizedType(List.class, Number.class), type);
+        assertEquals(Utils.createParameterizedType(List.class, Number.class), type);
     }
 
     @Test
     public void testInheritancePathWithUnresolvedVariable1() throws Exception {
         final Class<?> cls = P123.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("field"));
-        Assertions.assertEquals(Utils.createParameterizedType(List.class, new JTypeVariable<>(P123.class, "B")), type);
+        assertEquals(Utils.createParameterizedType(List.class, new JTypeVariable<>(P123.class, "B")), type);
     }
 
     @Test
     public void testInheritancePathWithUnresolvedVariable2() throws Exception {
         final Class<?> cls = P12.class;
         final Type type = GenericsResolver.resolveField(cls, cls.getField("field"));
-        Assertions.assertEquals(new JTypeVariable<>(P12.class, "V"), type);
+        assertEquals(new JTypeVariable<>(P12.class, "V"), type);
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -99,13 +122,13 @@ public class GenericsResolverTest {
     @Test
     public void testGenericVariableMappingToBase1() {
         final List<String> mappedTypeParameters = GenericsResolver.mapGenericVariablesToBase(R123.class, R1.class);
-        Assertions.assertEquals(Arrays.asList(null, null, "T"), mappedTypeParameters);
+        assertEquals(Arrays.asList(null, null, "T"), mappedTypeParameters);
     }
 
     @Test
     public void testGenericVariableMappingToBase2() {
         final List<String> mappedTypeParameters = GenericsResolver.mapGenericVariablesToBase(R12.class, R1.class);
-        Assertions.assertEquals(Arrays.asList("T", "S"), mappedTypeParameters);
+        assertEquals(Arrays.asList("T", "S"), mappedTypeParameters);
     }
 
     static class R1<S, T> {
@@ -121,21 +144,21 @@ public class GenericsResolverTest {
     public void testResolvingGenericVariablesInContextType1() throws NoSuchFieldException {
         final Type contextType = MyClass.class.getField("property1").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.String", "java.lang.Integer"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.String", "java.lang.Integer"), getTypeNames(resolvedTypeParameters));
     }
 
     @Test
     public void testResolvingGenericVariablesInContextType3() throws NoSuchFieldException {
         final Type contextType = MyClass.class.getField("property3").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.Integer", "java.lang.Boolean"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.Integer", "java.lang.Boolean"), getTypeNames(resolvedTypeParameters));
     }
 
     @Test
     public void testResolvingGenericVariablesInContextTypeBase() throws NoSuchFieldException {
         final Type contextType = MyClass.class.getField("propertyBase").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(BaseClass.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.Integer", "java.lang.String"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.Integer", "java.lang.String"), getTypeNames(resolvedTypeParameters));
     }
 
     static class BaseClass<A, B> {
@@ -158,14 +181,14 @@ public class GenericsResolverTest {
     public void testResolvingRawUsage1() throws NoSuchFieldException {
         final Type contextType = RawUsage.class.getField("rawMap").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(Map.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.Object", "java.lang.Object"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.Object", "java.lang.Object"), getTypeNames(resolvedTypeParameters));
     }
 
     @Test
     public void testResolvingRawUsage2() throws NoSuchFieldException {
         final Type contextType = RawUsage.class.getField("rawStringKeyMap").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(Map.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.Object", "java.lang.Object"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.Object", "java.lang.Object"), getTypeNames(resolvedTypeParameters));
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -181,7 +204,7 @@ public class GenericsResolverTest {
     public void testResolvingFixedDescendant() throws NoSuchFieldException {
         final Type contextType = StringMapDescendantUsage.class.getField("stringMapDescendant").getGenericType();
         final List<Type> resolvedTypeParameters = GenericsResolver.resolveBaseGenericVariables(Map.class, contextType);
-        Assertions.assertEquals(Arrays.asList("java.lang.String", "java.lang.String"), getTypeNames(resolvedTypeParameters));
+        assertEquals(Arrays.asList("java.lang.String", "java.lang.String"), getTypeNames(resolvedTypeParameters));
     }
 
     @SuppressWarnings("NullAway.Init")
