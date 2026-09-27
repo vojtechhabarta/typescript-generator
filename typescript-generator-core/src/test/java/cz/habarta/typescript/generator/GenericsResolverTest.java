@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,15 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SuppressWarnings("rawtypes")
 public class GenericsResolverTest {
     /**
-     * TODO: Not sure how to test this GenericsResolver.typeParameterNameList method. This test doesn't work.
+     * Checks that the method returns the formal type parameter names declared on the generic class/interface,
+     * not the actual type arguments used at a given usage site.
+     * For instance, for {@code List<E>} it returns {@code ["E"]}, regardless of the concrete type used to parameterize it.
+     *
+     * <p>The concrete argument ({@code BigDecimal}) is lost to type erasure as soon as the {@link JParameterizedType}
+     * is reduced to a raw {@link Class}, since a {@code Class} object has no way to represent it.
+     * The returned {@code "E"} is unrelated to that loss: it comes from {@code List}'s own declaration
+     * (the {@code Signature} attribute the compiler keeps for reflection), so it would be {@code "E"} regardless
+     * of how {@code List} was parameterized at the call site.</p>
      */
     @Test
     void testTypeParameterNameList() {
         // A type for a generic attribute that is List<BigDecimal>
         final var javaType = new JParameterizedType(List.class, new Type[]{BigDecimal.class}, null);
-        final Class<?> attributeRawClass = Utils.getRawClassOrNull(javaType);
-        assertEquals(List.of("BigDecimal"), GenericsResolver.typeParameterNameList(attributeRawClass));
-        //assertEquals(List.of("List<BigDecimal>"), GenericsResolver.typeParameterNameList(classOfFieldWithNestedGeneric));
+        final Class<?> attributeRawClass = Objects.requireNonNull(Utils.getRawClassOrNull(javaType));
+        assertEquals(List.of("E"), GenericsResolver.typeParameterNameList(attributeRawClass));
     }
 
     @Test

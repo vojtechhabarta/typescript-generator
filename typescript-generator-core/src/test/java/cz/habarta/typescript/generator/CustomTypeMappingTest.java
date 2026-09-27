@@ -42,6 +42,7 @@ public class CustomTypeMappingTest {
      */
     @Test
     public void testSimpleGenericParameter() {
+        @SuppressWarnings("NullAway.Init")
         class ClassWithNonNestedGenericTypes {
             public List<String> stringList;
             public List<BigDecimal> bigDecimalList;
@@ -63,6 +64,7 @@ public class CustomTypeMappingTest {
      */
     @Test
     public void testNestedGenericParameter() {
+        @SuppressWarnings("NullAway.Init")
         class ClassWithNestedGenericTypes {
             public List<String> stringList;
             public List<List<BigDecimal>> bigDecimalMatrix;
