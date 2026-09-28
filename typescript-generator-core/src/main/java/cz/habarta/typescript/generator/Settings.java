@@ -13,6 +13,7 @@ import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -143,7 +144,7 @@ public class Settings {
 
     private boolean defaultStringEnumsOverriddenByExtension = false;
 
-    public static class ConfiguredExtension {
+    public static class ConfiguredExtension implements Serializable {
         public @Nullable String className; // required
         public @Nullable Map<String, String> configuration;
     }

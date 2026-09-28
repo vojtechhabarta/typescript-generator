@@ -4,11 +4,12 @@ package cz.habarta.typescript.generator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.habarta.typescript.generator.util.Utils;
 import java.io.File;
+import java.io.Serializable;
 import org.jspecify.annotations.Nullable;
 
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class ModuleDependency {
+public class ModuleDependency implements Serializable {
 
     public boolean global;
     public @Nullable String importFrom;
