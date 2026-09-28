@@ -21,8 +21,8 @@ jobs:
           java: 25
           profiles: ""
           runGradle: true
-        - name: "Java 26 (latest) with JSpecify"
-          java: 26
+        - name: "Java 27 (latest) with JSpecify"
+          java: 27
           profiles: ""
           runGradle: false
 
