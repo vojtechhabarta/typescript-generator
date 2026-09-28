@@ -48,3 +48,11 @@ jobs:
     - name: Gradle build
       if: matrix.build.runGradle == true
       run: cd typescript-generator-gradle-plugin && ./gradlew build
+
+    - name: Build sample-gradle
+      if: matrix.build.runGradle == true
+      run: cd sample-gradle && ./gradlew build
+
+    - name: Build sample-gradle-spring
+      if: matrix.build.runGradle == true
+      run: cd sample-gradle-spring && ./gradlew build

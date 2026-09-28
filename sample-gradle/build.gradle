@@ -1,4 +1,5 @@
 import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.Jackson3Configuration
 import cz.habarta.typescript.generator.TypeScriptOutputKind
 
 buildscript {
@@ -49,6 +50,9 @@ generateTypeScript {
         'cz.habarta.typescript.generator.sample.PersonScala',
     ]
     jsonLibrary = JsonLibrary.jackson3
+    def customConfiguration = new Jackson3Configuration()
+    customConfiguration.disableObjectIdentityFeature = true
+    jackson3Configuration = customConfiguration
     outputKind = TypeScriptOutputKind.module
     excludeClasses = [
         'groovy.lang.GroovyObject',

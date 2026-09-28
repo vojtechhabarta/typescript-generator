@@ -2,6 +2,7 @@
 package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import java.io.Serializable;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -10,7 +11,7 @@ import org.jspecify.annotations.Nullable;
  * This class is used for configuration in Maven and Gradle plugins
  * so we need to pay attention to use only types supported in both build plugins.
  */
-public class Jackson3Configuration {
+public class Jackson3Configuration implements Serializable {
 
     /**
      * Minimum visibility required for fields to be auto-detected.
