@@ -46,7 +46,7 @@ public class JavadocTest {
         {
             final String generated = new TypeScriptGenerator(settings).generateTypeScript(
                 Input.from(ClassWithJavadoc.class, InterfaceWithJavadoc.class, ClassWithEmbeddedExample.class));
-            System.out.println(generated);
+            // System.out.println(generated);
 
             assertThat(generated).contains("Documentation for ClassWithJavadoc. First line.");
             assertThat(generated).contains("Second line.");

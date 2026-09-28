@@ -30,12 +30,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'tools.jackson.jaxrs:jackson-jaxrs-json-provider:3.1.2'
+    implementation 'tools.jackson.jaxrs:jackson-jaxrs-json-provider:3.2.3'
     implementation 'org.codehaus.groovy:groovy:3.0.25'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
     implementation 'org.scala-lang:scala3-library_3:3.8.2'
-    implementation 'tools.jackson.module:jackson-module-kotlin:3.1.2'
-    implementation 'tools.jackson.module:jackson-module-scala_3:3.1.2'
+    implementation 'tools.jackson.module:jackson-module-kotlin:3.2.3'
+    implementation 'tools.jackson.module:jackson-module-scala_3:3.2.3'
 }
 
 tasks.withType(JavaCompile).configureEach {
