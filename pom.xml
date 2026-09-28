@@ -331,6 +331,8 @@
                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                                 <arg>-XDcompilePolicy=simple</arg>
+                                <!-- Required by Error Prone on JDK 21. See https://github.com/google/error-prone/issues/5426. -->
+                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                                 <arg>--should-stop=ifError=FLOW</arg>
                                 <arg>-Xplugin:ErrorProne -XepDisableAllChecks -Xep:NullAway:ERROR -XepOpt:NullAway:JSpecifyMode=true -XepOpt:NullAway:AnnotatedPackages=cz.habarta.typescript.generator -XepOpt:NullAway:UnannotatedSubPackages=cz.habarta.typescript.generator.xmldoclet</arg>
                             </compilerArgs>
