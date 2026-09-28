@@ -451,10 +451,12 @@ public class Jackson3Parser extends ModelParser {
                     .findFirst()
                     .orElse(null);
                 if (typeName == null) {
-                    return isInterfaceOrAbstract(cls) ? null : typeIdResolver.idFromBaseType(serializationContext);
+                    return isInterfaceOrAbstract(cls) ? null : typeIdResolver.idFromValueAndType(serializationContext, null, cls);
                 } else {
                     return typeName;
                 }
+            } else if (typeIdResolver.getMechanism() == JsonTypeInfo.Id.CLASS) {
+                return typeIdResolver.idFromValueAndType(serializationContext, null, cls);
             } else {
                 return typeIdResolver.idFromBaseType(serializationContext);
             }
