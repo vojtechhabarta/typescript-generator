@@ -14,10 +14,13 @@ public class ModuleDependency implements Serializable {
     public boolean global;
     public @Nullable String importFrom;
     public @Nullable String importAs;
-    public File infoJson;
+    public @Nullable File infoJson;
     public @Nullable String npmPackageName;
     public @Nullable String npmVersionRange;
     public boolean peerDependency;
+
+    public ModuleDependency() {
+    }
 
     public ModuleDependency(
         boolean global,
