@@ -80,6 +80,8 @@ import tools.jackson.databind.ser.bean.BeanSerializerBase;
 import tools.jackson.databind.type.TypeFactory;
 import tools.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 
+import static java.util.Objects.requireNonNull;
+
 
 public class Jackson3Parser extends ModelParser {
 
@@ -610,11 +612,14 @@ public class Jackson3Parser extends ModelParser {
             return getPropertiesPairs().stream()
                 .map(pair -> pair.getValue1() != null
                     ? Pair.of(pair.getValue1(), pair.getValue2() != null ? PropertyAccess.ReadWrite : PropertyAccess.ReadOnly)
-                    : Pair.of(pair.getValue2(), PropertyAccess.WriteOnly)
+                    : Pair.of(requireNonNull(pair.getValue2()), PropertyAccess.WriteOnly)
                 )
                 .collect(Collectors.toList());
         }
 
+        /**
+         * One of the properties in the pair is always non-null.
+         */
         private List<Pair<@Nullable BeanProperty, @Nullable BeanProperty>> getPropertiesPairs() {
             final List<BeanProperty> serializableProperties = getSerializableProperties();
             final List<BeanProperty> deserializableProperties = getDeserializableProperties();
