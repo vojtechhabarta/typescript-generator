@@ -214,7 +214,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.21.0</version>
+                <version>3.22.0</version>
                 <configuration>
                     <skipDeploy>true</skipDeploy>
                 </configuration>
@@ -268,7 +268,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.10.3</version>
                     <configuration>
                         <java>
                             <eclipse>
@@ -391,7 +391,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
-                        <version>3.1.4</version>
+                        <version>3.2.0</version>
                         <executions>
                             <execution>
                                 <id>local-deploy</id>
@@ -435,7 +435,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.10.0</version>
+                        <version>0.11.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
@@ -457,7 +457,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-report-plugin</artifactId>
-                <version>3.15.2</version>
+                <version>3.16.0</version>
                 <reportSets>
                     <reportSet>
                         <reports>
