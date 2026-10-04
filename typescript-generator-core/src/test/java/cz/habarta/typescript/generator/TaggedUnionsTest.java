@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 
 @SuppressWarnings("unused")
@@ -645,6 +645,105 @@ public class TaggedUnionsTest {
     static class ProductListRecord extends ListRecord {
     }
 
+    @SuppressWarnings("NullAway.Init")
+    static class AbstractIntermediates {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Mammal.class),
+            @JsonSubTypes.Type(Bird.class),
+        })
+        public abstract static class Animal {
+            public String name;
+        }
+
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Cat.class),
+            @JsonSubTypes.Type(Dog.class),
+        })
+        public abstract static class Mammal extends Animal {
+            public int numberOfLegs;
+        }
+
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Duck.class),
+            @JsonSubTypes.Type(Parrot.class),
+        })
+        public abstract static class Bird extends Animal {
+            public boolean canFly;
+        }
+
+        @JsonTypeName("cat")
+        public static class Cat extends Mammal {
+            public String breed;
+        }
+
+        @JsonTypeName("dog")
+        public static class Dog extends Mammal {
+            public boolean trained;
+        }
+
+        @JsonTypeName("duck")
+        public static class Duck extends Bird {
+            public String color;
+        }
+
+        @JsonTypeName("parrot")
+        public static class Parrot extends Bird {
+            public boolean canTalk;
+        }
+    }
+
+    @SuppressWarnings("NullAway.Init")
+    static class ConcreteIntermediates {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Mammal.class),
+            @JsonSubTypes.Type(Bird.class),
+        })
+        @JsonTypeName("animal")
+        public static class Animal {
+            public String name;
+        }
+
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Cat.class),
+            @JsonSubTypes.Type(Dog.class),
+        })
+        @JsonTypeName("mammal")
+        public static class Mammal extends Animal {
+            public int numberOfLegs;
+        }
+
+        @JsonSubTypes({
+            @JsonSubTypes.Type(Duck.class),
+            @JsonSubTypes.Type(Parrot.class),
+        })
+        @JsonTypeName("bird")
+        public static class Bird extends Animal {
+            public boolean canFly;
+        }
+
+        @JsonTypeName("cat")
+        public static class Cat extends Mammal {
+            public String breed;
+        }
+
+        @JsonTypeName("dog")
+        public static class Dog extends Mammal {
+            public boolean trained;
+        }
+
+        @JsonTypeName("duck")
+        public static class Duck extends Bird {
+            public String color;
+        }
+
+        @JsonTypeName("parrot")
+        public static class Parrot extends Bird {
+            public boolean canTalk;
+        }
+    }
+
     @Test
     public void testIntermediateUnions() {
         final Settings settings = TestUtils.settings();
@@ -685,13 +784,68 @@ public class TaggedUnionsTest {
             + "    '@type': 'product.list';\n"
             + "}\n"
             + "\n"
-            + "type RecordUnion = FormRecord | ListRecord;\n"
+            + "type RecordUnion = FormRecordUnion | ListRecordUnion;\n"
             + "\n"
             + "type FormRecordUnion = OrderFormRecord | ProductFormRecord;\n"
             + "\n"
             + "type ListRecordUnion = OrderListRecord | ProductListRecord;\n"
             + "";
         Assertions.assertEquals(expected.trim(), output.trim());
+    }
+
+    @Test
+    public void testAbstractIntermediateTaggedUnionsAndRoundTrip() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(AbstractIntermediates.Animal.class));
+        Assertions.assertTrue(output.contains("type AnimalUnion = MammalUnion | BirdUnion;"), output);
+        Assertions.assertTrue(output.contains("type MammalUnion = Cat | Dog;"), output);
+        Assertions.assertTrue(output.contains("type BirdUnion = Duck | Parrot;"), output);
+
+        final AbstractIntermediates.Cat cat = new AbstractIntermediates.Cat();
+        cat.name = "Mittens";
+        cat.numberOfLegs = 4;
+        cat.breed = "tabby";
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String json = objectMapper.writeValueAsString(cat);
+        final AbstractIntermediates.Animal deserialized = objectMapper.readValue(json, AbstractIntermediates.Animal.class);
+        Assertions.assertInstanceOf(AbstractIntermediates.Cat.class, deserialized);
+        final AbstractIntermediates.Cat deserializedCat = (AbstractIntermediates.Cat) deserialized;
+        Assertions.assertEquals("Mittens", deserializedCat.name);
+        Assertions.assertEquals(4, deserializedCat.numberOfLegs);
+        Assertions.assertEquals("tabby", deserializedCat.breed);
+    }
+
+    @Test
+    public void testConcreteIntermediateTaggedUnionsAndRoundTrip() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(ConcreteIntermediates.Animal.class));
+        Assertions.assertTrue(output.contains("type AnimalUnion = Mammal | MammalUnion | Bird | BirdUnion;"), output);
+        Assertions.assertTrue(output.contains("type MammalUnion = Cat | Dog;"), output);
+        Assertions.assertTrue(output.contains("type BirdUnion = Duck | Parrot;"), output);
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final ConcreteIntermediates.Cat cat = new ConcreteIntermediates.Cat();
+        cat.name = "Mittens";
+        cat.numberOfLegs = 4;
+        cat.breed = "tabby";
+        final String catJson = objectMapper.writeValueAsString(cat);
+        final ConcreteIntermediates.Animal deserializedCat = objectMapper.readValue(catJson, ConcreteIntermediates.Animal.class);
+        Assertions.assertInstanceOf(ConcreteIntermediates.Cat.class, deserializedCat);
+        final ConcreteIntermediates.Cat catResult = (ConcreteIntermediates.Cat) deserializedCat;
+        Assertions.assertEquals("Mittens", catResult.name);
+        Assertions.assertEquals(4, catResult.numberOfLegs);
+        Assertions.assertEquals("tabby", catResult.breed);
+
+        final ConcreteIntermediates.Mammal mammal = new ConcreteIntermediates.Mammal();
+        mammal.name = "Mittens' parent";
+        mammal.numberOfLegs = 4;
+        final String mammalJson = objectMapper.writeValueAsString(mammal);
+        final ConcreteIntermediates.Animal deserializedMammal = objectMapper.readValue(mammalJson, ConcreteIntermediates.Animal.class);
+        Assertions.assertEquals(ConcreteIntermediates.Mammal.class, deserializedMammal.getClass());
+        Assertions.assertEquals("Mittens' parent", deserializedMammal.name);
+        Assertions.assertEquals(4, ((ConcreteIntermediates.Mammal) deserializedMammal).numberOfLegs);
     }
 
     @Test
