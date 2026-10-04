@@ -1080,7 +1080,7 @@ public class ModelCompiler {
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
                     final Symbol childUnionSymbol = classToUnionSymbol.get(cls);
                     if (childUnionSymbol != null && (cls.isInterface() || Modifier.isAbstract(cls.getModifiers()))) {
-                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, isGeneric));
+                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, bean.getOrigin(), isGeneric));
                         continue;
                     }
                     final TsType type;
@@ -1096,7 +1096,7 @@ public class ModelCompiler {
                     }
                     unionTypes.add(type);
                     if (childUnionSymbol != null) {
-                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, isGeneric));
+                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, bean.getOrigin(), isGeneric));
                     }
                 }
                 final TsType.UnionType union = new TsType.UnionType(unionTypes);
@@ -1130,9 +1130,9 @@ public class ModelCompiler {
         return modelWithUsedTaggedUnions;
     }
 
-    private static TsType createUnionReference(Symbol unionSymbol, Class<?> childClass, TsBeanModel parentBean, boolean isGeneric) {
+    private static TsType createUnionReference(Symbol unionSymbol, Class<?> childClass, TsBeanModel parentBean, Class<?> parentBeanOrigin, boolean isGeneric) {
         if (isGeneric && childClass.getTypeParameters().length != 0) {
-            final List<String> mappedGenericVariables = Objects.requireNonNull(GenericsResolver.mapGenericVariablesToBase(childClass, parentBean.getOrigin()));
+            final List<String> mappedGenericVariables = Objects.requireNonNull(GenericsResolver.mapGenericVariablesToBase(childClass, parentBeanOrigin));
             return new TsType.GenericReferenceType(
                 unionSymbol,
                 mappedGenericVariables.stream()
