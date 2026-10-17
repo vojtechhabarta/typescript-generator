@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -61,9 +62,11 @@ import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.PropertyMember;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,6 +266,9 @@ public class Jackson2Parser extends ModelParser {
                 final BeanProperty beanProperty = pair.getValue1();
                 final PropertyAccess access = pair.getValue2();
                 final Member member = beanProperty.getMember().getMember();
+                if (shouldSkipRecordConstructorProperty(member, beanProperty)) {
+                    continue;
+                }
                 final PropertyMember propertyMember = wrapMember(settings.getTypeParser(), member, getCreatorIndex(beanProperty), beanProperty::getAnnotation, beanProperty.getName(), sourceClass.type);
                 if (propertyMember == null) {
                     continue;
@@ -361,6 +367,20 @@ public class Jackson2Parser extends ModelParser {
         } else {
             return null;
         }
+    }
+
+    private static boolean shouldSkipRecordConstructorProperty(Member member, BeanProperty beanProperty) {
+        if (!(member instanceof Constructor<?> constructor) || !constructor.getDeclaringClass().isRecord()) {
+            return false;
+        }
+        final JsonProperty jsonProperty = beanProperty.getAnnotation(JsonProperty.class);
+        if (jsonProperty != null && jsonProperty.access() == JsonProperty.Access.WRITE_ONLY) {
+            return false;
+        }
+        final Class<?>[] componentTypes = Arrays.stream(constructor.getDeclaringClass().getRecordComponents())
+            .map(RecordComponent::getType)
+            .toArray(Class<?>[]::new);
+        return Arrays.equals(constructor.getParameterTypes(), componentTypes);
     }
 
     // @JsonIdentityInfo and @JsonIdentityReference

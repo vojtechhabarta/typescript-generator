@@ -1,6 +1,7 @@
 
 package cz.habarta.typescript.generator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import cz.habarta.typescript.generator.util.Utils;
 import java.time.LocalDate;
@@ -67,9 +68,26 @@ public class JsonUnwrappedTest {
     }
 
     @Test
+    public void testWriteOnlyRecordComponent() {
+        final String expected = "\n"
+            + "interface WriteOnlyRecord {\n"
+            + "    name: string;\n"
+            + "    /**\n"
+            + "     * @writeonly\n"
+            + "     */\n"
+            + "    secret: string;\n"
+            + "}\n"
+            + "";
+        for (JsonLibrary jsonLibrary : new JsonLibrary[] { JsonLibrary.jackson2, JsonLibrary.jackson3 }) {
+            final Settings settings = TestUtils.settings(jsonLibrary);
+            settings.generateReadonlyAndWriteonlyJSDocTags = true;
+            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(WriteOnlyRecord.class));
+            Assertions.assertEquals(expected.trim(), output.trim());
+        }
+    }
+
+    @Test
     public void testRecord() {
-        final Settings settings = TestUtils.settings();
-        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(PersonRecord.class));
         final String expected = "\n"
             + "interface PersonRecord {\n"
             + "    first: string;\n"
@@ -82,7 +100,11 @@ public class JsonUnwrappedTest {
             + "    last: string;\n"
             + "}\n"
             + "";
-        Assertions.assertEquals(expected.trim(), output.trim());
+        for (JsonLibrary jsonLibrary : new JsonLibrary[] { JsonLibrary.jackson2, JsonLibrary.jackson3 }) {
+            final Settings settings = TestUtils.settings(jsonLibrary);
+            final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(PersonRecord.class));
+            Assertions.assertEquals(expected.trim(), output.trim());
+        }
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -119,14 +141,20 @@ public class JsonUnwrappedTest {
         }
     }
 
-    @SuppressWarnings("NullAway.Init")
-    public record NameRecord(String first, String last) {
-    }
+    public record WriteOnlyRecord(
+        String name,
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String secret
+    ) {}
 
-    @SuppressWarnings("NullAway.Init")
-    public record PersonRecord(@JsonUnwrapped NameRecord name,
-        LocalDate dateOfBirth) {
-    }
+    public record NameRecord(
+        String first,
+        String last
+    ) {}
+
+    public record PersonRecord(
+        @JsonUnwrapped NameRecord name,
+        LocalDate dateOfBirth
+    ) {}
 
     public static void main(String[] args) throws Exception {
         final Parent parent = new Parent();
