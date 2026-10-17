@@ -3,6 +3,7 @@ package cz.habarta.typescript.generator;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import cz.habarta.typescript.generator.util.Utils;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -65,6 +66,25 @@ public class JsonUnwrappedTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @Test
+    public void testRecord() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(PersonRecord.class));
+        final String expected = "\n"
+            + "interface PersonRecord {\n"
+            + "    first: string;\n"
+            + "    last: string;\n"
+            + "    dateOfBirth: Date;\n"
+            + "}\n"
+            + "\n"
+            + "interface NameRecord {\n"
+            + "    first: string;\n"
+            + "    last: string;\n"
+            + "}\n"
+            + "";
+        Assertions.assertEquals(expected.trim(), output.trim());
+    }
+
     @SuppressWarnings("NullAway.Init")
     public static class Person {
         @JsonUnwrapped(prefix = "A", suffix = "A")
@@ -97,6 +117,15 @@ public class JsonUnwrappedTest {
         public Name getName() {
             return name;
         }
+    }
+
+    @SuppressWarnings("NullAway.Init")
+    public record NameRecord(String first, String last) {
+    }
+
+    @SuppressWarnings("NullAway.Init")
+    public record PersonRecord(@JsonUnwrapped NameRecord name,
+        LocalDate dateOfBirth) {
     }
 
     public static void main(String[] args) throws Exception {

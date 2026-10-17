@@ -9,6 +9,8 @@ public class RecordTest {
 
     public record Account(Long id, String name) {}
 
+    public record BusinessAccount(String owner, Account account) {}
+
     @Test
     public void test() {
         final Settings settings = TestUtils.settings();
@@ -28,6 +30,24 @@ public class RecordTest {
         Assertions.assertTrue(!output.contains("interface Record"));
         Assertions.assertTrue(!output.contains("super"));
         Assertions.assertTrue(output.contains("constructor(data: Account)"));
+    }
+
+    @Test
+    public void testNested() {
+        final Settings settings = TestUtils.settings();
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BusinessAccount.class));
+        Assertions.assertEquals("""
+                
+                interface BusinessAccount {
+                    owner: string;
+                    account: Account;
+                }
+                
+                interface Account {
+                    id: number;
+                    name: string;
+                }
+                """, output);
     }
 
 }
