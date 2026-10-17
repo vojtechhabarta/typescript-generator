@@ -59,6 +59,7 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -1065,12 +1066,23 @@ public class ModelCompiler {
         // create tagged unions
         final List<TsBeanModel> beans = new ArrayList<>();
         final LinkedHashSet<TsAliasModel> typeAliases = new LinkedHashSet<>(tsModel.getTypeAliases());
+        final Map<Class<?>, Symbol> classToUnionSymbol = new LinkedHashMap<>();
+        for (TsBeanModel bean : tsModel.getBeans()) {
+            if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null && bean.getOrigin() != null) {
+                classToUnionSymbol.put(bean.getOrigin(), symbolTable.getSymbol(bean.getOrigin(), "Union"));
+            }
+        }
         for (TsBeanModel bean : tsModel.getBeans()) {
             if (!bean.getTaggedUnionClasses().isEmpty() && bean.getDiscriminantProperty() != null && bean.getOrigin() != null) {
                 final Symbol unionName = symbolTable.getSymbol(bean.getOrigin(), "Union");
                 final boolean isGeneric = !bean.getTypeParameters().isEmpty();
                 final List<TsType> unionTypes = new ArrayList<>();
                 for (Class<?> cls : bean.getTaggedUnionClasses()) {
+                    final Symbol childUnionSymbol = classToUnionSymbol.get(cls);
+                    if (childUnionSymbol != null && (cls.isInterface() || Modifier.isAbstract(cls.getModifiers()))) {
+                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, bean.getOrigin(), isGeneric));
+                        continue;
+                    }
                     final TsType type;
                     if (isGeneric && cls.getTypeParameters().length != 0) {
                         final List<String> mappedGenericVariables = Objects.requireNonNull(GenericsResolver.mapGenericVariablesToBase(cls, bean.getOrigin()));
@@ -1083,6 +1095,9 @@ public class ModelCompiler {
                         type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
                     }
                     unionTypes.add(type);
+                    if (childUnionSymbol != null) {
+                        unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, bean.getOrigin(), isGeneric));
+                    }
                 }
                 final TsType.UnionType union = new TsType.UnionType(unionTypes);
                 final TsAliasModel tsAliasModel = new TsAliasModel(bean.getOrigin(), unionName, bean.getTypeParameters(), union, null);
@@ -1113,6 +1128,18 @@ public class ModelCompiler {
             }
         });
         return modelWithUsedTaggedUnions;
+    }
+
+    private static TsType createUnionReference(Symbol unionSymbol, Class<?> childClass, TsBeanModel parentBean, Class<?> parentBeanOrigin, boolean isGeneric) {
+        if (isGeneric && childClass.getTypeParameters().length != 0) {
+            final List<String> mappedGenericVariables = Objects.requireNonNull(GenericsResolver.mapGenericVariablesToBase(childClass, parentBeanOrigin));
+            return new TsType.GenericReferenceType(
+                unionSymbol,
+                mappedGenericVariables.stream()
+                    .map(TsType.GenericVariableType::new)
+                    .collect(Collectors.toList()));
+        }
+        return new TsType.ReferenceType(unionSymbol);
     }
 
     // example: transforms property `text: string | undefined` to `text?: string | undefined`
