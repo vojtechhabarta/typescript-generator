@@ -37,17 +37,17 @@ public class RecordTest {
         final Settings settings = TestUtils.settings();
         final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(BusinessAccount.class));
         Assertions.assertEquals("""
-                
-                interface BusinessAccount {
-                    owner: string;
-                    account: Account;
-                }
-                
-                interface Account {
-                    id: number;
-                    name: string;
-                }
-                """, output);
+
+            interface BusinessAccount {
+                owner: string;
+                account: Account;
+            }
+
+            interface Account {
+                id: number;
+                name: string;
+            }
+            """, output);
     }
 
 }
