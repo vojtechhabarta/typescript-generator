@@ -71,7 +71,7 @@ public class Input {
                 if (parameters.classesImplementingInterfaces != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
                     final List<SourceType<Type>> c = fromClassNames(parameters.classesImplementingInterfaces.stream()
-                        .flatMap(interf -> scanResult.getClassesImplementing(interf).getNames().stream())
+                        .flatMap(interf -> scanResult.getAllClassesImplementing(interf).getNames().stream())
                         .distinct()
                         .collect(Collectors.toList())
                     );
@@ -80,7 +80,7 @@ public class Input {
                 if (parameters.classesExtendingClasses != null) {
                     final ScanResult scanResult = classpathScanner.getScanResult();
                     final List<SourceType<Type>> c = fromClassNames(parameters.classesExtendingClasses.stream()
-                        .flatMap(superclass -> scanResult.getSubclasses(superclass).getNames().stream())
+                        .flatMap(superclass -> scanResult.getAllSubclasses(superclass).getNames().stream())
                         .distinct()
                         .collect(Collectors.toList())
                     );
@@ -134,7 +134,9 @@ public class Input {
                     .enableAnnotationInfo()
                     .ignoreClassVisibility();
                 if (classLoader != null) {
-                    classGraph = classGraph.overrideClasspath((Object[]) classLoader.getURLs());
+                    classGraph = classGraph.enableClasspathEntries((Object[]) classLoader.getURLs());
+                } else {
+                    classGraph = classGraph.enableClasspath();
                 }
                 if (acceptedPackages != null && !acceptedPackages.isEmpty()) {
                     classGraph = classGraph.acceptPackages(acceptedPackages.toArray(new String[0]));

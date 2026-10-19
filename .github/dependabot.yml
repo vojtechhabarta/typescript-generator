@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "io.github.classgraph:classgraph"
+        # ClassGraph 6 requires a newer Java version; this project supports Java 17.
+        versions: [">= 6.0.0"]
     groups:
       production:
         dependency-type: "production"

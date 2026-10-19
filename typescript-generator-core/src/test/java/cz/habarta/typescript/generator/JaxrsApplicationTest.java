@@ -10,6 +10,7 @@ import cz.habarta.typescript.generator.parser.SourceType;
 import cz.habarta.typescript.generator.type.JGenericArrayType;
 import cz.habarta.typescript.generator.type.JTypeWithNullability;
 import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -109,7 +110,13 @@ public class JaxrsApplicationTest {
 
     @Test
     public void testWithParsingWithDefaultApplication() {
-        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanAutomaticJaxrsApplication(new ClassGraph().enableAllInfo().scan(), null);
+        final ScanResult scanResult = new ClassGraph()
+            .enableClasspath()
+            .enableClassInfo()
+            .enableAnnotationInfo()
+            .ignoreClassVisibility()
+            .scan();
+        final List<SourceType<Type>> sourceTypes = JaxrsApplicationScanner.scanAutomaticJaxrsApplication(scanResult, null);
         testWithParsing(sourceTypes, false);
     }
 

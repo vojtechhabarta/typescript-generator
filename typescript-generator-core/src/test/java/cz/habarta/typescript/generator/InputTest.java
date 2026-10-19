@@ -18,7 +18,12 @@ public class InputTest {
 
     @Test
     public void testScanner() {
-        final ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("cz.habarta").scan();
+        final ScanResult scanResult = new ClassGraph()
+            .enableClasspath()
+            .enableClassInfo()
+            .enableAnnotationInfo()
+            .acceptPackages("cz.habarta")
+            .scan();
         final List<String> allClassNames = scanResult.getAllStandardClasses().getNames();
         final List<String> testClassNames = Input.filterClassNames(allClassNames, Arrays.asList("cz.habarta.typescript.generator.**Test"));
         Assertions.assertTrue(testClassNames.size() > 20, "Typescript-generator must have at least 20 tests :-)");
