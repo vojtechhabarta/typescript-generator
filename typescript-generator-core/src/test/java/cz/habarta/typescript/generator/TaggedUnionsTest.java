@@ -793,6 +793,27 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(expected.trim(), output.trim());
     }
 
+    @SuppressWarnings("NullAway.Init")
+    static class SelfListedBase {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+        @JsonSubTypes({
+            @JsonSubTypes.Type(value = Mammal.class, name = "mammal"),
+            @JsonSubTypes.Type(value = Cat.class, name = "cat"),
+            @JsonSubTypes.Type(value = Dog.class, name = "dog"),
+        })
+        public static class Mammal {
+            public String name;
+        }
+
+        public static class Cat extends Mammal {
+            public String breed;
+        }
+
+        public static class Dog extends Mammal {
+            public boolean goodBoy;
+        }
+    }
+
     @Test
     public void testAbstractIntermediateTaggedUnionsAndRoundTrip() throws Exception {
         final Settings settings = TestUtils.settings();
@@ -846,6 +867,25 @@ public class TaggedUnionsTest {
         Assertions.assertEquals(ConcreteIntermediates.Mammal.class, deserializedMammal.getClass());
         Assertions.assertEquals("Mittens' parent", deserializedMammal.name);
         Assertions.assertEquals(4, ((ConcreteIntermediates.Mammal) deserializedMammal).numberOfLegs);
+    }
+
+    @Test
+    public void testBaseClassListedInItsOwnSubTypes() throws Exception {
+        final Settings settings = TestUtils.settings();
+        settings.quotes = "'";
+        final String output = new TypeScriptGenerator(settings).generateTypeScript(Input.from(SelfListedBase.Mammal.class));
+        Assertions.assertTrue(output.contains("type MammalUnion = Mammal | Cat | Dog;"), output);
+        Assertions.assertFalse(output.contains("MammalUnion = Mammal | MammalUnion"), output);
+        Assertions.assertTrue(output.contains("type: 'mammal' | 'cat' | 'dog';"), output);
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final SelfListedBase.Mammal mammal = new SelfListedBase.Mammal();
+        mammal.name = "Generic mammal";
+        final String mammalJson = objectMapper.writeValueAsString(mammal);
+        Assertions.assertTrue(mammalJson.contains("\"type\":\"mammal\""), mammalJson);
+        final SelfListedBase.Mammal deserialized = objectMapper.readValue(mammalJson, SelfListedBase.Mammal.class);
+        Assertions.assertEquals(SelfListedBase.Mammal.class, deserialized.getClass());
+        Assertions.assertEquals("Generic mammal", deserialized.name);
     }
 
     @Test

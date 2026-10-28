@@ -1095,7 +1095,8 @@ public class ModelCompiler {
                         type = new TsType.ReferenceType(symbolTable.getSymbol(cls));
                     }
                     unionTypes.add(type);
-                    if (childUnionSymbol != null) {
+                    if (childUnionSymbol != null && cls != bean.getOrigin()) {
+                        // a concrete base class listed in its own @JsonSubTypes must not reference its own union (#1169)
                         unionTypes.add(createUnionReference(childUnionSymbol, cls, bean, bean.getOrigin(), isGeneric));
                     }
                 }
